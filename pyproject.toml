@@ -1,0 +1,27 @@
+[project]
+name = "pykingenie"
+version = "0.1.59"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+  { name = "Osvaldo Burastero", email = "oburastero@gmail.com" }
+]
+requires-python = ">=3.7"
+dependencies = [
+  "numpy",
+  "pandas",
+  "scipy"
+]
+
+[build-system]
+requires = ["setuptools >= 77.0.3"]
+build-backend = "setuptools.build_meta"
+
+#optional-dependencies for plotting, plottly and kaleido
+[project.optional-dependencies]
+plot = [
+  "matplotlib",
+  "plotly",
+  "kaleido"
+]
+

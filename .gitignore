@@ -1,0 +1,11 @@
+venv/
+dist/
+.idea
+__pycache__/
+*.pyc
+*.egg-info/
+submit_package.bash
+test.py
+test2.py
+test3.py
+*png
