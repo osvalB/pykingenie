@@ -423,7 +423,6 @@ def get_initial_concentration_conformational_selection(total_protein,k1,k_minus1
 
     return [E1, E2]
 
-
 def get_kobs_induced_fit(tot_lig, tot_prot, kr, ke, kon, koff,dominant=True):
 
     """
@@ -446,8 +445,8 @@ def get_kobs_induced_fit(tot_lig, tot_prot, kr, ke, kon, koff,dominant=True):
     """
 
     kd_app = koff * ke / (kon * (ke + kr))
-    delta = np.sqrt((tot_lig - tot_prot + kd_app) ** 2 + 4 * tot_prot * kd_app)
-    gamma = -ke - kr + koff + kon * (delta - kd_app)
+    delta  = np.sqrt((tot_lig - tot_prot + kd_app) ** 2 + 4 * tot_prot * kd_app)
+    gamma  = -ke - kr + koff + kon * (delta - kd_app)
 
     if dominant:
 
