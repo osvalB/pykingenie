@@ -156,7 +156,7 @@ def ode_induced_fit_insolution_reduced(t, y, k1, k_minus1, k2, k_minus2, E_tot, 
     S = S_tot - E_S - ES
 
     dE_S = k1 * E * S - k_minus1 * E_S - k2 * E_S + k_minus2 * ES
-    dES = k2 * E_S - k_minus2 * ES
+    dES  = k2 * E_S   - k_minus2 * ES
 
     return [dE_S, dES]
 
@@ -286,7 +286,6 @@ def signal_ode_induced_fit_insolution(t, y, k1, k_minus1, k2, k_minus2,t0=0,sign
     signal = signal_E * species[0] + signal_S * species[1] + signal_ES_int * species[2] + signal_ES * species[3]
 
     return signal
-
 
 def ode_conformational_selection_insolution(t, y, k1, k_minus1, k2, k_minus2):
 

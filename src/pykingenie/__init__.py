@@ -4,6 +4,7 @@ from .utils.signal_surface   import *
 from .utils.signal_solution  import *
 from .utils.fitting_surface  import *
 from .utils.fitting_general  import *
+from .utils.fitting_solution import *
 
 try:
     from .utils.plotting import *
