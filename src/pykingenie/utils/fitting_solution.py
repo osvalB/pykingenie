@@ -1,8 +1,10 @@
-from scipy.optimize import curve_fit
-from ..utils.signal_solution  import *
 import numpy as np
 import pandas as pd
 import itertools
+
+from scipy.optimize import curve_fit
+
+from ..utils.signal_solution  import *
 
 def fit_one_site_solution(
         signal_lst,
@@ -92,7 +94,6 @@ def fit_one_site_solution(
         idx += n
 
     return global_fit_params, cov, fitted_values
-
 
 def fit_induced_fit_solution(
         signal_lst,

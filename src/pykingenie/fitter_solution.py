@@ -1,5 +1,6 @@
 from .utils.math            import *
 from .utils.fitting_general import *
+from .utils.fitting_solution import *
 
 class KineticsFitterSolution:
 
@@ -214,7 +215,7 @@ class KineticsFitterSolution:
         high_bounds        = [np.inf,np.max(self.lig_conc)*1e2,np.inf]
 
         global_fit_params, cov, fitted_values = fit_one_site_solution(
-            signal_time_lst=self.assoc_lst,
+            signal_lst=self.assoc_lst,
             time_lst=self.time_assoc_lst,
             ligand_conc_lst=self.lig_conc,
             protein_conc_lst=self.prot_conc,
