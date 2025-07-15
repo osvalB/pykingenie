@@ -1,6 +1,97 @@
 from scipy.optimize import curve_fit
 from ..utils.signal_solution  import *
 import numpy as np
+import pandas as pd
+import itertools
+
+def fit_one_site_solution(
+        signal_lst,
+        time_lst,
+        ligand_conc_lst,
+        protein_conc_lst,
+        initial_parameters,
+        low_bounds,
+        high_bounds,
+        fit_signal_E    =   False,
+        fit_signal_S    =   False,
+        fit_signal_ES   =   True,
+        fixed_t0        =   True,
+        fixed_Kd        =   False,
+        Kd_value        =   None,
+        fixed_koff      =   False,
+        koff_value      =   None):
+
+    """
+    Global fit to association and dissociation traces - one-to-one binding model
+    Args:
+        signal_lst (list):          list of signals. We assume initial values as follows: E = E_tot, S = S_tot, ES = 0
+        time_lst (list):            list of time points for the association signals
+        ligand_conc_lst (list):     list of ligand concentrations, one per element in signal_lst
+        protein_conc_lst (list):    list of protein concentrations, one per element in signal_lst
+        initial_parameters (list):  initial parameters for the fit
+        low_bounds (list):          lower bounds for the fit parameters
+        high_bounds (list):         upper bounds for the fit parameters
+        fit_signal_E (bool):        if True, fit the signal of the free protein
+        fit_signal_S (bool):        if True, fit the signal of the free ligand
+        fit_signal_ES (bool):       if True, fit the signal of the complex
+        fixed_t0 (bool):            if True, the initial time point is zero
+        fixed_Kd (bool):            if True, the equilibrium dissociation constant is fixed
+        Kd_value (float):           value of the equilibrium dissociation constant if fixed_Kd is True
+        fixed_koff (bool):          if True, the dissociation rate constant is fixed
+        koff_value (float):         value of the dissociation rate constant if fixed_koff is True
+    """
+
+    # Flatten signals once
+    all_signal = np.concatenate(signal_lst)
+    # Preprocess time
+    time_lst = [np.asarray(t) for t in time_lst]
+
+    def fit_fx(_, *args):
+        # Efficient argument unpacking
+        idx = 0
+
+        signal_E  = 0 if not fit_signal_E  else args[idx]; idx += fit_signal_E
+        signal_S  = 0 if not fit_signal_S  else args[idx]; idx += fit_signal_S
+
+        if fit_signal_ES:
+            signal_ES = args[idx]
+            idx += 1
+
+        Kd     = Kd_value     if fixed_Kd    else args[idx]; idx += not fixed_Kd
+        k_off  = koff_value   if fixed_koff  else args[idx]; idx += not fixed_koff
+
+        # Preallocate lists
+        signal_a = [None] * len(time_lst)
+
+        # Association phase
+        for i, t in enumerate(time_lst):
+
+            t0 = 0 if fixed_t0 else args[idx + i]
+            lig_conc  = ligand_conc_lst[i]
+            prot_conc = protein_conc_lst[i]
+            signal = signal_ode_one_site_insolution(t,k_off,Kd,prot_conc,lig_conc,t0=t0,signal_a=signal_E,signal_b=signal_S,signal_complex=signal_ES)
+            signal_a[i] = signal
+
+        return np.concatenate(signal_a)
+
+    # Run fitting
+    global_fit_params, cov = curve_fit(
+        fit_fx, xdata=1, ydata=all_signal,
+        p0=initial_parameters,
+        bounds=(low_bounds, high_bounds),
+        max_nfev=None
+    )
+    # Predict
+    predicted = fit_fx(1, *global_fit_params)
+    # Split fitted values
+    fitted_values = []
+    idx = 0
+    for t in time_lst:
+        n = len(t)
+        fitted_values.append(predicted[idx:idx + n])
+        idx += n
+
+    return global_fit_params, cov, fitted_values
 
 def fit_induced_fit_solution(
         signal_lst,
@@ -28,7 +119,7 @@ def fit_induced_fit_solution(
     """
     Global fit to association and dissociation traces - one-to-one binding model with induced fit
 
-    Arguments:
+    Args:
         signal_lst:          list of signals. We assume initial values as follows: E = E_tot, S = S_tot, ES = 0, ESint = 0
         time_lst:            list of time points for the association signals
         ligand_conc_lst:     list of ligand concentrations, one per element in signal_lst
@@ -57,7 +148,6 @@ def fit_induced_fit_solution(
         signal_ES    if fit_signal_ES                           (signal of the trapped complex)
         signal_ESint if fit_signal_ES and not ESint_equals_ES   (signal of the intermediate complex)
                                                                 if ESint_equals_ES is True, then the trapped complex signal is used for both ES and ESint
-
         k_on         if not fixed_kon                           (association rate constant)
         k_off        if not fixed_koff                          (dissociation rate constant)
         k_c          if not fixed_kc                            (induced fit rate constant)
@@ -74,11 +164,6 @@ def fit_induced_fit_solution(
 
     # Preprocess time
     time_lst = [np.asarray(t) for t in time_lst]
-
-    # Indexing logic
-    start       = 4 - sum([fixed_kon, fixed_koff, fixed_kc, fixed_krev])
-
-    n_t0s       = len(time_lst) * (not fixed_t0)
 
     def fit_fx(_, *args):
         # Efficient argument unpacking
@@ -107,7 +192,7 @@ def fit_induced_fit_solution(
         # Association phase
         for i, t in enumerate(time_lst):
 
-            t0 = 0 if fixed_t0 else args[start + i]  # Initial time point for the current signal
+            t0 = 0 if fixed_t0 else args[idx + i]  # Initial time point for the current signal
 
             lig_conc  = ligand_conc_lst[i]
             prot_conc = protein_conc_lst[i]
@@ -152,3 +237,78 @@ def fit_induced_fit_solution(
         idx += n
 
     return global_fit_params, cov, fitted_values
+
+def find_initial_parameters_induced_fit_solution(
+        signal_lst,
+        time_lst,
+        ligand_conc_lst,
+        protein_conc_lst,
+        fit_signal_E    =   False,
+        fit_signal_S    =   False,
+        fit_signal_ES   =   True,
+        ESint_equals_ES =   True,
+        fixed_t0        =   True
+        ):
+
+    """
+    Heuristic algorithm to find initial parameters for the global fit to association and dissociation traces - one-to-one binding model with induced fit
+    We explore a range of fixed kc and krev values, and fit kon and koff.
+    This function is used to find the initial parameters for the fit_induced_fit_solution function.
+
+    Args:
+        signal_lst (list):          list of signals. We assume initial values as follows: E = E_tot, S = S_tot, ES = 0, ESint = 0
+        time_lst   (list):          list of time points for the association signals
+        ligand_conc_lst (list):     list of ligand concentrations, one per element in signal_lst
+        protein_conc_lst (list):    list of protein concentrations, one per element in signal_lst
+        fit_signal_E (bool):        if True, fit the signal of the free protein
+        fit_signal_S (bool):        if True, fit the signal of the free ligand
+        fit_signal_ES (bool):       if True, fit the signal of the complex
+        ESint_equals_ES (bool):     if True, the signal of the intermediate complex is equal to the signal of the trapped complex
+        fixed_t0 (bool):            if True, the initial time point is zero
+
+    """
+
+    kc_seq   = 10 ** (np.linspace(-2, 2, 5))
+    krev_seq = kc_seq
+
+    # Find combinations of kc and krev - create a dataframe with all combinations
+    combinations    = list(itertools.product(kc_seq, krev_seq))
+
+    # Create a DataFrame with the combinations
+    df_combinations = pd.DataFrame(combinations, columns=['kc', 'krev'])
+
+    # Filter by Kc >= Krev*0.1
+    df_combinations = df_combinations[df_combinations['kc'] >= df_combinations['krev'] * 0.1]
+
+    rss_init    = np.inf
+    best_params = None
+
+    initial_parameters = [1, 1, 1]
+    low_bounds         = [0, 1e-2, 1e-2]
+    high_bounds        = [1e5, 1e3, 1e3]
+
+    for index, row in df_combinations.iterrows():
+
+        kc   = row['kc']
+        krev = row['krev']
+
+        global_fit_params, cov, fitted_values = fit_induced_fit_solution(signal_lst, time_lst, ligand_conc_lst,
+                                                                         protein_conc_lst, initial_parameters,
+                                                                         low_bounds,
+                                                                         high_bounds,
+                                                                         fixed_kc=True, kc_value=kc,
+                                                                         fixed_krev=True, krev_value=krev,
+                                                                         fit_signal_E = fit_signal_E,
+                                                                         fit_signal_S = fit_signal_S,
+                                                                         fit_signal_ES = fit_signal_ES,
+                                                                         ESint_equals_ES = ESint_equals_ES,
+                                                                         fixed_t0 = fixed_t0)
+
+        # We fit k_on and k_off, using fixed kc and krev
+        rss = np.sum((np.concatenate(signal_lst) - np.concatenate(fitted_values)) ** 2)
+
+        if rss < rss_init:
+            rss_init = rss
+            best_params = np.concatenate((global_fit_params, [kc, krev]))
+
+    return best_params
