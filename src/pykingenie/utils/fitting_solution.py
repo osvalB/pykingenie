@@ -93,6 +93,7 @@ def fit_one_site_solution(
 
     return global_fit_params, cov, fitted_values
 
+
 def fit_induced_fit_solution(
         signal_lst,
         time_lst,

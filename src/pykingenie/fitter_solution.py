@@ -201,3 +201,36 @@ class KineticsFitterSolution:
         self.k_obs_2_per_prot = k_obs_2_per_prot
 
         return None
+
+    def fit_one_binding_site(self):
+
+        """
+        Fit the association signals assuming one binding site.
+        This is a simplified model that assumes a single binding site for the ligand on the protein.
+        """
+
+        initial_parameters = [1,np.mean(self.lig_conc),1] # Signal amplitude of the complex, Kd, and koff
+        low_bounds         = [0,np.min(self.lig_conc)/1e2,1e-2]
+        high_bounds        = [np.inf,np.max(self.lig_conc)*1e2,np.inf]
+
+        global_fit_params, cov, fitted_values = fit_one_site_solution(
+            signal_time_lst=self.assoc_lst,
+            time_lst=self.time_assoc_lst,
+            ligand_conc_lst=self.lig_conc,
+            protein_conc_lst=self.prot_conc,
+            initial_parameters=initial_parameters,
+            low_bounds=low_bounds,
+            high_bounds=high_bounds,
+            fit_signal_E=False,
+            fit_signal_S=False,
+            fit_signal_ES=True,
+            fixed_t0=True,
+            fixed_Kd=False,
+            Kd_value=None,
+            fixed_koff=False,
+            koff_value=None
+        )
+
+        self.signal_assoc_fit = fitted_values
+
+        return None

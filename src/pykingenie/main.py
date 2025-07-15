@@ -390,10 +390,10 @@ class KineticsAnalyzer:
 
         return None
 
-    def submit_exponential_fitting_solution(self,fitting_model='single'):
+    def submit_fitting_solution(self,fitting_model='single'):
 
         """
-        Fit single or double exponentials to the interaction signals for solution-based kinetics experiments.
+        Fit a variety of models to the kinetics data in the solution-based experiments.
         """
 
         for kf in self.fittings.values():
@@ -403,6 +403,9 @@ class KineticsAnalyzer:
 
             elif fitting_model == 'double':
                 kf.fit_double_exponentials()
+
+            elif fitting_model == 'one_binding_site':
+                kf.fit_one_binding_site()
 
             else:
                 raise ValueError("Unknown fitting model: " + fitting_model)
