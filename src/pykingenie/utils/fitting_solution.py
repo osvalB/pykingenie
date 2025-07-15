@@ -48,6 +48,17 @@ def fit_one_site_solution(
     # Preprocess time
     time_lst = [np.asarray(t) for t in time_lst]
 
+    # Create an empty list that will contain the parameter names
+    parameter_names = []
+    if fit_signal_E: parameter_names.append("Signal of free protein")
+    if fit_signal_S: parameter_names.append("Signal of free ligand")
+    if fit_signal_ES: parameter_names.append("Signal of the complex")
+    if not fixed_Kd: parameter_names.append("Kd [µM]")
+    if not fixed_koff: parameter_names.append("k_off [1/s]")
+    if not fixed_t0:
+        for i in range(len(time_lst)):
+            parameter_names.append(f't0_{i+1}')
+
     def fit_fx(_, *args):
         # Efficient argument unpacking
         idx = 0
@@ -93,7 +104,7 @@ def fit_one_site_solution(
         fitted_values.append(predicted[idx:idx + n])
         idx += n
 
-    return global_fit_params, cov, fitted_values
+    return global_fit_params, cov, fitted_values, parameter_names
 
 def fit_induced_fit_solution(
         signal_lst,

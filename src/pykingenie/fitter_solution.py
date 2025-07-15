@@ -91,11 +91,21 @@ class KineticsFitterSolution:
 
         return None
 
+    def clear_fittings(self):
+
+        self.signal_assoc_fit    = None
+        self.fit_params_kinetics = None
+        self.fit_params_ss       = None
+
+        return None
+
     def fit_single_exponentials(self):
 
         """
         Fit single exponentials to the association signals in the solution kinetics experiment.
         """
+        self.clear_fittings()
+
         k_obs  = []
         y_pred = []
 
@@ -117,6 +127,13 @@ class KineticsFitterSolution:
         self.signal_assoc_fit = y_pred
 
         self.group_k_obs_by_protein_concentration()
+
+        # Create a DataFrame with the fitted parameters and assign it to fit_params_kinetics
+        self.fit_params_kinetics = pd.DataFrame({
+            'Protein [µM]': self.prot_conc,
+            'Ligand [µM]':  self.lig_conc,
+            'k_obs [1/s]':  self.k_obs
+        })
 
         return None
 
@@ -175,6 +192,14 @@ class KineticsFitterSolution:
 
         self.group_double_exponential_k_obs_by_protein_concentration()
 
+        # Create a DataFrame with the fitted parameters and assign it to fit_params_kinetics
+        self.fit_params_kinetics = pd.DataFrame({
+            'Protein [µM]': self.prot_conc,
+            'Ligand [µM]':  self.lig_conc,
+            'k_obs_1 [1/s]': self.k_obs_1,
+            'k_obs_2 [1/s]': self.k_obs_2
+        })
+
         return None
 
     def group_double_exponential_k_obs_by_protein_concentration(self):
@@ -214,7 +239,7 @@ class KineticsFitterSolution:
         low_bounds         = [0,np.min(self.lig_conc)/1e2,1e-2]
         high_bounds        = [np.inf,np.max(self.lig_conc)*1e2,np.inf]
 
-        global_fit_params, cov, fitted_values = fit_one_site_solution(
+        global_fit_params, cov, fitted_values, parameter_names = fit_one_site_solution(
             signal_lst=self.assoc_lst,
             time_lst=self.time_assoc_lst,
             ligand_conc_lst=self.lig_conc,
@@ -233,5 +258,15 @@ class KineticsFitterSolution:
         )
 
         self.signal_assoc_fit = fitted_values
+
+        # Create a DataFrame with the fitted parameters and assign it to fit_params_kinetics
+
+        self.fit_params_kinetics = pd.DataFrame({
+            'Protein [µM]': self.prot_conc,
+            'Ligand [µM]':  self.lig_conc,
+        })
+
+        for i, param in enumerate(parameter_names):
+            self.fit_params_kinetics[param] = global_fit_params[i]
 
         return None

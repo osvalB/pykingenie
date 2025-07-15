@@ -1,6 +1,6 @@
 [project]
 name = "pykingenie"
-version = "0.1.63"
+version = "0.1.69"
 readme = "README.md"
 license = {text = "MIT"}
 authors = [
