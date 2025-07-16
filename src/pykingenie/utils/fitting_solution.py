@@ -178,6 +178,22 @@ def fit_induced_fit_solution(
     # Preprocess time
     time_lst = [np.asarray(t) for t in time_lst]
 
+    # Create an empty list that will contain the parameter names
+    parameter_names = []
+    if fit_signal_E: parameter_names.append("Signal of free protein")
+    if fit_signal_S: parameter_names.append("Signal of free ligand")
+    if fit_signal_ES: parameter_names.append("Signal of the intermediate complex")
+    if fit_signal_ES and not ESint_equals_ES:
+        parameter_names.append("Signal of the trapped complex")
+    if not fixed_kon: parameter_names.append("k_on [1/(µM·s)]")
+    if not fixed_koff: parameter_names.append("k_off [1/s]")
+    if not fixed_kc: parameter_names.append("k_c [1/s]")
+    if not fixed_krev: parameter_names.append("k_rev [1/s]")
+
+    if not fixed_t0:
+        for i in range(len(time_lst)):
+            parameter_names.append(f't0_{i+1}')
+
     def fit_fx(_, *args):
         # Efficient argument unpacking
         idx = 0
@@ -249,7 +265,7 @@ def fit_induced_fit_solution(
         fitted_values.append(predicted[idx:idx + n])
         idx += n
 
-    return global_fit_params, cov, fitted_values
+    return global_fit_params, cov, fitted_values, parameter_names
 
 def find_initial_parameters_induced_fit_solution(
         signal_lst,
@@ -305,7 +321,7 @@ def find_initial_parameters_induced_fit_solution(
         kc   = row['kc']
         krev = row['krev']
 
-        global_fit_params, cov, fitted_values = fit_induced_fit_solution(signal_lst, time_lst, ligand_conc_lst,
+        global_fit_params, cov, fitted_values, _ = fit_induced_fit_solution(signal_lst, time_lst, ligand_conc_lst,
                                                                          protein_conc_lst, initial_parameters,
                                                                          low_bounds,
                                                                          high_bounds,

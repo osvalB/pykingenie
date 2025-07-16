@@ -407,6 +407,9 @@ class KineticsAnalyzer:
             elif fitting_model == 'one_binding_site':
                 kf.fit_one_binding_site()
 
+            elif fitting_model == 'one_binding_site_if':
+                kf.fit_induced_fit()
+
             else:
                 raise ValueError("Unknown fitting model: " + fitting_model)
 

@@ -34,7 +34,7 @@ class KineticsFitterSolution:
             name (str):                     name of the experiment
             assoc (list):                   list containing the association signals
             lig_conc (list):                list of ligand concentrations, one per element in assoc
-            prot_conc (list):               list of protein concentrations, one per element in assoc
+            protein_conc (list):            list of protein concentrations, one per element in assoc
             time_assoc (list):              list of time points for the association signals, one per replicate
 
         """
@@ -270,3 +270,81 @@ class KineticsFitterSolution:
             self.fit_params_kinetics[param] = global_fit_params[i]
 
         return None
+
+    def find_initial_params_if(self,
+                               fit_signal_E=False,
+                               fit_signal_S=False,
+                               fit_signal_ES=True,
+                               ESint_equals_ES=True,
+                               fixed_t0=True
+                               ):
+
+        # Heuristically find the best initial parameters for the fit
+        # We explore fixed values of kc and krev and fit kon and koff (and the signal of the complex)
+        params_guess = find_initial_parameters_induced_fit_solution(
+            signal_lst=self.assoc_lst,
+            time_lst=self.time_assoc_lst,
+            ligand_conc_lst=self.lig_conc,
+            protein_conc_lst=self.prot_conc,
+            fit_signal_E=fit_signal_E,
+            fit_signal_S=fit_signal_S,
+            fit_signal_ES=fit_signal_ES,
+            ESint_equals_ES=ESint_equals_ES,
+            fixed_t0=fixed_t0)
+
+        self.params_guess = params_guess
+
+        return None
+
+    def fit_induced_fit(self,
+                        fit_signal_E=False,
+                        fit_signal_S=False,
+                        fit_signal_ES=True,
+                        ESint_equals_ES=True,
+                        fixed_t0=True
+                        ):
+
+        """
+        Fit the association signals assuming induced fit.
+        This model accounts for conformational changes in the protein upon ligand binding.
+        Args:
+            fit_signal_E (bool): If True, fit the signal of the free protein E.
+            fit_signal_S (bool): If True, fit the signal of the free ligand S.
+            fit_signal_ES (bool): If True, fit the signal of the complex ES.
+            ESint_equals_ES (bool): If True, assume that the signal of the intermediate ESint is equal to the signal of the complex ES.
+            fixed_t0 (bool): If True, fix the t0 parameter to 0.
+        """
+
+        # fit using as initial parameters the best found parameters
+        initial_parameters = np.array(self.params_guess )
+        low_bounds  = initial_parameters / 1e3
+        high_bounds = initial_parameters * 1e3
+
+        global_fit_params, cov, fitted_values, parameter_names = fit_induced_fit_solution(
+            signal_lst=self.assoc_lst,
+            time_lst=self.time_assoc_lst,
+            ligand_conc_lst=self.lig_conc,
+            protein_conc_lst=self.prot_conc,
+            initial_parameters= initial_parameters,
+            low_bounds=low_bounds,
+            high_bounds=high_bounds,
+            fit_signal_E=fit_signal_E,
+            fit_signal_S=fit_signal_S,
+            fit_signal_ES=fit_signal_ES,
+            ESint_equals_ES=ESint_equals_ES,
+            fixed_t0=fixed_t0
+        )
+
+        self.signal_assoc_fit = fitted_values
+
+        # Create a DataFrame with the fitted parameters and assign it to fit_params_kinetics
+        self.fit_params_kinetics = pd.DataFrame({
+            'Protein [µM]': self.prot_conc,
+            'Ligand [µM]':  self.lig_conc,
+        })
+
+        for i, param in enumerate(parameter_names):
+            self.fit_params_kinetics[param] = global_fit_params[i]
+
+        return None
+
