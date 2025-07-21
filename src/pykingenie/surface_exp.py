@@ -497,11 +497,22 @@ class SurfaceBasedExperiment:
 
             else:
 
+                i = None
                 # Find the index of the first association, from the single cycle
                 # Iterate over the previous steps, two at a time, until we find a step that is not a step of the same type
-                for i in range(step_index-2,0,-2):
-                    if self.df_steps['Type'][i] != step_type:
+
+                for idx in range(step_index-2,0,-2):
+                    if self.df_steps['Type'][idx] != step_type:
+                        i = idx
                         break
+
+                # If we did not find a previous step of a different type
+                # Assign i to the first step index of the same type
+                # This is useful for single-cycle kinetics where we do not have a previous step (e.g., baseline) of a different type
+                if i is None:
+
+                    # Find the index where the step_type matches
+                    i = np.where(self.df_steps['Type'] == step_type)[0][0] - 2
 
                 # If the step_type is an association step, subtract the first data point
                 if step_type == 'ASSOC':

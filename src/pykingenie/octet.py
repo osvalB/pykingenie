@@ -175,9 +175,14 @@ class OctetExperiment(SurfaceBasedExperiment):
             if step_type == 'ASSOC':
                 # Find the previous loading step
                 for i in range(row[0],0,-1):
+
                     if self.df_steps.iloc[i]['Type'] == 'LOADING':
                         loading_location.append(self.df_steps.iloc[i]['Column_location'])
                         break
+                    # If no loading step is found, append NaN
+                    if i == 1:
+                        loading_location.append(np.nan)
+
             else:
                 loading_location.append(np.nan)
 
@@ -238,9 +243,13 @@ class OctetExperiment(SurfaceBasedExperiment):
                         loading_sample_id.append(df_all.iloc[j]['SampleID'])
                         break
 
-
         # Keep only association or dissociation steps
         df = df_all[df_all['Type'] == 'ASSOC'].copy()
+
+        # If loading location is empty, fill with 0
+        if len(loading_location) == 0:
+            loading_location =  [0] * len(df)
+            loading_sample_id = [0] * len(df)
 
         # ADD column loading_location
         df['Loading_location']  = loading_location
