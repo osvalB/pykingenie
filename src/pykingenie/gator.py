@@ -32,7 +32,7 @@ class GatorExperiment(SurfaceBasedExperiment):
 
         return None
 
-    def read_experiment_ini(self, file):
+    def read_experiment_ini(self, file,nr_max_columns=12):
 
         """
         Read the experiment ini file
@@ -103,8 +103,8 @@ class GatorExperiment(SurfaceBasedExperiment):
         # Change column name 'Location' to 'Column'
         df.rename(columns={'Location': 'Column'}, inplace=True)
 
-        # If column location is larger than 12, then subtract 12 from it
-        df['Column'] = df['Column'] - 11
+        # Subtract 11 from it - beacuse the plate with the sample usually starts at index 12 to 24
+        df['Column'] = df['Column'] - nr_max_columns + 1
 
         # If kst equals 2, then the step is a association
         # If kst equals 3, then the step is a dissociation
@@ -123,12 +123,12 @@ class GatorExperiment(SurfaceBasedExperiment):
 
         return None
 
-    def read_settings_ini(self, file):
+    def read_settings_ini(self, file,nr_max_sensors=8,nr_max_columns=12):
 
         """
         Read the settings ini file
 
-        We assume a plate format, so wells 1 to 8 correspond to the first column,
+        We assume a plate format, so wells 1 to nr_max_sensors correspond to the first column,
         wells 9 to 16 correspond to the second column, etc.
 
         Example format:
@@ -200,11 +200,11 @@ class GatorExperiment(SurfaceBasedExperiment):
             sample_strings = [line for line in sample_strings if line.startswith('Well')]
 
             # Now we need to convert wells that go from 1 to 96 into a combination of letters and numbers
-            # They are ordered by rows, each column has 8 rows
+            # They are ordered by rows, each column has nr_max_sensors rows
             concs = []
 
-            locations = np.concatenate([np.repeat(x, 8) for x in range(1, 13)], axis=0)
-            sensors = np.concatenate([(65 + np.arange(8)) for _ in range(1, 13)], axis=0)
+            locations = np.concatenate([np.repeat(x, nr_max_sensors)     for x in range(1, nr_max_columns+1)], axis=0)
+            sensors   = np.concatenate([(65 + np.arange(nr_max_sensors)) for _ in range(1, nr_max_columns+1)], axis=0)
             # Apply chr function to sensors
             sensors = [chr(x) for x in sensors]
 
@@ -253,10 +253,12 @@ class GatorExperiment(SurfaceBasedExperiment):
 
                     association_column = self.df_steps.iat[row_index, self.df_steps.columns.get_loc('Column')]
 
-                    location += [association_column for _ in range(8)]
-                    sensor += [chr(65 + i) for i in range(8)]
+                    location += [association_column for _ in range(nr_max_sensors)]
+                    # The expression chr(65 + i) returns the uppercase ASCII letter corresponding to the index i,
+                    # where i = 0 gives 'A', i = 1 gives 'B', and so on. For example, chr(65 + 2) returns 'C'.
+                    sensor   += [chr(65 + i) for i in range(nr_max_sensors)]
 
-                    loading_columns_extended += [loading_column for _ in range(8)]
+                    loading_columns_extended += [loading_column for _ in range(nr_max_sensors)]
 
                     df_temp = df_sensor_prev[df_sensor_prev['Location'].isin([association_column])]
                     sample_labels += df_temp['SampleID'].to_list()
@@ -285,7 +287,7 @@ class GatorExperiment(SurfaceBasedExperiment):
                 for i in idx[1:]:
                     if sample_id[i] == sample_id[i - 1]:
                         idx_cnt += 1
-                    replicates[i] = (idx_cnt - 1) // 8 + 1
+                    replicates[i] = (idx_cnt - 1) // nr_max_sensors + 1
 
             # Create the ligand concentration dataframe
             df_sensor = pd.DataFrame({'Sensor': sensor,

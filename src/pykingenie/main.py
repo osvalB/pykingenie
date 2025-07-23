@@ -396,7 +396,7 @@ class KineticsAnalyzer:
         Fit a variety of models to the kinetics data in the solution-based experiments.
         """
 
-        for kf in self.generate_fittings.values():
+        for kf in self.fittings.values():
 
             if fitting_model == 'single':
                 kf.fit_single_exponentials()

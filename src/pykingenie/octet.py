@@ -151,6 +151,21 @@ class OctetExperiment(SurfaceBasedExperiment):
         # Convert text to floats
         self.convert_to_numbers()
 
+        self.generate_ligand_conc_df()
+
+        return None
+
+    def generate_ligand_conc_df(self):
+
+        """
+        Based on the step_info and exp_info attributes, generate a dataframe with the analyte concentrations
+
+        Requires the attributes:
+            self.step_info
+            self.exp_info
+            self.fns
+        """
+
         self.no_steps = len(self.step_info[0]['ActualTime'])
 
         self.no_sensors = len(self.fns)
@@ -302,6 +317,107 @@ class OctetExperiment(SurfaceBasedExperiment):
         self.create_unique_sensor_names()
 
         self.traces_loaded = True
+
+        return None
+
+    def merge_consecutive_steps(self,idx_ref,idx_to_merge):
+
+        """
+        Combine two steps into one step
+        Args:
+            idx_ref (int): index of the reference step. The type of step will be taken from this step.
+            idx_to_merge (int): index of the step to merge with the reference step
+        """
+
+        assert np.abs(idx_ref - idx_to_merge) == 1, "The two steps must be consecutive"
+        assert idx_ref != idx_to_merge, "The two steps must be different"
+
+        idx_ref -= 1      # Adjust for 0-based indexing
+        idx_to_merge -= 1 # Adjust for 0-based indexing
+
+        for sensor in range(self.no_sensors):
+
+            # Extract the reference step x and y values
+            x_ref = self.xs[sensor][idx_ref]
+            y_ref = self.ys[sensor][idx_ref]
+
+            # Extract the step to merge x and y values
+            x_merge = self.xs[sensor][idx_to_merge]
+            y_merge = self.ys[sensor][idx_to_merge]
+
+            # Find wich has the lowest start time
+            t0_ref   = np.min(x_ref)
+            t0_merge = np.min(x_merge)
+
+            # Concatenate the x and y values
+            if t0_ref < t0_merge:
+
+                self.xs[sensor][idx_ref] = np.concatenate((x_ref, x_merge))
+                self.ys[sensor][idx_ref] = np.concatenate((y_ref, y_merge))
+
+            else:
+
+                self.xs[sensor][idx_ref] = np.concatenate((x_merge, x_ref))
+                self.ys[sensor][idx_ref] = np.concatenate((y_merge, y_ref))
+
+            # Remove the merge step from the xs and ys lists
+            self.xs[sensor].pop(idx_to_merge)
+            self.ys[sensor].pop(idx_to_merge)
+
+            # Remove the step from self.step_info
+            # using the idx_to_merge index
+
+            for sensor_id in range(self.no_sensors):
+
+                step_info = self.step_info[sensor_id]
+
+                for i,l in enumerate(step_info):
+
+                    values = self.step_info[sensor_id][l]
+
+                    if isinstance(values, list) and len(values) > idx_to_merge:
+                        self.step_info[sensor_id][l].pop(idx_to_merge)
+                    elif isinstance(values, np.ndarray) and len(values) > idx_to_merge:
+                        self.step_info[sensor_id][l] = np.delete(values, idx_to_merge)
+
+                #self.step_info[i].pop(key)
+
+            # Create the analyte concentration dataframe again
+
+            self.generate_ligand_conc_df()
+
+            return None
+
+    def merge_consecutive_steps_by_name(self,step_name,reference=True):
+
+        """
+        Merge the step after the step of nam step_name
+        Args:
+            step_name (str): name of the step to merge with the next step
+            Reference (bool): if True, the step type will be used as reference to extract the analyte concentration, loading location, etc.
+        """
+        # Find the indices of the steps of type step_type
+        idxs = []
+        for i in range(len(self.df_steps)):
+            if self.df_steps.iloc[i]['Name'] == step_name:
+
+                # check if idx+2 is valid
+                if i+2 <= len(self.df_steps):
+                    idxs.append(i)
+
+        # Sort them in reverse order to avoid index shifting issues
+        idxs.sort(reverse=True)
+
+        for idx in idxs:
+
+            if reference:
+
+            # Merge the step with the next step
+                self.merge_consecutive_steps(idx+1,idx+2)
+
+            else:
+                # Merge the step with the previous step
+                self.merge_consecutive_steps(idx+2,idx+1)
 
         return None
 
