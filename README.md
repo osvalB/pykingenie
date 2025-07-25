@@ -1,7 +1,9 @@
-Python package for analysing binding kinetics data 
+[![Tests](https://github.com/osvalB/pykingenie/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/osvalB/pykingenie/actions/workflows/ci-cd.yml)
+[![codecov](https://codecov.io/gh/osvalB/pykingenie/graph/badge.svg)](https://codecov.io/gh/osvalB/pykingenie)
 
-This project is under development, and breaking changes may occur.
-The package is used in our online tool KinGenie: spc.embl-hamburg.de/app/kingenie
+Welcome to **pyKingenie**!, a python package for analysing binding kinetics data 
+
+This project is under development, and breaking changes may occur at any moment!
 
 ## Installation 
 

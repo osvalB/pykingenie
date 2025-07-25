@@ -1,6 +1,7 @@
 from .surface_exp      import *
 import os
 import json
+import zipfile
 
 from .utils.processing import find_loading_column
 
@@ -11,6 +12,12 @@ class GatorExperiment(SurfaceBasedExperiment):
         super().__init__(name, 'Gator_experiment')
 
     def read_all_gator_data(self, files, names=None):
+
+        # Check if files is a zipfile and extract it
+        if files.endswith('.zip'):
+            with zipfile.ZipFile(files, 'r') as zip_ref:
+                zip_ref.extractall(os.path.dirname(files))
+            files = [os.path.join(os.path.dirname(files), file) for file in zip_ref.namelist()]
 
         self.traces_loaded = False
 
@@ -166,19 +173,10 @@ class GatorExperiment(SurfaceBasedExperiment):
 
             # Find the molar concentration units
             # below the line MolarConcentrationUnit=NM
-            for i, line in enumerate(lines):
+            for line in lines:
                 if line.startswith('MolarConcentrationUnit='):
                     units = line.split('=')[1].strip().lower()
-                    if units == 'nm':
-                        factor = 1e-3
-                    elif units == 'mm':
-                        factor = 1e3
-                    elif units == 'pm':
-                        factor = 1e-6
-                    elif units == 'm':
-                        factor = 1e6
-                    else:
-                        factor = 1
+                    factor = {'nm': 1e-3, 'mm': 1e3, 'pm': 1e-6, 'm': 1e6}.get(units, 1)
                     break
 
             # Find the line [SampleKinetics]
@@ -312,20 +310,10 @@ class GatorExperiment(SurfaceBasedExperiment):
 
     def read_sensor_data(self, files, names=None):
 
-        if names is None:
-            names = files
-
-        if not isinstance(files, list):
-            files = [files]
-            names = [names]
-
         fns   = [fn for fn, name in zip(files, names) if '.csv' in name and 'Channel' in name]
         names = [name for name in names if '.csv' in name and 'Channel' in name]
 
-        if len(fns) < 1:
-            return None
-        else:
-            self.fns = fns
+        self.fns = fns
 
         # Initialize dictionaries with data
         xs = [[] for _ in range(len(self.sensor_names))]
@@ -396,7 +384,7 @@ class GatorExperiment(SurfaceBasedExperiment):
 
             try:
 
-                assay_number_i = int(name.split('_')[1].split('Channel')[0])
+                assay_number_i   = int(name.split('_')[1].split('Channel')[0])
                 channel_number_i = int(name.split('Channel')[1].split('.')[0])
 
                 df = pd.read_csv(fn, skiprows=1, header=None)

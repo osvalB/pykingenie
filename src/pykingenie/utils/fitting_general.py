@@ -3,6 +3,8 @@ import numpy as np
 from scipy.optimize import curve_fit
 from ..utils.math import *
 
+__all__ = ['fit_single_exponential', 'fit_double_exponential']
+
 def fit_single_exponential(y,t,min_log_k=-5, max_log_k=5,log_k_points=50):
 
     """

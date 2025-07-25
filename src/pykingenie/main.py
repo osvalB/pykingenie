@@ -478,3 +478,4 @@ class KineticsAnalyzer:
         self.fit_params_kinetics_all = df.copy()
 
         return None
+

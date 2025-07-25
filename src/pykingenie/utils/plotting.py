@@ -9,6 +9,15 @@ from ..utils.math       import median_filter
 
 PLOT_TICKS_LENGTH_CST = 8
 
+__all__ = [
+    'config_fig',
+    'plot_plate_info',
+    'plot_traces',
+    'plot_traces_all',
+    'plot_steady_state',
+    'plot_association_dissociation'
+]
+
 def config_fig(fig, name_for_download, export_format=None,
                plot_width=10, plot_height=6, scale_factor=50, autosize=True,save=False):
     """
@@ -312,8 +321,8 @@ def plot_association_dissociation(
     split_by_smax_id=True,
     max_points_per_plot=2000,
     smooth_curves_fit=False,
-    rolling_window=0.1
-):
+    rolling_window=0.1):
+
     pyKinetics_fittings = pyKinetics.fittings.values()
 
     lig_conc_lst = pyKinetics.get_experiment_properties('lig_conc_lst', fittings=True)

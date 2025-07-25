@@ -1,0 +1,1881 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>pykingenie package &#8212; PyKinGenie 0.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=01f34227"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'pykingenie';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="pykingenie.utils package" href="pykingenie.utils.html" />
+    <link rel="prev" title="pykingenie" href="modules.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">PyKinGenie 0.1.0 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="modules.html">
+    pykingenie
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/osvalB/pykingenie" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="modules.html">
+    pykingenie
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/osvalB/pykingenie" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">pykingenie package</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html">pykingenie.utils package</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="modules.html" class="nav-link">pykingenie</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">pykingenie package</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-pykingenie">
+<span id="pykingenie-package"></span><h1>pykingenie package<a class="headerlink" href="#module-pykingenie" title="Link to this heading">#</a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading">#</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="pykingenie.utils.html">pykingenie.utils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.fitting_general">pykingenie.utils.fitting_general module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_general.fit_single_exponential"><code class="docutils literal notranslate"><span class="pre">fit_single_exponential()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_general.fit_double_exponential"><code class="docutils literal notranslate"><span class="pre">fit_double_exponential()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.fitting_solution">pykingenie.utils.fitting_solution module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_solution.fit_one_site_solution"><code class="docutils literal notranslate"><span class="pre">fit_one_site_solution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_solution.fit_induced_fit_solution"><code class="docutils literal notranslate"><span class="pre">fit_induced_fit_solution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_solution.find_initial_parameters_induced_fit_solution"><code class="docutils literal notranslate"><span class="pre">find_initial_parameters_induced_fit_solution()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.fitting_surface">pykingenie.utils.fitting_surface module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.guess_initial_signal"><code class="docutils literal notranslate"><span class="pre">guess_initial_signal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.fit_steady_state_one_site"><code class="docutils literal notranslate"><span class="pre">fit_steady_state_one_site()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.steady_state_one_site_asymmetric_ci95"><code class="docutils literal notranslate"><span class="pre">steady_state_one_site_asymmetric_ci95()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.fit_one_site_association"><code class="docutils literal notranslate"><span class="pre">fit_one_site_association()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.fit_one_site_dissociation"><code class="docutils literal notranslate"><span class="pre">fit_one_site_dissociation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.fit_one_site_assoc_and_disso"><code class="docutils literal notranslate"><span class="pre">fit_one_site_assoc_and_disso()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.fit_induced_fit_sites_assoc_and_disso"><code class="docutils literal notranslate"><span class="pre">fit_induced_fit_sites_assoc_and_disso()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.fit_one_site_assoc_and_disso_ktr"><code class="docutils literal notranslate"><span class="pre">fit_one_site_assoc_and_disso_ktr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.one_site_assoc_and_disso_asymmetric_ci95"><code class="docutils literal notranslate"><span class="pre">one_site_assoc_and_disso_asymmetric_ci95()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.one_site_assoc_and_disso_asymmetric_ci95_koff"><code class="docutils literal notranslate"><span class="pre">one_site_assoc_and_disso_asymmetric_ci95_koff()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.math">pykingenie.utils.math module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.math.single_exponential"><code class="docutils literal notranslate"><span class="pre">single_exponential()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.math.double_exponential"><code class="docutils literal notranslate"><span class="pre">double_exponential()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.math.median_filter"><code class="docutils literal notranslate"><span class="pre">median_filter()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.math.rss_p"><code class="docutils literal notranslate"><span class="pre">rss_p()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.math.get_rss"><code class="docutils literal notranslate"><span class="pre">get_rss()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.math.get_desired_rss"><code class="docutils literal notranslate"><span class="pre">get_desired_rss()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.palettes">pykingenie.utils.palettes module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.plotting">pykingenie.utils.plotting module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.plotting.config_fig"><code class="docutils literal notranslate"><span class="pre">config_fig()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.plotting.plot_plate_info"><code class="docutils literal notranslate"><span class="pre">plot_plate_info()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.plotting.plot_traces"><code class="docutils literal notranslate"><span class="pre">plot_traces()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.plotting.plot_traces_all"><code class="docutils literal notranslate"><span class="pre">plot_traces_all()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.plotting.plot_steady_state"><code class="docutils literal notranslate"><span class="pre">plot_steady_state()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.plotting.plot_association_dissociation"><code class="docutils literal notranslate"><span class="pre">plot_association_dissociation()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.processing">pykingenie.utils.processing module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.processing.guess_experiment_name"><code class="docutils literal notranslate"><span class="pre">guess_experiment_name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.processing.etree_to_dict"><code class="docutils literal notranslate"><span class="pre">etree_to_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.processing.combine_dicts"><code class="docutils literal notranslate"><span class="pre">combine_dicts()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.processing.guess_experiment_type"><code class="docutils literal notranslate"><span class="pre">guess_experiment_type()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.processing.detect_time_list_continuos"><code class="docutils literal notranslate"><span class="pre">detect_time_list_continuos()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.processing.find_loading_column"><code class="docutils literal notranslate"><span class="pre">find_loading_column()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.processing.concat_signal_lst"><code class="docutils literal notranslate"><span class="pre">concat_signal_lst()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.processing.expand_parameter_list"><code class="docutils literal notranslate"><span class="pre">expand_parameter_list()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.processing.combine_sequences"><code class="docutils literal notranslate"><span class="pre">combine_sequences()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.processing.get_palette"><code class="docutils literal notranslate"><span class="pre">get_palette()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.processing.get_plotting_df"><code class="docutils literal notranslate"><span class="pre">get_plotting_df()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.processing.subset_data"><code class="docutils literal notranslate"><span class="pre">subset_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.processing.sample_type_to_letter"><code class="docutils literal notranslate"><span class="pre">sample_type_to_letter()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.processing.get_colors_from_numeric_values"><code class="docutils literal notranslate"><span class="pre">get_colors_from_numeric_values()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.signal_solution">pykingenie.utils.signal_solution module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_solution.ode_one_site_insolution"><code class="docutils literal notranslate"><span class="pre">ode_one_site_insolution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_solution.solve_ode_one_site_insolution"><code class="docutils literal notranslate"><span class="pre">solve_ode_one_site_insolution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_solution.signal_ode_one_site_insolution"><code class="docutils literal notranslate"><span class="pre">signal_ode_one_site_insolution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_solution.ode_induced_fit_insolution"><code class="docutils literal notranslate"><span class="pre">ode_induced_fit_insolution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_solution.ode_induced_fit_insolution_reduced"><code class="docutils literal notranslate"><span class="pre">ode_induced_fit_insolution_reduced()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_solution.solve_ode_induced_fit_insolution_reduced"><code class="docutils literal notranslate"><span class="pre">solve_ode_induced_fit_insolution_reduced()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_solution.solve_ode_induced_fit_insolution"><code class="docutils literal notranslate"><span class="pre">solve_ode_induced_fit_insolution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_solution.signal_ode_induced_fit_insolution_reduced"><code class="docutils literal notranslate"><span class="pre">signal_ode_induced_fit_insolution_reduced()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_solution.signal_ode_induced_fit_insolution"><code class="docutils literal notranslate"><span class="pre">signal_ode_induced_fit_insolution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_solution.ode_conformational_selection_insolution"><code class="docutils literal notranslate"><span class="pre">ode_conformational_selection_insolution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_solution.solve_ode_conformational_selection_insolution"><code class="docutils literal notranslate"><span class="pre">solve_ode_conformational_selection_insolution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_solution.signal_ode_conformational_selection_insolution"><code class="docutils literal notranslate"><span class="pre">signal_ode_conformational_selection_insolution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_solution.get_initial_concentration_conformational_selection"><code class="docutils literal notranslate"><span class="pre">get_initial_concentration_conformational_selection()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_solution.get_kobs_induced_fit"><code class="docutils literal notranslate"><span class="pre">get_kobs_induced_fit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_solution.get_kobs_conformational_selection"><code class="docutils literal notranslate"><span class="pre">get_kobs_conformational_selection()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.signal_surface">pykingenie.utils.signal_surface module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.steady_state_one_site"><code class="docutils literal notranslate"><span class="pre">steady_state_one_site()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.one_site_association_analytical"><code class="docutils literal notranslate"><span class="pre">one_site_association_analytical()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.one_site_dissociation_analytical"><code class="docutils literal notranslate"><span class="pre">one_site_dissociation_analytical()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.ode_one_site_mass_transport_association"><code class="docutils literal notranslate"><span class="pre">ode_one_site_mass_transport_association()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.ode_one_site_mass_transport_dissociation"><code class="docutils literal notranslate"><span class="pre">ode_one_site_mass_transport_dissociation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.solve_ode_one_site_mass_transport_association"><code class="docutils literal notranslate"><span class="pre">solve_ode_one_site_mass_transport_association()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.solve_ode_one_site_mass_transport_dissociation"><code class="docutils literal notranslate"><span class="pre">solve_ode_one_site_mass_transport_dissociation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.differential_matrix_association_induced_fit"><code class="docutils literal notranslate"><span class="pre">differential_matrix_association_induced_fit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.differential_matrix_association_conformational_selection"><code class="docutils literal notranslate"><span class="pre">differential_matrix_association_conformational_selection()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.differential_matrix_dissociation_induced_fit"><code class="docutils literal notranslate"><span class="pre">differential_matrix_dissociation_induced_fit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.differential_matrix_dissociation_conformational_selection"><code class="docutils literal notranslate"><span class="pre">differential_matrix_dissociation_conformational_selection()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.constant_vector_induced_fit"><code class="docutils literal notranslate"><span class="pre">constant_vector_induced_fit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.constant_vector_conformational_selection"><code class="docutils literal notranslate"><span class="pre">constant_vector_conformational_selection()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.solve_state_t"><code class="docutils literal notranslate"><span class="pre">solve_state_t()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.solve_steady_state"><code class="docutils literal notranslate"><span class="pre">solve_steady_state()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.solve_induced_fit_association"><code class="docutils literal notranslate"><span class="pre">solve_induced_fit_association()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.solve_all_states_fast"><code class="docutils literal notranslate"><span class="pre">solve_all_states_fast()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.solve_conformational_selection_association"><code class="docutils literal notranslate"><span class="pre">solve_conformational_selection_association()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.solve_induced_fit_dissociation"><code class="docutils literal notranslate"><span class="pre">solve_induced_fit_dissociation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.solve_conformational_selection_dissociation"><code class="docutils literal notranslate"><span class="pre">solve_conformational_selection_dissociation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.ode_mixture_analyte_association"><code class="docutils literal notranslate"><span class="pre">ode_mixture_analyte_association()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.solve_ode_mixture_analyte_association"><code class="docutils literal notranslate"><span class="pre">solve_ode_mixture_analyte_association()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.ode_mixture_analyte_dissociation"><code class="docutils literal notranslate"><span class="pre">ode_mixture_analyte_dissociation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.solve_ode_mixture_analyte_dissociation"><code class="docutils literal notranslate"><span class="pre">solve_ode_mixture_analyte_dissociation()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">#</a></h2>
+</section>
+<section id="module-pykingenie.fitter">
+<span id="pykingenie-fitter-module"></span><h2>pykingenie.fitter module<a class="headerlink" href="#module-pykingenie.fitter" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pykingenie.fitter.</span></span><span class="sig-name descname"><span class="pre">KineticsFitter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_assoc_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">association_signal_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lig_conc_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_diss_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dissociation_signal_lst</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smax_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_lst</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_single_cycle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter.html#KineticsFitter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter.KineticsFitter" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class used to fit kinetics data with shared thermodynamic parameters</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.names">
+<span class="sig-name descname"><span class="pre">names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.names" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of experiment names</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.assoc">
+<span class="sig-name descname"><span class="pre">assoc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.assoc" title="Link to this definition">#</a></dt>
+<dd><p>each signal is a numpy matrix of size n*m where n is the number of time points and m</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of association signals, one per replicate,</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.disso">
+<span class="sig-name descname"><span class="pre">disso</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.disso" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list containing the dissociation signals</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.smax_id">
+<span class="sig-name descname"><span class="pre">smax_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.smax_id" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list containing the Smax IDs (maximum amplitude identifiers)</p>
+<dl class="simple">
+<dt>disso (list):                   list of dissociation signals</dt><dd><p>each signal is a numpy matrix of size n*m where n is the number of time points and m
+is the number of ligand concentrations (different from zero)</p>
+</dd>
+<dt>lig_conc (list):                list of ligand concentrations, one per replicate</dt><dd><p>each element contains a numpy array with the ligand concentrations</p>
+</dd>
+<dt>time_assoc (list):              list of time points for the association signals, one per replicate</dt><dd><p>each element contains a numpy array with the time points</p>
+</dd>
+<dt>time_disso (list):              list of time points for the dissociation signals, one per replicate</dt><dd><p>each element contains a numpy array with the time points</p>
+</dd>
+<dt>signal_ss (list):               list of steady state signals, one per replicate</dt><dd><p>each element contains a numpy array with the steady state signals</p>
+</dd>
+<dt>signal_ss_fit (list):           list of steady state fitted signals, one per replicate</dt><dd><p>each element contains a numpy array with the steady state fitted signals</p>
+</dd>
+<dt>signal_assoc_fit (list):        list of association kinetics fitted signals, one per replicate</dt><dd><p>each element contains a numpy array with the association kinetics fitted signals</p>
+</dd>
+<dt>signal_disso_fit (list):        list of dissociation kinetics fitted signals, one per replicate</dt><dd><p>each element contains a numpy array with the dissociation kinetics fitted signals</p>
+</dd>
+</dl>
+<p>fit_params_kinetics (pd.Dataframe):     dataframe with the fitted parameters for the association / dissociation kinetics
+fit_params_ss (pd.Dataframe):           dataframe with the values of the fitted parameters - steady state</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_assoc_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">association_signal_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lig_conc_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_diss_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dissociation_signal_lst</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smax_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_lst</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_single_cycle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter.html#KineticsFitter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.__init__" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.get_steady_state">
+<span class="sig-name descname"><span class="pre">get_steady_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter.html#KineticsFitter.get_steady_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.get_steady_state" title="Link to this definition">#</a></dt>
+<dd><p>This function calculates the steady state signal and groups it by smax ID</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.clear_fittings">
+<span class="sig-name descname"><span class="pre">clear_fittings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter.html#KineticsFitter.clear_fittings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.clear_fittings" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.create_fitting_bounds_table">
+<span class="sig-name descname"><span class="pre">create_fitting_bounds_table</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter.html#KineticsFitter.create_fitting_bounds_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.create_fitting_bounds_table" title="Link to this definition">#</a></dt>
+<dd><p>Create a dataframe with the fitting bounds and the fitted parameters.
+It uses self.params, self.low_bounds and self.high_bounds</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.fit_steady_state">
+<span class="sig-name descname"><span class="pre">fit_steady_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter.html#KineticsFitter.fit_steady_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.fit_steady_state" title="Link to this definition">#</a></dt>
+<dd><p>This function fits the steady state signal</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.fit_one_site_association">
+<span class="sig-name descname"><span class="pre">fit_one_site_association</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shared_smax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter.html#KineticsFitter.fit_one_site_association"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.fit_one_site_association" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.fit_one_site_dissociation">
+<span class="sig-name descname"><span class="pre">fit_one_site_dissociation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter.html#KineticsFitter.fit_one_site_dissociation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.fit_one_site_dissociation" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.fit_single_exponentials">
+<span class="sig-name descname"><span class="pre">fit_single_exponentials</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter.html#KineticsFitter.fit_single_exponentials"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.fit_single_exponentials" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.fit_one_site_assoc_and_disso">
+<span class="sig-name descname"><span class="pre">fit_one_site_assoc_and_disso</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shared_smax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_ktr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter.html#KineticsFitter.fit_one_site_assoc_and_disso"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.fit_one_site_assoc_and_disso" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.calculate_ci95">
+<span class="sig-name descname"><span class="pre">calculate_ci95</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shared_smax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_ktr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter.html#KineticsFitter.calculate_ci95"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.calculate_ci95" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.fit_one_site_if_assoc_and_disso">
+<span class="sig-name descname"><span class="pre">fit_one_site_if_assoc_and_disso</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shared_smax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter.html#KineticsFitter.fit_one_site_if_assoc_and_disso"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.fit_one_site_if_assoc_and_disso" title="Link to this definition">#</a></dt>
+<dd><p>Fit the association and dissociation signals using the induced fit model.
+This function is a wrapper for the fit_induced_fit_sites_assoc_and_disso method.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-pykingenie.fitter_solution">
+<span id="pykingenie-fitter-solution-module"></span><h2>pykingenie.fitter_solution module<a class="headerlink" href="#module-pykingenie.fitter_solution" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pykingenie.fitter_solution.KineticsFitterSolution">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pykingenie.fitter_solution.</span></span><span class="sig-name descname"><span class="pre">KineticsFitterSolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assoc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lig_conc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protein_conc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_assoc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_solution.html#KineticsFitterSolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_solution.KineticsFitterSolution" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class used to fit solution-based kinetics data with shared thermodynamic parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>name (str):                     name of the experiment</strong></dt><dd></dd>
+<dt><strong>assoc_lst (list):                   list containing the association signals</strong></dt><dd></dd>
+<dt><strong>lig_conc (list):                list of ligand concentrations, one per element in assoc</strong></dt><dd></dd>
+<dt><strong>prot_conc (list):               list of protein concentrations, one per element in assoc</strong></dt><dd></dd>
+<dt><strong>time_assoc_lst (list):              list of time points for the association signals</strong></dt><dd></dd>
+<dt><strong>signal_ss (list):               list of steady state signals</strong></dt><dd></dd>
+<dt><strong>signal_ss_fit (list):           list of steady state fitted signals</strong></dt><dd></dd>
+<dt><strong>signal_assoc_fit (list):        list of association kinetics fitted signals</strong></dt><dd></dd>
+<dt><strong>fit_params_kinetics (pd.Dataframe):     dataframe with the fitted parameters</strong></dt><dd></dd>
+<dt><strong>fit_params_ss (pd.Dataframe):           dataframe with the values of the fitted parameters - steady state</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter_solution.KineticsFitterSolution.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assoc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lig_conc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protein_conc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_assoc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_solution.html#KineticsFitterSolution.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_solution.KineticsFitterSolution.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialize the KineticsFitterSolution class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – name of the experiment</p></li>
+<li><p><strong>assoc</strong> (<em>list</em>) – list containing the association signals</p></li>
+<li><p><strong>lig_conc</strong> (<em>list</em>) – list of ligand concentrations, one per element in assoc</p></li>
+<li><p><strong>protein_conc</strong> (<em>list</em>) – list of protein concentrations, one per element in assoc</p></li>
+<li><p><strong>time_assoc</strong> (<em>list</em>) – list of time points for the association signals, one per replicate</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter_solution.KineticsFitterSolution.get_steady_state">
+<span class="sig-name descname"><span class="pre">get_steady_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_solution.html#KineticsFitterSolution.get_steady_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_solution.KineticsFitterSolution.get_steady_state" title="Link to this definition">#</a></dt>
+<dd><p>Get the steady state signals from the association signals.
+The steady state signal is the last value of each association signal.</p>
+<p>We calculate the steady signal grouped by protein concentration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter_solution.KineticsFitterSolution.clear_fittings">
+<span class="sig-name descname"><span class="pre">clear_fittings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_solution.html#KineticsFitterSolution.clear_fittings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_solution.KineticsFitterSolution.clear_fittings" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter_solution.KineticsFitterSolution.fit_single_exponentials">
+<span class="sig-name descname"><span class="pre">fit_single_exponentials</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_solution.html#KineticsFitterSolution.fit_single_exponentials"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_solution.KineticsFitterSolution.fit_single_exponentials" title="Link to this definition">#</a></dt>
+<dd><p>Fit single exponentials to the association signals in the solution kinetics experiment.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter_solution.KineticsFitterSolution.group_k_obs_by_protein_concentration">
+<span class="sig-name descname"><span class="pre">group_k_obs_by_protein_concentration</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_solution.html#KineticsFitterSolution.group_k_obs_by_protein_concentration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_solution.KineticsFitterSolution.group_k_obs_by_protein_concentration" title="Link to this definition">#</a></dt>
+<dd><p>Group the observed rate constants by protein concentration.
+This is useful for plotting the rate constants against the protein concentration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter_solution.KineticsFitterSolution.fit_double_exponentials">
+<span class="sig-name descname"><span class="pre">fit_double_exponentials</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_log_k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_log_k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_k_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">22</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_solution.html#KineticsFitterSolution.fit_double_exponentials"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_solution.KineticsFitterSolution.fit_double_exponentials" title="Link to this definition">#</a></dt>
+<dd><p>Fit double exponentials to the association signals in the solution kinetics experiment.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter_solution.KineticsFitterSolution.group_double_exponential_k_obs_by_protein_concentration">
+<span class="sig-name descname"><span class="pre">group_double_exponential_k_obs_by_protein_concentration</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_solution.html#KineticsFitterSolution.group_double_exponential_k_obs_by_protein_concentration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_solution.KineticsFitterSolution.group_double_exponential_k_obs_by_protein_concentration" title="Link to this definition">#</a></dt>
+<dd><p>Group the observed rate constants by protein concentration for double exponential fits.
+This is useful for plotting the rate constants against the protein concentration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter_solution.KineticsFitterSolution.fit_one_binding_site">
+<span class="sig-name descname"><span class="pre">fit_one_binding_site</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_solution.html#KineticsFitterSolution.fit_one_binding_site"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_solution.KineticsFitterSolution.fit_one_binding_site" title="Link to this definition">#</a></dt>
+<dd><p>Fit the association signals assuming one binding site.
+This is a simplified model that assumes a single binding site for the ligand on the protein.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter_solution.KineticsFitterSolution.find_initial_params_if">
+<span class="sig-name descname"><span class="pre">find_initial_params_if</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fit_signal_E</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_signal_S</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_signal_ES</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ESint_equals_ES</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_solution.html#KineticsFitterSolution.find_initial_params_if"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_solution.KineticsFitterSolution.find_initial_params_if" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter_solution.KineticsFitterSolution.fit_induced_fit">
+<span class="sig-name descname"><span class="pre">fit_induced_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fit_signal_E</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_signal_S</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_signal_ES</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ESint_equals_ES</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_solution.html#KineticsFitterSolution.fit_induced_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_solution.KineticsFitterSolution.fit_induced_fit" title="Link to this definition">#</a></dt>
+<dd><p>Fit the association signals assuming induced fit.
+This model accounts for conformational changes in the protein upon ligand binding.
+:param fit_signal_E: If True, fit the signal of the free protein E.
+:type fit_signal_E: bool
+:param fit_signal_S: If True, fit the signal of the free ligand S.
+:type fit_signal_S: bool
+:param fit_signal_ES: If True, fit the signal of the complex ES.
+:type fit_signal_ES: bool
+:param ESint_equals_ES: If True, assume that the signal of the intermediate ESint is equal to the signal of the complex ES.
+:type ESint_equals_ES: bool
+:param fixed_t0: If True, fix the t0 parameter to 0.
+:type fixed_t0: bool</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-pykingenie.gator">
+<span id="pykingenie-gator-module"></span><h2>pykingenie.gator module<a class="headerlink" href="#module-pykingenie.gator" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pykingenie.gator.GatorExperiment">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pykingenie.gator.</span></span><span class="sig-name descname"><span class="pre">GatorExperiment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Gator_experiment'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/gator.html#GatorExperiment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.gator.GatorExperiment" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pykingenie.surface_exp.SurfaceBasedExperiment" title="pykingenie.surface_exp.SurfaceBasedExperiment"><code class="xref py py-class docutils literal notranslate"><span class="pre">SurfaceBasedExperiment</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.gator.GatorExperiment.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Gator_experiment'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/gator.html#GatorExperiment.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.gator.GatorExperiment.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialize the instance</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.gator.GatorExperiment.read_all_gator_data">
+<span class="sig-name descname"><span class="pre">read_all_gator_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/gator.html#GatorExperiment.read_all_gator_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.gator.GatorExperiment.read_all_gator_data" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.gator.GatorExperiment.read_experiment_ini">
+<span class="sig-name descname"><span class="pre">read_experiment_ini</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nr_max_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/gator.html#GatorExperiment.read_experiment_ini"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.gator.GatorExperiment.read_experiment_ini" title="Link to this definition">#</a></dt>
+<dd><p>Read the experiment ini file</p>
+<p>Example format:</p>
+<blockquote>
+<div><p>[Experiment]
+Num=4
+[Experiment1]
+Step1=0,0,60,0
+Step2=1,60,104,1
+Step3=5,104,164,0
+Step4=6,164,464,2
+Step5=7,464,764,3
+Num=5
+ProbeIndex=12
+[ExperimentLog]
+Step1=”{“StepType”:0,”AssayNumber”:1,”PlateIndex”:1,”PlateColumnType”:12,”RowLocation”:0,”Location”:0,”Speed”:400,”Time”:600,”SumTime”:0,”ProbeIndex”:0,”PickerUsed”:1,”AllChannelUsed”:[255],”ChannelUsed”:0,”bAssayFirstStep”:false,”kst”:0,”Status”:0}”
+Step2=”{“StepType”:3,”AssayNumber”:1,”PlateIndex”:1,”PlateColumnType”:12,”RowLocation”:0,”Location”:1,”Speed”:1000,”Time”:5,”SumTime”:0,”ProbeIndex”:0,”PickerUsed”:1,”AllChannelUsed”:[255],”ChannelUsed”:0,”bAssayFirstStep”:false,”kst”:0,”Status”:0}”
+Step3=”{“StepType”:4,”AssayNumber”:1,”PlateIndex”:1,”PlateColumnType”:12,”RowLocation”:0,”Location”:2,”Speed”:1000,”Time”:5,”SumTime”:0,”ProbeIndex”:0,”PickerUsed”:1,”AllChannelUsed”:[255],”ChannelUsed”:0,”bAssayFirstStep”:false,”kst”:0,”Status”:0}”
+Step4=”{“StepType”:3,”AssayNumber”:1,”PlateIndex”:1,”PlateColumnType”:12,”RowLocation”:0,”Location”:1,”Speed”:1000,”Time”:5,”SumTime”:0,”ProbeIndex”:0,”PickerUsed”:1,”AllChannelUsed”:[255],”ChannelUsed”:0,”bAssayFirstStep”:false,”kst”:0,”Status”:0}”
+Step5=”{“StepType”:4,”AssayNumber”:1,”PlateIndex”:1,”PlateColumnType”:12,”RowLocation”:0,”Location”:2,”Speed”:1000,”Time”:5,”SumTime”:0,”ProbeIndex”:0,”PickerUsed”:1,”AllChannelUsed”:[255],”ChannelUsed”:0,”bAssayFirstStep”:false,”kst”:0,”Status”:0}”
+Step6=”{“StepType”:3,”AssayNumber”:1,”PlateIndex”:1,”PlateColumnType”:12,”RowLocation”:0,”Location”:1,”Speed”:1000,”Time”:5,”SumTime”:0,”ProbeIndex”:0,”PickerUsed”:1,”AllChannelUsed”:[255],”ChannelUsed”:0,”bAssayFirstStep”:false,”kst”:0,”Status”:0}”
+Step7=”{“StepType”:4,”AssayNumber”:1,”PlateIndex”:1,”PlateColumnType”:12,”RowLocation”:0,”Location”:2,”Speed”:1000,”Time”:5,”SumTime”:0,”ProbeIndex”:0,”PickerUsed”:1,”AllChannelUsed”:[255],”ChannelUsed”:0,”bAssayFirstStep”:false,”kst”:0,”Status”:0}”
+Step8=”{“StepType”:2,”AssayNumber”:1,”PlateIndex”:0,”PlateColumnType”:12,”RowLocation”:0,”Location”:12,”Speed”:1000,”Time”:60,”SumTime”:0,”ProbeIndex”:0,”PickerUsed”:1,”AllChannelUsed”:[255],”ChannelUsed”:0,”bAssayFirstStep”:true,”kst”:0,”Status”:0}”
+Step9=”{“StepType”:2,”AssayNumber”:1,”PlateIndex”:0,”PlateColumnType”:12,”RowLocation”:0,”Location”:13,”Speed”:400,”Time”:44,”SumTime”:60,”ProbeIndex”:0,”PickerUsed”:1,”AllChannelUsed”:[255],”ChannelUsed”:0,”bAssayFirstStep”:false,”kst”:1,”Status”:1}”</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.gator.GatorExperiment.read_settings_ini">
+<span class="sig-name descname"><span class="pre">read_settings_ini</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nr_max_sensors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nr_max_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/gator.html#GatorExperiment.read_settings_ini"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.gator.GatorExperiment.read_settings_ini" title="Link to this definition">#</a></dt>
+<dd><p>Read the settings ini file</p>
+<p>We assume a plate format, so wells 1 to nr_max_sensors correspond to the first column,
+wells 9 to 16 correspond to the second column, etc.</p>
+<p>Example format:</p>
+<blockquote>
+<div><p>[BasicInformation]
+PreExperiment=”{“AssayDescription”:””,”AssayUser”:”Marianna”,”CreationTime”:”03-31-2025 14:01:50”,”ModificationTime”:”03-31-2025 14:44:10”,”StartExperimentTime”:”03-31-2025 14:44:10”,”EndExperimentTime”:”03-31-2025 15:55:27”,”AnotherSavePath”:””,”AssayType”:2,”PreAssayShakerASpeed”:400,”PreAssayShakerBSpeed”:400,”PreAssayTime”:600,”GapTime”:100,”AssayShakerATemperature”:30,”AssayShakerBTemperature”:30,”MachineRealType”:”Prime”,”idleShakerATemperature”:30,”idleShakerBTemperature”:30,”PlateAType”:0,”bPlateAFlat”:false,”bRegeneration”:true,”bRegenerationStart”:true,”RegenerationNum”:99999,”RegenerationMode”:0,”ShakerASpeedDeviation”:10,”ShakerBSpeedDeviation”:10,”ShakerATempDeviation”:2,”ShakerBTempDeviation”:2,”SpectrometerTempDeviation”:1,”ParentName”:”K Result”,”ResultName”:”4x ab vs egfr 03-31-2025 14-44-10”,”SoftWareVersion”:null,”SeriesNo”:”GA00092”,”ErrorChannelList”:[0,0,0,0,0,0,0,0],”ErrorPreAssayList”:[0,0,0,0,0,0,0,0],”ErrorSampleList”:[],”ErrorRegenerationList”:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],”AnalysisSettingList”:[],”ReportSettingList”:[],”PlateColumns”:[12,12],”threshold”:Infinity,”bsingle”:false,”bThresh”:false,”strFileID”:null}”
+ExperimentType=Kinetics
+SaveTime=03/31/2025 15:55:27
+Frequency=10Hz
+DataVersion=2.15.5.1221
+[Regeneration]
+RegenerationEnable=1
+Repeat=3
+RTime=5
+RSpeed=1000
+NTime=5
+NSpeed=1000
+[SampleKinetics]
+Well1=4,-1,-1,-1,,
+Well2=4,-1,-1,-1,,
+Well3=4,-1,-1,-1,,
+Well4=4,-1,-1,-1,,
+Well5=4,-1,-1,-1,,
+Well6=4,-1,-1,-1,,
+Well7=4,-1,-1,-1,,
+Well8=4,-1,-1,-1,,
+Well9=5,30,150,200,,Cetuximab
+Well10=5,30,150,200,,Cetuximab
+Well11=5,30,150,200,,Cetuximab</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.gator.GatorExperiment.read_sensor_data">
+<span class="sig-name descname"><span class="pre">read_sensor_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/gator.html#GatorExperiment.read_sensor_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.gator.GatorExperiment.read_sensor_data" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-pykingenie.kingenie_solution">
+<span id="pykingenie-kingenie-solution-module"></span><h2>pykingenie.kingenie_solution module<a class="headerlink" href="#module-pykingenie.kingenie_solution" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pykingenie.kingenie_solution.KinGenieCsvSolution">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pykingenie.kingenie_solution.</span></span><span class="sig-name descname"><span class="pre">KinGenieCsvSolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/kingenie_solution.html#KinGenieCsvSolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.kingenie_solution.KinGenieCsvSolution" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pykingenie.solution_exp.SolutionBasedExp" title="pykingenie.solution_exp.SolutionBasedExp"><code class="xref py py-class docutils literal notranslate"><span class="pre">SolutionBasedExp</span></code></a></p>
+<p>A class used to represent a KinGenie simulation (solution-based), which can be exported from the Simulation panel</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.kingenie_solution.KinGenieCsvSolution.name">
+<span class="sig-name descname"><span class="pre">name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.kingenie_solution.KinGenieCsvSolution.name" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>name of the experiment</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.kingenie_solution.KinGenieCsvSolution.xs">
+<span class="sig-name descname"><span class="pre">xs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">np.array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.kingenie_solution.KinGenieCsvSolution.xs" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of x values (time, length n, one per sensor)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.kingenie_solution.KinGenieCsvSolution.ys">
+<span class="sig-name descname"><span class="pre">ys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">np.array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.kingenie_solution.KinGenieCsvSolution.ys" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of y values (length n, one per sensor)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.kingenie_solution.KinGenieCsvSolution.no_sensors">
+<span class="sig-name descname"><span class="pre">no_sensors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.kingenie_solution.KinGenieCsvSolution.no_sensors" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>number of sensors</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.kingenie_solution.KinGenieCsvSolution.sensor_names">
+<span class="sig-name descname"><span class="pre">sensor_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.kingenie_solution.KinGenieCsvSolution.sensor_names" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of sensor names (length n, one per sensor)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.kingenie_solution.KinGenieCsvSolution.sensor_names_unique">
+<span class="sig-name descname"><span class="pre">sensor_names_unique</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.kingenie_solution.KinGenieCsvSolution.sensor_names_unique" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of unique sensor names (length n, one per sensor)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.kingenie_solution.KinGenieCsvSolution.ligand_conc_df">
+<span class="sig-name descname"><span class="pre">ligand_conc_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pd.DataFrame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.kingenie_solution.KinGenieCsvSolution.ligand_conc_df" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dataframe with the ligand concentration information</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.kingenie_solution.KinGenieCsvSolution.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/kingenie_solution.html#KinGenieCsvSolution.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.kingenie_solution.KinGenieCsvSolution.__init__" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.kingenie_solution.KinGenieCsvSolution.read_csv">
+<span class="sig-name descname"><span class="pre">read_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/kingenie_solution.html#KinGenieCsvSolution.read_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.kingenie_solution.KinGenieCsvSolution.read_csv" title="Link to this definition">#</a></dt>
+<dd><p>Read the KinGenie csv file</p>
+<p class="rubric">Example</p>
+<p>Time        Signal  Protein_concentration_micromolar Ligand_concentration_micromolar
+0       0       5                                   0.1
+0.5     1       5                                   0.1</p>
+<p>Results:</p>
+<blockquote>
+<div><p>It creates the attributes</p>
+<blockquote>
+<div><p>self.xs
+self.ys
+self.no_sensors
+self.sensor_names
+self.sensor_names_unique</p>
+</div></blockquote>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-pykingenie.kingenie_surface">
+<span id="pykingenie-kingenie-surface-module"></span><h2>pykingenie.kingenie_surface module<a class="headerlink" href="#module-pykingenie.kingenie_surface" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pykingenie.kingenie_surface.KinGenieCsv">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pykingenie.kingenie_surface.</span></span><span class="sig-name descname"><span class="pre">KinGenieCsv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kingenie_csv'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/kingenie_surface.html#KinGenieCsv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.kingenie_surface.KinGenieCsv" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pykingenie.surface_exp.SurfaceBasedExperiment" title="pykingenie.surface_exp.SurfaceBasedExperiment"><code class="xref py py-class docutils literal notranslate"><span class="pre">SurfaceBasedExperiment</span></code></a></p>
+<p>A class used to represent a KinGenie csv file, which can be exported from the Simulation panel</p>
+<p class="rubric">Example</p>
+<p>Time    Signal  Smax    Analyte_concentration_micromolar_constant       Cycle
+0       0       5       0.1     1
+0.5     0.00498512709952641     5       0.1     1
+1       0.00994051854979453     5       0.1     1
+1.5     0.0148661741864963      5       0.1     1
+2       0.0197623830271752      5       0.1     1
+2.5     0.0246293723316269      5       0.1     1
+3       0.0294671469344429      5       0.1     1
+3.5     0.0342760214300913      5       0.1     1
+4       0.0390561847030298      5       0.1     1
+4.5     0.043807638803537       5       0.1     1
+5       0.0485304884515415      5       0.1     1</p>
+<p>Attributes</p>
+<blockquote>
+<div><p>name (str):                 name of the experiment
+fn (str):                   file name
+xs (np.array):              list of x values (time, length n, one per sensor)
+ys (np.array):              list of y values (length n, one per sensor)
+no_sensors (int):           number of sensors
+sensor_names (list):        list of sensor names (length n, one per sensor)
+sensor_names_unique (list): list of unique sensor names (length n, one per sensor)
+ligand_conc_df (pd.DataFrame): dataframe with the ligand concentration information</p>
+</div></blockquote>
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.kingenie_surface.KinGenieCsv.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kingenie_csv'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/kingenie_surface.html#KinGenieCsv.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.kingenie_surface.KinGenieCsv.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialize the instance</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.kingenie_surface.KinGenieCsv.read_csv">
+<span class="sig-name descname"><span class="pre">read_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/kingenie_surface.html#KinGenieCsv.read_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.kingenie_surface.KinGenieCsv.read_csv" title="Link to this definition">#</a></dt>
+<dd><p>Read the KinGenie csv file</p>
+<p>Results:</p>
+<blockquote>
+<div><p>It creates the attributes</p>
+<blockquote>
+<div><p>self.xs
+self.ys
+self.no_sensors
+self.sensor_names
+self.sensor_names_unique</p>
+</div></blockquote>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-pykingenie.main">
+<span id="pykingenie-main-module"></span><h2>pykingenie.main module<a class="headerlink" href="#module-pykingenie.main" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pykingenie.main.KineticsAnalyzer">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pykingenie.main.</span></span><span class="sig-name descname"><span class="pre">KineticsAnalyzer</span></span><a class="reference internal" href="_modules/pykingenie/main.html#KineticsAnalyzer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.main.KineticsAnalyzer" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.main.KineticsAnalyzer.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/main.html#KineticsAnalyzer.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.main.KineticsAnalyzer.__init__" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.main.KineticsAnalyzer.delete_experiment">
+<span class="sig-name descname"><span class="pre">delete_experiment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">experiment_names</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/main.html#KineticsAnalyzer.delete_experiment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.main.KineticsAnalyzer.delete_experiment" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.main.KineticsAnalyzer.add_experiment">
+<span class="sig-name descname"><span class="pre">add_experiment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">experiment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">experiment_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/main.html#KineticsAnalyzer.add_experiment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.main.KineticsAnalyzer.add_experiment" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.main.KineticsAnalyzer.init_fittings">
+<span class="sig-name descname"><span class="pre">init_fittings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/main.html#KineticsAnalyzer.init_fittings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.main.KineticsAnalyzer.init_fittings" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.main.KineticsAnalyzer.add_fitting">
+<span class="sig-name descname"><span class="pre">add_fitting</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fitting</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitting_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/main.html#KineticsAnalyzer.add_fitting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.main.KineticsAnalyzer.add_fitting" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.main.KineticsAnalyzer.get_experiment_properties">
+<span class="sig-name descname"><span class="pre">get_experiment_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fittings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/main.html#KineticsAnalyzer.get_experiment_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.main.KineticsAnalyzer.get_experiment_properties" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.main.KineticsAnalyzer.merge_ligand_conc_df">
+<span class="sig-name descname"><span class="pre">merge_ligand_conc_df</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/main.html#KineticsAnalyzer.merge_ligand_conc_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.main.KineticsAnalyzer.merge_ligand_conc_df" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.main.KineticsAnalyzer.merge_conc_df_solution">
+<span class="sig-name descname"><span class="pre">merge_conc_df_solution</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/main.html#KineticsAnalyzer.merge_conc_df_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.main.KineticsAnalyzer.merge_conc_df_solution" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.main.KineticsAnalyzer.generate_fittings">
+<span class="sig-name descname"><span class="pre">generate_fittings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/main.html#KineticsAnalyzer.generate_fittings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.main.KineticsAnalyzer.generate_fittings" title="Link to this definition">#</a></dt>
+<dd><p>Given a data frame, extract the kinetics data and create a fitting object for each sample.
+The data frame should contain the following columns:
+- ‘Sensor’: The sensor ID
+- ‘Experiment’: The experiment ID
+- ‘Replicate’: The replicate number
+- ‘Analyte_location’: The location of the analyte
+- ‘Loading_location’: The location of the loading
+- ‘Concentration_micromolar’: The concentration of the analyte in micromolar
+- ‘SampleID’: The sample ID
+- ‘Smax_ID’: The Smax ID
+- ‘Select’: A boolean value indicating whether to select the sample or not</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.main.KineticsAnalyzer.generate_fittings_solution">
+<span class="sig-name descname"><span class="pre">generate_fittings_solution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/main.html#KineticsAnalyzer.generate_fittings_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.main.KineticsAnalyzer.generate_fittings_solution" title="Link to this definition">#</a></dt>
+<dd><p>Given a data frame, extract the kinetics data and create a fitting object for each sample.
+The data frame should contain the following columns:
+- ‘Trace’: The trace ID
+- ‘Experiment’: The experiment ID
+- ‘[Protein] (μM)’: The protein concentration in micromolar
+- ‘[Ligand] (μM)’: The ligand concentration in micromolar
+- ‘SampleID’: The sample ID
+- ‘Select’: A boolean value indicating whether to select the sample or not</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.main.KineticsAnalyzer.submit_steady_state_fitting">
+<span class="sig-name descname"><span class="pre">submit_steady_state_fitting</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/main.html#KineticsAnalyzer.submit_steady_state_fitting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.main.KineticsAnalyzer.submit_steady_state_fitting" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.main.KineticsAnalyzer.submit_fitting_solution">
+<span class="sig-name descname"><span class="pre">submit_fitting_solution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fitting_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'single'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/main.html#KineticsAnalyzer.submit_fitting_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.main.KineticsAnalyzer.submit_fitting_solution" title="Link to this definition">#</a></dt>
+<dd><p>Fit a variety of models to the kinetics data in the solution-based experiments.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.main.KineticsAnalyzer.submit_kinetics_fitting">
+<span class="sig-name descname"><span class="pre">submit_kinetics_fitting</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fitting_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'one_to_one'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitting_region</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'association_dissociation'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkedSmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/main.html#KineticsAnalyzer.submit_kinetics_fitting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.main.KineticsAnalyzer.submit_kinetics_fitting" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.main.KineticsAnalyzer.calculate_asymmetric_error">
+<span class="sig-name descname"><span class="pre">calculate_asymmetric_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shared_smax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_ktr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/main.html#KineticsAnalyzer.calculate_asymmetric_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.main.KineticsAnalyzer.calculate_asymmetric_error" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.main.KineticsAnalyzer.get_fitting_results">
+<span class="sig-name descname"><span class="pre">get_fitting_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/main.html#KineticsAnalyzer.get_fitting_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.main.KineticsAnalyzer.get_fitting_results" title="Link to this definition">#</a></dt>
+<dd><p>Get the results of the fitting process into a nice dataframe</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-pykingenie.octet">
+<span id="pykingenie-octet-module"></span><h2>pykingenie.octet module<a class="headerlink" href="#module-pykingenie.octet" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pykingenie.octet.OctetExperiment">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pykingenie.octet.</span></span><span class="sig-name descname"><span class="pre">OctetExperiment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'BLI_experiment'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/octet.html#OctetExperiment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.octet.OctetExperiment" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pykingenie.surface_exp.SurfaceBasedExperiment" title="pykingenie.surface_exp.SurfaceBasedExperiment"><code class="xref py py-class docutils literal notranslate"><span class="pre">SurfaceBasedExperiment</span></code></a></p>
+<p>A class used to represent a BLI experiment</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.octet.OctetExperiment.name">
+<span class="sig-name descname"><span class="pre">name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.octet.OctetExperiment.name" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>name of the experiment</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.octet.OctetExperiment.fns">
+<span class="sig-name descname"><span class="pre">fns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.octet.OctetExperiment.fns" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of file names (length n, one per sensor)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.octet.OctetExperiment.xs">
+<span class="sig-name descname"><span class="pre">xs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.octet.OctetExperiment.xs" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of x values (time, length n, one per sensor)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.octet.OctetExperiment.ys">
+<span class="sig-name descname"><span class="pre">ys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.octet.OctetExperiment.ys" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of y values (length n, one per sensor)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.octet.OctetExperiment.exp_info">
+<span class="sig-name descname"><span class="pre">exp_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.octet.OctetExperiment.exp_info" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dictionaries with experimental information</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.octet.OctetExperiment.step_info">
+<span class="sig-name descname"><span class="pre">step_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.octet.OctetExperiment.step_info" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dictionaries with step information</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.octet.OctetExperiment.no_steps">
+<span class="sig-name descname"><span class="pre">no_steps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.octet.OctetExperiment.no_steps" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>number of steps</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.octet.OctetExperiment.no_sensors">
+<span class="sig-name descname"><span class="pre">no_sensors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.octet.OctetExperiment.no_sensors" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>number of sensors</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.octet.OctetExperiment.sample_column">
+<span class="sig-name descname"><span class="pre">sample_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">np.ndarray</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.octet.OctetExperiment.sample_column" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array of sample column information (96 elements, one per well)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.octet.OctetExperiment.sample_row">
+<span class="sig-name descname"><span class="pre">sample_row</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">np.ndarray</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.octet.OctetExperiment.sample_row" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array of sample row information    (96 elements, one per well)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.octet.OctetExperiment.sample_type">
+<span class="sig-name descname"><span class="pre">sample_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.octet.OctetExperiment.sample_type" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of sample types   (96 elements, one per well)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.octet.OctetExperiment.sample_id">
+<span class="sig-name descname"><span class="pre">sample_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.octet.OctetExperiment.sample_id" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of sample ids     (96 elements, one per well)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.octet.OctetExperiment.sensor_names_unique">
+<span class="sig-name descname"><span class="pre">sensor_names_unique</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.octet.OctetExperiment.sensor_names_unique" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of unique sensor names (length n, one per sensor)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.octet.OctetExperiment.sensor_names">
+<span class="sig-name descname"><span class="pre">sensor_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.octet.OctetExperiment.sensor_names" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of sensor names (length n, one per sensor)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.octet.OctetExperiment.df_steps">
+<span class="sig-name descname"><span class="pre">df_steps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pd.DataFrame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.octet.OctetExperiment.df_steps" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dataframe with the steps information</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.octet.OctetExperiment.ligand_conc_df">
+<span class="sig-name descname"><span class="pre">ligand_conc_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pd.DataFrame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.octet.OctetExperiment.ligand_conc_df" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dataframe with the ligand concentration information</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.octet.OctetExperiment.ligand_conc_df.head">
+<span class="sig-prename descclassname"><span class="pre">ligand_conc_df.</span></span><span class="sig-name descname"><span class="pre">head</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.octet.OctetExperiment.ligand_conc_df.head" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Sensor</span> <span class="pre">Analyte_location</span>&#160; <span class="pre">Concentration_micromolar</span> <span class="pre">SampleID</span>&#160; <span class="pre">Replicate</span> <span class="pre">Experiment</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">A1</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">5</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">0.1300</span>&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">wt</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">1</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">t</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">B1</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">5</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">0.0692</span>&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">wt</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">1</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">t</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.octet.OctetExperiment.traces_loaded">
+<span class="sig-name descname"><span class="pre">traces_loaded</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.octet.OctetExperiment.traces_loaded" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if traces are loaded</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.octet.OctetExperiment.sample_plate_loaded">
+<span class="sig-name descname"><span class="pre">sample_plate_loaded</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.octet.OctetExperiment.sample_plate_loaded" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if sample plate information is loaded</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.octet.OctetExperiment.sample_conc">
+<span class="sig-name descname"><span class="pre">sample_conc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">np.array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.octet.OctetExperiment.sample_conc" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array with the sample concentrations (96 elements, one per well)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.octet.OctetExperiment.sample_conc_labeled">
+<span class="sig-name descname"><span class="pre">sample_conc_labeled</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.octet.OctetExperiment.sample_conc_labeled" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list with the sample concentrations labeled (96 elements, one per well)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.octet.OctetExperiment.steps_performed">
+<span class="sig-name descname"><span class="pre">steps_performed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pd.DataFrame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.octet.OctetExperiment.steps_performed" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dataframe with the steps performed</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.octet.OctetExperiment.steps_performed.head">
+<span class="sig-prename descclassname"><span class="pre">steps_performed.</span></span><span class="sig-name descname"><span class="pre">head</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pykingenie.octet.OctetExperiment.steps_performed.head" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">#Step</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">Type</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">Column</span>&#160;&#160; <span class="pre">Time</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">1</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">Regeneration</span>&#160;&#160;&#160;&#160;&#160; <span class="pre">1</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">25</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">2</span>&#160; <span class="pre">BaselineNeutralization</span>&#160;&#160;&#160;&#160;&#160; <span class="pre">2</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">90</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">3</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">BaselineLoading</span>&#160;&#160;&#160;&#160;&#160; <span class="pre">3</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">50</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.octet.OctetExperiment.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'BLI_experiment'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/octet.html#OctetExperiment.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.octet.OctetExperiment.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialize the instance</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.octet.OctetExperiment.read_sensor_data">
+<span class="sig-name descname"><span class="pre">read_sensor_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/octet.html#OctetExperiment.read_sensor_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.octet.OctetExperiment.read_sensor_data" title="Link to this definition">#</a></dt>
+<dd><p>Read the sensor data from the .frd files</p>
+<p>Results:</p>
+<blockquote>
+<div><p>It creates the attributes</p>
+<blockquote>
+<div><p>self.traces_loaded
+self.xs
+self.ys
+self.exp_info
+self.step_info
+self.no_steps
+self.no_sensors
+self.sensor_names
+self.df_steps
+self.ligand_conc_df</p>
+</div></blockquote>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.octet.OctetExperiment.generate_ligand_conc_df">
+<span class="sig-name descname"><span class="pre">generate_ligand_conc_df</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/octet.html#OctetExperiment.generate_ligand_conc_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.octet.OctetExperiment.generate_ligand_conc_df" title="Link to this definition">#</a></dt>
+<dd><p>Based on the step_info and exp_info attributes, generate a dataframe with the analyte concentrations</p>
+<dl class="simple">
+<dt>Requires the attributes:</dt><dd><p>self.step_info
+self.exp_info
+self.fns</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.octet.OctetExperiment.merge_consecutive_steps">
+<span class="sig-name descname"><span class="pre">merge_consecutive_steps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx_ref</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx_to_merge</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/octet.html#OctetExperiment.merge_consecutive_steps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.octet.OctetExperiment.merge_consecutive_steps" title="Link to this definition">#</a></dt>
+<dd><p>Combine two steps into one step
+:param idx_ref: index of the reference step. The type of step will be taken from this step.
+:type idx_ref: int
+:param idx_to_merge: index of the step to merge with the reference step
+:type idx_to_merge: int</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.octet.OctetExperiment.merge_consecutive_steps_by_name">
+<span class="sig-name descname"><span class="pre">merge_consecutive_steps_by_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/octet.html#OctetExperiment.merge_consecutive_steps_by_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.octet.OctetExperiment.merge_consecutive_steps_by_name" title="Link to this definition">#</a></dt>
+<dd><p>Merge the step after the step of nam step_name
+:param step_name: name of the step to merge with the next step
+:type step_name: str
+:param Reference: if True, the step type will be used as reference to extract the analyte concentration, loading location, etc.
+:type Reference: bool</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.octet.OctetExperiment.read_sample_plate_info">
+<span class="sig-name descname"><span class="pre">read_sample_plate_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/octet.html#OctetExperiment.read_sample_plate_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.octet.OctetExperiment.read_sample_plate_info" title="Link to this definition">#</a></dt>
+<dd><p>Read the sample plate information from the .fmf file</p>
+<p>Results:</p>
+<blockquote>
+<div><p>It creates the attributes</p>
+<blockquote>
+<div><p>self.sample_column
+self.sample_row
+self.sample_type
+self.sample_id
+self.sample_conc
+self.sample_conc_labeled
+self.sample_plate_loaded
+self.steps_performed</p>
+</div></blockquote>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.octet.OctetExperiment.convert_to_numbers">
+<span class="sig-name descname"><span class="pre">convert_to_numbers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/octet.html#OctetExperiment.convert_to_numbers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.octet.OctetExperiment.convert_to_numbers" title="Link to this definition">#</a></dt>
+<dd><p>Convert the strings in the step info to numbers</p>
+<p>Results:</p>
+<blockquote>
+<div><p>It modifies the attribute self.step_info</p>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-pykingenie.solution_exp">
+<span id="pykingenie-solution-exp-module"></span><h2>pykingenie.solution_exp module<a class="headerlink" href="#module-pykingenie.solution_exp" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pykingenie.solution_exp.SolutionBasedExp">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pykingenie.solution_exp.</span></span><span class="sig-name descname"><span class="pre">SolutionBasedExp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/solution_exp.html#SolutionBasedExp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.solution_exp.SolutionBasedExp" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.solution_exp.SolutionBasedExp.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/solution_exp.html#SolutionBasedExp.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.solution_exp.SolutionBasedExp.__init__" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.solution_exp.SolutionBasedExp.create_unique_traces_names">
+<span class="sig-name descname"><span class="pre">create_unique_traces_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/solution_exp.html#SolutionBasedExp.create_unique_traces_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.solution_exp.SolutionBasedExp.create_unique_traces_names" title="Link to this definition">#</a></dt>
+<dd><p>Create unique traces names by appending the name of the experiment to the trace names.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.solution_exp.SolutionBasedExp.get_trace_xy">
+<span class="sig-name descname"><span class="pre">get_trace_xy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trace_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'y'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/solution_exp.html#SolutionBasedExp.get_trace_xy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.solution_exp.SolutionBasedExp.get_trace_xy" title="Link to this definition">#</a></dt>
+<dd><p>Return the x or y values of a certain step</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trace_name</strong> (<em>str</em>) – name of the trace</p></li>
+<li><p><strong>type</strong> (<em>str</em>) – x or y</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>x or y (np.n) values of the step</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-pykingenie.surface_exp">
+<span id="pykingenie-surface-exp-module"></span><h2>pykingenie.surface_exp module<a class="headerlink" href="#module-pykingenie.surface_exp" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pykingenie.surface_exp.SurfaceBasedExperiment">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pykingenie.surface_exp.</span></span><span class="sig-name descname"><span class="pre">SurfaceBasedExperiment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/surface_exp.html#SurfaceBasedExperiment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.surface_exp.SurfaceBasedExperiment" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.surface_exp.SurfaceBasedExperiment.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/surface_exp.html#SurfaceBasedExperiment.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.surface_exp.SurfaceBasedExperiment.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialize the instance</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.surface_exp.SurfaceBasedExperiment.create_unique_sensor_names">
+<span class="sig-name descname"><span class="pre">create_unique_sensor_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/surface_exp.html#SurfaceBasedExperiment.create_unique_sensor_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.surface_exp.SurfaceBasedExperiment.create_unique_sensor_names" title="Link to this definition">#</a></dt>
+<dd><p>Create unique sensor names by adding the name of the experiment to the sensor names</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.surface_exp.SurfaceBasedExperiment.subtraction_one_to_one">
+<span class="sig-name descname"><span class="pre">subtraction_one_to_one</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sensor_name1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensor_name2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/surface_exp.html#SurfaceBasedExperiment.subtraction_one_to_one"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.surface_exp.SurfaceBasedExperiment.subtraction_one_to_one" title="Link to this definition">#</a></dt>
+<dd><p>Subtract the signal of sensor2 from sensor1</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sensor_name1</strong> (<em>str</em>) – name of the sensor to subtract from</p></li>
+<li><p><strong>sensor_name2</strong> (<em>str</em>) – name of the sensor to subtract</p></li>
+<li><p><strong>inplace</strong> (<em>bool</em>) – if True, the subtraction is done in place, otherwise a new sensor is created</p></li>
+</ul>
+</dd>
+</dl>
+<p>Results:</p>
+<blockquote>
+<div><p>It modifies the attributes self.xs, self.ys, self.sensor_names and self.ligand_conc_df</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.surface_exp.SurfaceBasedExperiment.subtraction">
+<span class="sig-name descname"><span class="pre">subtraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_of_sensor_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference_sensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/surface_exp.html#SurfaceBasedExperiment.subtraction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.surface_exp.SurfaceBasedExperiment.subtraction" title="Link to this definition">#</a></dt>
+<dd><p>Apply the subtract operation to a list of sensors</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>list_of_sensor_names</strong> (<em>list</em>) – list of sensor names to subtract</p></li>
+<li><p><strong>reference_sensor</strong> (<em>str</em>) – name of the sensor to subtract from</p></li>
+<li><p><strong>inplace</strong> (<em>bool</em>) – if True, the subtraction is done in place, otherwise a new sensor is created</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Results:</dt><dd><p>It modifies the attributes self.xs, self.ys, self.sensor_names and self.ligand_conc_df</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.surface_exp.SurfaceBasedExperiment.average">
+<span class="sig-name descname"><span class="pre">average</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_of_sensor_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_sensor_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Average'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/surface_exp.html#SurfaceBasedExperiment.average"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.surface_exp.SurfaceBasedExperiment.average" title="Link to this definition">#</a></dt>
+<dd><p>Average the signals of the sensors in the list</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>list_of_sensor_names</strong> (<em>list</em>) – list of sensor names to average</p></li>
+<li><p><strong>new_sensor_name</strong> (<em>str</em>) – name of the new sensor</p></li>
+</ul>
+</dd>
+</dl>
+<p>Results:</p>
+<blockquote>
+<div><p>It modifies the attributes self.xs, self.ys, self.sensor_names and self.ligand_conc_df</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.surface_exp.SurfaceBasedExperiment.align_association">
+<span class="sig-name descname"><span class="pre">align_association</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sensor_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/surface_exp.html#SurfaceBasedExperiment.align_association"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.surface_exp.SurfaceBasedExperiment.align_association" title="Link to this definition">#</a></dt>
+<dd><p>Align the BLI traces based on the signal before the association step(s)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sensor_names</strong> (<em>str</em><em> or </em><em>list</em>) – name of the sensor(s) to align</p></li>
+<li><p><strong>inplace</strong> (<em>bool</em>) – if True, the alignment is done in place, otherwise a new sensor is created</p></li>
+<li><p><strong>new_names</strong> (<em>bool</em>) – if True, the new sensor name is used, otherwise the old one is used</p></li>
+</ul>
+</dd>
+</dl>
+<p>Results:</p>
+<blockquote>
+<div><p>It modifies the attributes self.xs, self.ys, self.sensor_names and self.ligand_conc_df</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.surface_exp.SurfaceBasedExperiment.align_dissociation">
+<span class="sig-name descname"><span class="pre">align_dissociation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sensor_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/surface_exp.html#SurfaceBasedExperiment.align_dissociation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.surface_exp.SurfaceBasedExperiment.align_dissociation" title="Link to this definition">#</a></dt>
+<dd><p>Align the BLI traces based on the signal before the dissociation step(s)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sensor_names</strong> (<em>str</em><em> or </em><em>list</em>) – name of the sensor(s) to align</p></li>
+<li><p><strong>inplace</strong> (<em>bool</em>) – if True, the alignment is done in place, otherwise a new sensor is created</p></li>
+</ul>
+</dd>
+</dl>
+<p>Results:</p>
+<blockquote>
+<div><p>It modifies the attributes self.xs, self.ys, self.sensor_names and self.ligand_conc_df</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.surface_exp.SurfaceBasedExperiment.discard_steps">
+<span class="sig-name descname"><span class="pre">discard_steps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sensor_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['KREGENERATION',</span> <span class="pre">'LOADING']</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/surface_exp.html#SurfaceBasedExperiment.discard_steps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.surface_exp.SurfaceBasedExperiment.discard_steps" title="Link to this definition">#</a></dt>
+<dd><p>Discard the steps of the sensors in the list</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sensor_names</strong> (<em>str</em><em> or </em><em>list</em>) – name of the sensor(s) to analyse</p></li>
+<li><p><strong>step_types</strong> (<em>str</em><em> or </em><em>list</em>) – type of the steps to discard</p></li>
+</ul>
+</dd>
+</dl>
+<p>Results:</p>
+<blockquote>
+<div><p>It modifies the attributes self.xs, self.ys, self.sensor_names and self.ligand_conc_df</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.surface_exp.SurfaceBasedExperiment.get_step_xy">
+<span class="sig-name descname"><span class="pre">get_step_xy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sensor_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location_loading</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location_sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ASSOC'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replicate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'y'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/surface_exp.html#SurfaceBasedExperiment.get_step_xy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.surface_exp.SurfaceBasedExperiment.get_step_xy" title="Link to this definition">#</a></dt>
+<dd><p>Return the x or y values of a certain step</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sensor_name</strong> (<em>str</em>) – name of the sensor</p></li>
+<li><p><strong>location_sample</strong> (<em>int</em>) – column location of the sample. If zero, we assume we only have one location</p></li>
+<li><p><strong>location_loading</strong> (<em>int</em>) – column location of the loading. If zero, we assume we only have one location</p></li>
+<li><p><strong>step_type</strong> (<em>str</em>) – type of the step, ASSOC or DISASSOC only</p></li>
+<li><p><strong>replicate</strong> (<em>int</em>) – replicate number</p></li>
+<li><p><strong>type</strong> (<em>str</em>) – x or y</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>x or y (np.n) values of the step</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="modules.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">pykingenie</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="pykingenie.utils.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">pykingenie.utils package</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#subpackages">Subpackages</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submodules">Submodules</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-pykingenie.fitter">pykingenie.fitter module</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter"><code class="docutils literal notranslate"><span class="pre">KineticsFitter</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.names"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.names</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.assoc"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.assoc</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.disso"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.disso</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.smax_id"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.smax_id</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.__init__"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.__init__()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.get_steady_state"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.get_steady_state()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.clear_fittings"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.clear_fittings()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.create_fitting_bounds_table"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.create_fitting_bounds_table()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.fit_steady_state"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_steady_state()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.fit_one_site_association"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_one_site_association()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.fit_one_site_dissociation"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_one_site_dissociation()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.fit_single_exponentials"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_single_exponentials()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.fit_one_site_assoc_and_disso"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_one_site_assoc_and_disso()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.calculate_ci95"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.calculate_ci95()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.fit_one_site_if_assoc_and_disso"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_one_site_if_assoc_and_disso()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-pykingenie.fitter_solution">pykingenie.fitter_solution module</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_solution.KineticsFitterSolution"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_solution.KineticsFitterSolution.__init__"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.__init__()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_solution.KineticsFitterSolution.get_steady_state"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.get_steady_state()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_solution.KineticsFitterSolution.clear_fittings"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.clear_fittings()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_solution.KineticsFitterSolution.fit_single_exponentials"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.fit_single_exponentials()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_solution.KineticsFitterSolution.group_k_obs_by_protein_concentration"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.group_k_obs_by_protein_concentration()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_solution.KineticsFitterSolution.fit_double_exponentials"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.fit_double_exponentials()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_solution.KineticsFitterSolution.group_double_exponential_k_obs_by_protein_concentration"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.group_double_exponential_k_obs_by_protein_concentration()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_solution.KineticsFitterSolution.fit_one_binding_site"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.fit_one_binding_site()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_solution.KineticsFitterSolution.find_initial_params_if"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.find_initial_params_if()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_solution.KineticsFitterSolution.fit_induced_fit"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.fit_induced_fit()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-pykingenie.gator">pykingenie.gator module</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.gator.GatorExperiment"><code class="docutils literal notranslate"><span class="pre">GatorExperiment</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.gator.GatorExperiment.__init__"><code class="docutils literal notranslate"><span class="pre">GatorExperiment.__init__()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.gator.GatorExperiment.read_all_gator_data"><code class="docutils literal notranslate"><span class="pre">GatorExperiment.read_all_gator_data()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.gator.GatorExperiment.read_experiment_ini"><code class="docutils literal notranslate"><span class="pre">GatorExperiment.read_experiment_ini()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.gator.GatorExperiment.read_settings_ini"><code class="docutils literal notranslate"><span class="pre">GatorExperiment.read_settings_ini()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.gator.GatorExperiment.read_sensor_data"><code class="docutils literal notranslate"><span class="pre">GatorExperiment.read_sensor_data()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-pykingenie.kingenie_solution">pykingenie.kingenie_solution module</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.kingenie_solution.KinGenieCsvSolution"><code class="docutils literal notranslate"><span class="pre">KinGenieCsvSolution</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.kingenie_solution.KinGenieCsvSolution.name"><code class="docutils literal notranslate"><span class="pre">KinGenieCsvSolution.name</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.kingenie_solution.KinGenieCsvSolution.xs"><code class="docutils literal notranslate"><span class="pre">KinGenieCsvSolution.xs</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.kingenie_solution.KinGenieCsvSolution.ys"><code class="docutils literal notranslate"><span class="pre">KinGenieCsvSolution.ys</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.kingenie_solution.KinGenieCsvSolution.no_sensors"><code class="docutils literal notranslate"><span class="pre">KinGenieCsvSolution.no_sensors</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.kingenie_solution.KinGenieCsvSolution.sensor_names"><code class="docutils literal notranslate"><span class="pre">KinGenieCsvSolution.sensor_names</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.kingenie_solution.KinGenieCsvSolution.sensor_names_unique"><code class="docutils literal notranslate"><span class="pre">KinGenieCsvSolution.sensor_names_unique</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.kingenie_solution.KinGenieCsvSolution.ligand_conc_df"><code class="docutils literal notranslate"><span class="pre">KinGenieCsvSolution.ligand_conc_df</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.kingenie_solution.KinGenieCsvSolution.__init__"><code class="docutils literal notranslate"><span class="pre">KinGenieCsvSolution.__init__()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.kingenie_solution.KinGenieCsvSolution.read_csv"><code class="docutils literal notranslate"><span class="pre">KinGenieCsvSolution.read_csv()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-pykingenie.kingenie_surface">pykingenie.kingenie_surface module</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.kingenie_surface.KinGenieCsv"><code class="docutils literal notranslate"><span class="pre">KinGenieCsv</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.kingenie_surface.KinGenieCsv.__init__"><code class="docutils literal notranslate"><span class="pre">KinGenieCsv.__init__()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.kingenie_surface.KinGenieCsv.read_csv"><code class="docutils literal notranslate"><span class="pre">KinGenieCsv.read_csv()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-pykingenie.main">pykingenie.main module</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.main.KineticsAnalyzer"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.main.KineticsAnalyzer.__init__"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.__init__()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.main.KineticsAnalyzer.delete_experiment"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.delete_experiment()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.main.KineticsAnalyzer.add_experiment"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.add_experiment()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.main.KineticsAnalyzer.init_fittings"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.init_fittings()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.main.KineticsAnalyzer.add_fitting"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.add_fitting()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.main.KineticsAnalyzer.get_experiment_properties"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.get_experiment_properties()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.main.KineticsAnalyzer.merge_ligand_conc_df"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.merge_ligand_conc_df()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.main.KineticsAnalyzer.merge_conc_df_solution"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.merge_conc_df_solution()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.main.KineticsAnalyzer.generate_fittings"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.generate_fittings()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.main.KineticsAnalyzer.generate_fittings_solution"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.generate_fittings_solution()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.main.KineticsAnalyzer.submit_steady_state_fitting"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.submit_steady_state_fitting()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.main.KineticsAnalyzer.submit_fitting_solution"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.submit_fitting_solution()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.main.KineticsAnalyzer.submit_kinetics_fitting"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.submit_kinetics_fitting()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.main.KineticsAnalyzer.calculate_asymmetric_error"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.calculate_asymmetric_error()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.main.KineticsAnalyzer.get_fitting_results"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.get_fitting_results()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-pykingenie.octet">pykingenie.octet module</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.octet.OctetExperiment"><code class="docutils literal notranslate"><span class="pre">OctetExperiment</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.octet.OctetExperiment.name"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.name</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.octet.OctetExperiment.fns"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.fns</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.octet.OctetExperiment.xs"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.xs</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.octet.OctetExperiment.ys"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.ys</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.octet.OctetExperiment.exp_info"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.exp_info</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.octet.OctetExperiment.step_info"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.step_info</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.octet.OctetExperiment.no_steps"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.no_steps</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.octet.OctetExperiment.no_sensors"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.no_sensors</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.octet.OctetExperiment.sample_column"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.sample_column</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.octet.OctetExperiment.sample_row"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.sample_row</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.octet.OctetExperiment.sample_type"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.sample_type</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.octet.OctetExperiment.sample_id"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.sample_id</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.octet.OctetExperiment.sensor_names_unique"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.sensor_names_unique</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.octet.OctetExperiment.sensor_names"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.sensor_names</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.octet.OctetExperiment.df_steps"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.df_steps</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.octet.OctetExperiment.ligand_conc_df"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.ligand_conc_df</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.octet.OctetExperiment.ligand_conc_df.head"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.ligand_conc_df.head</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.octet.OctetExperiment.traces_loaded"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.traces_loaded</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.octet.OctetExperiment.sample_plate_loaded"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.sample_plate_loaded</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.octet.OctetExperiment.sample_conc"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.sample_conc</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.octet.OctetExperiment.sample_conc_labeled"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.sample_conc_labeled</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.octet.OctetExperiment.steps_performed"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.steps_performed</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.octet.OctetExperiment.steps_performed.head"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.steps_performed.head</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.octet.OctetExperiment.__init__"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.__init__()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.octet.OctetExperiment.read_sensor_data"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.read_sensor_data()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.octet.OctetExperiment.generate_ligand_conc_df"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.generate_ligand_conc_df()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.octet.OctetExperiment.merge_consecutive_steps"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.merge_consecutive_steps()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.octet.OctetExperiment.merge_consecutive_steps_by_name"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.merge_consecutive_steps_by_name()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.octet.OctetExperiment.read_sample_plate_info"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.read_sample_plate_info()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.octet.OctetExperiment.convert_to_numbers"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.convert_to_numbers()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-pykingenie.solution_exp">pykingenie.solution_exp module</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.solution_exp.SolutionBasedExp"><code class="docutils literal notranslate"><span class="pre">SolutionBasedExp</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.solution_exp.SolutionBasedExp.__init__"><code class="docutils literal notranslate"><span class="pre">SolutionBasedExp.__init__()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.solution_exp.SolutionBasedExp.create_unique_traces_names"><code class="docutils literal notranslate"><span class="pre">SolutionBasedExp.create_unique_traces_names()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.solution_exp.SolutionBasedExp.get_trace_xy"><code class="docutils literal notranslate"><span class="pre">SolutionBasedExp.get_trace_xy()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-pykingenie.surface_exp">pykingenie.surface_exp module</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.surface_exp.SurfaceBasedExperiment"><code class="docutils literal notranslate"><span class="pre">SurfaceBasedExperiment</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.surface_exp.SurfaceBasedExperiment.__init__"><code class="docutils literal notranslate"><span class="pre">SurfaceBasedExperiment.__init__()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.surface_exp.SurfaceBasedExperiment.create_unique_sensor_names"><code class="docutils literal notranslate"><span class="pre">SurfaceBasedExperiment.create_unique_sensor_names()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.surface_exp.SurfaceBasedExperiment.subtraction_one_to_one"><code class="docutils literal notranslate"><span class="pre">SurfaceBasedExperiment.subtraction_one_to_one()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.surface_exp.SurfaceBasedExperiment.subtraction"><code class="docutils literal notranslate"><span class="pre">SurfaceBasedExperiment.subtraction()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.surface_exp.SurfaceBasedExperiment.average"><code class="docutils literal notranslate"><span class="pre">SurfaceBasedExperiment.average()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.surface_exp.SurfaceBasedExperiment.align_association"><code class="docutils literal notranslate"><span class="pre">SurfaceBasedExperiment.align_association()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.surface_exp.SurfaceBasedExperiment.align_dissociation"><code class="docutils literal notranslate"><span class="pre">SurfaceBasedExperiment.align_dissociation()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.surface_exp.SurfaceBasedExperiment.discard_steps"><code class="docutils literal notranslate"><span class="pre">SurfaceBasedExperiment.discard_steps()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.surface_exp.SurfaceBasedExperiment.get_step_xy"><code class="docutils literal notranslate"><span class="pre">SurfaceBasedExperiment.get_step_xy()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/pykingenie.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, osvalB.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

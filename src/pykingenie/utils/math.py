@@ -3,6 +3,13 @@ import pandas as pd
 
 from scipy           import stats
 
+___all__ = ['single_exponential',
+           'double_exponential',
+           'median_filter',
+           'rss_p',
+           'get_rss',
+           'get_desired_rss']
+
 def single_exponential(t, a0, a1, kobs):
 
     """

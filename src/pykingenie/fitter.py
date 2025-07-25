@@ -1,4 +1,3 @@
-
 from .utils.fitting_surface import *
 from .utils.fitting_general import fit_single_exponential
 from .utils.processing      import *
@@ -722,3 +721,4 @@ class KineticsFitter:
         self.high_bounds = high_bounds
 
         return None
+

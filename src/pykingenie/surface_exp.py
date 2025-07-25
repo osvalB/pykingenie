@@ -191,7 +191,7 @@ class SurfaceBasedExperiment:
 
         return None
 
-    def align_association(self,sensor_names,inplace=True,new_names = False):
+    def align_association(self,sensor_names,inplace=True,new_names = False, npoints=10):
 
         """
 
@@ -243,7 +243,7 @@ class SurfaceBasedExperiment:
             for i, association_step_index in enumerate(association_steps_indices):
 
                 #  Subtract the first point of the previous baseline step
-                last_point = np.mean(self.ys[sensor][association_step_index-1][-10:])
+                last_point = np.mean(self.ys[sensor][association_step_index-1][-npoints:])
 
                 if i == 0:
 
@@ -297,7 +297,7 @@ class SurfaceBasedExperiment:
 
         return None
 
-    def align_dissociation(self,sensor_names,inplace=True,new_names = False):
+    def align_dissociation(self,sensor_names,inplace=True,new_names = False,npoints=10):
 
         """
         Align the BLI traces based on the signal before the dissociation step(s)
@@ -336,8 +336,8 @@ class SurfaceBasedExperiment:
             for diss_step_index in dissociation_steps_indices:
 
                 #  Subtract the difference between the steps
-                last_point = np.mean(self.ys[sensor][diss_step_index-1][-10:])
-                next_point = np.mean(self.ys[sensor][diss_step_index][:10])
+                last_point = np.mean(self.ys[sensor][diss_step_index-1][-npoints:])
+                next_point = np.mean(self.ys[sensor][diss_step_index][:npoints])
 
                 diff = next_point - last_point
 

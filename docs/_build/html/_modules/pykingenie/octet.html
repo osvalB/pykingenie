@@ -1,0 +1,976 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pykingenie.octet &#8212; PyKinGenie 0.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/pykingenie/octet';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">PyKinGenie 0.1.0 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../modules.html">
+    pykingenie
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/osvalB/pykingenie" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../modules.html">
+    pykingenie
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/osvalB/pykingenie" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">pykingenie.octet</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for pykingenie.octet</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">base64</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xml.etree.ElementTree</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">elementTree</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.utils.processing</span><span class="w"> </span><span class="kn">import</span> <span class="n">etree_to_dict</span><span class="p">,</span> <span class="n">combine_dicts</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.surface_exp</span><span class="w">      </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">factor_conc_to_micro</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;nM&#39;</span><span class="p">:</span><span class="mf">1e-3</span><span class="p">,</span> <span class="s1">&#39;µM&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;mM&#39;</span><span class="p">:</span><span class="mf">1e3</span><span class="p">,</span> <span class="s1">&#39;M&#39;</span><span class="p">:</span><span class="mf">1e6</span><span class="p">,</span> <span class="s1">&#39;mg/ml&#39;</span><span class="p">:</span><span class="mf">1e3</span><span class="p">,</span> <span class="s1">&#39;µg/ml&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">}</span>
+
+<div class="viewcode-block" id="OctetExperiment">
+<a class="viewcode-back" href="../../pykingenie.html#pykingenie.octet.OctetExperiment">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OctetExperiment</span><span class="p">(</span><span class="n">SurfaceBasedExperiment</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class used to represent a BLI experiment</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">        name (str):                 name of the experiment</span>
+<span class="sd">        fns (list):                 list of file names (length n, one per sensor)</span>
+<span class="sd">        xs (list):                  list of x values (time, length n, one per sensor)</span>
+<span class="sd">        ys (list):                  list of y values (length n, one per sensor)</span>
+<span class="sd">        exp_info (list):            list of dictionaries with experimental information</span>
+<span class="sd">        step_info (list):           list of dictionaries with step information</span>
+<span class="sd">        no_steps (int):             number of steps</span>
+<span class="sd">        no_sensors (int):           number of sensors</span>
+<span class="sd">        sample_column (np.ndarray): array of sample column information (96 elements, one per well)</span>
+<span class="sd">        sample_row (np.ndarray):    array of sample row information    (96 elements, one per well)</span>
+<span class="sd">        sample_type (list):         list of sample types   (96 elements, one per well)</span>
+<span class="sd">        sample_id (list):           list of sample ids     (96 elements, one per well)</span>
+<span class="sd">        sensor_names_unique (list): list of unique sensor names (length n, one per sensor)</span>
+<span class="sd">        sensor_names (list):        list of sensor names (length n, one per sensor)</span>
+<span class="sd">        df_steps    (pd.DataFrame): dataframe with the steps information</span>
+<span class="sd">        ligand_conc_df (pd.DataFrame): dataframe with the ligand concentration information</span>
+
+<span class="sd">        ligand_conc_df.head(2):</span>
+<span class="sd">        Sensor Analyte_location  Concentration_micromolar SampleID  Replicate Experiment</span>
+<span class="sd">        A1        5                    0.1300       wt          1          t</span>
+<span class="sd">        B1        5                    0.0692       wt          1          t</span>
+
+<span class="sd">        traces_loaded (bool):       True if traces are loaded</span>
+<span class="sd">        sample_plate_loaded (bool): True if sample plate information is loaded</span>
+<span class="sd">        sample_conc (np.array):     array with the sample concentrations (96 elements, one per well)</span>
+<span class="sd">        sample_conc_labeled (list): list with the sample concentrations labeled (96 elements, one per well)</span>
+<span class="sd">        steps_performed (pd.DataFrame): dataframe with the steps performed</span>
+
+<span class="sd">        steps_performed.head(2):</span>
+<span class="sd">        #Step         Type              Column   Time</span>
+<span class="sd">        1            Regeneration      1        25</span>
+<span class="sd">        2  BaselineNeutralization      2        90</span>
+<span class="sd">        3         BaselineLoading      3        50</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="OctetExperiment.__init__">
+<a class="viewcode-back" href="../../pykingenie.html#pykingenie.octet.OctetExperiment.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;BLI_experiment&#39;</span><span class="p">):</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Initialize the instance</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="s1">&#39;BLI_experiment&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="OctetExperiment.read_sensor_data">
+<a class="viewcode-back" href="../../pykingenie.html#pykingenie.octet.OctetExperiment.read_sensor_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read_sensor_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span><span class="n">names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Read the sensor data from the .frd files</span>
+
+<span class="sd">        Results:</span>
+
+<span class="sd">            It creates the attributes</span>
+
+<span class="sd">                self.traces_loaded</span>
+<span class="sd">                self.xs</span>
+<span class="sd">                self.ys</span>
+<span class="sd">                self.exp_info</span>
+<span class="sd">                self.step_info</span>
+<span class="sd">                self.no_steps</span>
+<span class="sd">                self.no_sensors</span>
+<span class="sd">                self.sensor_names</span>
+<span class="sd">                self.df_steps</span>
+<span class="sd">                self.ligand_conc_df</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="n">files</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">files</span><span class="p">]</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">names</span><span class="p">]</span>
+
+        <span class="n">fns</span> <span class="o">=</span> <span class="p">[</span><span class="n">fn</span> <span class="k">for</span> <span class="n">fn</span><span class="p">,</span><span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">files</span><span class="p">,</span><span class="n">names</span><span class="p">)</span> <span class="k">if</span> <span class="s1">&#39;.frd&#39;</span> <span class="ow">in</span> <span class="n">name</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fns</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">traces_loaded</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fns</span> <span class="o">=</span> <span class="n">fns</span>
+
+        <span class="c1"># Initialize dictionaries with data</span>
+        <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">all_expinfo</span><span class="p">,</span> <span class="n">all_stepinfo</span><span class="p">,</span> <span class="n">more_info</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">fns</span><span class="p">:</span>
+            <span class="c1"># Load file</span>
+            <span class="n">tree</span> <span class="o">=</span> <span class="n">elementTree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+            <span class="n">root</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+
+            <span class="c1"># Extract experimental info</span>
+            <span class="n">all_expinfo</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">etree_to_dict</span><span class="p">(</span><span class="n">root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;ExperimentInfo&#39;</span><span class="p">)))</span>
+
+            <span class="c1"># Initialize lists for each file</span>
+            <span class="n">x_values</span><span class="p">,</span> <span class="n">y_values</span><span class="p">,</span> <span class="n">step_info</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+            <span class="n">more_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;FlowRate&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;StepType&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;StepName&#39;</span><span class="p">:[],</span> <span class="s1">&#39;StepStatus&#39;</span><span class="p">:[],</span> <span class="s1">&#39;ActualTime&#39;</span><span class="p">:[],</span> <span class="s1">&#39;CycleTime&#39;</span><span class="p">:[]}</span>
+            <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;KineticsData&#39;</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">step_x</span> <span class="ow">in</span> <span class="n">step</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;AssayXData&#39;</span><span class="p">):</span>
+                    <span class="c1"># Convert string to binary</span>
+                    <span class="n">data_text</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">step_x</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+                    <span class="c1"># Convert to base64</span>
+                    <span class="n">decoded</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">decodebytes</span><span class="p">(</span><span class="n">data_text</span><span class="p">)</span>
+                    <span class="c1"># And now convert to float32 array</span>
+                    <span class="n">data_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">decoded</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
+                    <span class="n">x_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data_values</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">step_y</span> <span class="ow">in</span> <span class="n">step</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;AssayYData&#39;</span><span class="p">):</span>
+                    <span class="c1"># Convert string to binary</span>
+                    <span class="n">data_text</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">step_y</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+                    <span class="c1"># Convert to base64</span>
+                    <span class="n">decoded</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">decodebytes</span><span class="p">(</span><span class="n">data_text</span><span class="p">)</span>
+                    <span class="c1"># And now convert to float32 array</span>
+                    <span class="n">data_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">decoded</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
+                    <span class="n">y_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data_values</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">step_data</span> <span class="ow">in</span> <span class="n">step</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;CommonData&#39;</span><span class="p">):</span>
+                    <span class="n">step_info</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">etree_to_dict</span><span class="p">(</span><span class="n">step_data</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;FlowRate&#39;</span><span class="p">,</span> <span class="s1">&#39;StepType&#39;</span><span class="p">,</span> <span class="s1">&#39;StepName&#39;</span><span class="p">,</span> <span class="s1">&#39;StepStatus&#39;</span><span class="p">,</span> <span class="s1">&#39;ActualTime&#39;</span><span class="p">,</span> <span class="s1">&#39;CycleTime&#39;</span><span class="p">]:</span>
+                    <span class="k">for</span> <span class="n">step_data</span> <span class="ow">in</span> <span class="n">step</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">tag</span><span class="p">):</span>
+                        <span class="n">more_dict</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">step_data</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+
+            <span class="n">xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x_values</span><span class="p">)</span>
+            <span class="n">ys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_values</span><span class="p">)</span>
+            <span class="n">all_stepinfo</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">combine_dicts</span><span class="p">(</span><span class="n">step_info</span><span class="p">))</span>
+            <span class="n">more_info</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">more_dict</span><span class="p">)</span>
+
+        <span class="c1"># Merge all_stepinfo and more_info</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">all_stepinfo</span><span class="p">)):</span>
+            <span class="n">all_stepinfo</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">all_stepinfo</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="o">**</span><span class="n">more_info</span><span class="p">[</span><span class="n">i</span><span class="p">]}</span>
+
+        <span class="c1"># Fill instance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xs</span>   <span class="o">=</span> <span class="n">xs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ys</span>   <span class="o">=</span> <span class="n">ys</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exp_info</span>  <span class="o">=</span> <span class="n">all_expinfo</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">step_info</span> <span class="o">=</span> <span class="n">all_stepinfo</span>
+        <span class="c1"># Convert text to floats</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">convert_to_numbers</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">generate_ligand_conc_df</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="OctetExperiment.generate_ligand_conc_df">
+<a class="viewcode-back" href="../../pykingenie.html#pykingenie.octet.OctetExperiment.generate_ligand_conc_df">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_ligand_conc_df</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Based on the step_info and exp_info attributes, generate a dataframe with the analyte concentrations</span>
+
+<span class="sd">        Requires the attributes:</span>
+<span class="sd">            self.step_info</span>
+<span class="sd">            self.exp_info</span>
+<span class="sd">            self.fns</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">no_steps</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">step_info</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;ActualTime&#39;</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">no_sensors</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fns</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sensor_names</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">exp_info</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;SensorName&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">no_sensors</span><span class="p">)]</span>
+
+        <span class="n">steps_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_info</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;StepName&#39;</span><span class="p">]</span>
+        <span class="n">steps_types</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_info</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;StepType&#39;</span><span class="p">]</span>
+        <span class="n">steps_start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_info</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;StartTime&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">1000</span> <span class="c1"># To seconds</span>
+        <span class="n">steps_loc</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_info</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;SampleLocation&#39;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_steps</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;#Step&#39;</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">steps_names</span><span class="p">))</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
+                                      <span class="s1">&#39;Name&#39;</span><span class="p">:</span><span class="n">steps_names</span><span class="p">,</span>
+                                      <span class="s1">&#39;Type&#39;</span><span class="p">:</span><span class="n">steps_types</span><span class="p">,</span>
+                                      <span class="s1">&#39;Start&#39;</span><span class="p">:</span><span class="n">steps_start</span><span class="p">,</span>
+                                      <span class="s1">&#39;Column_location&#39;</span><span class="p">:</span><span class="n">steps_loc</span><span class="p">})</span>
+
+        <span class="c1"># We need to include the loading location in self.df_steps</span>
+        <span class="n">loading_location</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_steps</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">step_type</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;Type&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">step_type</span> <span class="o">==</span> <span class="s1">&#39;ASSOC&#39;</span><span class="p">:</span>
+                <span class="c1"># Find the previous loading step</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_steps</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;Type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;LOADING&#39;</span><span class="p">:</span>
+                        <span class="n">loading_location</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df_steps</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;Column_location&#39;</span><span class="p">])</span>
+                        <span class="k">break</span>
+                    <span class="c1"># If no loading step is found, append NaN</span>
+                    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">loading_location</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">loading_location</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_steps</span><span class="p">[</span><span class="s1">&#39;Loading_location&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">loading_location</span>
+
+        <span class="n">sensor_locs_all</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">step_info</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;SampleLocation&#39;</span><span class="p">]</span>       <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">no_sensors</span><span class="p">)])</span>
+        <span class="n">sensor_type_all</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">step_info</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;StepType&#39;</span><span class="p">]</span>             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">no_sensors</span><span class="p">)])</span>
+
+        <span class="n">sensor_molar_conc_all</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">step_info</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;MolarConcentration&#39;</span><span class="p">]</span>  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">no_sensors</span><span class="p">)])</span>
+        <span class="n">sensor_mass_conc_all</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">step_info</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;Concentration&#39;</span><span class="p">]</span>       <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">no_sensors</span><span class="p">)])</span>
+
+        <span class="n">sensor_conc_all</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sensor_molar_conc_all</span><span class="p">)):</span>
+
+            <span class="k">if</span> <span class="n">sensor_molar_conc_all</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+
+                <span class="n">sensor_conc_all</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sensor_mass_conc_all</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+            <span class="k">else</span><span class="p">:</span>
+
+                <span class="n">sensor_conc_all</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sensor_molar_conc_all</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="n">sensor_conc_all</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sensor_conc_all</span><span class="p">)</span>
+
+        <span class="n">sample_id_all</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">step_info</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;SampleID&#39;</span><span class="p">]</span>   <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">no_sensors</span><span class="p">)])</span>
+
+        <span class="n">sensor_name_rep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exp_info</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;SensorName&#39;</span><span class="p">],</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">step_info</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;Concentration&#39;</span><span class="p">]))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">no_sensors</span><span class="p">)])</span>
+
+        <span class="n">conc_units</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">step_info</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;MolarConcUnits&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">no_sensors</span><span class="p">)])</span>
+
+        <span class="n">df_all</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Sensor&#39;</span><span class="p">:</span><span class="n">sensor_name_rep</span><span class="p">,</span>
+                               <span class="s1">&#39;Analyte_location&#39;</span><span class="p">:</span><span class="n">sensor_locs_all</span><span class="p">,</span>
+                               <span class="s1">&#39;Type&#39;</span><span class="p">:</span><span class="n">sensor_type_all</span><span class="p">,</span>
+                               <span class="s1">&#39;Concentration_micromolar&#39;</span><span class="p">:</span><span class="n">sensor_conc_all</span><span class="p">,</span>
+                               <span class="s1">&#39;ConcUnits&#39;</span><span class="p">:</span><span class="n">conc_units</span><span class="p">,</span>
+                               <span class="s1">&#39;SampleID&#39;</span><span class="p">:</span><span class="n">sample_id_all</span><span class="p">})</span>
+
+        <span class="c1"># For each association step, find the corresponding loading step</span>
+        <span class="c1"># and add the loading step to the dataframe as a column next to the association</span>
+
+        <span class="c1"># Add empty column to the data frame</span>
+        <span class="n">loading_location</span>  <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">loading_sample_id</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df_all</span><span class="p">)):</span>
+
+            <span class="n">row</span> <span class="o">=</span> <span class="n">df_all</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="c1"># Find if row is association step</span>
+            <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;Type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;ASSOC&#39;</span><span class="p">:</span>
+
+                <span class="c1"># Find the previous loading step</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+
+                    <span class="k">if</span> <span class="n">df_all</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="s1">&#39;Type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;LOADING&#39;</span><span class="p">:</span>
+
+                        <span class="n">loading_location</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_all</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="s1">&#39;Analyte_location&#39;</span><span class="p">])</span>
+                        <span class="n">loading_sample_id</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_all</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="s1">&#39;SampleID&#39;</span><span class="p">])</span>
+                        <span class="k">break</span>
+
+        <span class="c1"># Keep only association or dissociation steps</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df_all</span><span class="p">[</span><span class="n">df_all</span><span class="p">[</span><span class="s1">&#39;Type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;ASSOC&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="c1"># If loading location is empty, fill with 0</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">loading_location</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">loading_location</span> <span class="o">=</span>  <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+            <span class="n">loading_sample_id</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+        <span class="c1"># ADD column loading_location</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Loading_location&#39;</span><span class="p">]</span>  <span class="o">=</span> <span class="n">loading_location</span>
+
+        <span class="c1"># Replace None with empty string in loading_sample_id</span>
+        <span class="n">loading_sample_id</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">loading_sample_id</span><span class="p">]</span>
+
+        <span class="c1"># Include the loading_sample_id, if we have more than one unique value</span>
+        <span class="n">unq_loading_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">loading_sample_id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unq_loading_ids</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+
+            <span class="c1"># Combine the sample id with the loading id</span>
+            <span class="n">df</span><span class="p">[</span><span class="s1">&#39;SampleID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;SampleID&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; - &#39;</span> <span class="o">+</span> <span class="n">loading_sample_id</span>
+
+        <span class="c1"># Remove the Type column</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Type&#39;</span><span class="p">])</span>
+
+        <span class="c1"># Sort by location and sensor name</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Loading_location&#39;</span><span class="p">,</span><span class="s1">&#39;Analyte_location&#39;</span><span class="p">,</span><span class="s1">&#39;Sensor&#39;</span><span class="p">])</span>
+
+        <span class="c1"># Add rep column</span>
+        <span class="n">sizes</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;Loading_location&#39;</span><span class="p">,</span><span class="s1">&#39;Analyte_location&#39;</span><span class="p">,</span><span class="s1">&#39;Sensor&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Repetitions&quot;</span><span class="p">)</span>
+
+        <span class="n">rep_number</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sizes</span><span class="p">)):</span>
+            <span class="n">rep_number</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">sizes</span><span class="p">[</span><span class="s1">&#39;Repetitions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Group by sensor and location</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Replicate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rep_number</span>
+
+        <span class="c1"># Sort the dataframe first by sensor, second by Loading location,</span>
+        <span class="c1"># Third by replicate and finally by location</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Analyte_location&#39;</span><span class="p">,</span><span class="s1">&#39;Replicate&#39;</span><span class="p">,</span><span class="s1">&#39;Loading_location&#39;</span><span class="p">,</span><span class="s1">&#39;Sensor&#39;</span><span class="p">])</span>
+
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Factor&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">factor_conc_to_micro</span><span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;ConcUnits&#39;</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Concentration_micromolar&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Concentration_micromolar&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Factor&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Remove the factor column and conc units</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Factor&#39;</span><span class="p">,</span><span class="s1">&#39;ConcUnits&#39;</span><span class="p">])</span>
+
+        <span class="c1"># Add the experiment name</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Experiment&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ligand_conc_df</span> <span class="o">=</span> <span class="n">df</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_unique_sensor_names</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">traces_loaded</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="OctetExperiment.merge_consecutive_steps">
+<a class="viewcode-back" href="../../pykingenie.html#pykingenie.octet.OctetExperiment.merge_consecutive_steps">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">merge_consecutive_steps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">idx_ref</span><span class="p">,</span><span class="n">idx_to_merge</span><span class="p">):</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Combine two steps into one step</span>
+<span class="sd">        Args:</span>
+<span class="sd">            idx_ref (int): index of the reference step. The type of step will be taken from this step.</span>
+<span class="sd">            idx_to_merge (int): index of the step to merge with the reference step</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">idx_ref</span> <span class="o">-</span> <span class="n">idx_to_merge</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;The two steps must be consecutive&quot;</span>
+        <span class="k">assert</span> <span class="n">idx_ref</span> <span class="o">!=</span> <span class="n">idx_to_merge</span><span class="p">,</span> <span class="s2">&quot;The two steps must be different&quot;</span>
+
+        <span class="n">idx_ref</span> <span class="o">-=</span> <span class="mi">1</span>      <span class="c1"># Adjust for 0-based indexing</span>
+        <span class="n">idx_to_merge</span> <span class="o">-=</span> <span class="mi">1</span> <span class="c1"># Adjust for 0-based indexing</span>
+
+        <span class="k">for</span> <span class="n">sensor</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">no_sensors</span><span class="p">):</span>
+
+            <span class="c1"># Extract the reference step x and y values</span>
+            <span class="n">x_ref</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xs</span><span class="p">[</span><span class="n">sensor</span><span class="p">][</span><span class="n">idx_ref</span><span class="p">]</span>
+            <span class="n">y_ref</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ys</span><span class="p">[</span><span class="n">sensor</span><span class="p">][</span><span class="n">idx_ref</span><span class="p">]</span>
+
+            <span class="c1"># Extract the step to merge x and y values</span>
+            <span class="n">x_merge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xs</span><span class="p">[</span><span class="n">sensor</span><span class="p">][</span><span class="n">idx_to_merge</span><span class="p">]</span>
+            <span class="n">y_merge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ys</span><span class="p">[</span><span class="n">sensor</span><span class="p">][</span><span class="n">idx_to_merge</span><span class="p">]</span>
+
+            <span class="c1"># Find wich has the lowest start time</span>
+            <span class="n">t0_ref</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">x_ref</span><span class="p">)</span>
+            <span class="n">t0_merge</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">x_merge</span><span class="p">)</span>
+
+            <span class="c1"># Concatenate the x and y values</span>
+            <span class="k">if</span> <span class="n">t0_ref</span> <span class="o">&lt;</span> <span class="n">t0_merge</span><span class="p">:</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">xs</span><span class="p">[</span><span class="n">sensor</span><span class="p">][</span><span class="n">idx_ref</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">x_ref</span><span class="p">,</span> <span class="n">x_merge</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ys</span><span class="p">[</span><span class="n">sensor</span><span class="p">][</span><span class="n">idx_ref</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">y_ref</span><span class="p">,</span> <span class="n">y_merge</span><span class="p">))</span>
+
+            <span class="k">else</span><span class="p">:</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">xs</span><span class="p">[</span><span class="n">sensor</span><span class="p">][</span><span class="n">idx_ref</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">x_merge</span><span class="p">,</span> <span class="n">x_ref</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ys</span><span class="p">[</span><span class="n">sensor</span><span class="p">][</span><span class="n">idx_ref</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">y_merge</span><span class="p">,</span> <span class="n">y_ref</span><span class="p">))</span>
+
+            <span class="c1"># Remove the merge step from the xs and ys lists</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">xs</span><span class="p">[</span><span class="n">sensor</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">idx_to_merge</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ys</span><span class="p">[</span><span class="n">sensor</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">idx_to_merge</span><span class="p">)</span>
+
+            <span class="c1"># Remove the step from self.step_info</span>
+            <span class="c1"># using the idx_to_merge index</span>
+
+            <span class="k">for</span> <span class="n">sensor_id</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">no_sensors</span><span class="p">):</span>
+
+                <span class="n">step_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_info</span><span class="p">[</span><span class="n">sensor_id</span><span class="p">]</span>
+
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">step_info</span><span class="p">):</span>
+
+                    <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_info</span><span class="p">[</span><span class="n">sensor_id</span><span class="p">][</span><span class="n">l</span><span class="p">]</span>
+
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">idx_to_merge</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">step_info</span><span class="p">[</span><span class="n">sensor_id</span><span class="p">][</span><span class="n">l</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">idx_to_merge</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">idx_to_merge</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">step_info</span><span class="p">[</span><span class="n">sensor_id</span><span class="p">][</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">idx_to_merge</span><span class="p">)</span>
+
+                <span class="c1">#self.step_info[i].pop(key)</span>
+
+            <span class="c1"># Create the analyte concentration dataframe again</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">generate_ligand_conc_df</span><span class="p">()</span>
+
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="OctetExperiment.merge_consecutive_steps_by_name">
+<a class="viewcode-back" href="../../pykingenie.html#pykingenie.octet.OctetExperiment.merge_consecutive_steps_by_name">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">merge_consecutive_steps_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">step_name</span><span class="p">,</span><span class="n">reference</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Merge the step after the step of nam step_name</span>
+<span class="sd">        Args:</span>
+<span class="sd">            step_name (str): name of the step to merge with the next step</span>
+<span class="sd">            Reference (bool): if True, the step type will be used as reference to extract the analyte concentration, loading location, etc.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Find the indices of the steps of type step_type</span>
+        <span class="n">idxs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df_steps</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_steps</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;Name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">step_name</span><span class="p">:</span>
+
+                <span class="c1"># check if idx+2 is valid</span>
+                <span class="k">if</span> <span class="n">i</span><span class="o">+</span><span class="mi">2</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df_steps</span><span class="p">):</span>
+                    <span class="n">idxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+        <span class="c1"># Sort them in reverse order to avoid index shifting issues</span>
+        <span class="n">idxs</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">idxs</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="n">reference</span><span class="p">:</span>
+
+            <span class="c1"># Merge the step with the next step</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">merge_consecutive_steps</span><span class="p">(</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">idx</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Merge the step with the previous step</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">merge_consecutive_steps</span><span class="p">(</span><span class="n">idx</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="OctetExperiment.read_sample_plate_info">
+<a class="viewcode-back" href="../../pykingenie.html#pykingenie.octet.OctetExperiment.read_sample_plate_info">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read_sample_plate_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">files</span><span class="p">,</span><span class="n">names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read the sample plate information from the .fmf file</span>
+
+<span class="sd">        Results:</span>
+
+<span class="sd">            It creates the attributes</span>
+
+<span class="sd">                self.sample_column</span>
+<span class="sd">                self.sample_row</span>
+<span class="sd">                self.sample_type</span>
+<span class="sd">                self.sample_id</span>
+<span class="sd">                self.sample_conc</span>
+<span class="sd">                self.sample_conc_labeled</span>
+<span class="sd">                self.sample_plate_loaded</span>
+<span class="sd">                self.steps_performed</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="n">files</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">files</span><span class="p">]</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">names</span><span class="p">]</span>
+
+        <span class="n">index</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">names</span><span class="p">)</span> <span class="k">if</span> <span class="s1">&#39;ExpMethod.fmf&#39;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">sample_plate_loaded</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">file</span> <span class="o">=</span> <span class="n">files</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+
+        <span class="n">tree</span> <span class="o">=</span> <span class="n">elementTree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+
+        <span class="n">sample_types</span>     <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;.//SampleType&quot;</span><span class="p">)]</span>
+        <span class="n">sample_locations</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;.//SampleLoc&quot;</span><span class="p">)]</span>
+        <span class="n">sample_ids</span>       <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;.//SampleID&quot;</span><span class="p">)]</span>
+
+        <span class="n">sample_conc_molar</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">text</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;.//SampleMolarConc&quot;</span><span class="p">)])</span>
+        <span class="n">sample_conc_mass</span>     <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">text</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;.//SampleConc&quot;</span><span class="p">)])</span>
+
+        <span class="n">sample_conc</span>          <span class="o">=</span> <span class="n">sample_conc_mass</span>
+
+        <span class="n">sel_ids</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;SAMPLE&#39;</span> <span class="ow">in</span> <span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sample_types</span><span class="p">]</span>
+
+        <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sample_conc</span><span class="p">)):</span>
+
+            <span class="k">if</span> <span class="n">sel_ids</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+
+                <span class="k">if</span> <span class="n">sample_conc_molar</span><span class="p">[</span><span class="n">counter</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+
+                    <span class="n">sample_conc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample_conc_molar</span><span class="p">[</span><span class="n">counter</span><span class="p">]</span>
+
+                <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">conc_units</span>       <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;.//ConcUnits&quot;</span><span class="p">)][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">molar_conc_units</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;.//MolarConcUnits&quot;</span><span class="p">)][</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">factors</span> <span class="o">=</span> <span class="p">[</span><span class="n">factor_conc_to_micro</span><span class="p">[</span><span class="n">molar_conc_units</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;SAMPLE&#39;</span> <span class="ow">in</span> <span class="n">st</span> <span class="k">else</span> <span class="n">factor_conc_to_micro</span><span class="p">[</span><span class="n">conc_units</span><span class="p">]</span> <span class="k">for</span> <span class="n">st</span> <span class="ow">in</span> <span class="n">sample_types</span><span class="p">]</span>
+
+        <span class="n">sample_conc</span> <span class="o">=</span> <span class="n">sample_conc</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">factors</span><span class="p">)</span>
+        <span class="n">sample_conc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">sample_conc</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+        <span class="n">sample_column</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\D&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">text</span><span class="p">))</span> <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">sample_locations</span><span class="p">])</span>
+        <span class="n">sample_row</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\d+&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>     <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">sample_locations</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_column</span> <span class="o">=</span> <span class="n">sample_column</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_row</span>    <span class="o">=</span> <span class="n">sample_row</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_type</span>   <span class="o">=</span> <span class="n">sample_types</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_id</span>     <span class="o">=</span> <span class="n">sample_ids</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_conc</span>    <span class="o">=</span> <span class="n">sample_conc</span>
+
+        <span class="n">sample_conc_labeled</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> µM&quot;</span> <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="s1">&#39;KSAMPLE&#39;</span> <span class="ow">and</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> µg/ml&quot;</span> <span class="k">if</span> <span class="n">t</span> <span class="o">!=</span> <span class="s1">&#39;KSAMPLE&#39;</span> <span class="ow">and</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">sample_conc</span><span class="p">,</span> <span class="n">sample_types</span><span class="p">)]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_conc_labeled</span> <span class="o">=</span> <span class="n">sample_conc_labeled</span>
+
+        <span class="n">data_name</span>     <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;.//DataName&quot;</span><span class="p">)]</span>
+        <span class="n">assay_time</span>    <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;.//AssayTime&quot;</span><span class="p">)]</span>
+
+        <span class="n">steps_info_df</span>      <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Type&#39;</span><span class="p">:</span><span class="n">data_name</span><span class="p">,</span><span class="s1">&#39;Time&#39;</span><span class="p">:</span><span class="n">assay_time</span><span class="p">})</span>
+
+        <span class="n">data_name</span>     <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;.//StepDataName&quot;</span><span class="p">)]</span>
+        <span class="n">data_col</span>      <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;.//SampleCol&quot;</span><span class="p">)]</span>
+
+        <span class="n">steps_performed</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;#Step&#39;</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_name</span><span class="p">))</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;Type&#39;</span><span class="p">:</span><span class="n">data_name</span><span class="p">,</span><span class="s1">&#39;Column&#39;</span><span class="p">:</span><span class="n">data_col</span><span class="p">})</span>
+
+        <span class="n">steps_performed</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">steps_performed</span><span class="p">,</span> <span class="n">steps_info_df</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;Type&#39;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">steps_performed</span> <span class="o">=</span> <span class="n">steps_performed</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_plate_loaded</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="OctetExperiment.convert_to_numbers">
+<a class="viewcode-back" href="../../pykingenie.html#pykingenie.octet.OctetExperiment.convert_to_numbers">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">convert_to_numbers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Convert the strings in the step info to numbers</span>
+
+<span class="sd">        Results:</span>
+
+<span class="sd">            It modifies the attribute self.step_info</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># List of entries in step info</span>
+        <span class="n">entries</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Concentration&#39;</span><span class="p">,</span> <span class="s1">&#39;MolarConcentration&#39;</span><span class="p">,</span> <span class="s1">&#39;MolecularWeight&#39;</span><span class="p">,</span> <span class="s1">&#39;Temperature&#39;</span><span class="p">,</span> <span class="s1">&#39;StartTime&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;AssayTime&#39;</span><span class="p">,</span> <span class="s1">&#39;FlowRate&#39;</span><span class="p">,</span> <span class="s1">&#39;ActualTime&#39;</span><span class="p">,</span> <span class="s1">&#39;CycleTime&#39;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">sensor</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fns</span><span class="p">)):</span>
+                <span class="c1"># Do sanity check</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">step_info</span><span class="p">[</span><span class="n">sensor</span><span class="p">][</span><span class="n">entry</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">step_info</span><span class="p">[</span><span class="n">sensor</span><span class="p">][</span><span class="n">entry</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Erroneous entry found for </span><span class="si">%s</span><span class="s2"> and sensor </span><span class="si">%i</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">sensor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_info</span><span class="p">[</span><span class="n">sensor</span><span class="p">][</span><span class="n">entry</span><span class="p">]))</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Will set it to -1. Needs to be corrected&quot;</span><span class="p">)</span>
+                    <span class="c1"># Correct erroneous value</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">step_info</span><span class="p">[</span><span class="n">sensor</span><span class="p">][</span><span class="n">entry</span><span class="p">])):</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">step_info</span><span class="p">[</span><span class="n">sensor</span><span class="p">][</span><span class="n">entry</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+                        <span class="k">except</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">step_info</span><span class="p">[</span><span class="n">sensor</span><span class="p">][</span><span class="n">entry</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">step_info</span><span class="p">[</span><span class="n">sensor</span><span class="p">][</span><span class="n">entry</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">step_info</span><span class="p">[</span><span class="n">sensor</span><span class="p">][</span><span class="n">entry</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+</div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, osvalB.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
