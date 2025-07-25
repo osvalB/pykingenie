@@ -81,3 +81,6 @@ fig.write_image('test_bli_fitted.png')
 ## Contributing
 
 Contributions are welcome! Please contact me at oburastero@embl-hamburg.de
+
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
