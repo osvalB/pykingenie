@@ -41,7 +41,7 @@ jobs:
     - name: Install dependencies and run tests
       run: |
         uv sync --extra test
-        uv run pytest --cov=src/pyphotomol --cov-report=xml --cov-report=term-missing
+        uv run pytest --cov=src/pykingenie --cov-report=xml --cov-report=term-missing
 
     - name: Upload coverage reports to Codecov
       if: matrix.python-version == '3.11'
