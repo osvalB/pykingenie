@@ -17,6 +17,52 @@ bli.read_sensor_data(frd_files)
 
 sensor_names = bli.sensor_names.copy()
 
+def test_subtract_no_traces_loaded():
+
+    # bli_temp has no traces loaded
+    bli_temp = OctetExperiment('test_octet')
+    with pytest.raises(RuntimeError, match="No traces loaded. Cannot perform subtraction."):
+        bli_temp.subtraction_one_to_one(sensor_name1='A1', sensor_name2='B1')
+
+def test_average_no_traces_loaded():
+    
+    # bli_temp has no traces loaded
+    bli_temp = OctetExperiment('test_octet')
+    with pytest.raises(RuntimeError, match="No traces loaded. Cannot perform averaging."):
+        bli_temp.average(list_of_sensor_names=['A1', 'B1'], new_sensor_name='Average')
+
+def test_subtract_incompatible():
+    
+    # bli_temp has no traces loaded
+    bli_temp = OctetExperiment('test_octet')
+    bli_temp.read_sensor_data(frd_files[:2])  # Load only A1, B1, and C1
+
+    bli_temp.xs[0] = bli_temp.xs[0][:5] # Reduce the number of steps for sensor A1
+
+    with pytest.raises(RuntimeError, match="Sensors have different number of steps"):
+        bli_temp.subtraction_one_to_one(sensor_name1='A1', sensor_name2='B1')    
+
+    bli_temp.xs[0] = bli_temp.xs[1].copy() # Reduce the number of data points for sensor A1
+    bli_temp.xs[0][0] = bli_temp.xs[0][0][:5] # Reduce the number of steps for sensor A1
+
+    with pytest.raises(RuntimeError, match="Sensors have different number of points"):
+        bli_temp.subtraction_one_to_one(sensor_name1='A1', sensor_name2='B1')
+
+
+def test_subtract_repeated_names():
+
+    bli.subtraction_one_to_one(sensor_name1='A1', sensor_name2='H1',inplace=False)
+    assert len(bli.sensor_names) == len(sensor_names) + 1, "The sensor_names list should have one more sensor after subtraction."
+
+    bli.subtraction_one_to_one(sensor_name1='A1', sensor_name2='H1', inplace=False)
+    assert len(bli.sensor_names) == len(sensor_names) + 2, "The sensor_names list should have two more sensors after repeated subtraction."
+
+    # Delete the newly created sensor to avoid conflicts in other tests
+    bli.sensor_names = bli.sensor_names[:len(sensor_names)]
+    bli.xs = bli.xs[:len(sensor_names)]
+    bli.ys = bli.ys[:len(sensor_names)]
+
+
 def test_align_association():
 
     bli.align_association(sensor_names = sensor_names,inplace = True,new_names = False)
@@ -69,6 +115,7 @@ def test_subtract():
     bli.subtraction(list_of_sensor_names=sensor_names_2, reference_sensor='H1', inplace=False)
 
     assert len(bli.sensor_names) == len(sensor_names)*2 - 1 # Double minus one because the reference sensor is not included
+
 
 def test_average():
 
@@ -133,3 +180,9 @@ def test_get_step_xy():
 
     # Check if y is a numpy array
     assert isinstance(y, np.ndarray), "The y should be a numpy array."
+
+def test_subtraction_string_as_sensor_names():
+
+    bli.subtraction(list_of_sensor_names=bli.sensor_names[0], reference_sensor=bli.sensor_names[-1], inplace=False)
+
+    assert bli.xs is not None, "The xs list should not be None after subtraction."

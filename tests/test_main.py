@@ -103,8 +103,6 @@ def test_calculate_asymmetric_error():
 
     pyKinetics.calculate_asymmetric_error(shared_smax=True, fixed_t0=True, fit_ktr=False)
 
-    print('here')
-
     asymmetric_error_df = pyKinetics.get_experiment_properties('fit_params_kinetics_ci95', fittings=True)[0]
 
     assert np.round(float(asymmetric_error_df.iloc[0,1]),3) == 0.01

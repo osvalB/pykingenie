@@ -45,6 +45,13 @@ class SurfaceBasedExperiment:
 
         return None
 
+    def check_sensor_name(self,new_sensor_name):
+
+        if new_sensor_name in self.sensor_names:
+            new_sensor_name += ' rep'
+
+        return new_sensor_name
+
     def subtraction_one_to_one(self, sensor_name1, sensor_name2,inplace=True):
 
         """
@@ -63,26 +70,23 @@ class SurfaceBasedExperiment:
 
         """
 
+        if not self.traces_loaded:
+            raise RuntimeError("No traces loaded. Cannot perform subtraction.")
+
         new_sensor_name = sensor_name1 + ' - ' + sensor_name2
 
-        if new_sensor_name in self.sensor_names:
-
-            new_sensor_name = new_sensor_name + ' rep'
+        new_sensor_name = self.check_sensor_name(new_sensor_name)
 
         sensor1 = self.sensor_names.index(sensor_name1)
         sensor2 = self.sensor_names.index(sensor_name2)
 
-        if not self.traces_loaded:
-            print("No traces loaded")
-            return None
-        # Check if sensors are compatible
+
+        # Check if sensors are compatible - return an error if not
         if len(self.xs[sensor1]) != len(self.xs[sensor2]):
-            print("Sensors have different number of steps")
-            return None
+            raise RuntimeError("Sensors have different number of steps")
 
         if len(self.xs[sensor1][0]) != len(self.xs[sensor2][0]):
-            print("Sensors have different number of points")
-            return None
+            raise RuntimeError("Sensors have different number of points")
 
         # Subtract
         if inplace:
@@ -155,12 +159,9 @@ class SurfaceBasedExperiment:
 
         # Check if sensors are loaded
         if not self.traces_loaded:
-            print("No traces loaded")
-            return None
+            raise RuntimeError("No traces loaded. Cannot perform averaging.")
 
-        if new_sensor_name in self.sensor_names:
-
-            new_sensor_name = new_sensor_name + ' rep'
+        new_sensor_name = self.check_sensor_name(new_sensor_name)
 
         ys = []
 

@@ -57,15 +57,22 @@ def median_filter(y,x,rolling_window):
 
     """
 
-    scaling_factor = 1e4
+    # Check the average time step in the x vector
+    dx = np.min(np.diff(x))
 
+    scaling_factor = 1
+    if dx <= 1:
+        
+        scaling_factor = 1/dx * 10 # Rescale 
+    
     temp_vec     =  np.multiply(x,scaling_factor).astype(int)
     series       =  pd.Series(y,index=temp_vec,dtype=float)
-    series.index =  pd.to_datetime(series.index,unit='s')
+    series.index =  pd.to_datetime(series.index,unit='s') # Convert to datetime index - allows rolling window
 
     roll_window  = str(int(rolling_window*scaling_factor))+"s"
 
-    y_filt = series.rolling(roll_window).median().to_numpy()
+    y_filt = series.rolling(
+        window=roll_window).median().to_numpy()
 
     return y_filt
 
