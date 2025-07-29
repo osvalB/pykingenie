@@ -6,10 +6,7 @@ __all__ = [
     'solve_ode_one_site_insolution',
     'signal_ode_one_site_insolution',
     'ode_induced_fit_insolution',
-    'ode_induced_fit_insolution_reduced',
-    'solve_ode_induced_fit_insolution_reduced',
     'solve_ode_induced_fit_insolution',
-    'signal_ode_induced_fit_insolution_reduced',
     'signal_ode_induced_fit_insolution',
     'ode_conformational_selection_insolution',
     'solve_ode_conformational_selection_insolution',
@@ -138,8 +135,8 @@ def ode_induced_fit_insolution(t, y, k1, k_minus1, k2, k_minus2):
 
         k+ = 100 / (μM*s)  k+ equals k1       in our notation
         k− = 100 / s       k- equals k_minus1 in our notation
-        ke = 10 / s        k+ equals k2       in our notation
-        kr = 1 /s          k+ equals k_minus2 in our notation
+        ke = 10 / s        ke equals k2       in our notation
+        kr = 1 /s          kr equals k_minus2 in our notation
 
     """
 
@@ -153,7 +150,7 @@ def ode_induced_fit_insolution(t, y, k1, k_minus1, k2, k_minus2):
 
     return [dE, dS, dE_S, dES]
 
-def ode_induced_fit_insolution_reduced(t, y, k1, k_minus1, k2, k_minus2, E_tot, S_tot):
+def ode_induced_fit_insolution(t, y, k1, k_minus1, k2, k_minus2, E_tot, S_tot):
     """
     Reduced ODEs for induced fit model using conservation of E and S.
     y: [E_S, ES]
@@ -178,11 +175,9 @@ def ode_induced_fit_insolution_reduced(t, y, k1, k_minus1, k2, k_minus2, E_tot, 
 
     return [dE_S, dES]
 
-def solve_ode_induced_fit_insolution_reduced(t, y0, k1, k_minus1, k2, k_minus2, E_tot, S_tot, t0=0):
-
+def solve_ode_induced_fit_insolution(t, y0, k1, k_minus1, k2, k_minus2, E_tot, S_tot, t0=0):
     """
     Solve the reduced ODE for the induced fit model in solution.
-
     Args:
         t (np.ndarray): time points to calculate the complex concentration
         y0 (list): initial concentrations of E·S and ES
@@ -193,60 +188,23 @@ def solve_ode_induced_fit_insolution_reduced(t, y0, k1, k_minus1, k2, k_minus2, 
         E_tot (float): total concentration of the enzyme
         S_tot (float): total concentration of the substrate
         t0 (float): initial time
-
     Returns:
         out.y (list): solution of the ODE, contains the concentration of E·S and ES
     """
-
     t = t + t0
-
-    out = solve_ivp(ode_induced_fit_insolution_reduced, t_span=[np.min(t), np.max(t)],
+    out = solve_ivp(ode_induced_fit_insolution, t_span=[np.min(t), np.max(t)],
                     t_eval=t, y0=y0, args=(k1, k_minus1, k2, k_minus2, E_tot, S_tot), method="LSODA")
-
     # Include the concentrations of E and S in the output
     E = E_tot - out.y[0] - out.y[1]  # E_S is out.y[0], ES is out.y[1]
     S = S_tot - out.y[0] - out.y[1]  # E_S is out.y[0], ES is out.y[1]
     out.y = np.vstack((E, S, out.y[0], out.y[1]))  # Stack E, S, E_S, ES
-
     return out.y
 
-def solve_ode_induced_fit_insolution(t_span, y0, k1, k_minus1, k2, k_minus2, t0):
-
-    """
-
-    Solve the ODE for the induced fit model (no product)
-
-    Args:
-
-        t_span (np.ndarray): time span for the simulation
-        y0 (list): initial concentrations of E, S, E·S, and ES
-        k1 (float): rate constant for E + S -> E·S
-        k_minus1 (float): rate constant for E·S -> E + S
-        k2 (float): rate constant for E·S -> ES
-        k_minus2 (float): rate constant for ES -> E·S
-        t0 (float): initial time
-
-    Returns:
-
-        out.y (list): solution of the ODE, contains the concentration of E, S, E_S, ES
-
-    """
-
-    t_span = t_span + t0
-
-    out = solve_ivp(ode_induced_fit_insolution,t_span=[np.min(t_span), np.max(t_span)],
-                    t_eval=t_span,y0=y0,args=(k1, k_minus1, k2, k_minus2),method="LSODA")
-
-    return out.y
-
-def signal_ode_induced_fit_insolution_reduced(t, y, k1, k_minus1, k2, k_minus2, E_tot, S_tot,
-                                              t0=0, signal_E=0, signal_S=0, signal_ES_int=0, signal_ES=0):
-
+def signal_ode_induced_fit_insolution(t, y, k1, k_minus1, k2, k_minus2, E_tot, S_tot,
+                                      t0=0, signal_E=0, signal_S=0, signal_ES_int=0, signal_ES=0):
     """
     Solve the reduced ODE for the induced fit model and compute the signal
-
     Args:
-
         t (np.ndarray): time
         y (list): concentrations of E·S and ES
         k1 (float): rate constant for E + S -> E·S
@@ -260,49 +218,11 @@ def signal_ode_induced_fit_insolution_reduced(t, y, k1, k_minus1, k2, k_minus2, 
         signal_S (float): signal for S
         signal_ES_int (float): signal for E·S
         signal_ES (float): signal for ES
-
     Returns:
-
        signal (np.ndarray): signal over time
-
     """
-
-    species = solve_ode_induced_fit_insolution_reduced(t, y, k1, k_minus1, k2, k_minus2, E_tot, S_tot, t0)
-
+    species = solve_ode_induced_fit_insolution(t, y, k1, k_minus1, k2, k_minus2, E_tot, S_tot, t0)
     signal = signal_E * species[0] + signal_S * species[1] + signal_ES_int * species[2] + signal_ES * species[3]
-
-    return signal
-
-def signal_ode_induced_fit_insolution(t, y, k1, k_minus1, k2, k_minus2,t0=0,signal_E=0,signal_S=0,signal_ES_int=0,signal_ES=0):
-
-    """
-
-    Solve the ODE for the induced fit model and compute the signal
-
-    Args:
-
-        t (np.ndarray): time
-        y (list): concentrations of E, S, E·S, and ES
-        k1 (float): rate constant for E + S -> E·S
-        k_minus1 (float): rate constant for E·S -> E + S
-        k2 (float): rate constant for E·S -> ES
-        k_minus2 (float): rate constant for ES -> E·S
-        t0 (float): initial time
-        signal_E (float): signal for E
-        signal_S (float): signal for S
-        signal_ES_int (float): signal for E·S
-        signal_ES (float): signal for ES
-
-    Returns:
-
-       signal (np.ndarray): signal over time
-
-    """
-
-    species = solve_ode_induced_fit_insolution(t, y, k1, k_minus1, k2, k_minus2,t0)
-
-    signal = signal_E * species[0] + signal_S * species[1] + signal_ES_int * species[2] + signal_ES * species[3]
-
     return signal
 
 def ode_conformational_selection_insolution(t, y, k1, k_minus1, k2, k_minus2):
@@ -465,13 +385,7 @@ def get_kobs_induced_fit(tot_lig, tot_prot, kr, ke, kon, koff,dominant=True):
     delta  = np.sqrt((tot_lig - tot_prot + kd_app) ** 2 + 4 * tot_prot * kd_app)
     gamma  = -ke - kr + koff + kon * (delta - kd_app)
 
-    if dominant:
-
-        kobs = ke + kr + 0.5 * gamma - 0.5 * np.sqrt(gamma ** 2 + 4 * koff * kr)
-
-    else:
-
-        kobs = ke + kr + 0.5 * gamma + 0.5 * np.sqrt(gamma ** 2 + 4 * koff * kr)
+    kobs = ke + kr + 0.5 * gamma + (-1*dominant * 0.5 * np.sqrt(gamma ** 2 + 4 * koff * kr))
 
     return kobs  # units are 1/s
 
@@ -500,12 +414,7 @@ def get_kobs_conformational_selection(tot_lig, tot_prot, kr, ke, kon, koff,domin
     beta = 2 * kr * (2 * ke - koff - koff * (delta - tot_lig + tot_prot) / kd_app)
     alpha = kr - ke + koff * ((2 * ke + kr) * delta + kr * (tot_lig - tot_prot - kd_app)) / (2 * ke * kd_app)
 
-    if dominant:
 
-        kobs = ke + 0.5 * alpha - 0.5 * np.sqrt(alpha**2 + beta)
-
-    else:
-
-        kobs = ke + 0.5 * alpha + 0.5 * np.sqrt(alpha**2 + beta)
+    kobs = ke + 0.5 * alpha + (-1*dominant* 0.5 * np.sqrt(alpha**2 + beta))
 
     return kobs  # units are 1/s
