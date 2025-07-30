@@ -102,53 +102,6 @@ def signal_ode_one_site_insolution(t,koff,Kd,a_total,b_total,t0=0,signal_a=0,sig
 
     return signal
 
-def ode_induced_fit_insolution(t, y, k1, k_minus1, k2, k_minus2):
-
-    """
-
-    Species:
-
-        E: Free enzyme
-        S: Free substrate
-        E·S: Intermediate complex
-        ES: Induced Enzyme-substrate complex
-
-    ODE for the induced fit model:
-
-        E + S <-> E·S (initial binding)
-        E·S   <-> ES (induced fit)
-
-    Args:
-
-        t (float): time
-        y (list): concentrations of E, S, E·S, and ES
-        k1 (float): rate constant for E + S -> E·S
-        k_minus1 (float): rate constant for E·S -> E + S
-        k2 (float): rate constant for E·S -> ES
-        k_minus2 (float): rate constant for ES -> E·S
-
-    Returns:
-
-        [dE, dS, dE_S, dES] (list): concentration of E, S, E·S, and ES
-
-    Example values taken from Fabian Paul ,Thomas R. Weikl, 2016:
-
-        k+ = 100 / (μM*s)  k+ equals k1       in our notation
-        k− = 100 / s       k- equals k_minus1 in our notation
-        ke = 10 / s        ke equals k2       in our notation
-        kr = 1 /s          kr equals k_minus2 in our notation
-
-    """
-
-    E, S, E_S, ES = y
-
-    # Differential equations
-    dE = -k1 * E * S + k_minus1 * E_S
-    dS = -k1 * E * S + k_minus1 * E_S
-    dE_S = k1 * E * S - k_minus1 * E_S - k2 * E_S + k_minus2 * ES
-    dES = k2 * E_S - k_minus2 * ES
-
-    return [dE, dS, dE_S, dES]
 
 def ode_induced_fit_insolution(t, y, k1, k_minus1, k2, k_minus2, E_tot, S_tot):
     """

@@ -19,8 +19,8 @@ __all__ = [
     'differential_matrix_dissociation_conformational_selection',
     'constant_vector_induced_fit',
     'constant_vector_conformational_selection',
-    'solve_state_t',
     'solve_steady_state',
+    'solve_all_states_fast',
     'solve_induced_fit_association',
     'solve_conformational_selection_association',
     'solve_induced_fit_dissociation',
@@ -349,28 +349,6 @@ def constant_vector_conformational_selection(kon,smax,krev,a):
 
     return   [krev*smax, kon*a*smax]
 
-def solve_state_t(time, A, initial_conditions, steady_state_value):
-
-    """
-    solve x(t) = x* + exp(At)(x0 - x*)
-    x(t) is the system state at time t
-    x*   is the steady state solution
-    x0   is the initial state
-
-    Args:
-        time (float): time
-        A (np.ndarray): differential matrix
-        initial_conditions (np.ndarray): initial conditions
-        steady_state_value (np.ndarray): steady state values
-    Returns:
-        state (np.ndarray): state at time t
-    """
-
-    v = initial_conditions - steady_state_value
-    eAtv = expm(A * time).dot(v)
-    state = steady_state_value + eAtv
-
-    return state
 
 def solve_steady_state(A, b):
     """
@@ -470,7 +448,9 @@ def solve_conformational_selection_association(time, a_conc, kon, koff, kc, krev
         koff (float): rate constant for E2S -> E2 + S
         kc (float): rate constant for E1 -> E2
         krev (float): rate constant for E2 -> E1
-        smax (float): signal proportional to the complex (E2S)
+        smax (float): maximum signal that the complex (E2S)can produce
+        sP1 (float): signal proportional to the protein in state E1
+        sP2L (float): signal proportional to the protein in state E2S
 
     Returns:
 
@@ -482,28 +462,21 @@ def solve_conformational_selection_association(time, a_conc, kon, koff, kc, krev
 
     b_col   = constant_vector_conformational_selection(kon, smax, krev, a_conc)
 
-    if sP2L == 0:
-
-        ka_conf            = kc / krev
-        initial_conditions = np.array([smax / (ka_conf + 1), 0]) # Assume pre-equilibrium of E1 and E2
-
-    else:
-
-        initial_conditions = np.array([sP1, sP2L])
+    initial_conditions = np.array([smax / (kc / krev + 1), 0]) if sP2L == 0 else np.array([sP1, sP2L])
 
     m = differential_matrix_association_conformational_selection(koff, kon, kc, krev, a_conc)
 
     res_steady_state = solve_steady_state(m, b_col)
 
-    states = np.array([solve_state_t(t, m, initial_conditions, res_steady_state) for t in time])
+    states = solve_all_states_fast(time, m, initial_conditions, res_steady_state)
 
-    df = pd.DataFrame({
-        'signal': states[:, 1], # Signal produced by E2S / P2L, depending on the notation
-        'sP1': states[:, 0],
-        'sP2': smax - states[:, 1] - states[:, 0]
-    })
+    signal = states[:, 1]
+    sP1 = states[:, 0]
+    sP2 = smax - states[:, 1] - states[:, 0]
 
-    return df
+    arr = np.column_stack((signal, sP1, sP2))
+
+    return arr
 
 def solve_induced_fit_dissociation(time, koff, kc, krev,s0=0,sP2L=0,smax=0):
 
@@ -580,15 +553,16 @@ def solve_conformational_selection_dissociation(time, koff, kc, krev,smax=0,sP1=
 
     res_steady_state = solve_steady_state(m, b_col)
 
-    states = np.array([solve_state_t(t, m, initial_conditions, res_steady_state) for t in time])
+    states = solve_all_states_fast(time, m, initial_conditions, res_steady_state)
 
-    df = pd.DataFrame({
-        'signal': states[:, 1],
-        'sP1': states[:, 0],
-        'sP2': smax - states[:, 1] - states[:, 0]
-    })
+    # Create a numpy array of three columns
+    signal = states[:, 1]  # Signal produced by E2S
+    sP1 = states[:, 0]  # Signal proportional to the protein in state E1
+    sP2 = smax - states[:, 1] - states[:, 0]  # Signal proportional to the protein in state E2S
 
-    return df
+    arr = np.column_stack((signal, sP1, sP2))
+
+    return arr
 
 def ode_mixture_analyte_association(t,Ris,C_TOT,Fis,Ris_max,koffs,Kds):
 
@@ -621,20 +595,9 @@ def ode_mixture_analyte_association(t,Ris,C_TOT,Fis,Ris_max,koffs,Kds):
 
     kons = koffs / Kds
 
-    dRis = np.zeros(len(Ris))
-
     choclo = (1 - np.sum(Ris / Ris_max))
 
-    for i in range(len(Ris)):
-
-        r_i    = Ris[i]
-        kon_i  = kons[i]
-        F_i    = Fis[i]
-        Rmax_i = Ris_max[i]
-        koff_i = koffs[i]
-
-        dRi_dt = kon_i * F_i * C_TOT * Rmax_i * choclo - koff_i * r_i
-        dRis[i] = dRi_dt
+    dRis = kons * Fis * C_TOT * Ris_max * choclo - koffs * Ris
 
     return dRis
 

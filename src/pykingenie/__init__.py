@@ -38,7 +38,7 @@ from .utils.signal_surface import (
     differential_matrix_dissociation_conformational_selection,
     constant_vector_induced_fit,
     constant_vector_conformational_selection,
-    solve_state_t,
+    solve_all_states_fast,
     solve_steady_state,
     solve_induced_fit_association,
     solve_conformational_selection_association,
