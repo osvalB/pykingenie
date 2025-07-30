@@ -19,7 +19,7 @@ __all__ = [
 ]
 
 def config_fig(fig, name_for_download, export_format=None,
-               plot_width=10, plot_height=6, scale_factor=50, autosize=True,save=False):
+               plot_width=10, plot_height=6, scale_factor=50,save=False):
     """
     Configure Plotly figure size and optionally save to file.
 
@@ -47,13 +47,30 @@ def config_fig(fig, name_for_download, export_format=None,
         try:
             fig.write_image(filename)
         except Exception as e:
-            print(f"Error saving image: {e}")
+            # raise runtimeError(f"Error saving image: {e}")
+            raise RuntimeError(f"Error saving image: {e}")
 
     return fig
 
 def plot_plate_info(pyKinetics, experiment_name, font_size=18):
 
+    """Plot the plate layout information from a KineticsAnalyzer experiment.
+    Args:
+        pyKinetics (KineticsAnalyzer): The KineticsAnalyzer instance containing the experiment data.
+        experiment_name (str): The name of the experiment to plot.
+        font_size (int): Font size for the plot.
+    Returns:
+        go.Figure: A Plotly figure containing the plate layout.
+    """
+
     py_single_exp = pyKinetics.experiments[experiment_name]
+
+    # Verify that we have the necessary attributes - sample_row, sample_column, sample_type, sample_id are not None
+    if any([py_single_exp.sample_row is None,
+           py_single_exp.sample_column is None,
+           py_single_exp.sample_type is None,
+           py_single_exp.sample_id is None]):
+        raise AttributeError("Experiment does not have the required attributes: sample_row, sample_column, sample_type, sample_id.")
 
     sample_row      = py_single_exp.sample_row
     sample_column   = py_single_exp.sample_column
@@ -85,9 +102,9 @@ def plot_plate_info(pyKinetics, experiment_name, font_size=18):
     return fig
 
 def plot_traces(xs, ys, legends, colors, show,
-                font_size=18, show_grid_x=False, show_grid_y=False,
-                marker_size=1, line_width=2, vertical_lines=None):
+                marker_size=1, line_width=2):
 
+    
     fig = go.Figure()
     total_traces = sum(show)
     max_points_per_trace = int(4000 / total_traces) if total_traces else 4000
@@ -113,7 +130,7 @@ def plot_traces(xs, ys, legends, colors, show,
 def plot_traces_all(pyKinetics, legends_df,
                     plot_width=16, plot_height=14, plot_type='png',
                     font_size=18, show_grid_x=False, show_grid_y=False,
-                    marker_size=1, line_width=2, vertical_lines=None):
+                    marker_size=1, line_width=2,vertical_spacing=0.08):
 
     all_xs = pyKinetics.get_experiment_properties('xs')
     all_ys = pyKinetics.get_experiment_properties('ys')
@@ -131,7 +148,7 @@ def plot_traces_all(pyKinetics, legends_df,
         colors_tmp = colors[cnt:cnt+n]
         show_tmp = show[cnt:cnt+n]
         cnt += n
-        fig = plot_traces(xs, ys, legends_tmp, colors_tmp, show_tmp, font_size, show_grid_x, show_grid_y, marker_size, line_width, vertical_lines)
+        fig = plot_traces(xs, ys, legends_tmp, colors_tmp, show_tmp, marker_size, line_width)
         plot_list.append(fig)
 
     n_plots = len(plot_list)
@@ -140,7 +157,7 @@ def plot_traces_all(pyKinetics, legends_df,
     nrows = 2 if n_plots < 9 else 3
     nrows = min(nrows, n_plots)  # Do not exceed the number of plots - case n equal 1
     ncols       = int(np.ceil(n_plots / nrows))
-    subplot_fig = make_subplots(rows=nrows, cols=ncols)
+    subplot_fig = make_subplots(rows=nrows, cols=ncols,vertical_spacing=vertical_spacing)
 
     col_arr = np.arange(1, ncols + 1)
     row_arr = np.arange(1, nrows + 1)
@@ -198,7 +215,6 @@ def plot_traces_all(pyKinetics, legends_df,
                              save=False)
 
     return subplot_fig
-
 
 def plot_steady_state(pyKinetics,
                       plot_width=30,
@@ -267,16 +283,11 @@ def plot_steady_state(pyKinetics,
         for j in range(1, ncols + 1):
 
             # Set the x-axis title only for the last row
-            if i == nrows:
-                title_text_x = 'Ligand concentration (μM)'
-            else:
-                title_text_x = ''
-            # Set the y-axis title only for the first column
-            if j == 1:
-                title_text_y = 'Signal (a.u.)'
-            else:
-                title_text_y = ''    
+            title_text_x = 'Ligand concentration (μM)' if i == nrows else ''
 
+            # Set the y-axis title only for the first column
+            title_text_y = 'Signal (a.u.)' if j == 1 else ''
+  
             subplot_fig.update_xaxes(
                 row=i, col=j,
                 title=dict(text=title_text_x, font=dict(size=font_size)),
@@ -321,7 +332,8 @@ def plot_association_dissociation(
     split_by_smax_id=True,
     max_points_per_plot=2000,
     smooth_curves_fit=False,
-    rolling_window=0.1):
+    rolling_window=0.1,
+    vertical_spacing=0.08):
 
     pyKinetics_fittings = pyKinetics.fittings.values()
 
@@ -367,7 +379,7 @@ def plot_association_dissociation(
         cols=ncols, 
         shared_xaxes=False, 
         shared_yaxes=False, 
-        vertical_spacing=0.08,
+        vertical_spacing=vertical_spacing,
         subplot_titles=subplot_titles)
 
     subplot_idx = 0
@@ -468,16 +480,11 @@ def plot_association_dissociation(
         col = row_col_info[i][1]
 
         # Set the x-axis title only for the last row
-        if row == nrows:
-            title_text_x = 'Time (s)'
-        else:
-            title_text_x = ''
+        title_text_x = 'Time (s)' if row == nrows else ''
+
         # Set the y-axis title only for the first column
-        if col == 1:
-            title_text_y = 'Signal (a.u.)'
-        else:
-            title_text_y = ''
-            
+        title_text_y = 'Signal (a.u.)' if col == 1 else ''
+    
         fig.update_xaxes(
             title_text=title_text_x,
             showgrid=show_grid_x,

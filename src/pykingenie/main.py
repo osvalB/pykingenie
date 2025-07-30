@@ -3,6 +3,8 @@ import pandas as pd
 from .fitter          import KineticsFitter
 from .fitter_solution import KineticsFitterSolution
 
+from .utils.processing import get_plotting_df
+
 class KineticsAnalyzer:
 
     def __init__(self):
@@ -479,3 +481,17 @@ class KineticsAnalyzer:
 
         return None
 
+    def get_legends_table(self):
+
+        """
+        Get the legends table for plotting the kinetics data
+        """
+        
+        labels = self.get_experiment_properties('sensor_names')
+        ids    = self.get_experiment_properties('sensor_names_unique')
+
+        # Flatten the lists
+        labels = [item for sublist in labels for item in sublist]
+        ids    = [item for sublist in ids    for item in sublist]
+
+        return get_plotting_df(labels, ids)
