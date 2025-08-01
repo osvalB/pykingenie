@@ -17,7 +17,9 @@ __all__ = [
     'fit_induced_fit_sites_assoc_and_disso',
     'fit_one_site_assoc_and_disso_ktr',
     'one_site_assoc_and_disso_asymmetric_ci95',
-    'one_site_assoc_and_disso_asymmetric_ci95_koff'
+    'one_site_assoc_and_disso_asymmetric_ci95_koff',
+    'get_smax_upper_bound_factor',
+    're_fit'
 ]
 
 def guess_initial_signal(assoc_time_lst, assoc_signal_lst,time_limit=30):
@@ -53,6 +55,17 @@ def guess_initial_signal(assoc_time_lst, assoc_signal_lst,time_limit=30):
             s0s.append(y[0])
 
     return s0s
+
+def get_smax_upper_bound_factor(Kd_ss):
+    factor_dict = {
+        (10, float('inf')): 1e3,
+        (1, 10): 1e2,
+        (float('-inf'), 1): 50
+    }
+    for (low, high), factor in factor_dict.items():
+        if low <= Kd_ss < high:
+            return factor
+    return None  # or raise an error if needed
 
 def fit_steady_state_one_site(signal_lst, ligand_lst,initial_parameters,
                               low_bounds, high_bounds,fixed_Kd = False,Kd_value = None):
@@ -103,6 +116,46 @@ def fit_steady_state_one_site(signal_lst, ligand_lst,initial_parameters,
     fitted_values = [steady_state_one_site(C, Rmax, Kd) for C, Rmax in zip(ligand_lst, Rmax_all)]
 
     return global_fit_params, cov, fitted_values
+
+def re_fit(fit, cov, fit_vals,fit_fx,low_bounds,high_bounds,**kwargs):
+
+    """
+    Evaluate the difference between the fitted parameters and the initial parameters
+    If the difference is less than 2 percent, the bounds are relaxed by a factor of 10
+    and the fitting is repeated
+    """
+
+    fit         = np.array(fit).astype(float)
+    low_bounds  = np.array(low_bounds).astype(float)
+    high_bounds = np.array(high_bounds).astype(float)
+
+    difference_to_upper = (high_bounds - fit) / high_bounds
+
+    if any(difference_to_upper < 0.02):
+
+        # Relax bounds by a factor of 10 - only those that are too close to the upper bound
+        high_bounds[difference_to_upper < 0.02] *= 10
+
+        fit, cov, fit_vals = fit_fx(
+            initial_parameters=fit,
+            low_bounds=low_bounds,
+            high_bounds=high_bounds,
+            **kwargs)
+
+    difference_to_lower = (fit - low_bounds) / fit
+
+    if any(difference_to_lower < 0.02):
+
+        # Relax bounds by a factor of 10 - only those that are too close to the lower bound
+        low_bounds[difference_to_lower < 0.02] *= 0.1
+
+        fit, cov, fit_vals = fit_fx(
+            initial_parameters=fit,
+            low_bounds=low_bounds,
+            high_bounds=high_bounds,
+            **kwargs)
+
+    return fit, cov, fit_vals, low_bounds, high_bounds
 
 def steady_state_one_site_asymmetric_ci95(kd_estimated,signal_lst, ligand_lst,initial_parameters,
                                           low_bounds, high_bounds,rss_desired):
