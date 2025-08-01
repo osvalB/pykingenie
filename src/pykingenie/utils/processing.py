@@ -5,6 +5,9 @@ import itertools
 import numpy  as np
 import pandas as pd
 
+import matplotlib.colors as mcolors
+
+
 from ..utils.palettes import set1_colors, set3_colors, VIRIDIS
 
 __all__ = ['guess_experiment_name', 'etree_to_dict', 'combine_dicts','guess_experiment_type',
@@ -180,12 +183,7 @@ def concat_signal_lst(signal_lst):
         allSignal (np.ndarray): Concatenated signal
     """
 
-    try:
-        allSignal = np.concatenate(signal_lst)
-    except:
-        allSignal = signal_lst
-
-    return (allSignal)
+    return np.concatenate(signal_lst)
 
 def expand_parameter_list(parameter_lst,id_list):
 
@@ -226,14 +224,9 @@ def get_palette(n_colors):
         return set3_colors[:n_colors]
     else:
 
-        try:
-            import matplotlib.colors as mcolors
-            # Create a colormap from the original palette
-            cmap = mcolors.LinearSegmentedColormap.from_list("set3_interp", set3_colors)
-            interpolated_colors = [mcolors.to_hex(cmap(i / (n_colors - 1))) for i in range(n_colors)]
-        except ImportError:
-            # default to all black if matplotlib is not available
-            interpolated_colors = ['#000000'] * n_colors
+        # Create a colormap from the original palette
+        cmap = mcolors.LinearSegmentedColormap.from_list("set3_interp", set3_colors)
+        interpolated_colors = [mcolors.to_hex(cmap(i / (n_colors - 1))) for i in range(n_colors)]
 
         return interpolated_colors
 

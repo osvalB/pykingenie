@@ -186,11 +186,14 @@ def fit_induced_fit_solution(
 
     # Create an empty list that will contain the parameter names
     parameter_names = []
-    if fit_signal_E: parameter_names.append("Signal of free protein")
-    if fit_signal_S: parameter_names.append("Signal of free ligand")
-    if fit_signal_ES: parameter_names.append("Signal of the intermediate complex")
+    if fit_signal_E: parameter_names.append("Signal of the free protein")
+    if fit_signal_S: parameter_names.append("Signal of the free ligand")
+    if fit_signal_ES and ESint_equals_ES: parameter_names.append("Signal of the complex")
+    
     if fit_signal_ES and not ESint_equals_ES:
         parameter_names.append("Signal of the trapped complex")
+        parameter_names.append("Signal of the intermediate complex")
+
     if not fixed_kon: parameter_names.append("k_on [1/(µM·s)]")
     if not fixed_koff: parameter_names.append("k_off [1/s]")
     if not fixed_kc: parameter_names.append("k_c [1/s]")
@@ -232,7 +235,7 @@ def fit_induced_fit_solution(
             lig_conc  = ligand_conc_lst[i]
             prot_conc = protein_conc_lst[i]
 
-            signal = signal_ode_induced_fit_insolution_reduced(
+            signal = signal_ode_induced_fit_insolution(
 
                 t,
                 y = [0,0], # Initial concentrations of E·S (aka ES_int) and ES
@@ -282,7 +285,10 @@ def find_initial_parameters_induced_fit_solution(
         fit_signal_S    =   False,
         fit_signal_ES   =   True,
         ESint_equals_ES =   True,
-        fixed_t0        =   True
+        fixed_t0        =   True,
+        np_linspace_low = -2,
+        np_linspace_high = 2,
+        np_linspace_num = 5
         ):
 
     """
@@ -303,7 +309,7 @@ def find_initial_parameters_induced_fit_solution(
 
     """
 
-    kc_seq   = 10 ** (np.linspace(-2, 2, 5))
+    kc_seq   = 10 ** (np.linspace(np_linspace_low, np_linspace_high, np_linspace_num))
     krev_seq = kc_seq
 
     # Find combinations of kc and krev - create a dataframe with all combinations
@@ -327,7 +333,7 @@ def find_initial_parameters_induced_fit_solution(
         kc   = row['kc']
         krev = row['krev']
 
-        global_fit_params, cov, fitted_values, _ = fit_induced_fit_solution(signal_lst, time_lst, ligand_conc_lst,
+        global_fit_params, _, fitted_values, _ = fit_induced_fit_solution(signal_lst, time_lst, ligand_conc_lst,
                                                                          protein_conc_lst, initial_parameters,
                                                                          low_bounds,
                                                                          high_bounds,
@@ -345,5 +351,6 @@ def find_initial_parameters_induced_fit_solution(
         if rss < rss_init:
             rss_init = rss
             best_params = np.concatenate((global_fit_params, [kc, krev]))
+            initial_parameters = global_fit_params.tolist() 
 
     return best_params

@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import os
 
-from src.pykingenie.utils.math import single_exponential, double_exponential, median_filter, rss_p, get_rss, get_desired_rss
+from pykingenie.utils.math import single_exponential, double_exponential, median_filter, rss_p, get_rss, get_desired_rss
 
 def test_single_exponential():
     t = np.array([0, 1, 2, 3, 4])

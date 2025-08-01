@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import os
 
-from src.pykingenie.kingenie_surface import KinGenieCsv
+from pykingenie.kingenie_surface import KinGenieCsv
 
 csv_file_single_cycle = "./test_files/single_cycle_kingenie.csv"
 csv_file_multi_cycle  = "./test_files/multi_cycle_kingenie.csv"

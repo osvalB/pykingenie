@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import os
 
-from src.pykingenie.gator import GatorExperiment
+from pykingenie.gator import GatorExperiment
 
 gator_zip_folder = "./test_files/gator_example_folder.zip"
 csv_file         = "./test_files/Assay_1_Channel1.csv"

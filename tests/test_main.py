@@ -3,8 +3,8 @@ import pandas as pd
 import pytest
 import os
 
-from src.pykingenie.main  import KineticsAnalyzer
-from src.pykingenie.octet import OctetExperiment
+from pykingenie.main  import KineticsAnalyzer
+from pykingenie.octet import OctetExperiment
 
 pyKinetics = KineticsAnalyzer()
 

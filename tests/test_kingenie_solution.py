@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import os
 
-from src.pykingenie.kingenie_solution import KinGenieCsvSolution
+from pykingenie.kingenie_solution import KinGenieCsvSolution
 
 kingenie = KinGenieCsvSolution('test_kingenie_csv')
 

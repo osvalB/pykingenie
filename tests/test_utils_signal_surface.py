@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 
-from src.pykingenie.utils.signal_surface import (
+from pykingenie.utils.signal_surface import (
     steady_state_one_site,
     one_site_association_analytical,
     one_site_dissociation_analytical,

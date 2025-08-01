@@ -488,10 +488,8 @@ class KineticsAnalyzer:
         """
         
         labels = self.get_experiment_properties('sensor_names')
-        ids    = self.get_experiment_properties('sensor_names_unique')
 
         # Flatten the lists
         labels = [item for sublist in labels for item in sublist]
-        ids    = [item for sublist in ids    for item in sublist]
 
-        return get_plotting_df(labels, ids)
+        return get_plotting_df(labels)

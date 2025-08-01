@@ -3,8 +3,8 @@ import pandas as pd
 import pytest
 import os
 
-from src.pykingenie.main import KineticsAnalyzer
-from src.pykingenie.kingenie_solution import KinGenieCsvSolution
+from pykingenie.main import KineticsAnalyzer
+from pykingenie.kingenie_solution import KinGenieCsvSolution
 
 pyKinetics = KineticsAnalyzer()
 

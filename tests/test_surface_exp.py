@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import os
 
-from src.pykingenie.octet import OctetExperiment
+from pykingenie.octet import OctetExperiment
 
 folder = "./test_files/"
 frd_files = os.listdir(folder)

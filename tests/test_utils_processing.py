@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import os
 
-from src.pykingenie.utils.processing import (
+from pykingenie.utils.processing import (
     guess_experiment_name,
     guess_experiment_type,
     detect_time_list_continuos,

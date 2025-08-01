@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 
-from src.pykingenie.utils.signal_solution import (
+from pykingenie.utils.signal_solution import (
     signal_ode_one_site_insolution,
     signal_ode_induced_fit_insolution,  # now the reduced version
     signal_ode_conformational_selection_insolution,

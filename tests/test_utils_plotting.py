@@ -1,10 +1,10 @@
 import pytest
 import os 
 
-from src.pykingenie.main import KineticsAnalyzer
-from src.pykingenie.octet import OctetExperiment
+from pykingenie.main import KineticsAnalyzer
+from pykingenie.octet import OctetExperiment
 
-from src.pykingenie.utils.plotting import (
+from pykingenie.utils.plotting import (
     plot_plate_info,
     plot_traces_all,
     config_fig,
