@@ -1,5 +1,8 @@
+import itertools
+import numpy as np
+
 from .utils.fitting_surface import *
-from .utils.fitting_general import fit_single_exponential
+from .utils.fitting_general import fit_single_exponential, re_fit, re_fit_2
 from .utils.processing      import *
 from .utils.math            import *
 
@@ -41,8 +44,9 @@ class KineticsFitter:
 
     """
 
-    def __init__(self,time_assoc_lst,association_signal_lst,lig_conc_lst,time_diss_lst,
-                 dissociation_signal_lst=None,smax_id=None,name_lst=None,is_single_cycle=False):
+    def __init__(self,time_assoc_lst,association_signal_lst,lig_conc_lst,
+                 time_diss_lst=None,dissociation_signal_lst=None,
+                 smax_id=None,name_lst=None,is_single_cycle=False):
 
         self.names            = name_lst
         self.assoc_lst        = association_signal_lst
@@ -64,6 +68,10 @@ class KineticsFitter:
         self.Kd_ss = None
 
         self.fit_params_kinetics  = None
+
+        # If smax_id is None, set it to a list of zeros
+        if smax_id is None:
+            smax_id = [0 for _ in range(len(association_signal_lst))]
 
         # We need to rearrange smax_id to start at 0, then 1, then 2, etc.
         smax_id_unq, idx = np.unique(smax_id, return_index=True)
@@ -174,8 +182,13 @@ class KineticsFitter:
         }
 
         fit, cov, fit_vals, low_bounds, high_bounds = re_fit(
-            fit, cov, fit_vals,
-            fit_steady_state_one_site, low_bounds, high_bounds,
+            fit=fit,
+            cov=cov,
+            fit_vals=fit_vals,
+            fit_fx=fit_steady_state_one_site,
+            low_bounds=low_bounds,
+            high_bounds= high_bounds,
+            times=3,
             **kwargs)
 
         self.Kd_ss   = fit[0]
@@ -213,40 +226,42 @@ class KineticsFitter:
         # Fit the steady state signal
         return None
 
-    def fit_one_site_association(self,shared_smax=True):
+    def get_k_off_initial_guess(self):
 
         # Initial guess for Kd_ss for single_cycle_kinetics
         if self.is_single_cycle:
             self.Kd_ss = np.median(self.lig_conc_lst)
-        else:
-            if self.Kd_ss is None:
-                raise ValueError("Kd_ss is not set. Please run fit_steady_state() first.")
 
-        self.clear_fittings()
+        # Requires that Kd_ss is set
+        if self.Kd_ss is None:
+            raise ValueError("Kd_ss is not set. Please run fit_steady_state() first.")
 
-        # Try to fit first the dissociation curves to get a better estimate of Koff
-        try:
+        # We check if we have dissociation curves and fit them to get a better estimate of k_off
+        if self.disso_lst is not None and self.time_disso_lst is not None:
 
             self.fit_one_site_dissociation()
-
-            p0          = [self.Kd_ss,self.Koff]
-            low_bounds  = [self.Kd_ss/7e2,self.Koff/7e2]
-            high_bounds = [self.Kd_ss*7e2,self.Koff*7e2]
+            p0 = [self.Kd_ss, self.k_off]
+            low_bounds  = [self.Kd_ss/7e2, self.k_off/7e2]
+            high_bounds = [self.Kd_ss*7e2, self.k_off*7e2]
 
             self.clear_fittings()
 
-        except:
+        else:
 
             p0 = [self.Kd_ss,0.01]
 
             low_bounds  = [self.Kd_ss/7e2,1e-7]
             high_bounds = [self.Kd_ss*7e2,10]
 
-        if shared_smax:
+        return p0, low_bounds, high_bounds
 
-            smax_guesses = self.smax_guesses_unq
-        else:
-            smax_guesses = self.smax_guesses_shared
+    def fit_one_site_association(self,shared_smax=True):
+
+        self.clear_fittings()
+
+        p0, low_bounds, high_bounds = self.get_k_off_initial_guess()
+
+        smax_guesses = self.smax_guesses_unq if shared_smax else self.smax_guesses_shared
 
         p0 += smax_guesses
 
@@ -267,12 +282,12 @@ class KineticsFitter:
         self.signal_assoc_fit = fit_vals
 
         self.Kd   = fit[0]
-        self.Koff = fit[1]
+        self.k_off = fit[1]
         self.Smax = fit[2:]
 
         # Create a dataframe with the fitted parameters
         df_fit = pd.DataFrame({'Kd [µM]':   self.Kd,
-                               'k_off [1/s]': self.Koff,
+                               'k_off [1/s]': self.k_off,
                                'Smax': self.Smax})
 
         error     = np.sqrt(np.diag(cov))
@@ -314,10 +329,10 @@ class KineticsFitter:
 
         self.signal_disso_fit = fit_vals
 
-        self.Koff = fit[0]
+        self.k_off = fit[0]
 
         # generate dataframe with the fitted parameters
-        df_fit = pd.DataFrame({'k_off': self.Koff,
+        df_fit = pd.DataFrame({'k_off': self.k_off,
                                'S0': fit[1:]})
 
         self.fit_params_kinetics = df_fit
@@ -337,19 +352,19 @@ class KineticsFitter:
     def fit_single_exponentials(self):
 
         # Fit one exponential to each signal
-        k_obs = []
 
+        # Initialize a list to store the k_obs values - filld with NaNs
+        k_obs = [np.nan for _ in range(len(self.assoc_lst))]
+
+        i = 0
         for y,t in zip(self.assoc_lst,self.time_assoc_lst):
 
-            try:
+            fit_params, _, _ = fit_single_exponential(y,t)
 
-                fit_params, cov, fit_y = fit_single_exponential(y,t)
-                # Append the k_obs value to the list
-                k_obs.append(fit_params[2])
+            # Append the k_obs value to the list
+            k_obs[i] = fit_params[2]
 
-            except:
-
-                k_obs.append(np.nan)
+            i += 1
 
         self.k_obs = k_obs
 
@@ -357,41 +372,14 @@ class KineticsFitter:
 
     def fit_one_site_assoc_and_disso(self,shared_smax=True,fixed_t0=True,fit_ktr=False):
 
-        # Initial guess for Kd_ss for single_cycle_kinetics
-        if self.is_single_cycle:
-            self.Kd_ss = np.median(self.lig_conc_lst)
-
         self.clear_fittings()
 
-        # check that we have Kd_ss
-        if self.Kd_ss is None:
-            raise ValueError("Kd_ss is not set. Please run fit_steady_state() first.")
+        p0, low_bounds, high_bounds = self.get_k_off_initial_guess()
 
-        kd_low_bound = np.min([self.Kd_ss/1e3, np.min(self.lig_conc_lst)])
+        # Extend the lower bound for Kd_ss
+        low_bounds[0] = np.min([self.Kd_ss/1e3] + self.lig_conc_lst)  # Kd lower bound
 
-        # Try to fit first the dissociation curves to get a better estimate of Koff
-        try:
-
-            self.fit_one_site_dissociation()
-
-            p0          = [self.Kd_ss,self.Koff]
-            low_bounds  = [kd_low_bound,self.Koff/7.5e2]
-            high_bounds = [self.Kd_ss*7.5e2,self.Koff*7.5e2]
-
-        except:
-
-            p0 = [self.Kd_ss,0.01]
-
-            low_bounds  = [kd_low_bound,1e-7]
-            high_bounds = [self.Kd_ss*7e2,10]
-
-        if shared_smax:
-
-            smax_guesses = self.smax_guesses_unq
-
-        else:
-
-            smax_guesses = self.smax_guesses_shared
+        smax_guesses = self.smax_guesses_unq if shared_smax else self.smax_guesses_shared
 
         p0 += smax_guesses
 
@@ -427,20 +415,28 @@ class KineticsFitter:
                 fixed_t0=fixed_t0
             )
 
-            # Refit the data if the Ktr is at the upper bound
-            if 1 - fit[2] < 0.01:
+            kwargs = {
+                'assoc_signal_lst' :self.assoc_lst,
+                'assoc_time_lst' : self.time_assoc_lst,
+                'analyte_conc_lst' : self.lig_conc_lst,
+                'disso_signal_lst' :self.disso_lst,
+                'disso_time_lst' : self.time_disso_lst,
+                'shared_smax' : shared_smax,
+                'smax_idx' : self.smax_id,
+                'fixed_t0' : fixed_t0
+            }
 
-                p0[2] = 1
-                low_bounds[2]  = 0.01
-                high_bounds[2] = 100
-                fit, cov, fit_vals_assoc, fit_vals_disso = fit_one_site_assoc_and_disso_ktr(
-                    self.assoc_lst,self.time_assoc_lst,self.lig_conc_lst,
-                    self.disso_lst,self.time_disso_lst,
-                    p0,low_bounds,high_bounds,
-                    smax_idx=self.smax_id,
-                    shared_smax=shared_smax,
-                    fixed_t0=fixed_t0
-                )
+            fit, cov, fit_vals_assoc, fit_vals_disso,low_bounds, high_bounds = re_fit_2(
+                fit=fit,
+                cov=cov,
+                fit_vals_a=fit_vals_assoc,
+                fit_vals_b=fit_vals_disso,
+                fit_fx=fit_one_site_assoc_and_disso_ktr,
+                low_bounds=low_bounds,
+                high_bounds=high_bounds,
+                times=2,
+                **kwargs
+            )
 
         else:
 
@@ -456,12 +452,12 @@ class KineticsFitter:
         self.signal_disso_fit = fit_vals_disso
 
         self.Kd   = fit[0]
-        self.Koff = fit[1]
+        self.k_off = fit[1]
         self.Smax = fit[smax_param_start:]
 
         # Create a dataframe with the fitted parameters
         df_fit = pd.DataFrame({'Kd [µM]':     self.Kd,
-                               'k_off [1/s]': self.Koff,
+                               'k_off [1/s]': self.k_off,
                                'Smax':        self.Smax})
 
         # Include the Kon, derived from the Kd and Koff
@@ -552,7 +548,7 @@ class KineticsFitter:
                 high_bounds = self.high_bounds[:1] + self.high_bounds[2:]
 
                 koff_min, koff_max  = one_site_assoc_and_disso_asymmetric_ci95_koff(
-                    self.Koff,rss_desired,
+                    self.k_off,rss_desired,
                     self.assoc_lst,self.time_assoc_lst,
                     self.lig_conc_lst,
                     self.disso_lst,self.time_disso_lst,
@@ -635,14 +631,14 @@ class KineticsFitter:
                     smax_idx=self.smax_id,
                     shared_smax=shared_smax,
                     fixed_t0=True,
-                    fixed_kon2 = True,
+                    fixed_kon2 = True, # k_on2 refers here to the forward rate constant of the induced fit
                     kon2_value=kc,
-                    fixed_koff2 = True,
+                    fixed_koff2 = True, # k_off2 refers here to the reverse rate constant of the induced fit
                     koff2_value=krev
                 )
 
                 # Calculate the residuals for the signals - use the subsampled data
-                rss_asso = np.sum([np.sum((y - fit_y)**2) for y, fit_y in zip(assoc_lst_subsampled, fit_vals_assoc)])
+                rss_asso  = np.sum([np.sum((y - fit_y)**2) for y, fit_y in zip(assoc_lst_subsampled, fit_vals_assoc)])
                 rss_disso = np.sum([np.sum((y - fit_y)**2) for y, fit_y in zip(disso_lst_subsampled, fit_vals_disso)])
 
                 rss = rss_asso + rss_disso
@@ -653,7 +649,9 @@ class KineticsFitter:
                     best_kc  = kc
                     best_krev = krev
                     best_params = params
+
             except:
+
                 # If the fit fails, just continue to the next combination
                 continue
 
@@ -689,18 +687,13 @@ class KineticsFitter:
         self.signal_assoc_fit = fit_vals_assoc
         self.signal_disso_fit = fit_vals_disso
 
-        self.Kon   = fit[0]
-        self.Koff  = fit[1]
-        self.Kc    = fit[2]
-        self.Krev  = fit[3]
-
-        self.Smax  = fit[4:]
+        self.k_on, self.k_off, self.k_c, self.k_rev, *self.Smax = fit
 
         # Create a dataframe with the fitted parameters
-        df_fit = pd.DataFrame({'k_on [1/(s*µM)]':  self.Kon,
-                               'k_off [1/s]':      self.Koff,
-                               'k_c [1/s]':        self.Kc,
-                               'k_rev [1/s]':      self.Krev,
+        df_fit = pd.DataFrame({'k_on [1/(s*µM)]':  self.k_on,
+                               'k_off [1/s]':      self.k_off,
+                               'k_c [1/s]':        self.k_c,
+                               'k_rev [1/s]':      self.k_rev,
                                'Smax':             self.Smax})
 
         self.fit_params_kinetics = df_fit

@@ -3,7 +3,7 @@ import numpy as np
 from scipy.optimize import curve_fit
 from ..utils.math import *
 
-__all__ = ['fit_single_exponential', 'fit_double_exponential']
+__all__ = ['fit_single_exponential', 'fit_double_exponential','re_fit','re_fit_2']
 
 def fit_single_exponential(y,t,min_log_k=-5, max_log_k=5,log_k_points=50):
 
@@ -141,3 +141,154 @@ def fit_double_exponential(y,t,min_log_k=-4, max_log_k=4,log_k_points=22):
     fitted_y    = double_exponential(t, *params)
 
     return params, cov, fitted_y
+
+def expand_high_bound(value,factor=10):
+
+    """
+    Multiply/divide the value by a factor and return the new value.
+    If the parameter is negative, we divide by the factor, otherwise we multiply.
+
+    Args:
+        value (float): Parameter to expand
+    Returns:
+        new_param (float): New parameter value after expansion
+    """
+
+    new_value = value * factor if value >= 0 else value / factor
+
+    return new_value
+
+def expand_low_bound(value,factor=10):
+
+    """
+    Multiply/divide the value by a factor and return the new value.
+    If the parameter is negative, we multiply by the factor, otherwise we divide.
+
+    Args:
+        value (float): Parameter to expand
+    Returns:
+        new_param (float): New parameter value after expansion
+    """
+
+    new_value = value * factor if value < 0 else value / factor
+
+    return new_value
+
+def re_fit(fit, cov, fit_vals,fit_fx,low_bounds,high_bounds,times,**kwargs):
+
+    """
+    Evaluate the difference between the fitted parameters and the initial parameters
+    If the difference is less than 2 percent, the bounds are relaxed by a factor of 10
+    and the fitting is repeated
+
+    Args:
+        fit (list): Fitted parameters
+        cov (np.ndarray): Covariance matrix of the fitted parameters
+        fit_vals (list): Fitted values for each signal, same dimensions as signal_lst
+        fit_fx (function): Function to fit the data - returns fit, cov, fit_vals
+        low_bounds (list): Lower bounds for the parameters
+        high_bounds (list): Upper bounds for the parameters
+        times (int): Number of times to re-fit the data
+        **kwargs: Additional arguments to pass to the fitting function
+
+    Returns:
+        fit (list): Fitted parameters after re-fitting
+        cov (np.ndarray): Covariance matrix of the fitted parameters after re-fitting
+        fit_vals (list): Fitted values for each signal after re-fitting, same dimensions as signal_lst
+        low_bounds (list): Lower bounds for the parameters after re-fitting
+        high_bounds (list): Upper bounds for the parameters after re-fitting
+    """
+
+    fit         = np.array(fit).astype(float)
+    low_bounds  = np.array(low_bounds).astype(float)
+    high_bounds = np.array(high_bounds).astype(float)
+
+    for _ in range(times):
+
+        difference_to_upper = np.abs( (high_bounds - fit) / high_bounds )
+        difference_to_lower = np.abs( (fit - low_bounds) / fit )
+
+        c1 = any(difference_to_upper < 0.02)
+        c2 = any(difference_to_lower < 0.02)
+
+        if c1:
+
+            # Relax bounds by a factor of 10 - only those that are too close to the upper bound
+            high_bounds = [expand_high_bound(value, factor=10) if diff < 0.02 else value for value, diff in zip(high_bounds, difference_to_upper)]
+            high_bounds = np.array(high_bounds)
+
+        if c2:
+
+            low_bounds = [expand_low_bound(value, factor=10) if diff < 0.02 else value for value, diff in zip(low_bounds, difference_to_lower)]
+            low_bounds = np.array(low_bounds)
+
+        if c1 or c2:
+
+            fit, cov, fit_vals = fit_fx(
+                initial_parameters=fit,
+                low_bounds=low_bounds,
+                high_bounds=high_bounds,
+                **kwargs)
+
+    return fit, cov, fit_vals, low_bounds, high_bounds
+
+def re_fit_2(fit, cov, fit_vals_a,fit_vals_b,fit_fx,low_bounds,high_bounds,times,**kwargs):
+
+    """
+    Evaluate the difference between the fitted parameters and the initial parameters
+    If the difference is less than 2 percent, the bounds are relaxed by a factor of 10
+    and the fitting is repeated.
+    The difference with re_fit() is that this function is used for fitting two signals at once,
+    e.g. fitting association and dissociation signals simultaneously.
+
+    Args:
+        fit (list): Fitted parameters
+        cov (np.ndarray): Covariance matrix of the fitted parameters
+        fit_vals_a (list): Fitted values for each signal, same dimensions as signal_lst
+        fit_vals_b (list): Fitted values for each signal, same dimensions as signal_lst
+        fit_fx (function): Function to fit the data - returns fit, cov, fit_vals_a, fit_vals_b
+        low_bounds (list): Lower bounds for the parameters
+        high_bounds (list): Upper bounds for the parameters
+        times (int): Number of times to re-fit the data
+        **kwargs: Additional arguments to pass to the fitting function
+
+    Returns:
+        fit (list): Fitted parameters after re-fitting
+        cov (np.ndarray): Covariance matrix of the fitted parameters after re-fitting
+        fit_vals (list): Fitted values for each signal after re-fitting, same dimensions as signal_lst
+        low_bounds (list): Lower bounds for the parameters after re-fitting
+        high_bounds (list): Upper bounds for the parameters after re-fitting
+    """
+
+    fit         = np.array(fit).astype(float)
+    low_bounds  = np.array(low_bounds).astype(float)
+    high_bounds = np.array(high_bounds).astype(float)
+
+    for _ in range(times):
+
+        difference_to_upper = (high_bounds - fit) / high_bounds
+        difference_to_lower = (fit - low_bounds) / fit
+
+        c1 = any(difference_to_upper < 0.02)
+        c2 = any(difference_to_lower < 0.02)
+
+        if c1:
+
+            # Relax bounds by a factor of 10 - only those that are too close to the upper bound
+            high_bounds = [expand_high_bound(value, factor=10) if diff < 0.02 else value for value, diff in zip(high_bounds, difference_to_upper)]
+            high_bounds = np.array(high_bounds)
+
+        if c2:
+
+            low_bounds = [expand_low_bound(value, factor=10) if diff < 0.02 else value for value, diff in zip(low_bounds, difference_to_lower)]
+            low_bounds = np.array(low_bounds)
+
+        if c1 or c2:
+
+            fit, cov, fit_vals_a, fit_vals_b  = fit_fx(
+                initial_parameters=fit,
+                low_bounds=low_bounds,
+                high_bounds=high_bounds,
+                **kwargs)
+
+    return fit, cov, fit_vals_a, fit_vals_b, low_bounds, high_bounds

@@ -32,6 +32,21 @@ def test_get_experiment_properties():
 
     assert sensor_names == ['A1','B1','C1','D1','E1','F1','G1','H1']
 
+def test_init_fittings():
+
+    pyKinetics.init_fittings()
+
+    assert pyKinetics.fittings == {}
+
+def test_add_existing_fitting():
+
+    pyKinetics.add_fitting('x','x')
+    pyKinetics.add_fitting('x','x')  # Adding the same fitting again
+
+    assert len(pyKinetics.fittings) == 1, "Adding an existing fitting should not increase the count."
+
+    pyKinetics.init_fittings()
+
 def test_merge_ligand_conc_df():
 
     pyKinetics.merge_ligand_conc_df()
@@ -79,7 +94,7 @@ def test_submit_kinetic_fitting():
                                        fitting_region='dissociation',
                                        linkedSmax=False)
 
-    k_off = pyKinetics.get_experiment_properties('Koff', fittings=True)[0]
+    k_off = pyKinetics.get_experiment_properties('k_off', fittings=True)[0]
 
     assert np.round(k_off, decimals=3) == 0.002
 

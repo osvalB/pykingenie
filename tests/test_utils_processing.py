@@ -10,7 +10,8 @@ from pykingenie.utils.processing import (
     subset_data,
     sample_type_to_letter,
     combine_sequences,
-    get_colors_from_numeric_values)
+    get_colors_from_numeric_values,
+    if_string_to_list)
 
 def test_guess_experiment_name():
     # Create a temporary file with known content
@@ -36,6 +37,18 @@ def test_guess_experiment_type():
     test_file = "./test_files/kingenie_solution.csv"
     file_type = guess_experiment_type(test_file)
     assert file_type == 'solution', "The guessed experiment type should be 'solution'"
+
+def test_if_string_to_list():
+
+    test_lst = if_string_to_list('test_string')
+    assert isinstance(test_lst, list), "The output should be a list"
+
+    test_lst = if_string_to_list(['test_string'])
+    assert isinstance(test_lst, list), "The output should be a list"
+
+    # check type error if input is not a string or a list
+    with pytest.raises(TypeError):
+        if_string_to_list(123)
 
 def test_detect_time_list_continuos():
 

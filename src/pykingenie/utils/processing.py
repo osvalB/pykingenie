@@ -10,10 +10,27 @@ import matplotlib.colors as mcolors
 
 from ..utils.palettes import set1_colors, set3_colors, VIRIDIS
 
-__all__ = ['guess_experiment_name', 'etree_to_dict', 'combine_dicts','guess_experiment_type',
-           'detect_time_list_continuos', 'find_loading_column', 'concat_signal_lst',
-           'expand_parameter_list', 'combine_sequences', 'get_palette', 'get_plotting_df',
-           'subset_data', 'sample_type_to_letter', 'get_colors_from_numeric_values']
+__all__ = [
+    'guess_experiment_name', 'etree_to_dict', 'combine_dicts','guess_experiment_type',
+    'detect_time_list_continuos', 'find_loading_column', 'concat_signal_lst',
+    'expand_parameter_list', 'combine_sequences', 'get_palette', 'get_plotting_df',
+    'subset_data', 'sample_type_to_letter', 'get_colors_from_numeric_values',
+    'if_string_to_list']
+
+def if_string_to_list(string_or_list):
+
+    """
+    Check if input is a string and convert it to a list
+    Otherwise, return the input as is
+    Args:
+        string_or_list (str or list): Input string or list
+    """
+    if isinstance(string_or_list, str):
+        return [string_or_list]
+    elif isinstance(string_or_list, list):
+        return string_or_list
+    else:
+        raise TypeError("Input must be a string or a list of strings.")
 
 def guess_experiment_name(frd_file):
 

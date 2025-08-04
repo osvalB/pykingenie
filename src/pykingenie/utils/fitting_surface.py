@@ -2,7 +2,7 @@ import numpy as np
 from ..utils.processing      import *
 from ..utils.signal_surface  import *
 from ..utils.math            import *
-from ..utils.fitting_general import fit_single_exponential
+from ..utils.fitting_general import fit_single_exponential, re_fit
 
 from scipy.optimize import curve_fit
 from scipy.optimize import minimize_scalar
@@ -18,8 +18,7 @@ __all__ = [
     'fit_one_site_assoc_and_disso_ktr',
     'one_site_assoc_and_disso_asymmetric_ci95',
     'one_site_assoc_and_disso_asymmetric_ci95_koff',
-    'get_smax_upper_bound_factor',
-    're_fit'
+    'get_smax_upper_bound_factor'
 ]
 
 def guess_initial_signal(assoc_time_lst, assoc_signal_lst,time_limit=30):
@@ -116,46 +115,6 @@ def fit_steady_state_one_site(signal_lst, ligand_lst,initial_parameters,
     fitted_values = [steady_state_one_site(C, Rmax, Kd) for C, Rmax in zip(ligand_lst, Rmax_all)]
 
     return global_fit_params, cov, fitted_values
-
-def re_fit(fit, cov, fit_vals,fit_fx,low_bounds,high_bounds,**kwargs):
-
-    """
-    Evaluate the difference between the fitted parameters and the initial parameters
-    If the difference is less than 2 percent, the bounds are relaxed by a factor of 10
-    and the fitting is repeated
-    """
-
-    fit         = np.array(fit).astype(float)
-    low_bounds  = np.array(low_bounds).astype(float)
-    high_bounds = np.array(high_bounds).astype(float)
-
-    difference_to_upper = (high_bounds - fit) / high_bounds
-
-    if any(difference_to_upper < 0.02):
-
-        # Relax bounds by a factor of 10 - only those that are too close to the upper bound
-        high_bounds[difference_to_upper < 0.02] *= 10
-
-        fit, cov, fit_vals = fit_fx(
-            initial_parameters=fit,
-            low_bounds=low_bounds,
-            high_bounds=high_bounds,
-            **kwargs)
-
-    difference_to_lower = (fit - low_bounds) / fit
-
-    if any(difference_to_lower < 0.02):
-
-        # Relax bounds by a factor of 10 - only those that are too close to the lower bound
-        low_bounds[difference_to_lower < 0.02] *= 0.1
-
-        fit, cov, fit_vals = fit_fx(
-            initial_parameters=fit,
-            low_bounds=low_bounds,
-            high_bounds=high_bounds,
-            **kwargs)
-
-    return fit, cov, fit_vals, low_bounds, high_bounds
 
 def steady_state_one_site_asymmetric_ci95(kd_estimated,signal_lst, ligand_lst,initial_parameters,
                                           low_bounds, high_bounds,rss_desired):

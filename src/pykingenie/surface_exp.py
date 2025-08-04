@@ -3,6 +3,8 @@ import numpy  as np
 
 import copy
 
+from pykingenie.utils.processing import if_string_to_list
+
 class SurfaceBasedExperiment:
 
     def __init__(self,name,type):
@@ -132,8 +134,7 @@ class SurfaceBasedExperiment:
             It modifies the attributes self.xs, self.ys, self.sensor_names and self.ligand_conc_df
         """
 
-        if not isinstance(list_of_sensor_names, list):
-            list_of_sensor_names = [list_of_sensor_names]
+        list_of_sensor_names = if_string_to_list(list_of_sensor_names)
 
         for sensor_name in list_of_sensor_names:
             self.subtraction_one_to_one(sensor_name, reference_sensor, inplace=inplace)
@@ -209,9 +210,7 @@ class SurfaceBasedExperiment:
             It modifies the attributes self.xs, self.ys, self.sensor_names and self.ligand_conc_df
 
         """
-
-        if not isinstance(sensor_names, list):
-            sensor_names = [sensor_names]
+        sensor_names = if_string_to_list(sensor_names)
 
         # Find the index of the association steps
         association_steps_indices = self.df_steps.index[self.df_steps['Type'] == 'ASSOC'].to_numpy()
@@ -313,9 +312,7 @@ class SurfaceBasedExperiment:
             It modifies the attributes self.xs, self.ys, self.sensor_names and self.ligand_conc_df
 
         """
-
-        if not isinstance(sensor_names, list):
-            sensor_names = [sensor_names]
+        sensor_names = if_string_to_list(sensor_names)
 
         # Find the index of the dissociation steps
         dissociation_steps_indices = self.df_steps.index[self.df_steps['Type'] == 'DISASSOC'].to_numpy()
@@ -393,11 +390,8 @@ class SurfaceBasedExperiment:
             It modifies the attributes self.xs, self.ys, self.sensor_names and self.ligand_conc_df
 
         """
-        if not isinstance(sensor_names, list):
-            sensor_names = [sensor_names]
-
-        if not isinstance(step_types, list):
-            step_types = [step_types]
+        sensor_names = if_string_to_list(sensor_names)
+        step_types   = if_string_to_list(step_types)
 
         sensor_indices = [self.sensor_names.index(sensor_name) for sensor_name in sensor_names]
 
