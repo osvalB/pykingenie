@@ -392,11 +392,30 @@ class KineticsAnalyzer:
 
         return None
 
-    def submit_fitting_solution(self,fitting_model='single'):
+    def submit_fitting_solution(self,fitting_model='single',**kwargs):
 
         """
         Fit a variety of models to the kinetics data in the solution-based experiments.
+        Args:
+            fitting_model (str): The model to fit. Options are:
+                - 'single': Fit single exponentials
+                - 'double': Fit double exponentials
+                - 'one_binding_site': Fit one binding site model
+                - 'one_binding_site_if': Fit one binding site model with induced fit
+            **kwargs: Additional keyword arguments for the fitting methods.
+            For example with 'one_binding_site_if' you can use
+                kwargs = {
+                "fit_signal_E": False,
+                "fit_signal_S": False,
+                "fit_signal_ES": True,
+                "ESint_equals_ES": True,
+                "fixed_t0": True
+                }
+
         """
+
+        if fitting_model not in ['single', 'double', 'one_binding_site', 'one_binding_site_if']:
+            raise ValueError("Unknown fitting model: " + fitting_model)
 
         for kf in self.fittings.values():
 
@@ -407,13 +426,11 @@ class KineticsAnalyzer:
                 kf.fit_double_exponentials()
 
             elif fitting_model == 'one_binding_site':
-                kf.fit_one_binding_site()
+                kf.fit_one_binding_site(**kwargs)
 
             elif fitting_model == 'one_binding_site_if':
-                kf.fit_induced_fit()
-
-            else:
-                raise ValueError("Unknown fitting model: " + fitting_model)
+                kf.find_initial_params_if(**kwargs)
+                kf.fit_induced_fit(**kwargs)
 
         return None
 
@@ -421,32 +438,29 @@ class KineticsAnalyzer:
                                 fitting_region='association_dissociation',
                                 linkedSmax=False):
 
+        if fitting_model not in ['one_to_one', 'one_to_one_mtl', 'one_to_one_if']:
+            raise ValueError("Unknown fitting model: " + fitting_model)
+
         for kf in self.fittings.values():
 
-            try:
+            if fitting_model == 'one_to_one' and fitting_region == 'association_dissociation':
+                kf.fit_one_site_assoc_and_disso(shared_smax=linkedSmax)
+                kf.fit_single_exponentials()
 
-                if fitting_model == 'one_to_one' and fitting_region == 'association_dissociation':
-                    kf.fit_one_site_assoc_and_disso(shared_smax=linkedSmax)
-                    kf.fit_single_exponentials()
+            if fitting_model == 'one_to_one_mtl' and fitting_region == 'association_dissociation':
+                kf.fit_one_site_assoc_and_disso(shared_smax=linkedSmax, fit_ktr=True)
 
-                if fitting_model == 'one_to_one_mtl' and fitting_region == 'association_dissociation':
-                    kf.fit_one_site_assoc_and_disso(shared_smax=linkedSmax, fit_ktr=True)
+            if fitting_model == 'one_to_one' and fitting_region == 'association':
+                kf.fit_one_site_association(shared_smax=linkedSmax)
+                kf.fit_single_exponentials()
 
-                if fitting_model == 'one_to_one' and fitting_region == 'association':
-                    kf.fit_one_site_association(shared_smax=linkedSmax)
-                    kf.fit_single_exponentials()
+            if fitting_model == 'one_to_one' and fitting_region == 'dissociation':
+                kf.fit_one_site_dissociation()
 
-                if fitting_model == 'one_to_one' and fitting_region == 'dissociation':
-                    kf.fit_one_site_dissociation()
+            if fitting_model == 'one_to_one_if' and fitting_region == 'association_dissociation':
+                kf.fit_one_site_if_assoc_and_disso(shared_smax=linkedSmax)
 
-                if fitting_model == 'one_to_one_if' and fitting_region == 'association_dissociation':
-                    kf.fit_one_site_if_assoc_and_disso(shared_smax=linkedSmax)
-
-                kf.create_fitting_bounds_table()
-
-            except:
-
-                pass
+            kf.create_fitting_bounds_table()
 
         return None
 

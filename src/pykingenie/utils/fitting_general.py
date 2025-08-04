@@ -5,6 +5,21 @@ from ..utils.math import *
 
 __all__ = ['fit_single_exponential', 'fit_double_exponential','re_fit','re_fit_2']
 
+def convert_to_numpy_array(data):
+    """
+    Convert input data to a numpy array if it is not already one.
+
+    Args:
+        data (list or np.ndarray): Input data to be converted.
+
+    Returns:
+        np.ndarray: Converted numpy array.
+    """
+    if not isinstance(data, np.ndarray):
+        return np.array(data)
+
+    return data
+
 def fit_single_exponential(y,t,min_log_k=-5, max_log_k=5,log_k_points=50):
 
     """
@@ -24,10 +39,8 @@ def fit_single_exponential(y,t,min_log_k=-5, max_log_k=5,log_k_points=50):
 
 
     # Convert to numpy array, if needed,
-    if not isinstance(y, np.ndarray):
-        y = np.array(y)
-    if not isinstance(t, np.ndarray):
-        t = np.array(t)
+    y = convert_to_numpy_array(y)
+    t = convert_to_numpy_array(t)
 
     t = t - np.min(t)  # Start at zero
 
@@ -86,10 +99,8 @@ def fit_double_exponential(y,t,min_log_k=-4, max_log_k=4,log_k_points=22):
     """
 
     # Convert to numpy array, if needed,
-    if not isinstance(y, np.ndarray):
-        y = np.array(y)
-    if not isinstance(t, np.ndarray):
-        t = np.array(t)
+    y = convert_to_numpy_array(y)
+    t = convert_to_numpy_array(t)
 
     # Define a two columns dataframe with possible values for k obs 1 and k obs 2
     # Evenly spaced in logarithmic scale
@@ -141,6 +152,54 @@ def fit_double_exponential(y,t,min_log_k=-4, max_log_k=4,log_k_points=22):
     fitted_y    = double_exponential(t, *params)
 
     return params, cov, fitted_y
+
+def fit_many_double_exponential(signal_lst, time_lst, min_log_k=-4, max_log_k=4, log_k_points=22):
+
+    """
+    Fit a double exponential to many signals.
+    Args:
+        signal_lst (list of np.ndarray): List of signals to fit
+        time_lst (list of np.ndarray): List of time arrays corresponding to each signal
+        min_log_k (float): Minimum logarithmic value for k_obs
+        max_log_k (float): Maximum logarithmic value for k_obs
+        log_k_points (int): Number of points in the logarithmic scale for k_obs
+    Returns:
+        k_obs_1 (list): List of slowest k_obs values for each signal
+        k_obs_2 (list): List of second slowest k_obs values for each signal
+        y_pred (list): List of fitted values for each signal
+
+    This function iterates over each signal and time pair, fits a double exponential model,
+    and returns the slowest and second slowest k_obs values along with the fitted values.
+    If fitting fails for a signal, it will skip that signal and return NaN for k_obs values and None for fitted values.
+    Note: The function assumes that the input signals and time arrays are of the same length.
+    """
+
+    k_obs_1 = [np.nan for _ in range(len(signal_lst))]
+    k_obs_2 = [np.nan for _ in range(len(signal_lst))]
+    y_pred =  [None   for _ in range(len(signal_lst))]
+
+    i = 0
+    for y, t in zip(signal_lst, time_lst):
+
+        try:
+
+            params, cov, fitted_y = fit_double_exponential(y, t, min_log_k=min_log_k, max_log_k=max_log_k,
+                                                           log_k_points=log_k_points)
+
+            slowest_k = np.min([params[2], params[4]])
+            second_k = np.max([params[2], params[4]])
+
+            k_obs_1[i] = slowest_k
+            k_obs_2[i] = second_k
+            y_pred[i] = fitted_y
+
+        except:
+
+            pass
+
+        i += 1
+
+    return k_obs_1, k_obs_2, y_pred
 
 def expand_high_bound(value,factor=10):
 

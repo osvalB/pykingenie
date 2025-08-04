@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import pytest
 import os
 
@@ -11,7 +12,8 @@ from pykingenie.utils.processing import (
     sample_type_to_letter,
     combine_sequences,
     get_colors_from_numeric_values,
-    if_string_to_list)
+    if_string_to_list,
+    find_loading_column)
 
 def test_guess_experiment_name():
     # Create a temporary file with known content
@@ -21,6 +23,10 @@ def test_guess_experiment_name():
     assert name == '5th interaction with antibodie reg and imd - wt mut and wtDTT', "The guessed experiment name should be '5th interaction with antibodie reg and imd - wt mut and wtDTT'"
 
 def test_guess_experiment_type():
+
+    non_existing_file = 'sarasaa'
+    file_type = guess_experiment_type(non_existing_file)
+    assert file_type == 'surface', "The default guessed experiment type should be 'surface'"
 
     mock_file = 'ExperimentStep.ini'
     file_type = guess_experiment_type(mock_file)
@@ -78,6 +84,20 @@ def test_get_palette():
     # Test with a number of colors greater than the available colors
     palette = get_palette(20)
     assert len(palette) == 20, "The palette should contain 20 colors even if it exceeds the default size"
+
+def test_find_loading_column():
+
+    # Create a mock DataFrame
+    data = {
+        'StepNumber': [1,1],
+        'Type': ['hello', 'world']
+    }
+
+    df = pd.DataFrame(data)
+
+    # Test with a valid step number
+    loading_col = find_loading_column(df, step_number=1)
+    assert loading_col is None, "There should be no loading column"
 
 def test_subset_data():
 

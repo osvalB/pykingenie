@@ -1,3 +1,6 @@
+import numpy as np
+
+from .utils.fitting_general import fit_many_double_exponential
 from .utils.math            import *
 from .utils.fitting_general import *
 from .utils.fitting_solution import *
@@ -106,22 +109,18 @@ class KineticsFitterSolution:
         """
         self.clear_fittings()
 
-        k_obs  = []
-        y_pred = []
+        k_obs  = [np.nan for _ in range(len(self.assoc_lst))]
+        y_pred = [None for _ in range(len(self.assoc_lst))]
 
+        i = 0
         for y,t in zip(self.assoc_lst,self.time_assoc_lst):
 
-            try:
+            fit_params, cov, fit_y = fit_single_exponential(y,t)
 
-                fit_params, cov, fit_y = fit_single_exponential(y,t)
+            k_obs[i] = fit_params[2]
+            y_pred[i] = fit_y
 
-                k_obs.append(fit_params[2])
-                y_pred.append(fit_y)
-
-            except:
-
-                k_obs.append(np.nan)
-                y_pred.append(None)
+            i += 1
 
         self.k_obs            = k_obs
         self.signal_assoc_fit = y_pred
@@ -163,28 +162,8 @@ class KineticsFitterSolution:
         """
         Fit double exponentials to the association signals in the solution kinetics experiment.
         """
-        k_obs_1 = []
-        k_obs_2 = []
-        y_pred  = []
 
-        for y,t in zip(self.assoc_lst,self.time_assoc_lst):
-
-            try:
-
-                params, cov, fitted_y = fit_double_exponential(y,t,min_log_k=min_log_k,max_log_k=max_log_k,log_k_points=log_k_points)
-
-                slowest_k = np.min([params[2], params[4]])
-                second_k  = np.max([params[2], params[4]])
-
-                k_obs_1.append(slowest_k)
-                k_obs_2.append(second_k)
-                y_pred.append(fitted_y)
-
-            except:
-
-                k_obs_1.append(np.nan)
-                k_obs_2.append(np.nan)
-                y_pred.append(None)
+        k_obs_1, k_obs_2, y_pred = fit_many_double_exponential(self.assoc_lst,self.time_assoc_lst,min_log_k, max_log_k, log_k_points)
 
         self.k_obs_1 = k_obs_1
         self.k_obs_2 = k_obs_2
