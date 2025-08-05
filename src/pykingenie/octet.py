@@ -85,26 +85,21 @@ class OctetExperiment(SurfaceBasedExperiment):
         Notes
         -----
         This method creates the following attributes:
+            
         - traces_loaded : bool
-            Whether traces were successfully loaded.
+          Whether traces were successfully loaded.
         - xs : list
-            List of x values (time) for each sensor.
+          List of x values (time) for each sensor.
         - ys : list
-            List of y values (signal) for each sensor.
+          List of y values (signal) for each sensor.
         - exp_info : list
-            List of dictionaries with experimental information.
+          List of dictionaries with experimental information.
         - step_info : list
-            List of dictionaries with step information.
+          List of dictionaries with step information.
         - no_steps : int
-            Number of steps in the experiment.
+          Number of steps in the experiment.
         - no_sensors : int
-            Number of sensors in the experiment.
-        - sensor_names : list
-            List of sensor names.
-        - df_steps : pandas.DataFrame
-            DataFrame with the steps information.
-        - ligand_conc_df : pandas.DataFrame
-            DataFrame with the ligand concentration information.
+          Number of sensors in the experiment.
         """
 
         if names is None:
@@ -195,24 +190,26 @@ class OctetExperiment(SurfaceBasedExperiment):
         Notes
         -----
         This method requires the following attributes to be already populated:
+            
         - step_info : list
-            List of dictionaries with step information.
+          List of dictionaries with step information.
         - exp_info : list
-            List of dictionaries with experimental information.
+          List of dictionaries with experimental information.
         - fns : list
-            List of file names.
+          List of file names.
             
         This method creates/updates the following attributes:
+            
         - no_steps : int
-            Number of steps in the experiment.
+          Number of steps in the experiment.
         - no_sensors : int
-            Number of sensors.
+          Number of sensors.
         - sensor_names : list
-            List of sensor names.
+          List of sensor names.
         - df_steps : pandas.DataFrame
-            DataFrame with step information.
+          DataFrame with step information.
         - ligand_conc_df : pandas.DataFrame
-            DataFrame with ligand concentration information.
+          DataFrame with ligand concentration information.
         """
 
         self.no_steps = len(self.step_info[0]['ActualTime'])
@@ -517,20 +514,21 @@ class OctetExperiment(SurfaceBasedExperiment):
         Notes
         -----
         This method creates the following attributes:
+            
         - sample_column : numpy.ndarray
-            Array of sample column information (96 elements, one per well).
+          Array of sample column information (96 elements, one per well).
         - sample_row : numpy.ndarray
-            Array of sample row information (96 elements, one per well).
+          Array of sample row information (96 elements, one per well).
         - sample_type : list
-            List of sample types (96 elements, one per well).
+          List of sample types (96 elements, one per well).
         - sample_id : list
-            List of sample IDs (96 elements, one per well).
+          List of sample IDs (96 elements, one per well).
         - sample_plate_loaded : bool
-            Set to True if sample plate information is successfully loaded.
+          Set to True if sample plate information is successfully loaded.
         - sample_conc : numpy.ndarray
-            Array with the sample concentrations (96 elements, one per well).
+          Array with the sample concentrations (96 elements, one per well).
         - sample_conc_labeled : list
-            List with the sample concentrations labeled (96 elements, one per well).
+          List with the sample concentrations labeled (96 elements, one per well).
         """
 
         if names is None:

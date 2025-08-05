@@ -20,7 +20,9 @@ def setup_docs():
     if not docs_dir.exists():
         print(f"Error: Could not create docs directory at {docs_dir.absolute()}")
         sys.exit(1)
-        
+
+    import time
+    time.sleep(1)   
     # Change to docs directory
     os.chdir(docs_dir)
 
@@ -96,17 +98,15 @@ numpydoc_show_class_members = False
 PyKinGenie Documentation
 ========================
 
-Welcome to PyKinGenie, a Python package for analyzing mass photometry data.
+Welcome to PyKinGenie, a Python package for analyzing binding kinetics data with simple models.
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   installation
-   quickstart
-   api
-   examples
    modules
+   pykingenie
+   pykingenie.utils
 
 Installation
 ============
@@ -155,6 +155,7 @@ def build_docs():
 
     if not docs_dir.exists():
         docs_dir = setup_docs()
+        print('Creating a new docs folder')
 
     os.chdir(docs_dir)
 

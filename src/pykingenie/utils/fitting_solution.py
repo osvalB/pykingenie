@@ -223,19 +223,18 @@ def fit_induced_fit_solution(
     Notes
     -----
     The initial_parameters are given in the following order:
-        signal_E     if fit_signal_E                            (signal of the free rotein)
-        signal_S     if fit_signal_S                            (signal of the free ligand)
-        signal_ES    if fit_signal_ES                           (signal of the trapped complex)
-        signal_ESint if fit_signal_ES and not ESint_equals_ES   (signal of the intermediate complex)
-                                                                if ESint_equals_ES is True, then the trapped complex signal is used for both ES and ESint
-        k_on         if not fixed_kon                           (association rate constant)
-        k_off        if not fixed_koff                          (dissociation rate constant)
-        k_c          if not fixed_kc                            (induced fit rate constant)
-        k_rev        if not fixed_krev                          (reverse induced fit rate constant)
-
-        t0_1         if not fixed_t0                             (initial time point for the first  signal array, default is 0)
-        t0_2         if not fixed_t0                             (initial time point for the second signal array, default is 0)
-        ...
+        
+    - signal_E     if fit_signal_E                            (signal of the free protein)
+    - signal_S     if fit_signal_S                            (signal of the free ligand)
+    - signal_ES    if fit_signal_ES                           (signal of the trapped complex)
+    - signal_ESint if fit_signal_ES and not ESint_equals_ES   (signal of the intermediate complex)
+      if ESint_equals_ES is True, then the trapped complex signal is used for both ES and ESint
+    - k_on         if not fixed_kon                           (association rate constant)
+    - k_off        if not fixed_koff                          (dissociation rate constant)
+    - k_c          if not fixed_kc                            (induced fit rate constant)
+    - k_rev        if not fixed_krev                          (reverse induced fit rate constant)
+    - t0_1         if not fixed_t0                            (initial time point for the first signal array, default is 0)
+    - t0_2         if not fixed_t0                            (initial time point for the second signal array, default is 0)
     """
     # Flatten signals once
     all_signal = np.concatenate(signal_lst)
