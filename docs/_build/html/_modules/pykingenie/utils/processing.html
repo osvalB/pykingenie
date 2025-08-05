@@ -132,6 +132,34 @@
   </a>
 </li>
 
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
+    pykingenie.utils package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
+    pykingenie.utils package
+  </a>
+</li>
+
   </ul>
 </nav></div>
       
@@ -222,6 +250,34 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../modules.html">
     pykingenie
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
+    pykingenie.utils package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
+    pykingenie.utils package
   </a>
 </li>
 
@@ -323,10 +379,37 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w">  </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.colors</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mcolors</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.palettes</span><span class="w"> </span><span class="kn">import</span> <span class="n">set1_colors</span><span class="p">,</span> <span class="n">set3_colors</span><span class="p">,</span> <span class="n">VIRIDIS</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;guess_experiment_name&#39;</span><span class="p">,</span> <span class="s1">&#39;etree_to_dict&#39;</span><span class="p">,</span> <span class="s1">&#39;combine_dicts&#39;</span><span class="p">,</span><span class="s1">&#39;guess_experiment_type&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;detect_time_list_continuos&#39;</span><span class="p">,</span> <span class="s1">&#39;find_loading_column&#39;</span><span class="p">,</span> <span class="s1">&#39;concat_signal_lst&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;expand_parameter_list&#39;</span><span class="p">,</span> <span class="s1">&#39;combine_sequences&#39;</span><span class="p">,</span> <span class="s1">&#39;get_palette&#39;</span><span class="p">,</span> <span class="s1">&#39;get_plotting_df&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;subset_data&#39;</span><span class="p">,</span> <span class="s1">&#39;sample_type_to_letter&#39;</span><span class="p">,</span> <span class="s1">&#39;get_colors_from_numeric_values&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;if_string_to_list&#39;</span><span class="p">,</span><span class="s1">&#39;find_index_of_previous_step_type&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="if_string_to_list">
+<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.processing.if_string_to_list">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">if_string_to_list</span><span class="p">(</span><span class="n">string_or_list</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if input is a string and convert it to a list</span>
+<span class="sd">    Otherwise, return the input as is</span>
+<span class="sd">    Args:</span>
+<span class="sd">        string_or_list (str or list): Input string or list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">string_or_list</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">string_or_list</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">string_or_list</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">string_or_list</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Input must be a string or a list of strings.&quot;</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="guess_experiment_name">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.processing.guess_experiment_name">[docs]</a>
@@ -516,12 +599,7 @@
 <span class="sd">        allSignal (np.ndarray): Concatenated signal</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">allSignal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">signal_lst</span><span class="p">)</span>
-    <span class="k">except</span><span class="p">:</span>
-        <span class="n">allSignal</span> <span class="o">=</span> <span class="n">signal_lst</span>
-
-    <span class="k">return</span> <span class="p">(</span><span class="n">allSignal</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">signal_lst</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="expand_parameter_list">
@@ -560,6 +638,7 @@
     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">seq1</span><span class="p">,</span> <span class="n">seq2</span><span class="p">))</span></div>
 
 
+
 <div class="viewcode-block" id="get_palette">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.processing.get_palette">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_palette</span><span class="p">(</span><span class="n">n_colors</span><span class="p">):</span>
@@ -571,14 +650,9 @@
         <span class="k">return</span> <span class="n">set3_colors</span><span class="p">[:</span><span class="n">n_colors</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
 
-        <span class="k">try</span><span class="p">:</span>
-            <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.colors</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mcolors</span>
-            <span class="c1"># Create a colormap from the original palette</span>
-            <span class="n">cmap</span> <span class="o">=</span> <span class="n">mcolors</span><span class="o">.</span><span class="n">LinearSegmentedColormap</span><span class="o">.</span><span class="n">from_list</span><span class="p">(</span><span class="s2">&quot;set3_interp&quot;</span><span class="p">,</span> <span class="n">set3_colors</span><span class="p">)</span>
-            <span class="n">interpolated_colors</span> <span class="o">=</span> <span class="p">[</span><span class="n">mcolors</span><span class="o">.</span><span class="n">to_hex</span><span class="p">(</span><span class="n">cmap</span><span class="p">(</span><span class="n">i</span> <span class="o">/</span> <span class="p">(</span><span class="n">n_colors</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_colors</span><span class="p">)]</span>
-        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-            <span class="c1"># default to all black if matplotlib is not available</span>
-            <span class="n">interpolated_colors</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;#000000&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_colors</span>
+        <span class="c1"># Create a colormap from the original palette</span>
+        <span class="n">cmap</span> <span class="o">=</span> <span class="n">mcolors</span><span class="o">.</span><span class="n">LinearSegmentedColormap</span><span class="o">.</span><span class="n">from_list</span><span class="p">(</span><span class="s2">&quot;set3_interp&quot;</span><span class="p">,</span> <span class="n">set3_colors</span><span class="p">)</span>
+        <span class="n">interpolated_colors</span> <span class="o">=</span> <span class="p">[</span><span class="n">mcolors</span><span class="o">.</span><span class="n">to_hex</span><span class="p">(</span><span class="n">cmap</span><span class="p">(</span><span class="n">i</span> <span class="o">/</span> <span class="p">(</span><span class="n">n_colors</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_colors</span><span class="p">)]</span>
 
         <span class="k">return</span> <span class="n">interpolated_colors</span></div>
 
@@ -669,6 +743,22 @@
     <span class="n">seq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">min_val</span><span class="p">,</span> <span class="n">max_val</span><span class="p">,</span> <span class="mi">21</span><span class="p">)</span>
     <span class="n">idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">v</span> <span class="o">-</span> <span class="n">seq</span><span class="p">))</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">]</span>
     <span class="k">return</span> <span class="p">[</span><span class="n">VIRIDIS</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">idx</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="find_index_of_previous_step_type">
+<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.processing.find_index_of_previous_step_type">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">find_index_of_previous_step_type</span><span class="p">(</span><span class="n">df_steps</span><span class="p">,</span><span class="n">step_index</span><span class="p">,</span><span class="n">step_type</span><span class="p">):</span>
+
+    <span class="n">i</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># Find the index of the first step_type, from the single cycle</span>
+    <span class="c1"># Iterate over the previous steps, two at a time, until we find a step that is not a step of the same type</span>
+
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">step_index</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">df_steps</span><span class="p">[</span><span class="s1">&#39;Type&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span> <span class="o">!=</span> <span class="n">step_type</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">idx</span>
+            <span class="k">break</span>
+
+    <span class="k">return</span> <span class="n">i</span></div>
 
 </pre></div>
 

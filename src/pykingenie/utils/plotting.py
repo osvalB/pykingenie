@@ -19,21 +19,31 @@ __all__ = [
 ]
 
 def config_fig(fig, name_for_download, export_format=None,
-               plot_width=10, plot_height=6, scale_factor=50,save=False):
+               plot_width=10, plot_height=6, scale_factor=50, save=False):
     """
     Configure Plotly figure size and optionally save to file.
 
-    Parameters:
-        fig (go.Figure): The Plotly figure.
-        name_for_download (str): Base name for saving the figure.
-        export_format (str): 'png', 'svg', 'pdf', etc. (if saving).
-        plot_width (int): Width in arbitrary units.
-        plot_height (int): Height in arbitrary units.
-        scale_factor (int): Multiply width/height to get actual pixels.
-        save (bool): Whether to save the figure as a file.
+    Parameters
+    ----------
+    fig : go.Figure
+        The Plotly figure.
+    name_for_download : str
+        Base name for saving the figure.
+    export_format : str, optional
+        'png', 'svg', 'pdf', etc. (if saving).
+    plot_width : int, optional
+        Width in arbitrary units. Default is 10.
+    plot_height : int, optional
+        Height in arbitrary units. Default is 6.
+    scale_factor : int, optional
+        Multiply width/height to get actual pixels. Default is 50.
+    save : bool, optional
+        Whether to save the figure as a file. Default is False.
 
-    Returns:
-        go.Figure: The updated figure.
+    Returns
+    -------
+    go.Figure
+        The updated figure.
     """
 
     fig.update_layout(
@@ -53,14 +63,22 @@ def config_fig(fig, name_for_download, export_format=None,
     return fig
 
 def plot_plate_info(pyKinetics, experiment_name, font_size=18):
+    """
+    Plot the plate layout information from a KineticsAnalyzer experiment.
 
-    """Plot the plate layout information from a KineticsAnalyzer experiment.
-    Args:
-        pyKinetics (KineticsAnalyzer): The KineticsAnalyzer instance containing the experiment data.
-        experiment_name (str): The name of the experiment to plot.
-        font_size (int): Font size for the plot.
-    Returns:
-        go.Figure: A Plotly figure containing the plate layout.
+    Parameters
+    ----------
+    pyKinetics : KineticsAnalyzer
+        The KineticsAnalyzer instance containing the experiment data.
+    experiment_name : str
+        The name of the experiment to plot.
+    font_size : int, optional
+        Font size for the plot. Default is 18.
+
+    Returns
+    -------
+    go.Figure
+        A Plotly figure containing the plate layout.
     """
 
     py_single_exp = pyKinetics.experiments[experiment_name]
@@ -103,7 +121,31 @@ def plot_plate_info(pyKinetics, experiment_name, font_size=18):
 
 def plot_traces(xs, ys, legends, colors, show,
                 marker_size=1, line_width=2):
+    """
+    Plot sensor traces for a set of sensors.
 
+    Parameters
+    ----------
+    xs : list of np.ndarray
+        List of x-axis arrays (time) for each sensor.
+    ys : list of np.ndarray
+        List of y-axis arrays (signal) for each sensor.
+    legends : list of str
+        List of legend labels for each sensor.
+    colors : list of str
+        List of colors for each sensor trace.
+    show : list of bool
+        List indicating whether to show each sensor trace.
+    marker_size : int, optional
+        Size of the markers. Default is 1.
+    line_width : int, optional
+        Width of the lines. Default is 2.
+
+    Returns
+    -------
+    go.Figure
+        A Plotly figure containing the sensor traces.
+    """
     
     fig = go.Figure()
     total_traces = sum(show)
@@ -130,7 +172,40 @@ def plot_traces(xs, ys, legends, colors, show,
 def plot_traces_all(pyKinetics, legends_df,
                     plot_width=16, plot_height=14, plot_type='png',
                     font_size=18, show_grid_x=False, show_grid_y=False,
-                    marker_size=1, line_width=2,vertical_spacing=0.08):
+                    marker_size=1, line_width=2, vertical_spacing=0.08):
+    """
+    Plot all sensor traces in subplots for a KineticsAnalyzer experiment.
+
+    Parameters
+    ----------
+    pyKinetics : KineticsAnalyzer
+        The KineticsAnalyzer instance containing the experiment data.
+    legends_df : pandas.DataFrame
+        DataFrame containing legend, color, and show information for each sensor.
+    plot_width : int, optional
+        Width of the plot. Default is 16.
+    plot_height : int, optional
+        Height of the plot. Default is 14.
+    plot_type : str, optional
+        Type of plot to export ('png', 'svg', etc.). Default is 'png'.
+    font_size : int, optional
+        Font size for plot text. Default is 18.
+    show_grid_x : bool, optional
+        Whether to show grid lines on the x-axis. Default is False.
+    show_grid_y : bool, optional
+        Whether to show grid lines on the y-axis. Default is False.
+    marker_size : int, optional
+        Size of the markers. Default is 1.
+    line_width : int, optional
+        Width of the lines. Default is 2.
+    vertical_spacing : float, optional
+        Vertical spacing between subplots. Default is 0.08.
+
+    Returns
+    -------
+    go.Figure
+        A Plotly figure containing all sensor traces in subplots.
+    """
 
     all_xs = pyKinetics.get_experiment_properties('xs')
     all_ys = pyKinetics.get_experiment_properties('ys')
@@ -226,6 +301,37 @@ def plot_steady_state(pyKinetics,
                       marker_size=5,
                       line_width=2,
                       plot_fit=False):
+    """
+    Plot steady-state data for a KineticsAnalyzer experiment.
+
+    Parameters
+    ----------
+    pyKinetics : KineticsAnalyzer
+        The KineticsAnalyzer instance containing the experiment data.
+    plot_width : int, optional
+        Width of the plot. Default is 30.
+    plot_height : int, optional
+        Height of the plot. Default is 20.
+    plot_type : str, optional
+        Type of plot to export ('png', 'svg', etc.). Default is 'png'.
+    font_size : int, optional
+        Font size for plot text. Default is 18.
+    show_grid_x : bool, optional
+        Whether to show grid lines on the x-axis. Default is True.
+    show_grid_y : bool, optional
+        Whether to show grid lines on the y-axis. Default is True.
+    marker_size : int, optional
+        Size of the markers. Default is 5.
+    line_width : int, optional
+        Width of the lines. Default is 2.
+    plot_fit : bool, optional
+        Whether to plot fitted curves. Default is False.
+
+    Returns
+    -------
+    go.Figure
+        A Plotly figure containing steady-state plots.
+    """
 
     pyKinetics_fittings = pyKinetics.fittings.values()
 
@@ -334,6 +440,45 @@ def plot_association_dissociation(
     smooth_curves_fit=False,
     rolling_window=0.1,
     vertical_spacing=0.08):
+    """
+    Plot association and dissociation traces for a KineticsAnalyzer experiment.
+
+    Parameters
+    ----------
+    pyKinetics : KineticsAnalyzer
+        The KineticsAnalyzer instance containing the experiment data.
+    plot_width : int, optional
+        Width of the plot. Default is 26.
+    plot_height : int, optional
+        Height of the plot. Default is 20.
+    plot_type : str, optional
+        Type of plot to export ('png', 'svg', etc.). Default is 'png'.
+    font_size : int, optional
+        Font size for plot text. Default is 14.
+    show_grid_x : bool, optional
+        Whether to show grid lines on the x-axis. Default is False.
+    show_grid_y : bool, optional
+        Whether to show grid lines on the y-axis. Default is False.
+    marker_size : int, optional
+        Size of the markers. Default is 4.
+    line_width : int, optional
+        Width of the lines. Default is 2.
+    split_by_smax_id : bool, optional
+        Whether to split subplots by Smax ID. Default is True.
+    max_points_per_plot : int, optional
+        Maximum number of points per subplot. Default is 2000.
+    smooth_curves_fit : bool, optional
+        Whether to apply median filter smoothing. Default is False.
+    rolling_window : float, optional
+        Window size for smoothing. Default is 0.1.
+    vertical_spacing : float, optional
+        Vertical spacing between subplots. Default is 0.08.
+
+    Returns
+    -------
+    go.Figure
+        A Plotly figure containing association-dissociation traces.
+    """
 
     pyKinetics_fittings = pyKinetics.fittings.values()
 

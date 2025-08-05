@@ -62,6 +62,25 @@ def test_merge_consecutive_steps():
     # This part would normally read files, but we can mock it for testing purposes
     # Here we assume that the method works correctly when provided with valid file paths
 
+def test_merge_consecutive_steps_2():
+
+    # Create an instance of OctetExperiment
+    bli = OctetExperiment('test_octet')
+
+    bli.read_sensor_data(frd_files)
+
+    # modify t0 so t0 ref is higher than t0 to merge
+    bli.xs[0][2] += 100
+
+    x_ref      = bli.xs[0][2]
+    x_to_merge = bli.xs[0][3]
+
+    bli.merge_consecutive_steps(3,4)
+
+    x_merged = bli.xs[0][2]
+
+    assert all(np.concatenate((x_to_merge, x_ref)) == x_merged), "The consecutive steps should be merged correctly."
+
 def test_merge_steps_by_name():
 
     # Create an instance of OctetExperiment
@@ -82,11 +101,18 @@ def test_read_sample_plate_info():
 
     bli.read_sensor_data(frd_files)
 
+    # run read_sample_plate_info without a valid fmf file
+    bli.read_sample_plate_info('test')
+
+    assert not bli.sample_plate_loaded, "The sample plate should not be loaded when an invalid fmf file is provided."
+
     # Read the plate information
     bli.read_sample_plate_info(fmf_file)
 
     # Check if sample_row is not None
     assert bli.sample_row is not None, "The sample_row should not be None after reading plate info."
+
+
 
 def test_convert_to_numbers():
 

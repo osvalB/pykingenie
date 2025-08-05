@@ -132,6 +132,34 @@
   </a>
 </li>
 
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
+    pykingenie.utils package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
+    pykingenie.utils package
+  </a>
+</li>
+
   </ul>
 </nav></div>
       
@@ -222,6 +250,34 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../modules.html">
     pykingenie
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
+    pykingenie.utils package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
+    pykingenie.utils package
   </a>
 </li>
 
@@ -322,6 +378,21 @@
 <span></span><span class="kn">import</span><span class="w">  </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.integrate</span><span class="w"> </span><span class="kn">import</span> <span class="n">solve_ivp</span>
 
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;ode_one_site_insolution&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;solve_ode_one_site_insolution&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;signal_ode_one_site_insolution&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ode_induced_fit_insolution&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;solve_ode_induced_fit_insolution&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;signal_ode_induced_fit_insolution&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ode_conformational_selection_insolution&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;solve_ode_conformational_selection_insolution&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;signal_ode_conformational_selection_insolution&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;get_initial_concentration_conformational_selection&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;get_kobs_induced_fit&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;get_kobs_conformational_selection&#39;</span>
+<span class="p">]</span>
+
 <div class="viewcode-block" id="ode_one_site_insolution">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_solution.ode_one_site_insolution">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">ode_one_site_insolution</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">complex_conc</span><span class="p">,</span><span class="n">koff</span><span class="p">,</span><span class="n">Kd</span><span class="p">,</span><span class="n">a_total</span><span class="p">,</span><span class="n">b_total</span><span class="p">):</span>
@@ -417,60 +488,10 @@
     <span class="k">return</span> <span class="n">signal</span></div>
 
 
+
 <div class="viewcode-block" id="ode_induced_fit_insolution">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_solution.ode_induced_fit_insolution">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">ode_induced_fit_insolution</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">k_minus1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">k_minus2</span><span class="p">):</span>
-
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">    Species:</span>
-
-<span class="sd">        E: Free enzyme</span>
-<span class="sd">        S: Free substrate</span>
-<span class="sd">        E·S: Intermediate complex</span>
-<span class="sd">        ES: Induced Enzyme-substrate complex</span>
-
-<span class="sd">    ODE for the induced fit model:</span>
-
-<span class="sd">        E + S &lt;-&gt; E·S (initial binding)</span>
-<span class="sd">        E·S   &lt;-&gt; ES (induced fit)</span>
-
-<span class="sd">    Args:</span>
-
-<span class="sd">        t (float): time</span>
-<span class="sd">        y (list): concentrations of E, S, E·S, and ES</span>
-<span class="sd">        k1 (float): rate constant for E + S -&gt; E·S</span>
-<span class="sd">        k_minus1 (float): rate constant for E·S -&gt; E + S</span>
-<span class="sd">        k2 (float): rate constant for E·S -&gt; ES</span>
-<span class="sd">        k_minus2 (float): rate constant for ES -&gt; E·S</span>
-
-<span class="sd">    Returns:</span>
-
-<span class="sd">        [dE, dS, dE_S, dES] (list): concentration of E, S, E·S, and ES</span>
-
-<span class="sd">    Example values taken from Fabian Paul ,Thomas R. Weikl, 2016:</span>
-
-<span class="sd">        k+ = 100 / (μM*s)  k+ equals k1       in our notation</span>
-<span class="sd">        k− = 100 / s       k- equals k_minus1 in our notation</span>
-<span class="sd">        ke = 10 / s        k+ equals k2       in our notation</span>
-<span class="sd">        kr = 1 /s          k+ equals k_minus2 in our notation</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">E</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">E_S</span><span class="p">,</span> <span class="n">ES</span> <span class="o">=</span> <span class="n">y</span>
-
-    <span class="c1"># Differential equations</span>
-    <span class="n">dE</span> <span class="o">=</span> <span class="o">-</span><span class="n">k1</span> <span class="o">*</span> <span class="n">E</span> <span class="o">*</span> <span class="n">S</span> <span class="o">+</span> <span class="n">k_minus1</span> <span class="o">*</span> <span class="n">E_S</span>
-    <span class="n">dS</span> <span class="o">=</span> <span class="o">-</span><span class="n">k1</span> <span class="o">*</span> <span class="n">E</span> <span class="o">*</span> <span class="n">S</span> <span class="o">+</span> <span class="n">k_minus1</span> <span class="o">*</span> <span class="n">E_S</span>
-    <span class="n">dE_S</span> <span class="o">=</span> <span class="n">k1</span> <span class="o">*</span> <span class="n">E</span> <span class="o">*</span> <span class="n">S</span> <span class="o">-</span> <span class="n">k_minus1</span> <span class="o">*</span> <span class="n">E_S</span> <span class="o">-</span> <span class="n">k2</span> <span class="o">*</span> <span class="n">E_S</span> <span class="o">+</span> <span class="n">k_minus2</span> <span class="o">*</span> <span class="n">ES</span>
-    <span class="n">dES</span> <span class="o">=</span> <span class="n">k2</span> <span class="o">*</span> <span class="n">E_S</span> <span class="o">-</span> <span class="n">k_minus2</span> <span class="o">*</span> <span class="n">ES</span>
-
-    <span class="k">return</span> <span class="p">[</span><span class="n">dE</span><span class="p">,</span> <span class="n">dS</span><span class="p">,</span> <span class="n">dE_S</span><span class="p">,</span> <span class="n">dES</span><span class="p">]</span></div>
-
-
-<div class="viewcode-block" id="ode_induced_fit_insolution_reduced">
-<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_solution.ode_induced_fit_insolution_reduced">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">ode_induced_fit_insolution_reduced</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">k_minus1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">k_minus2</span><span class="p">,</span> <span class="n">E_tot</span><span class="p">,</span> <span class="n">S_tot</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">ode_induced_fit_insolution</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">k_minus1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">k_minus2</span><span class="p">,</span> <span class="n">E_tot</span><span class="p">,</span> <span class="n">S_tot</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Reduced ODEs for induced fit model using conservation of E and S.</span>
 <span class="sd">    y: [E_S, ES]</span>
@@ -496,13 +517,11 @@
     <span class="k">return</span> <span class="p">[</span><span class="n">dE_S</span><span class="p">,</span> <span class="n">dES</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="solve_ode_induced_fit_insolution_reduced">
-<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_solution.solve_ode_induced_fit_insolution_reduced">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">solve_ode_induced_fit_insolution_reduced</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">k_minus1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">k_minus2</span><span class="p">,</span> <span class="n">E_tot</span><span class="p">,</span> <span class="n">S_tot</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-
+<div class="viewcode-block" id="solve_ode_induced_fit_insolution">
+<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_solution.solve_ode_induced_fit_insolution">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">solve_ode_induced_fit_insolution</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">k_minus1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">k_minus2</span><span class="p">,</span> <span class="n">E_tot</span><span class="p">,</span> <span class="n">S_tot</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Solve the reduced ODE for the induced fit model in solution.</span>
-
 <span class="sd">    Args:</span>
 <span class="sd">        t (np.ndarray): time points to calculate the complex concentration</span>
 <span class="sd">        y0 (list): initial concentrations of E·S and ES</span>
@@ -513,66 +532,26 @@
 <span class="sd">        E_tot (float): total concentration of the enzyme</span>
 <span class="sd">        S_tot (float): total concentration of the substrate</span>
 <span class="sd">        t0 (float): initial time</span>
-
 <span class="sd">    Returns:</span>
 <span class="sd">        out.y (list): solution of the ODE, contains the concentration of E·S and ES</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">t</span> <span class="o">=</span> <span class="n">t</span> <span class="o">+</span> <span class="n">t0</span>
-
-    <span class="n">out</span> <span class="o">=</span> <span class="n">solve_ivp</span><span class="p">(</span><span class="n">ode_induced_fit_insolution_reduced</span><span class="p">,</span> <span class="n">t_span</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">t</span><span class="p">)],</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">solve_ivp</span><span class="p">(</span><span class="n">ode_induced_fit_insolution</span><span class="p">,</span> <span class="n">t_span</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">t</span><span class="p">)],</span>
                     <span class="n">t_eval</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">y0</span><span class="o">=</span><span class="n">y0</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">k1</span><span class="p">,</span> <span class="n">k_minus1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">k_minus2</span><span class="p">,</span> <span class="n">E_tot</span><span class="p">,</span> <span class="n">S_tot</span><span class="p">),</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;LSODA&quot;</span><span class="p">)</span>
-
     <span class="c1"># Include the concentrations of E and S in the output</span>
     <span class="n">E</span> <span class="o">=</span> <span class="n">E_tot</span> <span class="o">-</span> <span class="n">out</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">out</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># E_S is out.y[0], ES is out.y[1]</span>
     <span class="n">S</span> <span class="o">=</span> <span class="n">S_tot</span> <span class="o">-</span> <span class="n">out</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">out</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># E_S is out.y[0], ES is out.y[1]</span>
     <span class="n">out</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">E</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">out</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>  <span class="c1"># Stack E, S, E_S, ES</span>
-
     <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">y</span></div>
 
 
-<div class="viewcode-block" id="solve_ode_induced_fit_insolution">
-<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_solution.solve_ode_induced_fit_insolution">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">solve_ode_induced_fit_insolution</span><span class="p">(</span><span class="n">t_span</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">k_minus1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">k_minus2</span><span class="p">,</span> <span class="n">t0</span><span class="p">):</span>
-
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">    Solve the ODE for the induced fit model (no product)</span>
-
-<span class="sd">    Args:</span>
-
-<span class="sd">        t_span (np.ndarray): time span for the simulation</span>
-<span class="sd">        y0 (list): initial concentrations of E, S, E·S, and ES</span>
-<span class="sd">        k1 (float): rate constant for E + S -&gt; E·S</span>
-<span class="sd">        k_minus1 (float): rate constant for E·S -&gt; E + S</span>
-<span class="sd">        k2 (float): rate constant for E·S -&gt; ES</span>
-<span class="sd">        k_minus2 (float): rate constant for ES -&gt; E·S</span>
-<span class="sd">        t0 (float): initial time</span>
-
-<span class="sd">    Returns:</span>
-
-<span class="sd">        out.y (list): solution of the ODE, contains the concentration of E, S, E_S, ES</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">t_span</span> <span class="o">=</span> <span class="n">t_span</span> <span class="o">+</span> <span class="n">t0</span>
-
-    <span class="n">out</span> <span class="o">=</span> <span class="n">solve_ivp</span><span class="p">(</span><span class="n">ode_induced_fit_insolution</span><span class="p">,</span><span class="n">t_span</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">t_span</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">t_span</span><span class="p">)],</span>
-                    <span class="n">t_eval</span><span class="o">=</span><span class="n">t_span</span><span class="p">,</span><span class="n">y0</span><span class="o">=</span><span class="n">y0</span><span class="p">,</span><span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">k1</span><span class="p">,</span> <span class="n">k_minus1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">k_minus2</span><span class="p">),</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;LSODA&quot;</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">y</span></div>
-
-
-<div class="viewcode-block" id="signal_ode_induced_fit_insolution_reduced">
-<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_solution.signal_ode_induced_fit_insolution_reduced">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">signal_ode_induced_fit_insolution_reduced</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">k_minus1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">k_minus2</span><span class="p">,</span> <span class="n">E_tot</span><span class="p">,</span> <span class="n">S_tot</span><span class="p">,</span>
-                                              <span class="n">t0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">signal_E</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">signal_S</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">signal_ES_int</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">signal_ES</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-
+<div class="viewcode-block" id="signal_ode_induced_fit_insolution">
+<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_solution.signal_ode_induced_fit_insolution">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">signal_ode_induced_fit_insolution</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">k_minus1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">k_minus2</span><span class="p">,</span> <span class="n">E_tot</span><span class="p">,</span> <span class="n">S_tot</span><span class="p">,</span>
+                                      <span class="n">t0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">signal_E</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">signal_S</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">signal_ES_int</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">signal_ES</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Solve the reduced ODE for the induced fit model and compute the signal</span>
-
 <span class="sd">    Args:</span>
-
 <span class="sd">        t (np.ndarray): time</span>
 <span class="sd">        y (list): concentrations of E·S and ES</span>
 <span class="sd">        k1 (float): rate constant for E + S -&gt; E·S</span>
@@ -586,52 +565,11 @@
 <span class="sd">        signal_S (float): signal for S</span>
 <span class="sd">        signal_ES_int (float): signal for E·S</span>
 <span class="sd">        signal_ES (float): signal for ES</span>
-
 <span class="sd">    Returns:</span>
-
 <span class="sd">       signal (np.ndarray): signal over time</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">species</span> <span class="o">=</span> <span class="n">solve_ode_induced_fit_insolution_reduced</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">k_minus1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">k_minus2</span><span class="p">,</span> <span class="n">E_tot</span><span class="p">,</span> <span class="n">S_tot</span><span class="p">,</span> <span class="n">t0</span><span class="p">)</span>
-
+    <span class="n">species</span> <span class="o">=</span> <span class="n">solve_ode_induced_fit_insolution</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">k_minus1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">k_minus2</span><span class="p">,</span> <span class="n">E_tot</span><span class="p">,</span> <span class="n">S_tot</span><span class="p">,</span> <span class="n">t0</span><span class="p">)</span>
     <span class="n">signal</span> <span class="o">=</span> <span class="n">signal_E</span> <span class="o">*</span> <span class="n">species</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">signal_S</span> <span class="o">*</span> <span class="n">species</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">signal_ES_int</span> <span class="o">*</span> <span class="n">species</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">signal_ES</span> <span class="o">*</span> <span class="n">species</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
-
-    <span class="k">return</span> <span class="n">signal</span></div>
-
-
-<div class="viewcode-block" id="signal_ode_induced_fit_insolution">
-<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_solution.signal_ode_induced_fit_insolution">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">signal_ode_induced_fit_insolution</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">k_minus1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">k_minus2</span><span class="p">,</span><span class="n">t0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">signal_E</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">signal_S</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">signal_ES_int</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">signal_ES</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">    Solve the ODE for the induced fit model and compute the signal</span>
-
-<span class="sd">    Args:</span>
-
-<span class="sd">        t (np.ndarray): time</span>
-<span class="sd">        y (list): concentrations of E, S, E·S, and ES</span>
-<span class="sd">        k1 (float): rate constant for E + S -&gt; E·S</span>
-<span class="sd">        k_minus1 (float): rate constant for E·S -&gt; E + S</span>
-<span class="sd">        k2 (float): rate constant for E·S -&gt; ES</span>
-<span class="sd">        k_minus2 (float): rate constant for ES -&gt; E·S</span>
-<span class="sd">        t0 (float): initial time</span>
-<span class="sd">        signal_E (float): signal for E</span>
-<span class="sd">        signal_S (float): signal for S</span>
-<span class="sd">        signal_ES_int (float): signal for E·S</span>
-<span class="sd">        signal_ES (float): signal for ES</span>
-
-<span class="sd">    Returns:</span>
-
-<span class="sd">       signal (np.ndarray): signal over time</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">species</span> <span class="o">=</span> <span class="n">solve_ode_induced_fit_insolution</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">k_minus1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">k_minus2</span><span class="p">,</span><span class="n">t0</span><span class="p">)</span>
-
-    <span class="n">signal</span> <span class="o">=</span> <span class="n">signal_E</span> <span class="o">*</span> <span class="n">species</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">signal_S</span> <span class="o">*</span> <span class="n">species</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">signal_ES_int</span> <span class="o">*</span> <span class="n">species</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">signal_ES</span> <span class="o">*</span> <span class="n">species</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
-
     <span class="k">return</span> <span class="n">signal</span></div>
 
 
@@ -809,13 +747,7 @@
     <span class="n">delta</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">tot_lig</span> <span class="o">-</span> <span class="n">tot_prot</span> <span class="o">+</span> <span class="n">kd_app</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">tot_prot</span> <span class="o">*</span> <span class="n">kd_app</span><span class="p">)</span>
     <span class="n">gamma</span>  <span class="o">=</span> <span class="o">-</span><span class="n">ke</span> <span class="o">-</span> <span class="n">kr</span> <span class="o">+</span> <span class="n">koff</span> <span class="o">+</span> <span class="n">kon</span> <span class="o">*</span> <span class="p">(</span><span class="n">delta</span> <span class="o">-</span> <span class="n">kd_app</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">dominant</span><span class="p">:</span>
-
-        <span class="n">kobs</span> <span class="o">=</span> <span class="n">ke</span> <span class="o">+</span> <span class="n">kr</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">gamma</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">gamma</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">koff</span> <span class="o">*</span> <span class="n">kr</span><span class="p">)</span>
-
-    <span class="k">else</span><span class="p">:</span>
-
-        <span class="n">kobs</span> <span class="o">=</span> <span class="n">ke</span> <span class="o">+</span> <span class="n">kr</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">gamma</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">gamma</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">koff</span> <span class="o">*</span> <span class="n">kr</span><span class="p">)</span>
+    <span class="n">kobs</span> <span class="o">=</span> <span class="n">ke</span> <span class="o">+</span> <span class="n">kr</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">gamma</span> <span class="o">+</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="n">dominant</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">gamma</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">koff</span> <span class="o">*</span> <span class="n">kr</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">kobs</span>  <span class="c1"># units are 1/s</span></div>
 
@@ -847,13 +779,8 @@
     <span class="n">beta</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">kr</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">ke</span> <span class="o">-</span> <span class="n">koff</span> <span class="o">-</span> <span class="n">koff</span> <span class="o">*</span> <span class="p">(</span><span class="n">delta</span> <span class="o">-</span> <span class="n">tot_lig</span> <span class="o">+</span> <span class="n">tot_prot</span><span class="p">)</span> <span class="o">/</span> <span class="n">kd_app</span><span class="p">)</span>
     <span class="n">alpha</span> <span class="o">=</span> <span class="n">kr</span> <span class="o">-</span> <span class="n">ke</span> <span class="o">+</span> <span class="n">koff</span> <span class="o">*</span> <span class="p">((</span><span class="mi">2</span> <span class="o">*</span> <span class="n">ke</span> <span class="o">+</span> <span class="n">kr</span><span class="p">)</span> <span class="o">*</span> <span class="n">delta</span> <span class="o">+</span> <span class="n">kr</span> <span class="o">*</span> <span class="p">(</span><span class="n">tot_lig</span> <span class="o">-</span> <span class="n">tot_prot</span> <span class="o">-</span> <span class="n">kd_app</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">ke</span> <span class="o">*</span> <span class="n">kd_app</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">dominant</span><span class="p">:</span>
 
-        <span class="n">kobs</span> <span class="o">=</span> <span class="n">ke</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">alpha</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">alpha</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">beta</span><span class="p">)</span>
-
-    <span class="k">else</span><span class="p">:</span>
-
-        <span class="n">kobs</span> <span class="o">=</span> <span class="n">ke</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">alpha</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">alpha</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">beta</span><span class="p">)</span>
+    <span class="n">kobs</span> <span class="o">=</span> <span class="n">ke</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">alpha</span> <span class="o">+</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="n">dominant</span><span class="o">*</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">alpha</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">beta</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">kobs</span>  <span class="c1"># units are 1/s</span></div>
 

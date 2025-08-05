@@ -4,57 +4,85 @@ import numpy  as np
 from .surface_exp import SurfaceBasedExperiment
 
 class KinGenieCsv(SurfaceBasedExperiment):
-
     """
-    A class used to represent a KinGenie csv file, which can be exported from the Simulation panel
+    A class used to represent a KinGenie surface-based simulation.
+    
+    This class handles data from KinGenie simulation CSV files that can be exported 
+    from the Simulation panel.
 
-    Example:
-
-        Time	Signal	Smax	Analyte_concentration_micromolar_constant	Cycle
-        0	0	5	0.1	1
-        0.5	0.00498512709952641	5	0.1	1
-        1	0.00994051854979453	5	0.1	1
-        1.5	0.0148661741864963	5	0.1	1
-        2	0.0197623830271752	5	0.1	1
-        2.5	0.0246293723316269	5	0.1	1
-        3	0.0294671469344429	5	0.1	1
-        3.5	0.0342760214300913	5	0.1	1
-        4	0.0390561847030298	5	0.1	1
-        4.5	0.043807638803537	5	0.1	1
-        5	0.0485304884515415	5	0.1	1
+    Parameters
+    ----------
+    name : str, optional
+        Name of the experiment. Default is 'kingenie_csv'.
 
     Attributes
-
-        name (str):                 name of the experiment
-        fn (str):                   file name
-        xs (np.array):              list of x values (time, length n, one per sensor)
-        ys (np.array):              list of y values (length n, one per sensor)
-        no_sensors (int):           number of sensors
-        sensor_names (list):        list of sensor names (length n, one per sensor)
-        sensor_names_unique (list): list of unique sensor names (length n, one per sensor)
-        ligand_conc_df (pd.DataFrame): dataframe with the ligand concentration information
-
+    ----------
+    name : str
+        Name of the experiment.
+    fn : str
+        File name.
+    xs : list of list of numpy.ndarray
+        List of time values for each sensor and phase. Structure is:
+        [sensor_1[assoc_phase, disso_phase], sensor_2[assoc_phase, disso_phase], ...].
+    ys : list of list of numpy.ndarray
+        List of signal values for each sensor and phase. Structure is:
+        [sensor_1[assoc_phase, disso_phase], sensor_2[assoc_phase, disso_phase], ...].
+    no_sensors : int
+        Number of sensors.
+    sensor_names : list of str
+        List of sensor names, one per sensor.
+    sensor_names_unique : list of str
+        List of unique sensor names.
+    ligand_conc_df : pandas.DataFrame
+        DataFrame with the ligand concentration information.
+    df_steps : pandas.DataFrame
+        DataFrame with step information (association, dissociation).
+    traces_loaded : bool
+        Whether traces have been loaded.
+        
+    Notes
+    -----
+    The CSV file should contain columns for Time, Signal, Smax, and 
+    Analyte_concentration_micromolar_constant. For single cycle kinetics,
+    it should also include a Cycle column.
     """
 
     def __init__(self, name='kingenie_csv'):
 
         super().__init__(name, 'kingenie_csv')
 
-    def read_csv(self,file):
-
+    def read_csv(self, file):
         """
-        Read the KinGenie csv file
-
-        Results:
-
-            It creates the attributes
-
-                self.xs
-                self.ys
-                self.no_sensors
-                self.sensor_names
-                self.sensor_names_unique
-
+        Read the KinGenie CSV file containing surface-based simulation data.
+        
+        Parameters
+        ----------
+        file : str
+            Path to the CSV file.
+            
+        Returns
+        -------
+        None
+            The method populates class attributes with data from the CSV file.
+            
+        Notes
+        -----
+        The CSV file should have the following columns:
+        - Time: time points of the simulation
+        - Signal: signal values at each time point
+        - Smax: maximum signal value
+        - Analyte_concentration_micromolar_constant: analyte concentration
+        - Cycle: (optional) cycle number for single cycle kinetics
+        
+        This method creates the following attributes:
+        - self.xs: list of time values for each sensor and phase
+        - self.ys: list of signal values for each sensor and phase
+        - self.no_sensors: number of sensors
+        - self.sensor_names: list of sensor names
+        - self.ligand_conc_df: DataFrame with concentration information
+        - self.df_steps: DataFrame with step information
+        
+        The method handles both multi-cycle and single-cycle kinetics data.
         """
 
         df = pd.read_csv(file)

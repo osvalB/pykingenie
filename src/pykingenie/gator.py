@@ -6,12 +6,44 @@ import zipfile
 from .utils.processing import find_loading_column
 
 class GatorExperiment(SurfaceBasedExperiment):
+    """
+    Class to handle Gator Bio-Layer Interferometry (BLI) experiments.
+    
+    This class extends the SurfaceBasedExperiment to provide functionality
+    specific to Gator BLI instruments, including parsing experiment files
+    and loading sensor data.
+    
+    Parameters
+    ----------
+    name : str, optional
+        Name of the experiment, default is 'Gator_experiment'.
+    """
 
     def __init__(self, name = 'Gator_experiment'):
 
         super().__init__(name, 'Gator_experiment')
 
     def read_all_gator_data(self, files, names=None):
+        """
+        Read all Gator data files for the experiment.
+        
+        This method reads all necessary files for a Gator experiment, including
+        the experiment settings, step information, and sensor data.
+        
+        Parameters
+        ----------
+        files : str or list
+            Path to a zip file containing Gator data files or a list of file paths.
+            If a zip file is provided, it will be extracted to the same directory.
+        names : list, optional
+            List of file names corresponding to the file paths in `files`.
+            If None, the file names will be extracted from the file paths.
+            
+        Returns
+        -------
+        None
+            Updates instance attributes with the loaded experiment data.
+        """
 
         # Check if files is a zipfile and extract it
         if files.endswith('.zip'):
@@ -39,13 +71,29 @@ class GatorExperiment(SurfaceBasedExperiment):
 
         return None
 
-    def read_experiment_ini(self, file,nr_max_columns=12):
-
+    def read_experiment_ini(self, file, nr_max_columns=12):
         """
-        Read the experiment ini file
-
-        Example format:
-
+        Read the experiment initialization file.
+        
+        Parses the ExperimentStep.ini file that contains information about the experimental steps,
+        their durations, and types (baseline, association, dissociation, etc.).
+        
+        Parameters
+        ----------
+        file : str
+            Path to the ExperimentStep.ini file.
+        nr_max_columns : int, optional
+            Maximum number of columns in the plate, default is 12.
+            
+        Returns
+        -------
+        None
+            Updates the df_steps attribute with a DataFrame containing step information.
+            
+        Notes
+        -----
+        Example format for ExperimentStep.ini:
+        
             [Experiment]
             Num=4
             [Experiment1]
@@ -130,18 +178,35 @@ class GatorExperiment(SurfaceBasedExperiment):
 
         return None
 
-    def read_settings_ini(self, file,nr_max_sensors=8,nr_max_columns=12):
-
+    def read_settings_ini(self, file, nr_max_sensors=8, nr_max_columns=12):
         """
-        Read the settings ini file
-
-        We assume a plate format, so wells 1 to nr_max_sensors correspond to the first column,
-        wells 9 to 16 correspond to the second column, etc.
-
-        Example format:
-
+        Read the settings initialization file.
+        
+        Parses the Setting.ini file that contains information about the experiment settings,
+        including sensor configurations, sample concentrations, and plate layout.
+        
+        Parameters
+        ----------
+        file : str
+            Path to the Setting.ini file.
+        nr_max_sensors : int, optional
+            Maximum number of sensors per column, default is 8.
+        nr_max_columns : int, optional
+            Maximum number of columns in the plate, default is 12.
+            
+        Returns
+        -------
+        None
+            Updates several instance attributes:
+            - sensor_names: List of sensor names
+            - ligand_conc_df: DataFrame with ligand concentration information
+            
+        Notes
+        -----
+        Example format for Setting.ini:
+        
             [BasicInformation]
-            PreExperiment="{"AssayDescription":"","AssayUser":"Marianna","CreationTime":"03-31-2025 14:01:50","ModificationTime":"03-31-2025 14:44:10","StartExperimentTime":"03-31-2025 14:44:10","EndExperimentTime":"03-31-2025 15:55:27","AnotherSavePath":"","AssayType":2,"PreAssayShakerASpeed":400,"PreAssayShakerBSpeed":400,"PreAssayTime":600,"GapTime":100,"AssayShakerATemperature":30,"AssayShakerBTemperature":30,"MachineRealType":"Prime","idleShakerATemperature":30,"idleShakerBTemperature":30,"PlateAType":0,"bPlateAFlat":false,"bRegeneration":true,"bRegenerationStart":true,"RegenerationNum":99999,"RegenerationMode":0,"ShakerASpeedDeviation":10,"ShakerBSpeedDeviation":10,"ShakerATempDeviation":2,"ShakerBTempDeviation":2,"SpectrometerTempDeviation":1,"ParentName":"K Result","ResultName":"4x ab vs egfr 03-31-2025 14-44-10","SoftWareVersion":null,"SeriesNo":"GA00092","ErrorChannelList":[0,0,0,0,0,0,0,0],"ErrorPreAssayList":[0,0,0,0,0,0,0,0],"ErrorSampleList":[],"ErrorRegenerationList":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"AnalysisSettingList":[],"ReportSettingList":[],"PlateColumns":[12,12],"threshold":Infinity,"bsingle":false,"bThresh":false,"strFileID":null}"
+            PreExperiment="{"AssayDescription":"","AssayUser":"Marianna","CreationTime":"03-31-2025 14:01:50",...}"
             ExperimentType=Kinetics
             SaveTime=03/31/2025 15:55:27
             Frequency=10Hz
@@ -156,16 +221,7 @@ class GatorExperiment(SurfaceBasedExperiment):
             [SampleKinetics]
             Well1=4,-1,-1,-1,,
             Well2=4,-1,-1,-1,,
-            Well3=4,-1,-1,-1,,
-            Well4=4,-1,-1,-1,,
-            Well5=4,-1,-1,-1,,
-            Well6=4,-1,-1,-1,,
-            Well7=4,-1,-1,-1,,
-            Well8=4,-1,-1,-1,,
-            Well9=5,30,150,200,,Cetuximab
-            Well10=5,30,150,200,,Cetuximab
-            Well11=5,30,150,200,,Cetuximab
-
+            ...
         """
 
         with open(file, 'r') as f:
@@ -309,6 +365,37 @@ class GatorExperiment(SurfaceBasedExperiment):
         return None
 
     def read_sensor_data(self, files, names=None):
+        """
+        Read the sensor data from CSV files.
+        
+        Parses the Gator sensor data CSV files containing time series data for each sensor channel.
+        The method organizes the data according to experimental steps and sensors.
+        
+        Parameters
+        ----------
+        files : list
+            List of file paths that may include sensor data CSV files.
+        names : list, optional
+            List of file names corresponding to the file paths in `files`.
+            If None, the file names will be extracted from the file paths.
+            
+        Returns
+        -------
+        None
+            Updates several instance attributes:
+            - xs: List of time arrays for each sensor
+            - ys: List of signal arrays for each sensor
+            - df_steps: DataFrame with filtered step information containing only steps with data
+            - no_steps: Number of steps with data
+            - traces_loaded: Boolean indicating if traces were successfully loaded
+            
+        Notes
+        -----
+        The sensor data files are expected to be in CSV format with the following characteristics:
+        - File names contain 'Channel' and have a '.csv' extension
+        - The first column contains signal values
+        - The second column contains time values
+        """
 
         fns   = [fn for fn, name in zip(files, names) if '.csv' in name and 'Channel' in name]
         names = [name for name in names if '.csv' in name and 'Channel' in name]

@@ -3,6 +3,7 @@ import pytest
 import os
 
 from pykingenie.octet import OctetExperiment
+from pykingenie.kingenie_surface import KinGenieCsv
 
 folder = "./test_files/"
 frd_files = os.listdir(folder)
@@ -16,6 +17,10 @@ bli = OctetExperiment('test_octet')
 bli.read_sensor_data(frd_files)
 
 sensor_names = bli.sensor_names.copy()
+
+csv_test_file = "./test_files/single_cycle_kingenie.csv"
+kingenie = KinGenieCsv()
+kingenie.read_csv(csv_test_file)
 
 def test_subtract_no_traces_loaded():
 
@@ -186,3 +191,103 @@ def test_subtraction_string_as_sensor_names():
     bli.subtraction(list_of_sensor_names=bli.sensor_names[0], reference_sensor=bli.sensor_names[-1], inplace=False)
 
     assert bli.xs is not None, "The xs list should not be None after subtraction."
+
+
+## Now we test the KinGenieCsv 
+def test_align_single_cycle():
+
+    sensor_names = kingenie.sensor_names.copy()
+
+    kingenie.align_association(sensor_names=sensor_names, inplace=False, new_names=True)
+
+    assert len(kingenie.sensor_names) == 2, "The sensor_names list should have two sensors after aligning association with new names."
+
+    # Align again to force the use of 'rep' in the new sensor names
+    kingenie.align_association(sensor_names=sensor_names, inplace=False, new_names=True)
+
+    assert len(kingenie.sensor_names) == 3, "The sensor_names list should have three sensors after aligning association with new names."
+
+    # Now align in place with new names
+
+    kingenie.align_association(sensor_names=sensor_names, inplace=True, new_names=True)
+
+    assert len(kingenie.sensor_names) == 3, "The sensor_names list should have three sensors after aligning association in place with new names."
+
+    # align the dissociation steps - not inplace and with new names twice to force the use of 'rep' in the new sensor names
+
+    sensor_names = kingenie.sensor_names.copy()[:1]
+
+    kingenie.align_dissociation(sensor_names=sensor_names, inplace=False, new_names=True)
+    kingenie.align_dissociation(sensor_names=sensor_names, inplace=False, new_names=True)
+
+    assert len(kingenie.sensor_names) == (len(sensor_names)*5), "The sensor_names list should have five times the number of sensors after aligning dissociation with new names."
+
+def test_get_step_xy_kingenie():
+
+    # check raise value error if location_sample is not an integer
+    with pytest.raises(ValueError, match="location_sample, location_loading and replicate must be integers"):
+        kingenie.get_step_xy(
+            sensor_name=kingenie.sensor_names[0],
+            location_loading=12,
+            location_sample='hola',
+            step_type='ASSOC',
+            replicate=1,
+            type='x')
+        
+    # check raise  Type error if sensor_name is not a string
+    with pytest.raises(TypeError, match="sensor_name must be a str"):
+        kingenie.get_step_xy(
+            sensor_name=123,
+            location_loading=12,
+            location_sample=5,
+            step_type='ASSOC',
+            replicate=1,
+            type='x')
+    
+    # Extract x and y values for four association steps
+    sensor_name = kingenie.sensor_names[0]
+
+    for i in range(1, 4):
+
+        x = kingenie.get_step_xy(
+            sensor_name=sensor_name,
+            location_loading=1,
+            location_sample=1+i,
+            step_type='ASSOC',
+            replicate=1,
+            type='x')  
+        
+        # Check if x is a numpy array
+        assert isinstance(x, np.ndarray), "The x should be a numpy array."
+    
+        y = kingenie.get_step_xy(
+            sensor_name=sensor_name,
+            location_loading=1,
+            location_sample=1+i,
+            step_type='ASSOC',
+            replicate=1,
+            type='y')
+        
+        # Check if y is a numpy array
+        assert isinstance(y, np.ndarray), "The y should be a numpy array."
+
+        x = kingenie.get_step_xy(
+            sensor_name=sensor_name,
+            location_loading=1,
+            location_sample=1+i,
+            step_type='DISASSOC',
+            replicate=1,
+            type='x')  
+        
+        # Check if x is a numpy array
+        assert isinstance(x, np.ndarray), "The x should be a numpy array."
+    
+        y = kingenie.get_step_xy(
+            sensor_name=sensor_name,
+            location_loading=1,
+            location_sample=1+i,
+            step_type='DISASSOC',
+            replicate=1,
+            type='y')
+        
+        # Check if y is a numpy array

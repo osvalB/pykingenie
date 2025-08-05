@@ -8,66 +8,121 @@ from .utils.processing import get_plotting_df
 class KineticsAnalyzer:
 
     def __init__(self):
-
+        """
+        Initialize the KineticsAnalyzer instance.
+        
+        Parameters
+        ----------
+        None
+        
+        Attributes
+        ----------
+        experiments : dict
+            Dictionary of experiment objects with experiment names as keys.
+        experiment_names : list
+            List of experiment names.
+        fittings : dict
+            Dictionary of fitting objects with fitting names as keys.
+        fittings_names : list
+            List of fitting names.
+        """
         self.experiments      = {}
         self.experiment_names = []
         self.fittings         = {}
         self.fittings_names   = []
 
-    def delete_experiment(self,experiment_names):
+    def delete_experiment(self, experiment_names):
+        """
+        Delete experiment(s) from the analyzer.
 
+        Parameters
+        ----------
+        experiment_names : str or list of str
+            Name(s) of the experiment(s) to delete.
+        """
         if not isinstance(experiment_names, list):
             experiment_names = [experiment_names]
-
         for experiment_name in experiment_names:
-
             if experiment_name in self.experiment_names:
-
                 del self.experiments[experiment_name]
                 self.experiment_names.remove(experiment_name)
-
         return None
 
-    def add_experiment(self,experiment,experiment_name):
+    def add_experiment(self, experiment, experiment_name):
+        """
+        Add an experiment to the analyzer.
 
+        Parameters
+        ----------
+        experiment : object
+            Experiment instance to add.
+        experiment_name : str
+            Name of the experiment.
+        """
         self.delete_experiment(experiment_name)
-
         self.experiments[experiment_name] = experiment
         self.experiment_names.append(experiment_name)
-
         return None
 
     def init_fittings(self):
+        """
+        Initialize (reset) the fittings dictionary and names list.
 
+        Parameters
+        ----------
+        None
+        """
         self.fittings       = {}
         self.fittings_names = []
-
         return None
 
-    def add_fitting(self,fitting,fitting_name):
+    def add_fitting(self, fitting, fitting_name):
+        """
+        Add a fitting object to the analyzer.
 
+        Parameters
+        ----------
+        fitting : object
+            Fitting object to add.
+        fitting_name : str
+            Name of the fitting.
+        """
         if fitting_name in self.fittings_names:
-
-                del self.fittings[fitting_name]
-                self.fittings_names.remove(fitting_name)
-
+            del self.fittings[fitting_name]
+            self.fittings_names.remove(fitting_name)
         self.fittings[fitting_name] = fitting
         self.fittings_names.append(fitting_name)
-
         return None
 
-    def get_experiment_properties(self, variable,fittings=False):
+    def get_experiment_properties(self, variable, fittings=False):
+        """
+        Get a list of properties from experiments or fittings.
 
+        Parameters
+        ----------
+        variable : str
+            Name of the property to retrieve.
+        fittings : bool, optional
+            If True, get from fittings; else from experiments. Default is False.
+
+        Returns
+        -------
+        list
+            List of property values.
+        """
         if fittings:
-
             return [getattr(self.fittings[fitting_name], variable) for fitting_name in self.fittings_names]
-
         else:
-
             return [getattr(self.experiments[exp_name], variable) for exp_name in self.experiment_names]
 
     def merge_ligand_conc_df(self):
+        """
+        Merge ligand concentration DataFrames from all experiments.
 
+        Returns
+        -------
+        None
+        """
         # Combine ligand concentration data frames from experiments
         dfs = [exp.ligand_conc_df for exp in self.experiments.values()]
         df  = pd.concat(dfs, ignore_index=True)
@@ -103,7 +158,24 @@ class KineticsAnalyzer:
         return None
 
     def merge_conc_df_solution(self):
-
+        """
+        Merge concentration DataFrames from all solution-based experiments.
+        
+        Parameters
+        ----------
+        None
+        
+        Returns
+        -------
+        None
+            Creates a combined_conc_df attribute containing the merged concentration data.
+            
+        Notes
+        -----
+        This method combines the concentration DataFrames from all solution-based 
+        experiments in the analyzer. It adds a 'Select' column with all values set to True,
+        which can be used for filtering data in subsequent analyses.
+        """
         # Combine concentration data frames from solution-based experiments
         dfs = [exp.conc_df for exp in self.experiments.values()]
         df  = pd.concat(dfs, ignore_index=True)
@@ -126,21 +198,19 @@ class KineticsAnalyzer:
 
         return None
 
-    def generate_fittings(self,df):
-
+    def generate_fittings(self, df):
         """
-        Given a data frame, extract the kinetics data and create a fitting object for each sample.
-        The data frame should contain the following columns:
-        - 'Sensor': The sensor ID
-        - 'Experiment': The experiment ID
-        - 'Replicate': The replicate number
-        - 'Analyte_location': The location of the analyte
-        - 'Loading_location': The location of the loading
-        - 'Concentration_micromolar': The concentration of the analyte in micromolar
-        - 'SampleID': The sample ID
-        - 'Smax_ID': The Smax ID
-        - 'Select': A boolean value indicating whether to select the sample or not
+        Generate fitting objects for surface-based experiments from a DataFrame.
 
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            DataFrame containing experiment data.
+
+        Returns
+        -------
+        list
+            List of messages about fitting creation.
         """
 
         # List of messages to be printed to the console
@@ -283,17 +353,19 @@ class KineticsAnalyzer:
 
         return messages
 
-    def generate_fittings_solution(self,df):
-
+    def generate_fittings_solution(self, df):
         """
-        Given a data frame, extract the kinetics data and create a fitting object for each sample.
-        The data frame should contain the following columns:
-        - 'Trace': The trace ID
-        - 'Experiment': The experiment ID
-        - '[Protein] (μM)': The protein concentration in micromolar
-        - '[Ligand] (μM)': The ligand concentration in micromolar
-        - 'SampleID': The sample ID
-        - 'Select': A boolean value indicating whether to select the sample or not
+        Generate fitting objects for solution-based experiments from a DataFrame.
+
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            DataFrame containing experiment data.
+
+        Returns
+        -------
+        list
+            List of messages about fitting creation.
         """
 
         # List of messages to be printed to the console
@@ -379,41 +451,36 @@ class KineticsAnalyzer:
         return messages
 
     def submit_steady_state_fitting(self):
+        """
+        Submit steady-state fitting for all fitting objects.
 
+        Returns
+        -------
+        None
+        """
         for kf in self.fittings.values():
-
             if not kf.is_single_cycle:
                 kf.fit_steady_state()
                 kf.create_fitting_bounds_table()
-
             else:
-
                 kf.Smax_upper_bound_factor = 1e2 # Normal values for lower than micromolar affinity
-
         return None
 
-    def submit_fitting_solution(self,fitting_model='single',**kwargs):
-
+    def submit_fitting_solution(self, fitting_model='single', **kwargs):
         """
-        Fit a variety of models to the kinetics data in the solution-based experiments.
-        Args:
-            fitting_model (str): The model to fit. Options are:
-                - 'single': Fit single exponentials
-                - 'double': Fit double exponentials
-                - 'one_binding_site': Fit one binding site model
-                - 'one_binding_site_if': Fit one binding site model with induced fit
-            **kwargs: Additional keyword arguments for the fitting methods.
-            For example with 'one_binding_site_if' you can use
-                kwargs = {
-                "fit_signal_E": False,
-                "fit_signal_S": False,
-                "fit_signal_ES": True,
-                "ESint_equals_ES": True,
-                "fixed_t0": True
-                }
+        Fit models to solution-based kinetics data.
 
+        Parameters
+        ----------
+        fitting_model : str, optional
+            Model to fit. Options: 'single', 'double', 'one_binding_site', 'one_binding_site_if'. Default is 'single'.
+        **kwargs : dict
+            Additional keyword arguments for fitting methods.
+
+        Returns
+        -------
+        None
         """
-
         if fitting_model not in ['single', 'double', 'one_binding_site', 'one_binding_site_if']:
             raise ValueError("Unknown fitting model: " + fitting_model)
 
@@ -434,10 +501,25 @@ class KineticsAnalyzer:
 
         return None
 
-    def submit_kinetics_fitting(self,fitting_model='one_to_one',
+    def submit_kinetics_fitting(self, fitting_model='one_to_one',
                                 fitting_region='association_dissociation',
                                 linkedSmax=False):
+        """
+        Fit models to surface-based kinetics data.
 
+        Parameters
+        ----------
+        fitting_model : str, optional
+            Model to fit. Options: 'one_to_one', 'one_to_one_mtl', 'one_to_one_if'. Default is 'one_to_one'.
+        fitting_region : str, optional
+            Region to fit. Options: 'association_dissociation', 'association', 'dissociation'. Default is 'association_dissociation'.
+        linkedSmax : bool, optional
+            Whether to link Smax values across curves. Default is False.
+
+        Returns
+        -------
+        None
+        """
         if fitting_model not in ['one_to_one', 'one_to_one_mtl', 'one_to_one_if']:
             raise ValueError("Unknown fitting model: " + fitting_model)
 
@@ -464,8 +546,31 @@ class KineticsAnalyzer:
 
         return None
 
-    def calculate_asymmetric_error(self,shared_smax=True,fixed_t0=True,fit_ktr=False):
+    def calculate_asymmetric_error(self, shared_smax=True, fixed_t0=True, fit_ktr=False):
+        """
+        Calculate asymmetric error (confidence intervals) for all fitting objects.
 
+        Parameters
+        ----------
+        shared_smax : bool, optional
+            Whether Smax is shared across different curves. Default is True.
+        fixed_t0 : bool, optional
+            Whether t0 (start time) is fixed during fitting. Default is True.
+        fit_ktr : bool, optional
+            Whether to fit mass transport limitation parameter ktr. Default is False.
+
+        Returns
+        -------
+        None
+            Updates the fitting objects with confidence intervals for the fitted parameters.
+            
+        Notes
+        -----
+        This method calculates asymmetric confidence intervals for the kinetic 
+        parameters (kon, koff, Kd) for each fitting object. The confidence intervals
+        are stored in the fitting objects and can be accessed through the 
+        get_fitting_results method.
+        """
         for kf in self.fittings.values():
 
             kf.calculate_ci95(
@@ -478,7 +583,18 @@ class KineticsAnalyzer:
 
     def get_fitting_results(self):
         """
-        Get the results of the fitting process into a nice dataframe
+        Get the results of the fitting process as a DataFrame.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        pandas.DataFrame or None
+            DataFrame containing fitting results from all fitting objects.
+            The DataFrame includes parameters like kon, koff, Kd, and their
+            confidence intervals. Returns None if no fitting results are available.
         """
         dfs = []
 
@@ -496,9 +612,13 @@ class KineticsAnalyzer:
         return None
 
     def get_legends_table(self):
-
         """
-        Get the legends table for plotting the kinetics data
+        Get the legends table for plotting the kinetics data.
+
+        Returns
+        -------
+        pandas.DataFrame
+            DataFrame containing legend information for plotting.
         """
         
         labels = self.get_experiment_properties('sensor_names')

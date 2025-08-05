@@ -8,9 +8,13 @@ from .surface_exp      import *
 factor_conc_to_micro = {'nM':1e-3, 'µM':1, 'mM':1e3, 'M':1e6, 'mg/ml':1e3, 'µg/ml':1}
 
 class OctetExperiment(SurfaceBasedExperiment):
-
     """
-    A class used to represent a BLI experiment
+    OctetExperiment class for handling Octet BLI data.
+
+    Parameters
+    ----------
+    name : str
+        Name of the experiment.
 
     Attributes
     ----------
@@ -51,36 +55,56 @@ class OctetExperiment(SurfaceBasedExperiment):
     """
 
     def __init__(self, name = 'BLI_experiment'):
-
         """
-
-        Initialize the instance
-
+        Initialize the OctetExperiment instance.
+        
+        Parameters
+        ----------
+        name : str, optional
+            Name of the experiment. Default is 'BLI_experiment'.
         """
 
         super().__init__(name,'BLI_experiment')
 
-    def read_sensor_data(self, files,names=None):
-
+    def read_sensor_data(self, files, names=None):
         """
-
-        Read the sensor data from the .frd files
-
-        Results:
-
-            It creates the attributes
-
-                self.traces_loaded
-                self.xs
-                self.ys
-                self.exp_info
-                self.step_info
-                self.no_steps
-                self.no_sensors
-                self.sensor_names
-                self.df_steps
-                self.ligand_conc_df
-
+        Read the sensor data from the .frd files.
+        
+        Parameters
+        ----------
+        files : str or list of str
+            Path(s) to .frd file(s) to read.
+        names : str or list of str, optional
+            Name(s) to assign to the sensors. If None, file names are used.
+            
+        Returns
+        -------
+        None
+            The method populates class attributes with data from the files.
+            
+        Notes
+        -----
+        This method creates the following attributes:
+        - traces_loaded : bool
+            Whether traces were successfully loaded.
+        - xs : list
+            List of x values (time) for each sensor.
+        - ys : list
+            List of y values (signal) for each sensor.
+        - exp_info : list
+            List of dictionaries with experimental information.
+        - step_info : list
+            List of dictionaries with step information.
+        - no_steps : int
+            Number of steps in the experiment.
+        - no_sensors : int
+            Number of sensors in the experiment.
+        - sensor_names : list
+            List of sensor names.
+        - df_steps : pandas.DataFrame
+            DataFrame with the steps information.
+        - ligand_conc_df : pandas.DataFrame
+            DataFrame with the ligand concentration information.
         """
 
         if names is None:
@@ -156,14 +180,39 @@ class OctetExperiment(SurfaceBasedExperiment):
         return None
 
     def generate_ligand_conc_df(self):
-
         """
-        Based on the step_info and exp_info attributes, generate a dataframe with the analyte concentrations
-
-        Requires the attributes:
-            self.step_info
-            self.exp_info
-            self.fns
+        Generate a DataFrame with the analyte concentrations based on step_info and exp_info.
+        
+        Parameters
+        ----------
+        None
+            
+        Returns
+        -------
+        None
+            This method populates class attributes related to ligand concentration.
+            
+        Notes
+        -----
+        This method requires the following attributes to be already populated:
+        - step_info : list
+            List of dictionaries with step information.
+        - exp_info : list
+            List of dictionaries with experimental information.
+        - fns : list
+            List of file names.
+            
+        This method creates/updates the following attributes:
+        - no_steps : int
+            Number of steps in the experiment.
+        - no_sensors : int
+            Number of sensors.
+        - sensor_names : list
+            List of sensor names.
+        - df_steps : pandas.DataFrame
+            DataFrame with step information.
+        - ligand_conc_df : pandas.DataFrame
+            DataFrame with ligand concentration information.
         """
 
         self.no_steps = len(self.step_info[0]['ActualTime'])
@@ -320,13 +369,25 @@ class OctetExperiment(SurfaceBasedExperiment):
 
         return None
 
-    def merge_consecutive_steps(self,idx_ref,idx_to_merge):
-
+    def merge_consecutive_steps(self, idx_ref, idx_to_merge):
         """
-        Combine two steps into one step
-        Args:
-            idx_ref (int): index of the reference step. The type of step will be taken from this step.
-            idx_to_merge (int): index of the step to merge with the reference step
+        Combine two consecutive steps into one step.
+        
+        Parameters
+        ----------
+        idx_ref : int
+            Index of the reference step. The type of step will be taken from this step.
+        idx_to_merge : int
+            Index of the step to merge with the reference step.
+            
+        Returns
+        -------
+        None
+            The method modifies the xs, ys, and step information in place.
+            
+        Notes
+        -----
+        The two steps must be consecutive (their indices must differ by exactly 1).
         """
 
         assert np.abs(idx_ref - idx_to_merge) == 1, "The two steps must be consecutive"
@@ -388,13 +449,29 @@ class OctetExperiment(SurfaceBasedExperiment):
 
             return None
 
-    def merge_consecutive_steps_by_name(self,step_name,reference=True):
-
+    def merge_consecutive_steps_by_name(self, step_name, reference=True):
         """
-        Merge the step after the step of nam step_name
-        Args:
-            step_name (str): name of the step to merge with the next step
-            Reference (bool): if True, the step type will be used as reference to extract the analyte concentration, loading location, etc.
+        Merge steps with a specific name with their consecutive step.
+        
+        Parameters
+        ----------
+        step_name : str
+            Name of the step to merge with the next/previous step.
+        reference : bool, optional
+            If True, the step with name step_name will be used as reference 
+            to extract the analyte concentration, loading location, etc.
+            Default is True.
+            
+        Returns
+        -------
+        None
+            The method modifies the xs, ys, and step information in place.
+            
+        Notes
+        -----
+        This method finds all steps with the given name and merges them with 
+        their adjacent step. The merged step inherits properties from the
+        reference step.
         """
         # Find the indices of the steps of type step_type
         idxs = []
@@ -421,24 +498,39 @@ class OctetExperiment(SurfaceBasedExperiment):
 
         return None
 
-    def read_sample_plate_info(self,files,names=None):
-
+    def read_sample_plate_info(self, files, names=None):
         """
-        Read the sample plate information from the .fmf file
-
-        Results:
-
-            It creates the attributes
-
-                self.sample_column
-                self.sample_row
-                self.sample_type
-                self.sample_id
-                self.sample_conc
-                self.sample_conc_labeled
-                self.sample_plate_loaded
-                self.steps_performed
-
+        Read the sample plate information from the .fmf file.
+        
+        Parameters
+        ----------
+        files : str or list of str
+            Path(s) to .fmf file(s) containing sample plate information.
+        names : str or list of str, optional
+            Name(s) to assign to the files. If None, file names are used.
+            
+        Returns
+        -------
+        None
+            The method populates class attributes with sample plate data.
+            
+        Notes
+        -----
+        This method creates the following attributes:
+        - sample_column : numpy.ndarray
+            Array of sample column information (96 elements, one per well).
+        - sample_row : numpy.ndarray
+            Array of sample row information (96 elements, one per well).
+        - sample_type : list
+            List of sample types (96 elements, one per well).
+        - sample_id : list
+            List of sample IDs (96 elements, one per well).
+        - sample_plate_loaded : bool
+            Set to True if sample plate information is successfully loaded.
+        - sample_conc : numpy.ndarray
+            Array with the sample concentrations (96 elements, one per well).
+        - sample_conc_labeled : list
+            List with the sample concentrations labeled (96 elements, one per well).
         """
 
         if names is None:
@@ -523,15 +615,23 @@ class OctetExperiment(SurfaceBasedExperiment):
         return None
 
     def convert_to_numbers(self):
-
         """
-
-        Convert the strings in the step info to numbers
-
-        Results:
-
-            It modifies the attribute self.step_info
-
+        Convert the strings in the step info to numbers.
+        
+        Parameters
+        ----------
+        None
+            
+        Returns
+        -------
+        None
+            The method modifies the step_info attribute in place.
+            
+        Notes
+        -----
+        This method processes the following entries in step_info:
+        'Concentration', 'MolarConcentration', 'MolecularWeight', 'Temperature',
+        'StartTime', 'AssayTime', 'FlowRate', 'ActualTime', 'CycleTime'.
         """
 
         # List of entries in step info

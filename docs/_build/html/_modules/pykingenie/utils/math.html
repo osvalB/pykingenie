@@ -132,6 +132,34 @@
   </a>
 </li>
 
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
+    pykingenie.utils package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
+    pykingenie.utils package
+  </a>
+</li>
+
   </ul>
 </nav></div>
       
@@ -222,6 +250,34 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../modules.html">
     pykingenie
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
+    pykingenie.utils package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
+    pykingenie.utils package
   </a>
 </li>
 
@@ -324,6 +380,13 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w">           </span><span class="kn">import</span> <span class="n">stats</span>
 
+<span class="n">___all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;single_exponential&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;double_exponential&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;median_filter&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;rss_p&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;get_rss&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;get_desired_rss&#39;</span><span class="p">]</span>
+
 <div class="viewcode-block" id="single_exponential">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.math.single_exponential">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">single_exponential</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">kobs</span><span class="p">):</span>
@@ -379,15 +442,22 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">scaling_factor</span> <span class="o">=</span> <span class="mf">1e4</span>
+    <span class="c1"># Check the average time step in the x vector</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
 
+    <span class="n">scaling_factor</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">dx</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+        
+        <span class="n">scaling_factor</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">dx</span> <span class="o">*</span> <span class="mi">10</span> <span class="c1"># Rescale </span>
+    
     <span class="n">temp_vec</span>     <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">scaling_factor</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
     <span class="n">series</span>       <span class="o">=</span>  <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="n">temp_vec</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-    <span class="n">series</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span>  <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">index</span><span class="p">,</span><span class="n">unit</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">)</span>
+    <span class="n">series</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span>  <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">index</span><span class="p">,</span><span class="n">unit</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">)</span> <span class="c1"># Convert to datetime index - allows rolling window</span>
 
     <span class="n">roll_window</span>  <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">rolling_window</span><span class="o">*</span><span class="n">scaling_factor</span><span class="p">))</span><span class="o">+</span><span class="s2">&quot;s&quot;</span>
 
-    <span class="n">y_filt</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">roll_window</span><span class="p">)</span><span class="o">.</span><span class="n">median</span><span class="p">()</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+    <span class="n">y_filt</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span>
+        <span class="n">window</span><span class="o">=</span><span class="n">roll_window</span><span class="p">)</span><span class="o">.</span><span class="n">median</span><span class="p">()</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">y_filt</span></div>
 

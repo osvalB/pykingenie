@@ -7,46 +7,93 @@ from .utils.processing      import *
 from .utils.math            import *
 
 class KineticsFitter:
-
     """
+    A class used to fit kinetics data with shared thermodynamic parameters.
 
-    A class used to fit kinetics data with shared thermodynamic parameters
+    Parameters
+    ----------
+    time_assoc_lst : list
+        List of time points for the association signals, one per replicate.
+    association_signal_lst : list
+        List of association signals, one per replicate.
+    lig_conc_lst : list
+        List of ligand concentrations, one per replicate.
+    time_diss_lst : list, optional
+        List of time points for the dissociation signals, one per replicate.
+    dissociation_signal_lst : list, optional
+        List of dissociation signals, one per replicate.
+    smax_id : list, optional
+        List containing the Smax IDs (maximum amplitude identifiers).
+    name_lst : list, optional
+        List of experiment names.
+    is_single_cycle : bool, optional
+        Whether the experiment is a single cycle kinetics experiment.
 
     Attributes
     ----------
-
-        names (list):                   list of experiment names
-        assoc (list):                   list of association signals, one per replicate,
-                                        each signal is a numpy matrix of size n*m where n is the number of time points and m
-        disso (list):                   list containing the dissociation signals
-        smax_id (list):                 list containing the Smax IDs (maximum amplitude identifiers)
-
-
-        disso (list):                   list of dissociation signals
-                                        each signal is a numpy matrix of size n*m where n is the number of time points and m
-                                        is the number of ligand concentrations (different from zero)
-        lig_conc (list):                list of ligand concentrations, one per replicate
-                                        each element contains a numpy array with the ligand concentrations
-        time_assoc (list):              list of time points for the association signals, one per replicate
-                                        each element contains a numpy array with the time points
-        time_disso (list):              list of time points for the dissociation signals, one per replicate
-                                        each element contains a numpy array with the time points
-        signal_ss (list):               list of steady state signals, one per replicate
-                                        each element contains a numpy array with the steady state signals
-        signal_ss_fit (list):           list of steady state fitted signals, one per replicate
-                                        each element contains a numpy array with the steady state fitted signals
-        signal_assoc_fit (list):        list of association kinetics fitted signals, one per replicate
-                                        each element contains a numpy array with the association kinetics fitted signals
-        signal_disso_fit (list):        list of dissociation kinetics fitted signals, one per replicate
-                                        each element contains a numpy array with the dissociation kinetics fitted signals
-        fit_params_kinetics (pd.Dataframe):     dataframe with the fitted parameters for the association / dissociation kinetics
-        fit_params_ss (pd.Dataframe):           dataframe with the values of the fitted parameters - steady state
-
+    names : list
+        List of experiment names.
+    assoc_lst : list
+        List of association signals, one per replicate.
+        Each signal is a numpy matrix of size n*m where n is the number of time points and m
+        is the number of ligand concentrations.
+    disso_lst : list
+        List of dissociation signals, one per replicate.
+        Each signal is a numpy matrix of size n*m where n is the number of time points and m
+        is the number of ligand concentrations (different from zero).
+    lig_conc_lst : list
+        List of ligand concentrations, one per replicate.
+    time_assoc_lst : list
+        List of time points for the association signals, one per replicate.
+    time_disso_lst : list
+        List of time points for the dissociation signals, one per replicate.
+    is_single_cycle : bool
+        Whether the experiment is a single cycle kinetics experiment.
+    signal_ss : list
+        List of steady state signals, one per replicate.
+    signal_ss_fit : list
+        List of steady state fitted signals, one per replicate.
+    signal_assoc_fit : list
+        List of association kinetics fitted signals, one per replicate.
+    signal_disso_fit : list
+        List of dissociation kinetics fitted signals, one per replicate.
+    lig_conc_lst_per_id : list
+        Ligand concentrations per Smax ID.
+    smax_guesses_unq : list
+        Smax guesses per association signal.
+    smax_guesses_shared : list
+        Smax guesses per Smax ID.
+    fit_params_kinetics : pd.DataFrame
+        DataFrame with the fitted parameters for the association/dissociation kinetics.
+    fit_params_ss : pd.DataFrame
+        DataFrame with the values of the fitted parameters - steady state.
     """
 
     def __init__(self,time_assoc_lst,association_signal_lst,lig_conc_lst,
                  time_diss_lst=None,dissociation_signal_lst=None,
                  smax_id=None,name_lst=None,is_single_cycle=False):
+        """
+        Initialize the KineticsFitter class.
+        
+        Parameters
+        ----------
+        time_assoc_lst : list
+            List of time points for the association signals, one per replicate.
+        association_signal_lst : list
+            List of association signals, one per replicate.
+        lig_conc_lst : list
+            List of ligand concentrations, one per replicate.
+        time_diss_lst : list, optional
+            List of time points for the dissociation signals, one per replicate.
+        dissociation_signal_lst : list, optional
+            List of dissociation signals, one per replicate.
+        smax_id : list, optional
+            List containing the Smax IDs (maximum amplitude identifiers).
+        name_lst : list, optional
+            List of experiment names.
+        is_single_cycle : bool, optional
+            Whether the experiment is a single cycle kinetics experiment, default is False.
+        """
 
         self.names            = name_lst
         self.assoc_lst        = association_signal_lst
@@ -86,7 +133,20 @@ class KineticsFitter:
     def get_steady_state(self):
 
         """
-        This function calculates the steady state signal and groups it by smax ID
+        Calculate the steady state signal and group it by Smax ID.
+        
+        This function calculates the steady state signal for each association curve
+        and groups the signals by Smax ID. It also calculates the Smax guesses
+        for each association signal.
+        
+        Returns
+        -------
+        None
+            Updates the following instance attributes:
+            - signal_ss: List of steady state signals grouped by Smax ID
+            - lig_conc_lst_per_id: List of ligand concentrations grouped by Smax ID
+            - smax_guesses_unq: Smax guesses for each association signal
+            - smax_guesses_shared: Smax guesses for each Smax ID
         """
 
         signals_steady_state = [np.median(assoc[-10:]) for assoc in self.assoc_lst]
@@ -118,7 +178,15 @@ class KineticsFitter:
         return None
 
     def clear_fittings(self):
-
+        """
+        Clear all fitting results.
+        
+        Resets all fitted signal arrays and parameter dataframes to None.
+        
+        Returns
+        -------
+        None
+        """
         self.signal_ss_fit        = None  # Steady state fitted signal
         self.signal_assoc_fit     = None  # Association kinetics fitted signal
         self.signal_disso_fit     = None  # Association kinetics fitted signal
@@ -128,12 +196,17 @@ class KineticsFitter:
         return None
 
     def create_fitting_bounds_table(self):
-
         """
         Create a dataframe with the fitting bounds and the fitted parameters.
-        It uses self.params, self.low_bounds and self.high_bounds
+        
+        Uses the class attributes params, low_bounds and high_bounds to create
+        a DataFrame with fitting boundaries.
+        
+        Returns
+        -------
+        None
+            Updates the fitted_params_boundaries attribute with a DataFrame.
         """
-
         df = pd.DataFrame({
             'Fitted_parameter_value':   self.params,
             'Lower_limit_for_fitting':  self.low_bounds,
@@ -147,7 +220,21 @@ class KineticsFitter:
     def fit_steady_state(self):
 
         """
-        This function fits the steady state signal
+        Fit the steady state signal using the one-site binding model.
+        
+        This function fits the steady state signal to a one-site binding model
+        to estimate the equilibrium dissociation constant (Kd) and maximum signal (Smax).
+        It also calculates the 95% confidence intervals for the Kd.
+        
+        Returns
+        -------
+        None
+            Updates the following instance attributes:
+            - params: The fitted parameters [Kd, Smax1, Smax2, ...]
+            - signal_ss_fit: The fitted steady state signals
+            - fit_params_ss: DataFrame with the fitted parameters
+            - Kd_ss: The equilibrium dissociation constant
+            - Smax_upper_bound_factor: Factor to determine the upper bound for Smax
         """
 
         self.clear_fittings()
@@ -227,6 +314,26 @@ class KineticsFitter:
         return None
 
     def get_k_off_initial_guess(self):
+        """
+        Get initial guess and bounds for k_off parameter.
+        
+        This method determines initial values and fitting bounds for Kd and k_off.
+        If dissociation data is available, it fits the dissociation curves to get
+        a better estimate of k_off.
+        
+        Returns
+        -------
+        tuple
+            A tuple containing:
+            - p0: Initial parameter guesses [Kd, k_off]
+            - low_bounds: Lower bounds for the parameters
+            - high_bounds: Upper bounds for the parameters
+            
+        Raises
+        ------
+        ValueError
+            If Kd_ss is not set and fit_steady_state has not been run
+        """
 
         # Initial guess for Kd_ss for single_cycle_kinetics
         if self.is_single_cycle:
@@ -255,7 +362,29 @@ class KineticsFitter:
 
         return p0, low_bounds, high_bounds
 
-    def fit_one_site_association(self,shared_smax=True):
+    def fit_one_site_association(self, shared_smax=True):
+        """
+        Fit the association curves using the one-site binding model.
+        
+        This function fits the association curves to a one-site binding model
+        to estimate the equilibrium dissociation constant (Kd), dissociation
+        rate constant (k_off), and maximum signal (Smax).
+        
+        Parameters
+        ----------
+        shared_smax : bool, optional
+            Whether to share Smax across curves with the same Smax ID, default is True.
+            
+        Returns
+        -------
+        None
+            Updates the following instance attributes:
+            - params: The fitted parameters [Kd, k_off, Smax1, Smax2, ...]
+            - signal_assoc_fit: The fitted association signals
+            - Kd: The equilibrium dissociation constant
+            - k_off: The dissociation rate constant
+            - Smax: The maximum signal values
+        """
 
         self.clear_fittings()
 
@@ -302,7 +431,29 @@ class KineticsFitter:
 
         return  None
 
-    def fit_one_site_dissociation(self,time_limit=0):
+    def fit_one_site_dissociation(self, time_limit=0):
+        """
+        Fit the dissociation curves using the one-site binding model.
+        
+        This function fits the dissociation curves to a one-site binding model
+        to estimate the dissociation rate constant (k_off) and the initial signal (S0).
+        
+        Parameters
+        ----------
+        time_limit : float, optional
+            Time limit for fitting (in seconds). If > 0, only fit data up to this time, 
+            default is 0 (fit all data).
+            
+        Returns
+        -------
+        None
+            Updates the following instance attributes:
+            - params: The fitted parameters [k_off, S0_1, S0_2, ...]
+            - signal_disso_fit: The fitted dissociation signals
+            - k_off: The dissociation rate constant
+            - fit_params_kinetics: DataFrame with the fitted parameters
+            - fit_params_kinetics_error: DataFrame with the relative errors
+        """
 
         self.clear_fittings()
 
@@ -350,6 +501,18 @@ class KineticsFitter:
         return  None
 
     def fit_single_exponentials(self):
+        """
+        Fit single exponentials to the association signals.
+        
+        This method fits each association curve with a single exponential function
+        and extracts the observed rate constants (k_obs).
+        
+        Returns
+        -------
+        None
+            Updates the k_obs attribute with a list of observed rate constants
+            for each association curve.
+        """
 
         # Fit one exponential to each signal
 
@@ -519,7 +682,32 @@ class KineticsFitter:
 
         return  None
 
-    def calculate_ci95(self,shared_smax=True,fixed_t0=True,fit_ktr=False):
+    def calculate_ci95(self, shared_smax=True, fixed_t0=True, fit_ktr=False):
+        """
+        Calculate 95% confidence intervals for the fitted parameters.
+        
+        This method computes asymmetrical 95% confidence intervals for the
+        equilibrium dissociation constant (Kd) and the dissociation rate constant (k_off).
+        
+        Parameters
+        ----------
+        shared_smax : bool, optional
+            Whether Smax was shared across curves with the same Smax ID, default is True.
+        fixed_t0 : bool, optional
+            Whether the time offset (t0) was fixed to zero, default is True.
+        fit_ktr : bool, optional
+            Whether mass transport rate constants were included in the model, default is False.
+            
+        Returns
+        -------
+        None
+            Updates the fit_params_kinetics_ci95 attribute with a DataFrame containing
+            the 95% confidence intervals for Kd and k_off.
+            
+        Notes
+        -----
+        This method will create an empty DataFrame if the confidence interval calculation fails.
+        """
 
         try:
 
@@ -571,11 +759,33 @@ class KineticsFitter:
 
         return  None
 
-    def fit_one_site_if_assoc_and_disso(self,shared_smax=True):
-
+    def fit_one_site_if_assoc_and_disso(self, shared_smax=True):
         """
         Fit the association and dissociation signals using the induced fit model.
-        This function is a wrapper for the fit_induced_fit_sites_assoc_and_disso method.
+        
+        This method first fits a simple one-site model to get initial parameter estimates,
+        then explores different values of the conformational change rate constants (kc and krev)
+        to find good initial guesses for the induced fit model. Finally, it fits the full
+        induced fit model with these initial guesses.
+        
+        Parameters
+        ----------
+        shared_smax : bool, optional
+            Whether to share Smax across curves with the same Smax ID, default is True.
+            
+        Returns
+        -------
+        None
+            Updates the following instance attributes:
+            - params: The fitted parameters [k_on, k_off, k_c, k_rev, Smax1, Smax2, ...]
+            - signal_assoc_fit: The fitted association signals
+            - signal_disso_fit: The fitted dissociation signals
+            - k_on: The association rate constant
+            - k_off: The dissociation rate constant
+            - k_c: The forward conformational change rate constant
+            - k_rev: The reverse conformational change rate constant
+            - Smax: The maximum signal values
+            - fit_params_kinetics: DataFrame with the fitted parameters
         """
 
         # Fit first a model without induced-fit

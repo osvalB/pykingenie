@@ -11,50 +11,73 @@ ___all__ = ['single_exponential',
            'get_desired_rss']
 
 def single_exponential(t, a0, a1, kobs):
-
     """
-    Single exponential function for fitting
+    Single exponential function for fitting.
 
-    Args:
-        t (np.ndarray): time
-        a0 (float): offset
-        a1 (float): amplitude
-        kobs (float): observed rate constant
+    Parameters
+    ----------
+    t : np.ndarray
+        Time values.
+    a0 : float
+        Offset.
+    a1 : float
+        Amplitude.
+    kobs : float
+        Observed rate constant.
 
-    Returns:
-        np.ndarray: computed values of the single exponential function
+    Returns
+    -------
+    np.ndarray
+        Computed values of the single exponential function.
     """
     return a0 + a1 * np.exp(-kobs * t)
 
 def double_exponential(t, a0, a1, kobs1, a2, kobs2):
     """
-    Double exponential function for fitting
+    Double exponential function for fitting.
 
-    Args:
-        t (np.ndarray): time
-        a0 (float): offset
-        a1 (float): amplitude of the first exponential
-        kobs1 (float): observed rate constant of the first exponential
-        a2 (float): amplitude of the second exponential
-        kobs2 (float): observed rate constant of the second exponential
+    Parameters
+    ----------
+    t : np.ndarray
+        Time values.
+    a0 : float
+        Offset.
+    a1 : float
+        Amplitude of the first exponential.
+    kobs1 : float
+        Observed rate constant of the first exponential.
+    a2 : float
+        Amplitude of the second exponential.
+    kobs2 : float
+        Observed rate constant of the second exponential.
 
-    Returns:
-        np.ndarray: computed values of the double exponential function
+    Returns
+    -------
+    np.ndarray
+        Computed values of the double exponential function.
     """
     return a0 + a1 * np.exp(-kobs1 * t) + a2 * np.exp(-kobs2 * t)
 
-def median_filter(y,x,rolling_window):
-
+def median_filter(y, x, rolling_window):
     """
+    Compute the median filter of the input signal using a rolling window.
 
-    Compute the median filter of the x vector using a rolling window
+    The x vector is converted into an integer vector and then into a time variable to take advantage of pandas rolling().median().
+    Returns the y vector passed through the median filter.
 
-    First, we convert the x vector into an integer vector and then
-        into time variable to take advantage of pandas function
-            rolling().median()
+    Parameters
+    ----------
+    y : np.ndarray
+        Input signal values.
+    x : np.ndarray
+        Time or index values corresponding to the signal.
+    rolling_window : int or float
+        Size of the median filter window.
 
-	Returns the y vector passed through the median filter
-
+    Returns
+    -------
+    np.ndarray
+        Filtered signal.
     """
 
     # Check the average time step in the x vector
@@ -62,7 +85,6 @@ def median_filter(y,x,rolling_window):
 
     scaling_factor = 1
     if dx <= 1:
-        
         scaling_factor = 1/dx * 10 # Rescale 
     
     temp_vec     =  np.multiply(x,scaling_factor).astype(int)
@@ -77,20 +99,26 @@ def median_filter(y,x,rolling_window):
     return y_filt
 
 def rss_p(rrs0, n, p, alfa):
-
     """
-    Given the residuals of the best fitted model,
-    compute the desired residual sum of squares for a 1-alpha confidence interval
-    This is used to compute asymmetric confidence intervals for the fitted parameters
+    Compute the desired residual sum of squares for a 1-alpha confidence interval.
 
-    Args:
-        rrs0 (float): residual sum of squares of the model with the best fit
-        n (int): number of data points
-        p (int): number of parameters
-        alfa (float): desired confidence interval
+    Given the residuals of the best fitted model, this is used to compute asymmetric confidence intervals for the fitted parameters.
 
-    Returns:
-        rss (float): residual sum of squares for the desired confidence interval
+    Parameters
+    ----------
+    rrs0 : float
+        Residual sum of squares of the model with the best fit.
+    n : int
+        Number of data points.
+    p : int
+        Number of parameters.
+    alfa : float
+        Desired confidence interval (1 - alpha).
+
+    Returns
+    -------
+    float
+        Residual sum of squares for the desired confidence interval.
     """
 
     critical_value = stats.f.ppf(q=1 - alfa, dfn=1, dfd=n - p)
@@ -98,19 +126,20 @@ def rss_p(rrs0, n, p, alfa):
     return rrs0 * (1 + critical_value / (n - p))
 
 def get_rss(y, y_fit):
-
     """
-    Compute the residual sum of squares
+    Compute the residual sum of squares.
 
-    Args:
+    Parameters
+    ----------
+    y : np.ndarray
+        Observed values.
+    y_fit : np.ndarray
+        Fitted values.
 
-        y (np.ndarray): observed values
-        y_fit (np.ndarray): fitted values
-
-    Returns:
-
-        rss (np.ndarray): residual sum of squares
-
+    Returns
+    -------
+    float
+        Residual sum of squares.
     """
 
     residuals = y - y_fit
@@ -118,24 +147,29 @@ def get_rss(y, y_fit):
 
     return rss
 
-def get_desired_rss(y, y_fit, n, p,alpha=0.05):
-
+def get_desired_rss(y, y_fit, n, p, alpha=0.05):
     """
-    Given the observed and fitted data,
-    find the residual sum of squares required for a 1-alpha confidence interval
+    Find the residual sum of squares required for a 1-alpha confidence interval.
 
-    Args:
+    Given the observed and fitted data, computes the RSS for the desired confidence interval.
 
-        y (np.ndarray): observed values
-        y_fit (np.ndarray): fitted values
-        n (int): number of data points
-        p (int): number of parameters
-        alpha (float): desired confidence interval
+    Parameters
+    ----------
+    y : np.ndarray
+        Observed values.
+    y_fit : np.ndarray
+        Fitted values.
+    n : int
+        Number of data points.
+    p : int
+        Number of parameters.
+    alpha : float, optional
+        Desired confidence interval (default is 0.05).
 
-    Returns:
-
-        rss (np.ndarray): residual sum of squares
-
+    Returns
+    -------
+    float
+        Residual sum of squares for the desired confidence interval.
     """
 
     rss = get_rss(y, y_fit)

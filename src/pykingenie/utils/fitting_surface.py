@@ -21,21 +21,26 @@ __all__ = [
     'get_smax_upper_bound_factor'
 ]
 
-def guess_initial_signal(assoc_time_lst, assoc_signal_lst,time_limit=30):
-
+def guess_initial_signal(assoc_time_lst, assoc_signal_lst, time_limit=30):
     """
-    Guess the initial signal for each signal in the list, by trying to fit a single exponentials
-    Used only for the one-to-one binding model in case one of the steps is not present
+    Guess the initial signal for each signal in the list by fitting single exponentials.
+    
+    Used only for the one-to-one binding model in case one of the steps is not present.
 
-    Args:
-        assoc_time_lst (list):   List of association time arrays
-        assoc_signal_lst (list): List of association signal arrays
-        time_limit (float):      Time limit to consider for the fit, default is 30 seconds
+    Parameters
+    ----------
+    assoc_time_lst : list
+        List of association time arrays.
+    assoc_signal_lst : list
+        List of association signal arrays.
+    time_limit : float, optional
+        Time limit to consider for the fit, default is 30 seconds.
 
-    Returns:
-        s0s (list): List of initial signals for each association signal
+    Returns
+    -------
+    list
+        List of initial signals for each association signal.
     """
-
     s0s = []
 
     for t,y in zip(assoc_time_lst,assoc_signal_lst):
@@ -56,6 +61,19 @@ def guess_initial_signal(assoc_time_lst, assoc_signal_lst,time_limit=30):
     return s0s
 
 def get_smax_upper_bound_factor(Kd_ss):
+    """
+    Get a factor to determine the upper bound for Smax based on Kd_ss value.
+    
+    Parameters
+    ----------
+    Kd_ss : float
+        Steady state Kd value.
+        
+    Returns
+    -------
+    float or None
+        Factor to multiply for setting Smax upper bound, or None if no matching range found.
+    """
     factor_dict = {
         (10, float('inf')): 1e3,
         (1, 10): 1e2,
@@ -66,25 +84,37 @@ def get_smax_upper_bound_factor(Kd_ss):
             return factor
     return None  # or raise an error if needed
 
-def fit_steady_state_one_site(signal_lst, ligand_lst,initial_parameters,
-                              low_bounds, high_bounds,fixed_Kd = False,Kd_value = None):
-
+def fit_steady_state_one_site(signal_lst, ligand_lst, initial_parameters,
+                              low_bounds, high_bounds, fixed_Kd=False, Kd_value=None):
     """
-    Fits a one-site binding model to a set of steady state signals
-    Args:
-        signal_lst (list): List of signals to fit, each signal is a numpy array
-        ligand_lst (list): List of ligand concentrations, each concentration is a numpy array
-        initial_parameters (list): Initial guess for the parameters
-        low_bounds (list): Lower bounds for the parameters
-        high_bounds (list): Upper bounds for the parameters
-        fixed_Kd (bool): If True, Kd is fixed to Kd_value
-        Kd_value (float): Value of Kd to use if fixed_Kd is True
-    Returns:
-        global_fit_params (list): Fitted parameters
-        cov (np.ndarray): Covariance matrix of the fitted parameters
-        fitted_values (list): Fitted values for each signal, same dimensions as signal_lst
+    Fit a one-site binding model to a set of steady state signals.
+    
+    Parameters
+    ----------
+    signal_lst : list
+        List of signals to fit, each signal is a numpy array.
+    ligand_lst : list
+        List of ligand concentrations, each concentration is a numpy array.
+    initial_parameters : list
+        Initial guess for the parameters.
+    low_bounds : list
+        Lower bounds for the parameters.
+    high_bounds : list
+        Upper bounds for the parameters.
+    fixed_Kd : bool, optional
+        If True, Kd is fixed to Kd_value, default is False.
+    Kd_value : float, optional
+        Value of Kd to use if fixed_Kd is True.
+        
+    Returns
+    -------
+    list
+        Fitted parameters.
+    np.ndarray
+        Covariance matrix of the fitted parameters.
+    list
+        Fitted values for each signal, same dimensions as signal_lst.
     """
-
     all_signal = concat_signal_lst(signal_lst)
 
     start = 1
@@ -116,25 +146,33 @@ def fit_steady_state_one_site(signal_lst, ligand_lst,initial_parameters,
 
     return global_fit_params, cov, fitted_values
 
-def steady_state_one_site_asymmetric_ci95(kd_estimated,signal_lst, ligand_lst,initial_parameters,
-                                          low_bounds, high_bounds,rss_desired):
-
+def steady_state_one_site_asymmetric_ci95(kd_estimated, signal_lst, ligand_lst, initial_parameters,
+                                          low_bounds, high_bounds, rss_desired):
     """
-    Calculate the asymmetric confidence interval for the steady-state signal
-    Args:
-        kd_estimated (float): Estimated Kd value
-        signal_lst (list): List of signals to fit, each signal is a numpy array
-        ligand_lst (list): List of ligand concentrations, each concentration is a numpy array
-        initial_parameters (list): Initial guess for the parameters (without the Kd!)
-        low_bounds (list): Lower bounds for the parameters (without the Kd!)
-        high_bounds (list): Upper bounds for the parameters (without the Kd!)
-        rss_desired (float): Maximum residual sum of squares
+    Calculate the asymmetric confidence interval for the steady-state signal.
+    
+    Parameters
+    ----------
+    kd_estimated : float
+        Estimated Kd value.
+    signal_lst : list
+        List of signals to fit, each signal is a numpy array.
+    ligand_lst : list
+        List of ligand concentrations, each concentration is a numpy array.
+    initial_parameters : list
+        Initial guess for the parameters (without the Kd!).
+    low_bounds : list
+        Lower bounds for the parameters (without the Kd!).
+    high_bounds : list
+        Upper bounds for the parameters (without the Kd!).
+    rss_desired : float
+        Maximum residual sum of squares.
 
-    Returns:
-        ci95 (np.ndarray): 95 % asymmetric confidence interval for the Kd value
-
+    Returns
+    -------
+    np.ndarray
+        95% asymmetric confidence interval for the Kd value [lower_bound, upper_bound].
     """
-
     def f_to_optimize(Kd):
 
         fit_params, _, fit_vals = fit_steady_state_one_site(signal_lst, ligand_lst,
@@ -161,38 +199,53 @@ def steady_state_one_site_asymmetric_ci95(kd_estimated,signal_lst, ligand_lst,in
     return ci95
 
 def fit_one_site_association(signal_lst, time_lst, analyte_conc_lst,
-                             initial_parameters,low_bounds, high_bounds,
+                             initial_parameters, low_bounds, high_bounds,
                              smax_idx=None,
-                             shared_smax = False,
-                             fixed_t0 = True,
-                             fixed_Kd = False, Kd_value = None,
-                             fixed_koff = False, koff_value = None):
-
+                             shared_smax=False,
+                             fixed_t0=True,
+                             fixed_Kd=False, Kd_value=None,
+                             fixed_koff=False, koff_value=None):
     """
-    Global fit to a list of association traces - one-to-one binding model
+    Global fit to a list of association traces - one-to-one binding model.
 
-    Args:
-        signal_lst (list): List of signals to fit, each signal is a numpy array
-        time_lst (list): List of time arrays
-        analyte_conc_lst (list): List of analyte concentrations, each element is a numpy array
-        initial_parameters (list): Initial guess for the parameters
-        low_bounds (list): Lower bounds for the parameters
-        high_bounds (list): Upper bounds for the parameters
-        smax_idx (list): List of indices for the s_max parameters, used if shared_smax is TRUE
-        shared_smax (bool): If True, the s_max parameters are shared between the signals
-        fixed_t0 (bool): If True, t0 is fixed to 0, otherwise we fit it
-        fixed_Kd (bool): If True, Kd is fixed to Kd_value
-        Kd_value (float): Value of Kd to use if fixed_Kd is True
-        fixed_koff (bool): If True, koff is fixed to koff_value
-        koff_value (float): Value of koff to use if fixed_koff is True
+    Parameters
+    ----------
+    signal_lst : list
+        List of signals to fit, each signal is a numpy array.
+    time_lst : list
+        List of time arrays.
+    analyte_conc_lst : list
+        List of analyte concentrations, each element is a numpy array.
+    initial_parameters : list
+        Initial guess for the parameters.
+    low_bounds : list
+        Lower bounds for the parameters.
+    high_bounds : list
+        Upper bounds for the parameters.
+    smax_idx : list, optional
+        List of indices for the s_max parameters, used if shared_smax is True.
+    shared_smax : bool, optional
+        If True, the s_max parameters are shared between the signals, default is False.
+    fixed_t0 : bool, optional
+        If True, t0 is fixed to 0, otherwise we fit it, default is True.
+    fixed_Kd : bool, optional
+        If True, Kd is fixed to Kd_value, default is False.
+    Kd_value : float, optional
+        Value of Kd to use if fixed_Kd is True.
+    fixed_koff : bool, optional
+        If True, koff is fixed to koff_value, default is False.
+    koff_value : float, optional
+        Value of koff to use if fixed_koff is True.
 
-    Returns:
-        global_fit_params (list): Fitted parameters
-        cov (np.ndarray): Covariance matrix of the fitted parameters
-        fitted_values (list): Fitted values for each signal, same dimensions as signal_lst
-
+    Returns
+    -------
+    list
+        Fitted parameters.
+    np.ndarray
+        Covariance matrix of the fitted parameters.
+    list
+        Fitted values for each signal, same dimensions as signal_lst.
     """
-
     all_signal = concat_signal_lst(signal_lst)
 
     time_lst = [np.array(t) for t in time_lst]
@@ -200,12 +253,10 @@ def fit_one_site_association(signal_lst, time_lst, analyte_conc_lst,
     start = 3 - sum([fixed_t0, fixed_Kd, fixed_koff])
 
     def fit_fx(dummyVariable, *args):
-
         """
         Arguments order:
             Kd, Koff, T0, Smax1, Smax2, Smax3, ...
         """
-
         Kd = Kd_value if fixed_Kd else args[0]
 
         Koff = koff_value if fixed_koff else args[1 - sum([fixed_Kd])]
@@ -249,32 +300,43 @@ def fit_one_site_association(signal_lst, time_lst, analyte_conc_lst,
     return global_fit_params, cov, fitted_values_assoc
 
 def fit_one_site_dissociation(signal_lst, time_lst,
-                             initial_parameters,low_bounds, high_bounds,
-                             fixed_t0   = True,
-                             fixed_koff = False, koff_value = None,
+                             initial_parameters, low_bounds, high_bounds,
+                             fixed_t0=True,
+                             fixed_koff=False, koff_value=None,
                              fit_s0=True):
-
     """
-    Global fit to a list of dissociation traces - one-to-one binding model
+    Global fit to a list of dissociation traces - one-to-one binding model.
 
-    Args:
-        signal_lst (list): List of signals to fit, each signal is a numpy array
-        time_lst (list): List of time arrays
-        initial_parameters (list): Initial guess for the parameters
-        low_bounds (list): Lower bounds for the parameters
-        high_bounds (list): Upper bounds for the parameters
-        fixed_t0 (bool): If True, t0 is fixed to 0, otherwise we fit it
-        fixed_koff (bool): If True, koff is fixed to koff_value
-        koff_value (float): Value of koff to use if fixed_koff is True
-        fit_s0 (bool): If True, s0 is fitted, otherwise it is fixed to the first value of the signal
+    Parameters
+    ----------
+    signal_lst : list
+        List of signals to fit, each signal is a numpy array.
+    time_lst : list
+        List of time arrays.
+    initial_parameters : list
+        Initial guess for the parameters.
+    low_bounds : list
+        Lower bounds for the parameters.
+    high_bounds : list
+        Upper bounds for the parameters.
+    fixed_t0 : bool, optional
+        If True, t0 is fixed to 0, otherwise we fit it, default is True.
+    fixed_koff : bool, optional
+        If True, koff is fixed to koff_value, default is False.
+    koff_value : float, optional
+        Value of koff to use if fixed_koff is True.
+    fit_s0 : bool, optional
+        If True, s0 is fitted, otherwise it is fixed to the first value of the signal, default is True.
 
-    Returns:
-        global_fit_params (list): Fitted parameters
-        cov (np.ndarray): Covariance matrix of the fitted parameters
-        fitted_values_disso (list): Fitted values for each signal, same dimensions as signal_lst
-
+    Returns
+    -------
+    list
+        Fitted parameters.
+    np.ndarray
+        Covariance matrix of the fitted parameters.
+    list
+        Fitted values for each signal, same dimensions as signal_lst.
     """
-
     all_signal = concat_signal_lst(signal_lst)
 
     time_lst = [np.array(t) for t in time_lst]
@@ -287,12 +349,10 @@ def fit_one_site_dissociation(signal_lst, time_lst,
         s0_all = [s[0] for s in signal_lst]
 
     def fit_fx(dummyVariable, *args):
-
         """
         Arguments order:
            Koff, T0, S01, S02, S03, ...
         """
-
         Koff = koff_value if fixed_koff else args[0]
 
         t0 = args[1 - sum([fixed_koff])] if not fixed_t0 else 0
@@ -328,38 +388,59 @@ def fit_one_site_dissociation(signal_lst, time_lst,
 
 def fit_one_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_lst,
                                  disso_signal_lst, disso_time_lst,
-                                 initial_parameters,low_bounds, high_bounds,
+                                 initial_parameters, low_bounds, high_bounds,
                                  smax_idx=None,
-                                 shared_smax = False,
-                                 fixed_t0 = True,
-                                 fixed_Kd = False,   Kd_value = None,
-                                 fixed_koff = False, koff_value = None):
-
+                                 shared_smax=False,
+                                 fixed_t0=True,
+                                 fixed_Kd=False, Kd_value=None,
+                                 fixed_koff=False, koff_value=None):
     """
-    Global fit to a set of association and dissociation traces - one-to-one binding model
-    Args:
-        assoc_signal_lst (list): List of association signals to fit, each signal is a numpy array
-        assoc_time_lst (list): List of association time arrays
-        analyte_conc_lst (list): List of analyte concentrations, each element is a numpy array
-        disso_signal_lst (list): List of dissociation signals to fit, each signal is a numpy array
-        disso_time_lst (list): List of dissociation time arrays
-        initial_parameters (list): Initial guess for the parameters
-        low_bounds (list): Lower bounds for the parameters
-        high_bounds (list): Upper bounds for the parameters
-        smax_idx (list): List of indices for the s_max parameters, used if shared_smax is TRUE
-        shared_smax (bool): If True, the s_max parameters are shared between traces
-        fixed_t0 (bool): If True, t0 is fixed to 0, otherwise we fit it
-        fixed_Kd (bool): If True, Kd is fixed to Kd_value
-        Kd_value (float): Value of Kd to use if fixed_Kd is True
-        fixed_koff (bool): If True, koff is fixed to koff_value
-        koff_value (float): Value of koff to use if fixed_koff is True
-    Returns:
-        global_fit_params (list): Fitted parameters
-        cov (np.ndarray): Covariance matrix of the fitted parameters
-        fitted_values_assoc (list): Fitted values for each association signal, same dimensions as assoc_signal_lst
-        fitted_values_disso (list): Fitted values for each dissociation signal, same dimensions as disso_signal_lst
+    Global fit to a set of association and dissociation traces - one-to-one binding model.
+    
+    Parameters
+    ----------
+    assoc_signal_lst : list
+        List of association signals to fit, each signal is a numpy array.
+    assoc_time_lst : list
+        List of association time arrays.
+    analyte_conc_lst : list
+        List of analyte concentrations, each element is a numpy array.
+    disso_signal_lst : list
+        List of dissociation signals to fit, each signal is a numpy array.
+    disso_time_lst : list
+        List of dissociation time arrays.
+    initial_parameters : list
+        Initial guess for the parameters.
+    low_bounds : list
+        Lower bounds for the parameters.
+    high_bounds : list
+        Upper bounds for the parameters.
+    smax_idx : list, optional
+        List of indices for the s_max parameters, used if shared_smax is True.
+    shared_smax : bool, optional
+        If True, the s_max parameters are shared between traces, default is False.
+    fixed_t0 : bool, optional
+        If True, t0 is fixed to 0, otherwise we fit it, default is True.
+    fixed_Kd : bool, optional
+        If True, Kd is fixed to Kd_value, default is False.
+    Kd_value : float, optional
+        Value of Kd to use if fixed_Kd is True.
+    fixed_koff : bool, optional
+        If True, koff is fixed to koff_value, default is False.
+    koff_value : float, optional
+        Value of koff to use if fixed_koff is True.
+        
+    Returns
+    -------
+    list
+        Fitted parameters.
+    np.ndarray
+        Covariance matrix of the fitted parameters.
+    list
+        Fitted values for each association signal, same dimensions as assoc_signal_lst.
+    list
+        Fitted values for each dissociation signal, same dimensions as disso_signal_lst.
     """
-
     # Set a flag for the association that was done after a dissociation step
     # We do this empirically by detecting if the initial time is greater than 2 seconds
     initial_signal_at_zero = [time[0] < 2 for time in assoc_time_lst]
@@ -383,12 +464,10 @@ def fit_one_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
     s0s            = guess_initial_signal(assoc_time_lst, assoc_signal_lst)
 
     def fit_fx(dummyVariable, *args):
-
         """
         Arguments order:
             Kd, Koff, T0, Smax1, Smax2, Smax3, ...
         """
-
         Kd   = Kd_value if fixed_Kd else args[0]
 
         Koff = koff_value if fixed_koff else args[1 - sum([fixed_Kd])]
@@ -483,9 +562,62 @@ def fit_induced_fit_sites_assoc_and_disso(
     max_nfev=None
 ):
     """
-    Global fit to association and dissociation traces - one-to-one binding model with induced fit
+    Global fit to association and dissociation traces - one-to-one binding model with induced fit.
+    
+    Parameters
+    ----------
+    assoc_signal_lst : list
+        List of association signals to fit, each signal is a numpy array.
+    assoc_time_lst : list
+        List of association time arrays.
+    analyte_conc_lst : list
+        List of analyte concentrations, each element is a numpy array.
+    disso_signal_lst : list
+        List of dissociation signals to fit, each signal is a numpy array.
+    disso_time_lst : list
+        List of dissociation time arrays.
+    initial_parameters : list
+        Initial guess for the parameters.
+    low_bounds : list
+        Lower bounds for the parameters.
+    high_bounds : list
+        Upper bounds for the parameters.
+    smax_idx : list, optional
+        List of indices for the s_max parameters, used if shared_smax is True.
+    shared_smax : bool, optional
+        If True, the s_max parameters are shared between traces, default is False.
+    fixed_t0 : bool, optional
+        If True, t0 is fixed to 0, otherwise we fit it, default is True.
+    fixed_kon1 : bool, optional
+        If True, kon1 is fixed to kon1_value, default is False.
+    kon1_value : float, optional
+        Value of kon1 to use if fixed_kon1 is True.
+    fixed_koff1 : bool, optional
+        If True, koff1 is fixed to koff1_value, default is False.
+    koff1_value : float, optional
+        Value of koff1 to use if fixed_koff1 is True.
+    fixed_kon2 : bool, optional
+        If True, kon2 is fixed to kon2_value, default is False.
+    kon2_value : float, optional
+        Value of kon2 to use if fixed_kon2 is True.
+    fixed_koff2 : bool, optional
+        If True, koff2 is fixed to koff2_value, default is False.
+    koff2_value : float, optional
+        Value of koff2 to use if fixed_koff2 is True.
+    max_nfev : int, optional
+        Maximum number of function evaluations.
+    
+    Returns
+    -------
+    list
+        Fitted parameters.
+    np.ndarray
+        Covariance matrix of the fitted parameters.
+    list
+        Fitted values for each association signal, same dimensions as assoc_signal_lst.
+    list
+        Fitted values for each dissociation signal, same dimensions as disso_signal_lst.
     """
-
     # Set a flag for the association that was done after a dissociation step
     # We do this empirically by detecting if the initial time is greater than 2 seconds
     initial_signal_at_zero = [time[0] < 2 for time in assoc_time_lst]
@@ -573,38 +705,59 @@ def fit_induced_fit_sites_assoc_and_disso(
 
 def fit_one_site_assoc_and_disso_ktr(assoc_signal_lst, assoc_time_lst, analyte_conc_lst,
                                  disso_signal_lst, disso_time_lst,
-                                 initial_parameters,low_bounds, high_bounds,
+                                 initial_parameters, low_bounds, high_bounds,
                                  smax_idx=None,
-                                 shared_smax = False,
-                                 fixed_t0 = True,
-                                 fixed_Kd = False,   Kd_value = None,
-                                 fixed_koff = False, koff_value = None):
-
+                                 shared_smax=False,
+                                 fixed_t0=True,
+                                 fixed_Kd=False, Kd_value=None,
+                                 fixed_koff=False, koff_value=None):
     """
-    Global fit to a set of association and dissociation traces - one-to-one with mass transport limitation binding model
-    Args:
-        assoc_signal_lst (list): List of association signals to fit, each signal is a numpy array
-        assoc_time_lst (list): List of association time arrays
-        analyte_conc_lst (list): List of analyte concentrations, each element is a numpy array
-        disso_signal_lst (list): List of dissociation signals to fit, each signal is a numpy array
-        disso_time_lst (list): List of dissociation time arrays
-        initial_parameters (list): Initial guess for the parameters
-        low_bounds (list): Lower bounds for the parameters
-        high_bounds (list): Upper bounds for the parameters
-        smax_idx (list): List of indices for the s_max parameters, used if shared_smax is TRUE
-        shared_smax (bool): If True, the s_max parameters are shared between traces
-        fixed_t0 (bool): If True, t0 is fixed to 0, otherwise we fit it
-        fixed_Kd (bool): If True, Kd is fixed to Kd_value
-        Kd_value (float): Value of Kd to use if fixed_Kd is True
-        fixed_koff (bool): If True, koff is fixed to koff_value
-        koff_value (float): Value of koff to use if fixed_koff is True
-    Returns:
-        global_fit_params (list): Fitted parameters
-        cov (np.ndarray): Covariance matrix of the fitted parameters
-        fitted_values_assoc (list): Fitted values for each association signal, same dimensions as assoc_signal_lst
-        fitted_values_disso (list): Fitted values for each dissociation signal, same dimensions as disso_signal_lst
-    """
+    Global fit to a set of association and dissociation traces - one-to-one with mass transport limitation binding model.
+    
+    Parameters
+    ----------
+    assoc_signal_lst : list
+        List of association signals to fit, each signal is a numpy array.
+    assoc_time_lst : list
+        List of association time arrays.
+    analyte_conc_lst : list
+        List of analyte concentrations, each element is a numpy array.
+    disso_signal_lst : list
+        List of dissociation signals to fit, each signal is a numpy array.
+    disso_time_lst : list
+        List of dissociation time arrays.
+    initial_parameters : list
+        Initial guess for the parameters.
+    low_bounds : list
+        Lower bounds for the parameters.
+    high_bounds : list
+        Upper bounds for the parameters.
+    smax_idx : list, optional
+        List of indices for the s_max parameters, used if shared_smax is True.
+    shared_smax : bool, optional
+        If True, the s_max parameters are shared between traces, default is False.
+    fixed_t0 : bool, optional
+        If True, t0 is fixed to 0, otherwise we fit it, default is True.
+    fixed_Kd : bool, optional
+        If True, Kd is fixed to Kd_value, default is False.
+    Kd_value : float, optional
+        Value of Kd to use if fixed_Kd is True.
+    fixed_koff : bool, optional
+        If True, koff is fixed to koff_value, default is False.
+    koff_value : float, optional
+        Value of koff to use if fixed_koff is True.
 
+    Returns
+    -------
+    list
+        Fitted parameters.
+    np.ndarray
+        Covariance matrix of the fitted parameters.
+    list
+        Fitted values for each association signal, same dimensions as assoc_signal_lst.
+    list
+        Fitted values for each dissociation signal, same dimensions as disso_signal_lst.
+    """
     all_signal_assoc = concat_signal_lst(assoc_signal_lst)
     all_signal_disso = concat_signal_lst(disso_signal_lst)
 
@@ -707,39 +860,57 @@ def fit_one_site_assoc_and_disso_ktr(assoc_signal_lst, assoc_time_lst, analyte_c
     return global_fit_params, cov, fitted_values_assoc, fitted_values_disso
 
 
-def one_site_assoc_and_disso_asymmetric_ci95(kd_estimated,rss_desired,
+def one_site_assoc_and_disso_asymmetric_ci95(kd_estimated, rss_desired,
                                              assoc_signal_lst, assoc_time_lst, analyte_conc_lst,
                                              disso_signal_lst, disso_time_lst,
-                                             initial_parameters,low_bounds, high_bounds,
+                                             initial_parameters, low_bounds, high_bounds,
                                              smax_idx=None,
-                                             shared_smax = False,
-                                             fixed_t0 = True,
-                                             fixed_koff = False, koff_value = None):
-
+                                             shared_smax=False,
+                                             fixed_t0=True,
+                                             fixed_koff=False, koff_value=None):
     """
-    Calculate the asymmetric confidence interval for the Kd value, given a desired RSS value
-    Args:
-        kd_estimated (float): Estimated Kd value
-        rss_desired (float): Desired RSS value
-        assoc_signal_lst (list): List of association signals to fit, each signal is a numpy array
-        assoc_time_lst (list): List of association time arrays
-        analyte_conc_lst (list): List of analyte concentrations, each element is a numpy array
-        disso_signal_lst (list): List of dissociation signals to fit, each signal is a numpy array
-        disso_time_lst (list): List of dissociation time arrays
-        initial_parameters (list): Initial guess for the parameters, without the Kd value!
-        low_bounds (list): Lower bounds for the parameters, without the Kd value!
-        high_bounds (list): Upper bounds for the parameters, without the Kd value!
-        smax_idx (list): List of indices for the s_max parameters, used if shared_smax is TRUE
-        shared_smax (bool): If True, the s_max parameters are shared between traces
-        fixed_t0 (bool): If True, t0 is fixed to 0, otherwise we fit it
-        fixed_koff (bool): If True, koff is fixed to koff_value
-        koff_value (float): Value of koff to use if fixed_koff is True
-
-    Returns:
-        kd_min95 (float): Minimum Kd value for the 95% confidence interval
-        kd_max95 (float): Maximum Kd value for the 95% confidence interval
+    Calculate the asymmetric confidence interval for the Kd value, given a desired RSS value.
+    
+    Parameters
+    ----------
+    kd_estimated : float
+        Estimated Kd value.
+    rss_desired : float
+        Desired RSS value.
+    assoc_signal_lst : list
+        List of association signals to fit, each signal is a numpy array.
+    assoc_time_lst : list
+        List of association time arrays.
+    analyte_conc_lst : list
+        List of analyte concentrations, each element is a numpy array.
+    disso_signal_lst : list
+        List of dissociation signals to fit, each signal is a numpy array.
+    disso_time_lst : list
+        List of dissociation time arrays.
+    initial_parameters : list
+        Initial guess for the parameters, without the Kd value!
+    low_bounds : list
+        Lower bounds for the parameters, without the Kd value!
+    high_bounds : list
+        Upper bounds for the parameters, without the Kd value!
+    smax_idx : list, optional
+        List of indices for the s_max parameters, used if shared_smax is True.
+    shared_smax : bool, optional
+        If True, the s_max parameters are shared between traces, default is False.
+    fixed_t0 : bool, optional
+        If True, t0 is fixed to 0, otherwise we fit it, default is True.
+    fixed_koff : bool, optional
+        If True, koff is fixed to koff_value, default is False.
+    koff_value : float, optional
+        Value of koff to use if fixed_koff is True.
+        
+    Returns
+    -------
+    float
+        Minimum Kd value for the 95% confidence interval.
+    float
+        Maximum Kd value for the 95% confidence interval.
     """
-
     boundsMax = np.array([kd_estimated*1e2, kd_estimated * 1e4]) * 1e3
 
     # Guess starting point for the upper bound
@@ -822,35 +993,52 @@ def one_site_assoc_and_disso_asymmetric_ci95(kd_estimated,rss_desired,
 
     return kd_min95, kd_max95
 
-def one_site_assoc_and_disso_asymmetric_ci95_koff(koff_estimated,rss_desired,
+def one_site_assoc_and_disso_asymmetric_ci95_koff(koff_estimated, rss_desired,
                                              assoc_signal_lst, assoc_time_lst, analyte_conc_lst,
                                              disso_signal_lst, disso_time_lst,
-                                             initial_parameters,low_bounds, high_bounds,
+                                             initial_parameters, low_bounds, high_bounds,
                                              smax_idx=None,
-                                             shared_smax = False,
-                                             fixed_t0 = True):
+                                             shared_smax=False,
+                                             fixed_t0=True):
     """
-    Calculate the asymmetric confidence interval for the koff value, given a desired RSS value
-    Args:
-        koff_estimated (float): Estimated koff value
-        rss_desired (float): Desired RSS value
-        assoc_signal_lst (list): List of association signals to fit, each signal is a numpy array
-        assoc_time_lst (list): List of association time arrays
-        analyte_conc_lst (list): List of analyte concentrations, each element is a numpy array
-        disso_signal_lst (list): List of dissociation signals to fit, each signal is a numpy array
-        disso_time_lst (list): List of dissociation time arrays
-        initial_parameters (list): Initial guess for the parameters, without the Kd value!
-        low_bounds (list): Lower bounds for the parameters, without the Kd value!
-        high_bounds (list): Upper bounds for the parameters, without the Kd value!
-        smax_idx (list): List of indices for the s_max parameters, used if shared_smax is TRUE
-        shared_smax (bool): If True, the s_max parameters are shared between traces
-        fixed_t0 (bool): If True, t0 is fixed to 0, otherwise we fit it
-
-    Returns:
-        k_min95 (float): Minimum koff value for the 95% confidence interval
-        k_max95 (float): Maximum koff value for the 95% confidence interval
+    Calculate the asymmetric confidence interval for the koff value, given a desired RSS value.
+    
+    Parameters
+    ----------
+    koff_estimated : float
+        Estimated koff value.
+    rss_desired : float
+        Desired RSS value.
+    assoc_signal_lst : list
+        List of association signals to fit, each signal is a numpy array.
+    assoc_time_lst : list
+        List of association time arrays.
+    analyte_conc_lst : list
+        List of analyte concentrations, each element is a numpy array.
+    disso_signal_lst : list
+        List of dissociation signals to fit, each signal is a numpy array.
+    disso_time_lst : list
+        List of dissociation time arrays.
+    initial_parameters : list
+        Initial guess for the parameters, without the Kd value!
+    low_bounds : list
+        Lower bounds for the parameters, without the Kd value!
+    high_bounds : list
+        Upper bounds for the parameters, without the Kd value!
+    smax_idx : list, optional
+        List of indices for the s_max parameters, used if shared_smax is TRUE
+    shared_smax : bool, optional
+        If True, the s_max parameters are shared between traces
+    fixed_t0 : bool, optional
+        If True, t0 is fixed to 0, otherwise we fit it, default is True
+        
+    Returns
+    -------
+    float
+        Minimum koff value for the 95% confidence interval.
+    float
+        Maximum koff value for the 95% confidence interval.
     """
-
     boundsMax = np.array([koff_estimated*1e2, koff_estimated * 1e4]) * 1e3
 
     # Guess starting point for the upper bound

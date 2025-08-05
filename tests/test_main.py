@@ -59,6 +59,22 @@ def test_remove_experiment():
 
     assert len(pyKinetics.experiments) == 0
 
+def test_generate_fittings_a():
+
+    pyKinetics.add_experiment(bli, 'test_octet')
+
+    pyKinetics.merge_ligand_conc_df()
+
+    # Set the Select column to False for all sensors
+    df = pyKinetics.combined_ligand_conc_df.copy()
+    df['Select'] = False
+
+    pyKinetics.generate_fittings(df)
+
+    # check that no fittings were generated
+    assert len(pyKinetics.fittings) == 0, "No fittings should be generated when all sensors are deselected."
+
+
 def test_generate_fittings():
 
     bli.align_association(bli.sensor_names)

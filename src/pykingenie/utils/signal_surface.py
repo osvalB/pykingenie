@@ -31,46 +31,60 @@ __all__ = [
     'solve_ode_mixture_analyte_dissociation'
 ]
 
-def steady_state_one_site(C,Rmax,Kd):
-
+def steady_state_one_site(C, Rmax, Kd):
     """
-    Calculate the steady state signal for a given concentration of ligand
-    If the concentration is zero, the signal is zero
-    If the concentration is infinite, the signal is Rmax
-    The units of Kd must match the units of C (ligand concentration)
-    Rmax depends on the amount of loaded receptor
+    Calculate the steady state signal for a given concentration of ligand.
+    
+    If the concentration is zero, the signal is zero.
+    If the concentration is infinite, the signal is Rmax.
+    The units of Kd must match the units of C (ligand concentration).
+    Rmax depends on the amount of loaded receptor.
 
-    Args:
-        C (np.ndarray): Concentration of the analyte
-        Rmax (float): Maximum response of the analyte
-        Kd (float): Equilibrium dissociation constant
-    Returns:
-        signal (np.ndarray): Steady state signal, according to the given parameters
+    Parameters
+    ----------
+    C : np.ndarray
+        Concentration of the analyte.
+    Rmax : float
+        Maximum response of the analyte.
+    Kd : float
+        Equilibrium dissociation constant.
+        
+    Returns
+    -------
+    np.ndarray
+        Steady state signal, according to the given parameters.
     """
-
     C    = np.array(C)
     Rmax = np.array(Rmax)
     signal = Rmax*C/(Kd + C)
     return signal
 
-def one_site_association_analytical(t,s0,s_max,k_off,Kd,A,t0=0):
-
+def one_site_association_analytical(t, s0, s_max, k_off, Kd, A, t0=0):
     """
-    Analytical solution for the one site association model
+    Analytical solution for the one site association model.
 
-    Args:
-        t (np.ndarray): Time variable
-        s0 (float):     Initial signal
-        s_max (float):  Maximum signal
-        k_off (float):  Dissociation rate constant
-        Kd (float):     Equilibrium dissociation constant
-        A (float): Concentration of the analyte
-        t0 (float):     Initial time offset
+    Parameters
+    ----------
+    t : np.ndarray
+        Time variable.
+    s0 : float
+        Initial signal.
+    s_max : float
+        Maximum signal.
+    k_off : float
+        Dissociation rate constant.
+    Kd : float
+        Equilibrium dissociation constant.
+    A : float
+        Concentration of the analyte.
+    t0 : float, optional
+        Initial time offset, default is 0.
 
-    Returns:
-        s_t (np.ndarray): Signal over time
+    Returns
+    -------
+    np.ndarray
+        Signal over time.
     """
-
     t = t - t0
     # Precompute constants
     rate = k_off * (A + Kd) / Kd
@@ -81,46 +95,53 @@ def one_site_association_analytical(t,s0,s_max,k_off,Kd,A,t0=0):
 
     return s_t
 
-def one_site_dissociation_analytical(t,s0,k_off,t0=0):
-
+def one_site_dissociation_analytical(t, s0, k_off, t0=0):
     """
-    Analytical solution for the one site model - dissociation phase
+    Analytical solution for the one site model - dissociation phase.
 
-    Args:
-        t (np.ndarray): Time variable
-        s0 (float):     Initial signal
-        k_off (float):  Dissociation rate constant
-        t0 (float):     Initial time offset
+    Parameters
+    ----------
+    t : np.ndarray
+        Time variable.
+    s0 : float
+        Initial signal.
+    k_off : float
+        Dissociation rate constant.
+    t0 : float, optional
+        Initial time offset, default is 0.
 
-    Returns:
-        s_t (np.ndarray): Signal over time
+    Returns
+    -------
+    np.ndarray
+        Signal over time.
     """
-
     t   = t + t0
     s_t = s0 * np.exp(-k_off*t)
 
     return s_t
 
-def ode_one_site_mass_transport_association(t,y,params,analyte_conc):
-
+def ode_one_site_mass_transport_association(t, y, params, analyte_conc):
     """
-    ODE for Mass Transport-limited binding
-
+    ODE for Mass Transport-limited binding.
+    
     See https://www.cell.com/AJHG/fulltext/S0006-3495(07)70982-7
 
-    Args:
+    Parameters
+    ----------
+    t : float
+        Time variable.
+    y : list
+        List of the state variables [s1,cs].
+    params : list
+        List of the parameters [K_d, k_off, k_tr, s_max].
+    analyte_conc : float
+        Concentration of the analyte.
 
-        t (float): Time variable.
-        y (list): List of the state variables [s1,cs]
-        params (list): List of the parameters [K_d, k_off, k_tr, s_max]
-
-    Returns:
-
-        ds1_dt (float): signal over time
-        dcs_dt (float): analyte surface concentration over time
-
+    Returns
+    -------
+    list
+        [ds1_dt, dcs_dt] representing the signal and analyte surface concentration derivatives.
     """
-
     s1, cs = y
     K_d, k_off, k_tr, s_max = params
 
@@ -133,25 +154,26 @@ def ode_one_site_mass_transport_association(t,y,params,analyte_conc):
 
     return [ds1_dt, dcs_dt]
 
-def ode_one_site_mass_transport_dissociation(t,s1,params):
-
+def ode_one_site_mass_transport_dissociation(t, s1, params):
     """
-    ODE for Mass Transport-limited binding
-
+    ODE for Mass Transport-limited binding - dissociation phase.
+    
     See Equation 7 from https://pmc.ncbi.nlm.nih.gov/articles/PMC4134667/
 
-    Args:
+    Parameters
+    ----------
+    t : float
+        Time variable.
+    s1 : float
+        The state variable representing the signal.
+    params : list
+        List of the parameters [K_d, k_off, k_tr, s_max].
 
-        t (float): Time variable.
-        y (list): List of the state variables [s1]
-        params (list): List of the parameters [K_d, k_off, k_tr, s_max]
-
-    Returns:
-
-        ds_dt (float): signal over time
-
+    Returns
+    -------
+    float
+        The derivative of signal over time.
     """
-
     K_d, k_off, k_tr, s_max = params
 
     k_on = k_off / K_d
@@ -160,25 +182,36 @@ def ode_one_site_mass_transport_dissociation(t,s1,params):
 
     return ds_dt
 
-def solve_ode_one_site_mass_transport_association(t,s1_0,cs_0,analyte_conc,K_d,k_off,k_tr,s_max,t0=0):
-
+def solve_ode_one_site_mass_transport_association(t, s1_0, cs_0, analyte_conc, K_d, k_off, k_tr, s_max, t0=0):
     """
-    Solves the ODE for the one site mass transport model - association phase
+    Solves the ODE for the one site mass transport model - association phase.
 
-    Args:
-        t (np.ndarray): Time variable
-        s1_0 (float):   Initial signal
-        cs_0 (float):   Initial analyte surface concentration
-        analyte_conc (float): Concentration of the analyte
-        K_d (float):    Equilibrium dissociation constant
-        k_off (float):  Dissociation rate constant
-        k_tr (float):   Mass transport rate constant
-        s_max (float): Maximum signal
-        t0 (float):     Initial time offset
-    Returns:
-        signal (np.ndarray): Signal overtime
+    Parameters
+    ----------
+    t : np.ndarray
+        Time variable.
+    s1_0 : float
+        Initial signal.
+    cs_0 : float
+        Initial analyte surface concentration.
+    analyte_conc : float
+        Concentration of the analyte.
+    K_d : float
+        Equilibrium dissociation constant.
+    k_off : float
+        Dissociation rate constant.
+    k_tr : float
+        Mass transport rate constant.
+    s_max : float
+        Maximum signal.
+    t0 : float, optional
+        Initial time offset, default is 0.
+        
+    Returns
+    -------
+    np.ndarray
+        Signal over time.
     """
-
     t = t + t0
 
     out = solve_ivp(ode_one_site_mass_transport_association,t_span=[np.min(t), np.max(t)],
@@ -187,23 +220,32 @@ def solve_ode_one_site_mass_transport_association(t,s1_0,cs_0,analyte_conc,K_d,k
     signal = out.y[0]
     return signal
 
-def solve_ode_one_site_mass_transport_dissociation(t,s1_0,K_d,k_off,k_tr,s_max,t0=0):
-
+def solve_ode_one_site_mass_transport_dissociation(t, s1_0, K_d, k_off, k_tr, s_max, t0=0):
     """
-    Solves the ODE for the one site mass transport model - dissociation phase
+    Solves the ODE for the one site mass transport model - dissociation phase.
 
-    Args:
-        t (np.ndarray): Time variable
-        s1_0 (float):   Initial signal
-        K_d (float):    Equilibrium dissociation constant
-        k_off (float):  Dissociation rate constant
-        k_tr (float):   Mass transport rate constant
-        s_max (float): Maximum signal
-        t0 (float):     Initial time offset
-    Returns:
-        signal (np.ndarray): Signal overtime
+    Parameters
+    ----------
+    t : np.ndarray
+        Time variable.
+    s1_0 : float
+        Initial signal.
+    K_d : float
+        Equilibrium dissociation constant.
+    k_off : float
+        Dissociation rate constant.
+    k_tr : float
+        Mass transport rate constant.
+    s_max : float
+        Maximum signal.
+    t0 : float, optional
+        Initial time offset, default is 0.
+        
+    Returns
+    -------
+    np.ndarray
+        Signal over time.
     """
-
     t = t + t0
 
     out = solve_ivp(ode_one_site_mass_transport_dissociation,t_span=[np.min(t), np.max(t)],
@@ -212,31 +254,36 @@ def solve_ode_one_site_mass_transport_dissociation(t,s1_0,K_d,k_off,k_tr,s_max,t
     signal = out.y[0]
     return signal
 
-def differential_matrix_association_induced_fit(koff,kon,kc,krev,a):
-
+def differential_matrix_association_induced_fit(koff, kon, kc, krev, a):
     """
-    Association step
-    set of differential equations for
-    -dS/dt and dS1/dt
-
+    Association step set of differential equations for the induced fit model.
+    
+    Differential equations for -dS/dt and dS1/dt where:
     S    = R([E2S] + [E1S]) ; Total signal
     S1   = R[E2S]           ; Signal produced by E2S
     Smax = R([Et])          ; Maximum signal
 
-    Note: E is here the molecule attached to the surface, S is the subtrate
+    Note: E is here the molecule attached to the surface, S is the substrate.
     The signal produced by E2S and E1S is the same.
 
-    Args:
-        koff (float): rate constant for E2S -> E2 + S
-        kon (float): rate constant for E2 + S -> E2S
-        kc (float): rate constant for E1 -> E2
-        krev (float): rate constant for E2 -> E1
-        a (float): concentration of the analyte (molecule being flown)
+    Parameters
+    ----------
+    koff : float
+        Rate constant for E2S -> E2 + S.
+    kon : float
+        Rate constant for E2 + S -> E2S.
+    kc : float
+        Rate constant for E1 -> E2.
+    krev : float
+        Rate constant for E2 -> E1.
+    a : float
+        Concentration of the analyte (molecule being flown).
 
-    Returns:
-         matrix (np.ndarray): differential matrix
+    Returns
+    -------
+    np.ndarray
+        Differential matrix.
     """
-
     row1 = [-koff - kon * a, -koff]
     row2 = [-kc, -kc - krev]
 
@@ -244,27 +291,34 @@ def differential_matrix_association_induced_fit(koff,kon,kc,krev,a):
 
     return matrix
 
-def differential_matrix_association_conformational_selection(koff,kon,kc,krev,a):
-
+def differential_matrix_association_conformational_selection(koff, kon, kc, krev, a):
     """
-    Conformational selection model
+    Conformational selection model for the association step.
+    
     E1     <-> E2
     E2 + S <-> E2S
+    
+    Set of differential equations for (d[E1]*R)/dt and d[E2S]*R/dt.
+    The signal is only given by E2S.
 
-    Association step
-    set of differential equations for
-    (d[E1]*R)/dt and d[E2S]*R/dt. The signal is only given by E2S
-
-    Args:
-        koff (float): rate constant for E2S -> E2 + S
-        kon (float): rate constant for E2 + S -> E2S
-        kc (float): rate constant for E1 -> E2
-        krev (float): rate constant for E2 -> E1
-        a (float): concentration of the analyte (molecule being flown)
-    Returns:
-        matrix (np.ndarray): differential matrix
+    Parameters
+    ----------
+    koff : float
+        Rate constant for E2S -> E2 + S.
+    kon : float
+        Rate constant for E2 + S -> E2S.
+    kc : float
+        Rate constant for E1 -> E2.
+    krev : float
+        Rate constant for E2 -> E1.
+    a : float
+        Concentration of the analyte (molecule being flown).
+        
+    Returns
+    -------
+    np.ndarray
+        Differential matrix.
     """
-
     row1 = [-kc - krev, -krev]
     row2 = [-kon*a,-kon*a - koff]
 
@@ -272,22 +326,26 @@ def differential_matrix_association_conformational_selection(koff,kon,kc,krev,a)
 
     return matrix
 
-def differential_matrix_dissociation_induced_fit(koff,kc,krev):
-
+def differential_matrix_dissociation_induced_fit(koff, kc, krev):
     """
-    Dissociation step
-    set of differential equations for
-    -ds/dt and ds1/dt
+    Dissociation step set of differential equations for the induced fit model.
+    
+    Differential equations for -ds/dt and ds1/dt.
 
-    Args:
-        koff (float): rate constant for E2S -> E2 + S
-        kc (float): rate constant for E1 -> E2
-        krev (float): rate constant for E2 -> E1
+    Parameters
+    ----------
+    koff : float
+        Rate constant for E2S -> E2 + S.
+    kc : float
+        Rate constant for E1 -> E2.
+    krev : float
+        Rate constant for E2 -> E1.
 
-    Returns:
-        matrix (np.ndarray): differential matrix
+    Returns
+    -------
+    np.ndarray
+        Differential matrix.
     """
-
     row1 = [-koff, -koff]
     row2 = [-kc, -kc - krev]
 
@@ -295,24 +353,27 @@ def differential_matrix_dissociation_induced_fit(koff,kc,krev):
 
     return matrix
 
-def differential_matrix_dissociation_conformational_selection(koff,kc,krev):
-
+def differential_matrix_dissociation_conformational_selection(koff, kc, krev):
     """
-    Dissociation step
-    set of differential equations for
-    (d[E1]*R)/dt and d[E2S]*R/dt.
+    Dissociation step set of differential equations for the conformational selection model.
+    
+    Differential equations for (d[E1]*R)/dt and d[E2S]*R/dt.
+    The signal is only proportional to E2S.
 
-    The signal is only proportional to E2S
+    Parameters
+    ----------
+    koff : float
+        Rate constant for E2S -> E2 + S.
+    kc : float
+        Rate constant for E1 -> E2.
+    krev : float
+        Rate constant for E2 -> E1.
 
-    Args:
-        koff (float): rate constant for E2S -> E2 + S
-        kc (float): rate constant for E1 -> E2
-        krev (float): rate constant for E2 -> E1
-
-    Returns:
-        matrix (np.ndarray): differential matrix
+    Returns
+    -------
+    np.ndarray
+        Differential matrix.
     """
-
     row1 = [-kc -krev, -krev]
     row2 = [0, -koff]
 
@@ -321,69 +382,97 @@ def differential_matrix_dissociation_conformational_selection(koff,kc,krev):
     return matrix
 
 def constant_vector_induced_fit(koff, a, kc):
-
     """
-    Calculate the constant vector for the induced fit model
-    Args:
-        koff (float): rate constant for E·S -> E + S
-        a (float): concentration of the analyte (molecule being flown)
-        kc (float): rate constant for E·S -> ES, induced fit step
-    Returns:
-        b_col (np.ndarray): constant vector
+    Calculate the constant vector for the induced fit model.
+    
+    Parameters
+    ----------
+    koff : float
+        Rate constant for E·S -> E + S.
+    a : float
+        Concentration of the analyte (molecule being flown).
+    kc : float
+        Rate constant for E·S -> ES, induced fit step.
+        
+    Returns
+    -------
+    np.ndarray
+        Constant vector.
     """
-
     return [koff * a, kc * a]
 
-def constant_vector_conformational_selection(kon,smax,krev,a):
-
+def constant_vector_conformational_selection(kon, smax, krev, a):
     """
-    Calculate the constant vector for the conformational selection model
-    Args:
-        kon (float): rate constant for E2 + S -> E2S
-        smax (float): signal proportional to the complex (E2S)
-        krev (float): rate constant for E2 -> E1
-        a (float): concentration of the analyte (molecule being flown)
-    Returns:
-        b_col (np.ndarray): constant vector
+    Calculate the constant vector for the conformational selection model.
+    
+    Parameters
+    ----------
+    kon : float
+        Rate constant for E2 + S -> E2S.
+    smax : float
+        Signal proportional to the complex (E2S).
+    krev : float
+        Rate constant for E2 -> E1.
+    a : float
+        Concentration of the analyte (molecule being flown).
+        
+    Returns
+    -------
+    np.ndarray
+        Constant vector.
     """
-
-    return   [krev*smax, kon*a*smax]
-
+    return [krev*smax, kon*a*smax]
 
 def solve_steady_state(A, b):
     """
-    Calculate the steady state solution of the system of equations
-    Args:
-        A (np.ndarray): differential matrix
-        b (np.ndarray): constant vector
-    Returns:
-        steady_state (np.ndarray): steady state solution
+    Calculate the steady state solution of the system of equations.
+    
+    Parameters
+    ----------
+    A : np.ndarray
+        Differential matrix.
+    b : np.ndarray
+        Constant vector.
+        
+    Returns
+    -------
+    np.ndarray
+        Steady state solution.
     """
     return -solve(A, b)
 
-def solve_induced_fit_association(time, a_conc, kon, koff, kc, krev,sP1L=0,sP2L=0,smax=0):
-
+def solve_induced_fit_association(time, a_conc, kon, koff, kc, krev, sP1L=0, sP2L=0, smax=0):
     """
-    Obtain the signal for the induced fit model (surface-based)
+    Obtain the signal for the induced fit model (surface-based).
 
-    We assume that the signal is given by the complex E·S and ES is the same
-    In other words, the complex before and after the conformational change produces the same signal
+    We assume that the signal is given by the complex E·S and ES is the same.
+    In other words, the complex before and after the conformational change produces the same signal.
 
-    Args:
+    Parameters
+    ----------
+    time : np.ndarray
+        Time array.
+    a_conc : float
+        Concentration of the analyte (molecule being flown).
+    kon : float
+        Rate constant for E + S -> E·S.
+    koff : float
+        Rate constant for E·S -> E + S.
+    kc : float
+        Rate constant for E·S -> ES.
+    krev : float
+        Rate constant for ES -> E·S.
+    sP1L : float, optional
+        Initial concentration of E·S, default is 0.
+    sP2L : float, optional
+        Initial concentration of ES, default is 0.
+    smax : float, optional
+        Signal proportional to the complex (E·S or ES), default is 0.
 
-        t (float): time
-        a_conc (float): concentration of the analyte (molecule being flown)
-        kon (float): rate constant for E + S -> E·S
-        koff (float): rate constant for E·S -> E + S
-        kc (float): rate constant for E·S -> ES
-        krev (float): rate constant for ES -> E·S
-        t0 (float): initial time
-        smax (float): signal proportional to the complex (E·S or ES)
-
-    Returns:
-
-       signal (np.ndarray): signal over time
-
+    Returns
+    -------
+    np.ndarray
+        Signal over time.
     """
     time = time - np.min(time) # Start at zero
 
@@ -410,9 +499,24 @@ def solve_induced_fit_association(time, a_conc, kon, koff, kc, krev,sP1L=0,sP2L=
     return arr
 
 def solve_all_states_fast(time, A, initial_conditions, steady_state_value):
-
     """
     Solve the system of differential equations for all time points using matrix exponentiation.
+    
+    Parameters
+    ----------
+    time : np.ndarray
+        Array of time points to solve the system for.
+    A : np.ndarray
+        Differential matrix of the system.
+    initial_conditions : np.ndarray
+        Initial conditions for the system.
+    steady_state_value : np.ndarray
+        Steady state solution of the system.
+        
+    Returns
+    -------
+    np.ndarray
+        Array of shape (len(time), len(initial_conditions)) containing the state of the system at each time point.
     """
 
     v = initial_conditions - steady_state_value
@@ -433,29 +537,37 @@ def solve_all_states_fast(time, A, initial_conditions, steady_state_value):
 
     return states
 
-def solve_conformational_selection_association(time, a_conc, kon, koff, kc, krev,smax=0,sP1=0,sP2L=0):
-
+def solve_conformational_selection_association(time, a_conc, kon, koff, kc, krev, smax=0, sP1=0, sP2L=0):
     """
-    Obtain the signal for the conformational selection model (surface-based)
+    Obtain the signal for the conformational selection model (surface-based).
 
-    We assume that the signal is given by the complex E2S only
+    We assume that the signal is given by the complex E2S only.
 
-    Args:
+    Parameters
+    ----------
+    time : np.ndarray
+        Time array.
+    a_conc : float
+        Concentration of the analyte (molecule being flown).
+    kon : float
+        Rate constant for E2 + S -> E2S.
+    koff : float
+        Rate constant for E2S -> E2 + S.
+    kc : float
+        Rate constant for E1 -> E2.
+    krev : float
+        Rate constant for E2 -> E1.
+    smax : float, optional
+        Maximum signal that the complex (E2S) can produce, default is 0.
+    sP1 : float, optional
+        Initial concentration of E1, default is 0.
+    sP2L : float, optional
+        Initial concentration of E2S, default is 0.
 
-        time (float): time
-        a_conc (float): concentration of the analyte (molecule being flown)
-        kon (float): rate constant for E2 + S -> E2S
-        koff (float): rate constant for E2S -> E2 + S
-        kc (float): rate constant for E1 -> E2
-        krev (float): rate constant for E2 -> E1
-        smax (float): maximum signal that the complex (E2S)can produce
-        sP1 (float): signal proportional to the protein in state E1
-        sP2L (float): signal proportional to the protein in state E2S
-
-    Returns:
-
-       signal (np.ndarray): signal over time
-
+    Returns
+    -------
+    np.ndarray
+        Signal over time, with columns for the signal, sP1, and sP2.
     """
 
     time = time - np.min(time) # Start at zero
@@ -478,29 +590,34 @@ def solve_conformational_selection_association(time, a_conc, kon, koff, kc, krev
 
     return arr
 
-def solve_induced_fit_dissociation(time, koff, kc, krev,s0=0,sP2L=0,smax=0):
-
+def solve_induced_fit_dissociation(time, koff, kc, krev, s0=0, sP2L=0, smax=0):
     """
-    Obtain the dissociation signal for the induced fit model (surface-based)
+    Obtain the dissociation signal for the induced fit model (surface-based).
 
-    We assume that the signal given by the complex E·S and ES is the same
-    In other words, the complex before and after the conformational change produces the same signal
+    We assume that the signal given by the complex E·S and ES is the same.
+    In other words, the complex before and after the conformational change produces the same signal.
 
-    Args:
+    Parameters
+    ----------
+    time : np.ndarray
+        Time array.
+    koff : float
+        Rate constant for E·S -> E + S.
+    kc : float
+        Rate constant for E·S -> ES.
+    krev : float
+        Rate constant for ES -> E·S.
+    s0 : float, optional
+        Initial signal, default is 0.
+    sP2L : float, optional
+        Initial concentration of ES, default is 0.
+    smax : float, optional
+        Signal proportional to the complex (E·S or ES), default is 0.
 
-        t (float): time
-        koff (float): rate constant for E·S -> E + S
-        kc (float): rate constant for E·S -> ES
-        krev (float): rate constant for ES -> E·S
-        t0 (float): initial time
-        s0 (float): initial signal
-        sP2L (float): signal proportional to the complex ES (NOT the sum of E·S and ES)
-        smax (float): signal proportional to the complex (E·S or ES)
-
-    Returns:
-
-       signal (np.ndarray): signal over time
-
+    Returns
+    -------
+    np.ndarray
+        Signal over time, with columns for total signal, signal produced by E·S, and signal produced by ES.
     """
     time = time - np.min(time) # Start at zero
 
@@ -522,25 +639,33 @@ def solve_induced_fit_dissociation(time, koff, kc, krev,s0=0,sP2L=0,smax=0):
 
     return arr
 
-def solve_conformational_selection_dissociation(time, koff, kc, krev,smax=0,sP1=0,sP2L=0):
-
+def solve_conformational_selection_dissociation(time, koff, kc, krev, smax=0, sP1=0, sP2L=0):
     """
-    Obtain the signal for the conformational selection model (surface-based)
+    Obtain the signal for the conformational selection model (surface-based) during dissociation.
 
-    We assume that the signal is given by the complex E2S only
+    We assume that the signal is given by the complex E2S only.
 
-    Args:
+    Parameters
+    ----------
+    time : np.ndarray
+        Time array.
+    koff : float
+        Rate constant for E2S -> E2 + S.
+    kc : float
+        Rate constant for E1 -> E2.
+    krev : float
+        Rate constant for E2 -> E1.
+    smax : float, optional
+        Signal proportional to the complex (E2S), default is 0.
+    sP1 : float, optional
+        Initial concentration of E1, default is 0.
+    sP2L : float, optional
+        Initial concentration of E2S, default is 0.
 
-        time (float): time
-        koff (float): rate constant for E2S -> E2 + S
-        kc (float): rate constant for E1 -> E2
-        krev (float): rate constant for E2 -> E1
-        smax (float): signal proportional to the complex (E2S)
-
-    Returns:
-
-       signal (np.ndarray): signal over time
-
+    Returns
+    -------
+    np.ndarray
+        Array with columns for signal (produced by E2S), sP1 (E1 concentration), and sP2 (E2 concentration).
     """
 
     time = time - np.min(time) # Start at zero
@@ -564,8 +689,7 @@ def solve_conformational_selection_dissociation(time, koff, kc, krev,smax=0,sP1=
 
     return arr
 
-def ode_mixture_analyte_association(t,Ris,C_TOT,Fis,Ris_max,koffs,Kds):
-
+def ode_mixture_analyte_association(t, Ris, C_TOT, Fis, Ris_max, koffs, Kds):
     """
     We assume a Langmuir 1:1 interaction between each analyte (Ai) and the ligand (L):
 
@@ -578,19 +702,27 @@ def ode_mixture_analyte_association(t,Ris,C_TOT,Fis,Ris_max,koffs,Kds):
     The parameters to fit are the factor weights (Fis), the maximum response of each analyte (Ris_max),
     the dissociation rate constants (koffs), and the equilibrium dissociation constants (Kds)
 
-    Args:
+    Parameters
+    ----------
+    t : np.ndarray
+        Time variable.
+    Ris : list
+        Response of each analyte.
+    C_TOT : float
+        Total concentration of the analyte mixture.
+    Fis : np.ndarray
+        Factor weights.
+    Ris_max : np.ndarray
+        Maximum response of each analyte.
+    koffs : np.ndarray
+        Dissociation rate constants.
+    Kds : np.ndarray
+        Equilibrium dissociation constants.
 
-        t (np.ndarray):         Time variable
-        Ris (list):             Response of each analyte
-        C_TOT (float):          Total concentration of the analyte mixture
-        Fi (np.ndarray):        Factor weights
-        Ris_max (np.ndarray):   Maximum response of each analyte
-        koffs (np.ndarray):     Dissociation rate constants
-        Kds (np.ndarray):       Equilibrium dissociation constants
-
-    Returns:
-        dRis (np.ndarray):     Rate of change of the response of each analyte
-
+    Returns
+    -------
+    np.ndarray
+        Rate of change of the response of each analyte.
     """
 
     kons = koffs / Kds
@@ -601,33 +733,43 @@ def ode_mixture_analyte_association(t,Ris,C_TOT,Fis,Ris_max,koffs,Kds):
 
     return dRis
 
-def solve_ode_mixture_analyte_association(t,Ris0,C_TOT,Fis,Ris_max,koffs,Kds,t0=0):
-
+def solve_ode_mixture_analyte_association(t, Ris0, C_TOT, Fis, Ris_max, koffs, Kds, t0=0):
     """
     Solves the ODE for the mixture analyte model - association phase
-    Args:
-        t (np.ndarray): Time variable
-        Ris0 (list):    Initial response of each analyte
-        C_TOT (float):  Total concentration of the analyte mixture
-        Fis (np.ndarray): Factor weights
-        Ris_max (np.ndarray): Maximum response of each analyte
-        koffs (np.ndarray): Dissociation rate constants
-        Kds (np.ndarray): Equilibrium dissociation constants
-        t0 (float):     Initial time offset
 
-    Returns:
-        out.y (np.ndarray): Response of EACH ANALYTE over time
+    Parameters
+    ----------
+    t : np.ndarray
+        Time variable.
+    Ris0 : list
+        Initial response of each analyte.
+    C_TOT : float
+        Total concentration of the analyte mixture.
+    Fis : np.ndarray
+        Factor weights.
+    Ris_max : np.ndarray
+        Maximum response of each analyte.
+    koffs : np.ndarray
+        Dissociation rate constants.
+    Kds : np.ndarray
+        Equilibrium dissociation constants.
+    t0 : float, optional
+        Initial time offset, default is 0.
+
+    Returns
+    -------
+    np.ndarray
+        Response of EACH ANALYTE over time.
     """
 
     t = t + t0
 
-    out = solve_ivp(ode_mixture_analyte_association,t_span=[np.min(t), np.max(t)],
-                    t_eval=t,y0=Ris0,args=(C_TOT,Fis,Ris_max,koffs,Kds),method="LSODA")
+    out = solve_ivp(ode_mixture_analyte_association, t_span=[np.min(t), np.max(t)],
+                    t_eval=t, y0=Ris0, args=(C_TOT, Fis, Ris_max, koffs, Kds), method="LSODA")
 
     return out.y
 
-def ode_mixture_analyte_dissociation(t,Ris,koffs):
-
+def ode_mixture_analyte_dissociation(t, Ris, koffs):
     """
     We assume a Langmuir 1:1 interaction between each analyte (Ai) and the ligand (L):
 
@@ -639,37 +781,49 @@ def ode_mixture_analyte_dissociation(t,Ris,koffs):
 
     The parameters to fit are the dissociation rate constants (koffs)
 
-    Args:
+    Parameters
+    ----------
+    t : np.ndarray
+        Time variable.
+    Ris : list
+        Response of each analyte.
+    koffs : np.ndarray
+        Dissociation rate constants.
 
-        t (np.ndarray):         Time variable
-        Ris (list):             Response of each analyte
-        koffs (np.ndarray):     Dissociation rate constants
-
-    Returns:
-        dRis_dt (np.ndarray):     Rate of change of the response of each analyte
+    Returns
+    -------
+    np.ndarray
+        Rate of change of the response of each analyte.
     """
 
     dRis_dt = - koffs * Ris
 
     return dRis_dt
 
-def solve_ode_mixture_analyte_dissociation(t,Ris0,koffs,t0=0):
-
+def solve_ode_mixture_analyte_dissociation(t, Ris0, koffs, t0=0):
     """
     Solves the ODE for the mixture analyte model - dissociation phase
-    Args:
-        t (np.ndarray): Time variable
-        Ris0 (list):    Initial response of each analyte
-        koffs (np.ndarray): Dissociation rate constants
-        t0 (float):     Initial time offset
 
-    Returns:
-        out.y (np.ndarray): Response of EACH ANALYTE over time
+    Parameters
+    ----------
+    t : np.ndarray
+        Time variable.
+    Ris0 : list
+        Initial response of each analyte.
+    koffs : np.ndarray
+        Dissociation rate constants.
+    t0 : float, optional
+        Initial time offset, default is 0.
+
+    Returns
+    -------
+    np.ndarray
+        Response of EACH ANALYTE over time.
     """
 
     t = t + t0
 
-    out = solve_ivp(ode_mixture_analyte_dissociation,t_span=[np.min(t), np.max(t)],
-                    t_eval=t,y0=Ris0,args=(koffs,),method="LSODA")
+    out = solve_ivp(ode_mixture_analyte_dissociation, t_span=[np.min(t), np.max(t)],
+                    t_eval=t, y0=Ris0, args=(koffs,), method="LSODA")
 
     return out.y

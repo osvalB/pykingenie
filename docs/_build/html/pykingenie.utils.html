@@ -134,6 +134,34 @@
   </a>
 </li>
 
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="#">
+    pykingenie.utils package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="#">
+    pykingenie.utils package
+  </a>
+</li>
+
   </ul>
 </nav></div>
       
@@ -226,6 +254,34 @@
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="modules.html">
     pykingenie
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="#">
+    pykingenie.utils package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="#">
+    pykingenie.utils package
   </a>
 </li>
 
@@ -387,6 +443,73 @@
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="pykingenie.utils.fitting_general.re_fit">
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.fitting_general.</span></span><span class="sig-name descname"><span class="pre">re_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_vals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_fx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">low_bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">high_bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">times</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/fitting_general.html#re_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.fitting_general.re_fit" title="Link to this definition">#</a></dt>
+<dd><p>Evaluate the difference between the fitted parameters and the initial parameters
+If the difference is less than 2 percent, the bounds are relaxed by a factor of 10
+and the fitting is repeated</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fit</strong> (<em>list</em>) – Fitted parameters</p></li>
+<li><p><strong>cov</strong> (<em>np.ndarray</em>) – Covariance matrix of the fitted parameters</p></li>
+<li><p><strong>fit_vals</strong> (<em>list</em>) – Fitted values for each signal, same dimensions as signal_lst</p></li>
+<li><p><strong>fit_fx</strong> (<em>function</em>) – Function to fit the data - returns fit, cov, fit_vals</p></li>
+<li><p><strong>low_bounds</strong> (<em>list</em>) – Lower bounds for the parameters</p></li>
+<li><p><strong>high_bounds</strong> (<em>list</em>) – Upper bounds for the parameters</p></li>
+<li><p><strong>times</strong> (<em>int</em>) – Number of times to re-fit the data</p></li>
+<li><p><strong>**kwargs</strong> – Additional arguments to pass to the fitting function</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Fitted parameters after re-fitting
+cov (np.ndarray): Covariance matrix of the fitted parameters after re-fitting
+fit_vals (list): Fitted values for each signal after re-fitting, same dimensions as signal_lst
+low_bounds (list): Lower bounds for the parameters after re-fitting
+high_bounds (list): Upper bounds for the parameters after re-fitting</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>fit (list)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pykingenie.utils.fitting_general.re_fit_2">
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.fitting_general.</span></span><span class="sig-name descname"><span class="pre">re_fit_2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_vals_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_vals_b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_fx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">low_bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">high_bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">times</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/fitting_general.html#re_fit_2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.fitting_general.re_fit_2" title="Link to this definition">#</a></dt>
+<dd><p>Evaluate the difference between the fitted parameters and the initial parameters
+If the difference is less than 2 percent, the bounds are relaxed by a factor of 10
+and the fitting is repeated.
+The difference with re_fit() is that this function is used for fitting two signals at once,
+e.g. fitting association and dissociation signals simultaneously.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fit</strong> (<em>list</em>) – Fitted parameters</p></li>
+<li><p><strong>cov</strong> (<em>np.ndarray</em>) – Covariance matrix of the fitted parameters</p></li>
+<li><p><strong>fit_vals_a</strong> (<em>list</em>) – Fitted values for each signal, same dimensions as signal_lst</p></li>
+<li><p><strong>fit_vals_b</strong> (<em>list</em>) – Fitted values for each signal, same dimensions as signal_lst</p></li>
+<li><p><strong>fit_fx</strong> (<em>function</em>) – Function to fit the data - returns fit, cov, fit_vals_a, fit_vals_b</p></li>
+<li><p><strong>low_bounds</strong> (<em>list</em>) – Lower bounds for the parameters</p></li>
+<li><p><strong>high_bounds</strong> (<em>list</em>) – Upper bounds for the parameters</p></li>
+<li><p><strong>times</strong> (<em>int</em>) – Number of times to re-fit the data</p></li>
+<li><p><strong>**kwargs</strong> – Additional arguments to pass to the fitting function</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Fitted parameters after re-fitting
+cov (np.ndarray): Covariance matrix of the fitted parameters after re-fitting
+fit_vals (list): Fitted values for each signal after re-fitting, same dimensions as signal_lst
+low_bounds (list): Lower bounds for the parameters after re-fitting
+high_bounds (list): Upper bounds for the parameters after re-fitting</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>fit (list)</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="module-pykingenie.utils.fitting_solution">
 <span id="pykingenie-utils-fitting-solution-module"></span><h2>pykingenie.utils.fitting_solution module<a class="headerlink" href="#module-pykingenie.utils.fitting_solution" title="Link to this heading">#</a></h2>
@@ -478,7 +601,7 @@ t0_2         if not fixed_t0                             (initial time point for
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pykingenie.utils.fitting_solution.find_initial_parameters_induced_fit_solution">
-<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.fitting_solution.</span></span><span class="sig-name descname"><span class="pre">find_initial_parameters_induced_fit_solution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ligand_conc_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protein_conc_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_signal_E</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_signal_S</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_signal_ES</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ESint_equals_ES</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/fitting_solution.html#find_initial_parameters_induced_fit_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.fitting_solution.find_initial_parameters_induced_fit_solution" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.fitting_solution.</span></span><span class="sig-name descname"><span class="pre">find_initial_parameters_induced_fit_solution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ligand_conc_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protein_conc_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_signal_E</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_signal_S</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_signal_ES</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ESint_equals_ES</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">np_linspace_low</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">np_linspace_high</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">np_linspace_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/fitting_solution.html#find_initial_parameters_induced_fit_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.fitting_solution.find_initial_parameters_induced_fit_solution" title="Link to this definition">#</a></dt>
 <dd><p>Heuristic algorithm to find initial parameters for the global fit to association and dissociation traces - one-to-one binding model with induced fit
 We explore a range of fixed kc and krev values, and fit kon and koff.
 This function is used to find the initial parameters for the fit_induced_fit_solution function.</p>
@@ -830,6 +953,11 @@ k_max95 (float): Maximum koff value for the 95% confidence interval</p>
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="pykingenie.utils.fitting_surface.get_smax_upper_bound_factor">
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.fitting_surface.</span></span><span class="sig-name descname"><span class="pre">get_smax_upper_bound_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Kd_ss</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/fitting_surface.html#get_smax_upper_bound_factor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.fitting_surface.get_smax_upper_bound_factor" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
 </section>
 <section id="module-pykingenie.utils.math">
 <span id="pykingenie-utils-math-module"></span><h2>pykingenie.utils.math module<a class="headerlink" href="#module-pykingenie.utils.math" title="Link to this heading">#</a></h2>
@@ -969,7 +1097,7 @@ find the residual sum of squares required for a 1-alpha confidence interval</p>
 <span id="pykingenie-utils-plotting-module"></span><h2>pykingenie.utils.plotting module<a class="headerlink" href="#module-pykingenie.utils.plotting" title="Link to this heading">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="pykingenie.utils.plotting.config_fig">
-<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.plotting.</span></span><span class="sig-name descname"><span class="pre">config_fig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_for_download</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">autosize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/plotting.html#config_fig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.plotting.config_fig" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.plotting.</span></span><span class="sig-name descname"><span class="pre">config_fig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_for_download</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/plotting.html#config_fig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.plotting.config_fig" title="Link to this definition">#</a></dt>
 <dd><p>Configure Plotly figure size and optionally save to file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -995,16 +1123,31 @@ find the residual sum of squares required for a 1-alpha confidence interval</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pykingenie.utils.plotting.plot_plate_info">
 <span class="sig-prename descclassname"><span class="pre">pykingenie.utils.plotting.</span></span><span class="sig-name descname"><span class="pre">plot_plate_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pyKinetics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">experiment_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">18</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/plotting.html#plot_plate_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.plotting.plot_plate_info" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Plot the plate layout information from a KineticsAnalyzer experiment.
+:param pyKinetics: The KineticsAnalyzer instance containing the experiment data.
+:type pyKinetics: KineticsAnalyzer
+:param experiment_name: The name of the experiment to plot.
+:type experiment_name: str
+:param font_size: Font size for the plot.
+:type font_size: int</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A Plotly figure containing the plate layout.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>go.Figure</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pykingenie.utils.plotting.plot_traces">
-<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.plotting.</span></span><span class="sig-name descname"><span class="pre">plot_traces</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legends</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">18</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_grid_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_grid_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertical_lines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/plotting.html#plot_traces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.plotting.plot_traces" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.plotting.</span></span><span class="sig-name descname"><span class="pre">plot_traces</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legends</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/plotting.html#plot_traces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.plotting.plot_traces" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pykingenie.utils.plotting.plot_traces_all">
-<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.plotting.</span></span><span class="sig-name descname"><span class="pre">plot_traces_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pyKinetics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legends_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'png'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">18</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_grid_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_grid_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertical_lines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/plotting.html#plot_traces_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.plotting.plot_traces_all" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.plotting.</span></span><span class="sig-name descname"><span class="pre">plot_traces_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pyKinetics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legends_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'png'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">18</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_grid_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_grid_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertical_spacing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.08</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/plotting.html#plot_traces_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.plotting.plot_traces_all" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -1014,7 +1157,7 @@ find the residual sum of squares required for a 1-alpha confidence interval</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pykingenie.utils.plotting.plot_association_dissociation">
-<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.plotting.</span></span><span class="sig-name descname"><span class="pre">plot_association_dissociation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pyKinetics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">26</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'png'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_grid_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_grid_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_by_smax_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_points_per_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smooth_curves_fit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rolling_window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/plotting.html#plot_association_dissociation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.plotting.plot_association_dissociation" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.plotting.</span></span><span class="sig-name descname"><span class="pre">plot_association_dissociation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pyKinetics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">26</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'png'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_grid_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_grid_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_by_smax_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_points_per_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smooth_curves_fit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rolling_window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertical_spacing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.08</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/plotting.html#plot_association_dissociation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.plotting.plot_association_dissociation" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 </section>
@@ -1260,6 +1403,20 @@ according to the IDs. In this case: [1,1,1,1,1,3,3]</p>
 :type use_log_scale: bool</p>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="pykingenie.utils.processing.if_string_to_list">
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.processing.</span></span><span class="sig-name descname"><span class="pre">if_string_to_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string_or_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/processing.html#if_string_to_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.processing.if_string_to_list" title="Link to this definition">#</a></dt>
+<dd><p>Check if input is a string and convert it to a list
+Otherwise, return the input as is
+:param string_or_list: Input string or list
+:type string_or_list: str or list</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pykingenie.utils.processing.find_index_of_previous_step_type">
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.processing.</span></span><span class="sig-name descname"><span class="pre">find_index_of_previous_step_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/processing.html#find_index_of_previous_step_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.processing.find_index_of_previous_step_type" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
 </section>
 <section id="module-pykingenie.utils.signal_solution">
 <span id="pykingenie-utils-signal-solution-module"></span><h2>pykingenie.utils.signal_solution module<a class="headerlink" href="#module-pykingenie.utils.signal_solution" title="Link to this heading">#</a></h2>
@@ -1341,49 +1498,7 @@ Assumes that the initial concentration of the complex is zero</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pykingenie.utils.signal_solution.ode_induced_fit_insolution">
-<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_solution.</span></span><span class="sig-name descname"><span class="pre">ode_induced_fit_insolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_minus1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_minus2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_solution.html#ode_induced_fit_insolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_solution.ode_induced_fit_insolution" title="Link to this definition">#</a></dt>
-<dd><p>Species:</p>
-<blockquote>
-<div><p>E: Free enzyme
-S: Free substrate
-E·S: Intermediate complex
-ES: Induced Enzyme-substrate complex</p>
-</div></blockquote>
-<p>ODE for the induced fit model:</p>
-<blockquote>
-<div><p>E + S &lt;-&gt; E·S (initial binding)
-E·S   &lt;-&gt; ES (induced fit)</p>
-</div></blockquote>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>t</strong> (<em>float</em>) – time</p></li>
-<li><p><strong>y</strong> (<em>list</em>) – concentrations of E, S, E·S, and ES</p></li>
-<li><p><strong>k1</strong> (<em>float</em>) – rate constant for E + S -&gt; E·S</p></li>
-<li><p><strong>k_minus1</strong> (<em>float</em>) – rate constant for E·S -&gt; E + S</p></li>
-<li><p><strong>k2</strong> (<em>float</em>) – rate constant for E·S -&gt; ES</p></li>
-<li><p><strong>k_minus2</strong> (<em>float</em>) – rate constant for ES -&gt; E·S</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>concentration of E, S, E·S, and ES</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>[dE, dS, dE_S, dES] (list)</p>
-</dd>
-</dl>
-<p>Example values taken from Fabian Paul ,Thomas R. Weikl, 2016:</p>
-<blockquote>
-<div><p>k+ = 100 / (μM*s)  k+ equals k1       in our notation
-k− = 100 / s       k- equals k_minus1 in our notation
-ke = 10 / s        k+ equals k2       in our notation
-kr = 1 /s          k+ equals k_minus2 in our notation</p>
-</div></blockquote>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pykingenie.utils.signal_solution.ode_induced_fit_insolution_reduced">
-<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_solution.</span></span><span class="sig-name descname"><span class="pre">ode_induced_fit_insolution_reduced</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_minus1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_minus2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">E_tot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S_tot</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_solution.html#ode_induced_fit_insolution_reduced"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_solution.ode_induced_fit_insolution_reduced" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_solution.</span></span><span class="sig-name descname"><span class="pre">ode_induced_fit_insolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_minus1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_minus2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">E_tot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S_tot</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_solution.html#ode_induced_fit_insolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_solution.ode_induced_fit_insolution" title="Link to this definition">#</a></dt>
 <dd><p>Reduced ODEs for induced fit model using conservation of E and S.
 y: [E_S, ES]
 :param t: time
@@ -1413,113 +1528,73 @@ y: [E_S, ES]
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="pykingenie.utils.signal_solution.solve_ode_induced_fit_insolution_reduced">
-<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_solution.</span></span><span class="sig-name descname"><span class="pre">solve_ode_induced_fit_insolution_reduced</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_minus1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_minus2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">E_tot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S_tot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_solution.html#solve_ode_induced_fit_insolution_reduced"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_solution.solve_ode_induced_fit_insolution_reduced" title="Link to this definition">#</a></dt>
-<dd><p>Solve the reduced ODE for the induced fit model in solution.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>t</strong> (<em>np.ndarray</em>) – time points to calculate the complex concentration</p></li>
-<li><p><strong>y0</strong> (<em>list</em>) – initial concentrations of E·S and ES</p></li>
-<li><p><strong>k1</strong> (<em>float</em>) – rate constant for E + S -&gt; E·S</p></li>
-<li><p><strong>k_minus1</strong> (<em>float</em>) – rate constant for E·S -&gt; E + S</p></li>
-<li><p><strong>k2</strong> (<em>float</em>) – rate constant for E·S -&gt; ES</p></li>
-<li><p><strong>k_minus2</strong> (<em>float</em>) – rate constant for ES -&gt; E·S</p></li>
-<li><p><strong>E_tot</strong> (<em>float</em>) – total concentration of the enzyme</p></li>
-<li><p><strong>S_tot</strong> (<em>float</em>) – total concentration of the substrate</p></li>
-<li><p><strong>t0</strong> (<em>float</em>) – initial time</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>solution of the ODE, contains the concentration of E·S and ES</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>out.y (list)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="pykingenie.utils.signal_solution.solve_ode_induced_fit_insolution">
-<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_solution.</span></span><span class="sig-name descname"><span class="pre">solve_ode_induced_fit_insolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t_span</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_minus1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_minus2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_solution.html#solve_ode_induced_fit_insolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_solution.solve_ode_induced_fit_insolution" title="Link to this definition">#</a></dt>
-<dd><p>Solve the ODE for the induced fit model (no product)</p>
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_solution.</span></span><span class="sig-name descname"><span class="pre">solve_ode_induced_fit_insolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_minus1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_minus2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">E_tot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S_tot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_solution.html#solve_ode_induced_fit_insolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_solution.solve_ode_induced_fit_insolution" title="Link to this definition">#</a></dt>
+<dd><p>Solve the reduced ODE for the induced fit model in solution.
+:param t: time points to calculate the complex concentration
+:type t: np.ndarray
+:param y0: initial concentrations of E·S and ES
+:type y0: list
+:param k1: rate constant for E + S -&gt; E·S
+:type k1: float
+:param k_minus1: rate constant for E·S -&gt; E + S
+:type k_minus1: float
+:param k2: rate constant for E·S -&gt; ES
+:type k2: float
+:param k_minus2: rate constant for ES -&gt; E·S
+:type k_minus2: float
+:param E_tot: total concentration of the enzyme
+:type E_tot: float
+:param S_tot: total concentration of the substrate
+:type S_tot: float
+:param t0: initial time
+:type t0: float</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>t_span</strong> (<em>np.ndarray</em>) – time span for the simulation</p></li>
-<li><p><strong>y0</strong> (<em>list</em>) – initial concentrations of E, S, E·S, and ES</p></li>
-<li><p><strong>k1</strong> (<em>float</em>) – rate constant for E + S -&gt; E·S</p></li>
-<li><p><strong>k_minus1</strong> (<em>float</em>) – rate constant for E·S -&gt; E + S</p></li>
-<li><p><strong>k2</strong> (<em>float</em>) – rate constant for E·S -&gt; ES</p></li>
-<li><p><strong>k_minus2</strong> (<em>float</em>) – rate constant for ES -&gt; E·S</p></li>
-<li><p><strong>t0</strong> (<em>float</em>) – initial time</p></li>
-</ul>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>solution of the ODE, contains the concentration of E·S and ES</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>solution of the ODE, contains the concentration of E, S, E_S, ES</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>out.y (list)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pykingenie.utils.signal_solution.signal_ode_induced_fit_insolution_reduced">
-<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_solution.</span></span><span class="sig-name descname"><span class="pre">signal_ode_induced_fit_insolution_reduced</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_minus1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_minus2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">E_tot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S_tot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_E</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_S</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_ES_int</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_ES</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_solution.html#signal_ode_induced_fit_insolution_reduced"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_solution.signal_ode_induced_fit_insolution_reduced" title="Link to this definition">#</a></dt>
-<dd><p>Solve the reduced ODE for the induced fit model and compute the signal</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>t</strong> (<em>np.ndarray</em>) – time</p></li>
-<li><p><strong>y</strong> (<em>list</em>) – concentrations of E·S and ES</p></li>
-<li><p><strong>k1</strong> (<em>float</em>) – rate constant for E + S -&gt; E·S</p></li>
-<li><p><strong>k_minus1</strong> (<em>float</em>) – rate constant for E·S -&gt; E + S</p></li>
-<li><p><strong>k2</strong> (<em>float</em>) – rate constant for E·S -&gt; ES</p></li>
-<li><p><strong>k_minus2</strong> (<em>float</em>) – rate constant for ES -&gt; E·S</p></li>
-<li><p><strong>E_tot</strong> (<em>float</em>) – total concentration of the enzyme</p></li>
-<li><p><strong>S_tot</strong> (<em>float</em>) – total concentration of the substrate</p></li>
-<li><p><strong>t0</strong> (<em>float</em>) – initial time</p></li>
-<li><p><strong>signal_E</strong> (<em>float</em>) – signal for E</p></li>
-<li><p><strong>signal_S</strong> (<em>float</em>) – signal for S</p></li>
-<li><p><strong>signal_ES_int</strong> (<em>float</em>) – signal for E·S</p></li>
-<li><p><strong>signal_ES</strong> (<em>float</em>) – signal for ES</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>signal over time</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>signal (np.ndarray)</p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>out.y (list)</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pykingenie.utils.signal_solution.signal_ode_induced_fit_insolution">
-<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_solution.</span></span><span class="sig-name descname"><span class="pre">signal_ode_induced_fit_insolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_minus1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_minus2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_E</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_S</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_ES_int</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_ES</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_solution.html#signal_ode_induced_fit_insolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_solution.signal_ode_induced_fit_insolution" title="Link to this definition">#</a></dt>
-<dd><p>Solve the ODE for the induced fit model and compute the signal</p>
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_solution.</span></span><span class="sig-name descname"><span class="pre">signal_ode_induced_fit_insolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_minus1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_minus2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">E_tot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S_tot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_E</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_S</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_ES_int</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_ES</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_solution.html#signal_ode_induced_fit_insolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_solution.signal_ode_induced_fit_insolution" title="Link to this definition">#</a></dt>
+<dd><p>Solve the reduced ODE for the induced fit model and compute the signal
+:param t: time
+:type t: np.ndarray
+:param y: concentrations of E·S and ES
+:type y: list
+:param k1: rate constant for E + S -&gt; E·S
+:type k1: float
+:param k_minus1: rate constant for E·S -&gt; E + S
+:type k_minus1: float
+:param k2: rate constant for E·S -&gt; ES
+:type k2: float
+:param k_minus2: rate constant for ES -&gt; E·S
+:type k_minus2: float
+:param E_tot: total concentration of the enzyme
+:type E_tot: float
+:param S_tot: total concentration of the substrate
+:type S_tot: float
+:param t0: initial time
+:type t0: float
+:param signal_E: signal for E
+:type signal_E: float
+:param signal_S: signal for S
+:type signal_S: float
+:param signal_ES_int: signal for E·S
+:type signal_ES_int: float
+:param signal_ES: signal for ES
+:type signal_ES: float</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>t</strong> (<em>np.ndarray</em>) – time</p></li>
-<li><p><strong>y</strong> (<em>list</em>) – concentrations of E, S, E·S, and ES</p></li>
-<li><p><strong>k1</strong> (<em>float</em>) – rate constant for E + S -&gt; E·S</p></li>
-<li><p><strong>k_minus1</strong> (<em>float</em>) – rate constant for E·S -&gt; E + S</p></li>
-<li><p><strong>k2</strong> (<em>float</em>) – rate constant for E·S -&gt; ES</p></li>
-<li><p><strong>k_minus2</strong> (<em>float</em>) – rate constant for ES -&gt; E·S</p></li>
-<li><p><strong>t0</strong> (<em>float</em>) – initial time</p></li>
-<li><p><strong>signal_E</strong> (<em>float</em>) – signal for E</p></li>
-<li><p><strong>signal_S</strong> (<em>float</em>) – signal for S</p></li>
-<li><p><strong>signal_ES_int</strong> (<em>float</em>) – signal for E·S</p></li>
-<li><p><strong>signal_ES</strong> (<em>float</em>) – signal for ES</p></li>
-</ul>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>signal over time</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>signal over time</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>signal (np.ndarray)</p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>signal (np.ndarray)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2013,31 +2088,6 @@ set of differential equations for
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="pykingenie.utils.signal_surface.solve_state_t">
-<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_surface.</span></span><span class="sig-name descname"><span class="pre">solve_state_t</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_conditions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steady_state_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_surface.html#solve_state_t"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_surface.solve_state_t" title="Link to this definition">#</a></dt>
-<dd><p>solve x(t) = x* + exp(At)(x0 - x*)
-x(t) is the system state at time t
-x*   is the steady state solution
-x0   is the initial state</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>time</strong> (<em>float</em>) – time</p></li>
-<li><p><strong>A</strong> (<em>np.ndarray</em>) – differential matrix</p></li>
-<li><p><strong>initial_conditions</strong> (<em>np.ndarray</em>) – initial conditions</p></li>
-<li><p><strong>steady_state_value</strong> (<em>np.ndarray</em>) – steady state values</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>state at time t</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>state (np.ndarray)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="pykingenie.utils.signal_surface.solve_steady_state">
 <span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_surface.</span></span><span class="sig-name descname"><span class="pre">solve_steady_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_surface.html#solve_steady_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_surface.solve_steady_state" title="Link to this definition">#</a></dt>
 <dd><p>Calculate the steady state solution of the system of equations
@@ -2053,6 +2103,12 @@ x0   is the initial state</p>
 <dd class="field-even"><p>steady_state (np.ndarray)</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pykingenie.utils.signal_surface.solve_all_states_fast">
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_surface.</span></span><span class="sig-name descname"><span class="pre">solve_all_states_fast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_conditions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steady_state_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_surface.html#solve_all_states_fast"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_surface.solve_all_states_fast" title="Link to this definition">#</a></dt>
+<dd><p>Solve the system of differential equations for all time points using matrix exponentiation.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -2084,12 +2140,6 @@ In other words, the complex before and after the conformational change produces 
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="pykingenie.utils.signal_surface.solve_all_states_fast">
-<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_surface.</span></span><span class="sig-name descname"><span class="pre">solve_all_states_fast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_conditions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steady_state_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_surface.html#solve_all_states_fast"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_surface.solve_all_states_fast" title="Link to this definition">#</a></dt>
-<dd><p>Solve the system of differential equations for all time points using matrix exponentiation.</p>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="pykingenie.utils.signal_surface.solve_conformational_selection_association">
 <span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_surface.</span></span><span class="sig-name descname"><span class="pre">solve_conformational_selection_association</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_conc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">koff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">krev</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sP1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sP2L</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_surface.html#solve_conformational_selection_association"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_surface.solve_conformational_selection_association" title="Link to this definition">#</a></dt>
 <dd><p>Obtain the signal for the conformational selection model (surface-based)</p>
@@ -2103,7 +2153,9 @@ In other words, the complex before and after the conformational change produces 
 <li><p><strong>koff</strong> (<em>float</em>) – rate constant for E2S -&gt; E2 + S</p></li>
 <li><p><strong>kc</strong> (<em>float</em>) – rate constant for E1 -&gt; E2</p></li>
 <li><p><strong>krev</strong> (<em>float</em>) – rate constant for E2 -&gt; E1</p></li>
-<li><p><strong>smax</strong> (<em>float</em>) – signal proportional to the complex (E2S)</p></li>
+<li><p><strong>smax</strong> (<em>float</em>) – maximum signal that the complex (E2S)can produce</p></li>
+<li><p><strong>sP1</strong> (<em>float</em>) – signal proportional to the protein in state E1</p></li>
+<li><p><strong>sP2L</strong> (<em>float</em>) – signal proportional to the protein in state E2S</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -2319,6 +2371,8 @@ the dissociation rate constants (koffs), and the equilibrium dissociation consta
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-pykingenie.utils.fitting_general">pykingenie.utils.fitting_general module</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.fitting_general.fit_single_exponential"><code class="docutils literal notranslate"><span class="pre">fit_single_exponential()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.fitting_general.fit_double_exponential"><code class="docutils literal notranslate"><span class="pre">fit_double_exponential()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.fitting_general.re_fit"><code class="docutils literal notranslate"><span class="pre">re_fit()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.fitting_general.re_fit_2"><code class="docutils literal notranslate"><span class="pre">re_fit_2()</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-pykingenie.utils.fitting_solution">pykingenie.utils.fitting_solution module</a><ul class="visible nav section-nav flex-column">
@@ -2338,6 +2392,7 @@ the dissociation rate constants (koffs), and the equilibrium dissociation consta
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.fitting_surface.fit_one_site_assoc_and_disso_ktr"><code class="docutils literal notranslate"><span class="pre">fit_one_site_assoc_and_disso_ktr()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.fitting_surface.one_site_assoc_and_disso_asymmetric_ci95"><code class="docutils literal notranslate"><span class="pre">one_site_assoc_and_disso_asymmetric_ci95()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.fitting_surface.one_site_assoc_and_disso_asymmetric_ci95_koff"><code class="docutils literal notranslate"><span class="pre">one_site_assoc_and_disso_asymmetric_ci95_koff()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.fitting_surface.get_smax_upper_bound_factor"><code class="docutils literal notranslate"><span class="pre">get_smax_upper_bound_factor()</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-pykingenie.utils.math">pykingenie.utils.math module</a><ul class="visible nav section-nav flex-column">
@@ -2374,6 +2429,8 @@ the dissociation rate constants (koffs), and the equilibrium dissociation consta
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.processing.subset_data"><code class="docutils literal notranslate"><span class="pre">subset_data()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.processing.sample_type_to_letter"><code class="docutils literal notranslate"><span class="pre">sample_type_to_letter()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.processing.get_colors_from_numeric_values"><code class="docutils literal notranslate"><span class="pre">get_colors_from_numeric_values()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.processing.if_string_to_list"><code class="docutils literal notranslate"><span class="pre">if_string_to_list()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.processing.find_index_of_previous_step_type"><code class="docutils literal notranslate"><span class="pre">find_index_of_previous_step_type()</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-pykingenie.utils.signal_solution">pykingenie.utils.signal_solution module</a><ul class="visible nav section-nav flex-column">
@@ -2381,10 +2438,7 @@ the dissociation rate constants (koffs), and the equilibrium dissociation consta
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_solution.solve_ode_one_site_insolution"><code class="docutils literal notranslate"><span class="pre">solve_ode_one_site_insolution()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_solution.signal_ode_one_site_insolution"><code class="docutils literal notranslate"><span class="pre">signal_ode_one_site_insolution()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_solution.ode_induced_fit_insolution"><code class="docutils literal notranslate"><span class="pre">ode_induced_fit_insolution()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_solution.ode_induced_fit_insolution_reduced"><code class="docutils literal notranslate"><span class="pre">ode_induced_fit_insolution_reduced()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_solution.solve_ode_induced_fit_insolution_reduced"><code class="docutils literal notranslate"><span class="pre">solve_ode_induced_fit_insolution_reduced()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_solution.solve_ode_induced_fit_insolution"><code class="docutils literal notranslate"><span class="pre">solve_ode_induced_fit_insolution()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_solution.signal_ode_induced_fit_insolution_reduced"><code class="docutils literal notranslate"><span class="pre">signal_ode_induced_fit_insolution_reduced()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_solution.signal_ode_induced_fit_insolution"><code class="docutils literal notranslate"><span class="pre">signal_ode_induced_fit_insolution()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_solution.ode_conformational_selection_insolution"><code class="docutils literal notranslate"><span class="pre">ode_conformational_selection_insolution()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_solution.solve_ode_conformational_selection_insolution"><code class="docutils literal notranslate"><span class="pre">solve_ode_conformational_selection_insolution()</span></code></a></li>
@@ -2408,10 +2462,9 @@ the dissociation rate constants (koffs), and the equilibrium dissociation consta
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_surface.differential_matrix_dissociation_conformational_selection"><code class="docutils literal notranslate"><span class="pre">differential_matrix_dissociation_conformational_selection()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_surface.constant_vector_induced_fit"><code class="docutils literal notranslate"><span class="pre">constant_vector_induced_fit()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_surface.constant_vector_conformational_selection"><code class="docutils literal notranslate"><span class="pre">constant_vector_conformational_selection()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_surface.solve_state_t"><code class="docutils literal notranslate"><span class="pre">solve_state_t()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_surface.solve_steady_state"><code class="docutils literal notranslate"><span class="pre">solve_steady_state()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_surface.solve_induced_fit_association"><code class="docutils literal notranslate"><span class="pre">solve_induced_fit_association()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_surface.solve_all_states_fast"><code class="docutils literal notranslate"><span class="pre">solve_all_states_fast()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_surface.solve_induced_fit_association"><code class="docutils literal notranslate"><span class="pre">solve_induced_fit_association()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_surface.solve_conformational_selection_association"><code class="docutils literal notranslate"><span class="pre">solve_conformational_selection_association()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_surface.solve_induced_fit_dissociation"><code class="docutils literal notranslate"><span class="pre">solve_induced_fit_dissociation()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_surface.solve_conformational_selection_dissociation"><code class="docutils literal notranslate"><span class="pre">solve_conformational_selection_dissociation()</span></code></a></li>

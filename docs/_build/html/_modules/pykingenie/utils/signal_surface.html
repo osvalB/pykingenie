@@ -132,6 +132,34 @@
   </a>
 </li>
 
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
+    pykingenie.utils package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
+    pykingenie.utils package
+  </a>
+</li>
+
   </ul>
 </nav></div>
       
@@ -222,6 +250,34 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../modules.html">
     pykingenie
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
+    pykingenie.utils package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
+    pykingenie.utils package
   </a>
 </li>
 
@@ -325,6 +381,32 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.integrate</span><span class="w"> </span><span class="kn">import</span> <span class="n">solve_ivp</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.linalg</span><span class="w">    </span><span class="kn">import</span> <span class="n">solve</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.linalg</span><span class="w">    </span><span class="kn">import</span> <span class="n">expm</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;steady_state_one_site&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;one_site_association_analytical&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;one_site_dissociation_analytical&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ode_one_site_mass_transport_association&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ode_one_site_mass_transport_dissociation&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;solve_ode_one_site_mass_transport_association&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;solve_ode_one_site_mass_transport_dissociation&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;differential_matrix_association_induced_fit&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;differential_matrix_association_conformational_selection&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;differential_matrix_dissociation_induced_fit&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;differential_matrix_dissociation_conformational_selection&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;constant_vector_induced_fit&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;constant_vector_conformational_selection&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;solve_steady_state&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;solve_all_states_fast&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;solve_induced_fit_association&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;solve_conformational_selection_association&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;solve_induced_fit_dissociation&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;solve_conformational_selection_dissociation&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ode_mixture_analyte_association&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;solve_ode_mixture_analyte_association&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ode_mixture_analyte_dissociation&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;solve_ode_mixture_analyte_dissociation&#39;</span>
+<span class="p">]</span>
 
 <div class="viewcode-block" id="steady_state_one_site">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.steady_state_one_site">[docs]</a>
@@ -683,31 +765,6 @@
     <span class="k">return</span>   <span class="p">[</span><span class="n">krev</span><span class="o">*</span><span class="n">smax</span><span class="p">,</span> <span class="n">kon</span><span class="o">*</span><span class="n">a</span><span class="o">*</span><span class="n">smax</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="solve_state_t">
-<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.solve_state_t">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">solve_state_t</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">initial_conditions</span><span class="p">,</span> <span class="n">steady_state_value</span><span class="p">):</span>
-
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    solve x(t) = x* + exp(At)(x0 - x*)</span>
-<span class="sd">    x(t) is the system state at time t</span>
-<span class="sd">    x*   is the steady state solution</span>
-<span class="sd">    x0   is the initial state</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        time (float): time</span>
-<span class="sd">        A (np.ndarray): differential matrix</span>
-<span class="sd">        initial_conditions (np.ndarray): initial conditions</span>
-<span class="sd">        steady_state_value (np.ndarray): steady state values</span>
-<span class="sd">    Returns:</span>
-<span class="sd">        state (np.ndarray): state at time t</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">v</span> <span class="o">=</span> <span class="n">initial_conditions</span> <span class="o">-</span> <span class="n">steady_state_value</span>
-    <span class="n">eAtv</span> <span class="o">=</span> <span class="n">expm</span><span class="p">(</span><span class="n">A</span> <span class="o">*</span> <span class="n">time</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-    <span class="n">state</span> <span class="o">=</span> <span class="n">steady_state_value</span> <span class="o">+</span> <span class="n">eAtv</span>
-
-    <span class="k">return</span> <span class="n">state</span></div>
-
 
 <div class="viewcode-block" id="solve_steady_state">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.solve_steady_state">[docs]</a>
@@ -818,7 +875,9 @@
 <span class="sd">        koff (float): rate constant for E2S -&gt; E2 + S</span>
 <span class="sd">        kc (float): rate constant for E1 -&gt; E2</span>
 <span class="sd">        krev (float): rate constant for E2 -&gt; E1</span>
-<span class="sd">        smax (float): signal proportional to the complex (E2S)</span>
+<span class="sd">        smax (float): maximum signal that the complex (E2S)can produce</span>
+<span class="sd">        sP1 (float): signal proportional to the protein in state E1</span>
+<span class="sd">        sP2L (float): signal proportional to the protein in state E2S</span>
 
 <span class="sd">    Returns:</span>
 
@@ -830,28 +889,21 @@
 
     <span class="n">b_col</span>   <span class="o">=</span> <span class="n">constant_vector_conformational_selection</span><span class="p">(</span><span class="n">kon</span><span class="p">,</span> <span class="n">smax</span><span class="p">,</span> <span class="n">krev</span><span class="p">,</span> <span class="n">a_conc</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">sP2L</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-
-        <span class="n">ka_conf</span>            <span class="o">=</span> <span class="n">kc</span> <span class="o">/</span> <span class="n">krev</span>
-        <span class="n">initial_conditions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">smax</span> <span class="o">/</span> <span class="p">(</span><span class="n">ka_conf</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">0</span><span class="p">])</span> <span class="c1"># Assume pre-equilibrium of E1 and E2</span>
-
-    <span class="k">else</span><span class="p">:</span>
-
-        <span class="n">initial_conditions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">sP1</span><span class="p">,</span> <span class="n">sP2L</span><span class="p">])</span>
+    <span class="n">initial_conditions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">smax</span> <span class="o">/</span> <span class="p">(</span><span class="n">kc</span> <span class="o">/</span> <span class="n">krev</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="n">sP2L</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">sP1</span><span class="p">,</span> <span class="n">sP2L</span><span class="p">])</span>
 
     <span class="n">m</span> <span class="o">=</span> <span class="n">differential_matrix_association_conformational_selection</span><span class="p">(</span><span class="n">koff</span><span class="p">,</span> <span class="n">kon</span><span class="p">,</span> <span class="n">kc</span><span class="p">,</span> <span class="n">krev</span><span class="p">,</span> <span class="n">a_conc</span><span class="p">)</span>
 
     <span class="n">res_steady_state</span> <span class="o">=</span> <span class="n">solve_steady_state</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">b_col</span><span class="p">)</span>
 
-    <span class="n">states</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">solve_state_t</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">initial_conditions</span><span class="p">,</span> <span class="n">res_steady_state</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">time</span><span class="p">])</span>
+    <span class="n">states</span> <span class="o">=</span> <span class="n">solve_all_states_fast</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">initial_conditions</span><span class="p">,</span> <span class="n">res_steady_state</span><span class="p">)</span>
 
-    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
-        <span class="s1">&#39;signal&#39;</span><span class="p">:</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="c1"># Signal produced by E2S / P2L, depending on the notation</span>
-        <span class="s1">&#39;sP1&#39;</span><span class="p">:</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
-        <span class="s1">&#39;sP2&#39;</span><span class="p">:</span> <span class="n">smax</span> <span class="o">-</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
-    <span class="p">})</span>
+    <span class="n">signal</span> <span class="o">=</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">sP1</span> <span class="o">=</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">sP2</span> <span class="o">=</span> <span class="n">smax</span> <span class="o">-</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
 
-    <span class="k">return</span> <span class="n">df</span></div>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">signal</span><span class="p">,</span> <span class="n">sP1</span><span class="p">,</span> <span class="n">sP2</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">arr</span></div>
 
 
 <div class="viewcode-block" id="solve_induced_fit_dissociation">
@@ -934,15 +986,16 @@
 
     <span class="n">res_steady_state</span> <span class="o">=</span> <span class="n">solve_steady_state</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">b_col</span><span class="p">)</span>
 
-    <span class="n">states</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">solve_state_t</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">initial_conditions</span><span class="p">,</span> <span class="n">res_steady_state</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">time</span><span class="p">])</span>
+    <span class="n">states</span> <span class="o">=</span> <span class="n">solve_all_states_fast</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">initial_conditions</span><span class="p">,</span> <span class="n">res_steady_state</span><span class="p">)</span>
 
-    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
-        <span class="s1">&#39;signal&#39;</span><span class="p">:</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
-        <span class="s1">&#39;sP1&#39;</span><span class="p">:</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
-        <span class="s1">&#39;sP2&#39;</span><span class="p">:</span> <span class="n">smax</span> <span class="o">-</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
-    <span class="p">})</span>
+    <span class="c1"># Create a numpy array of three columns</span>
+    <span class="n">signal</span> <span class="o">=</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>  <span class="c1"># Signal produced by E2S</span>
+    <span class="n">sP1</span> <span class="o">=</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>  <span class="c1"># Signal proportional to the protein in state E1</span>
+    <span class="n">sP2</span> <span class="o">=</span> <span class="n">smax</span> <span class="o">-</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>  <span class="c1"># Signal proportional to the protein in state E2S</span>
 
-    <span class="k">return</span> <span class="n">df</span></div>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">signal</span><span class="p">,</span> <span class="n">sP1</span><span class="p">,</span> <span class="n">sP2</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">arr</span></div>
 
 
 <div class="viewcode-block" id="ode_mixture_analyte_association">
@@ -978,20 +1031,9 @@
 
     <span class="n">kons</span> <span class="o">=</span> <span class="n">koffs</span> <span class="o">/</span> <span class="n">Kds</span>
 
-    <span class="n">dRis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">Ris</span><span class="p">))</span>
-
     <span class="n">choclo</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Ris</span> <span class="o">/</span> <span class="n">Ris_max</span><span class="p">))</span>
 
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">Ris</span><span class="p">)):</span>
-
-        <span class="n">r_i</span>    <span class="o">=</span> <span class="n">Ris</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-        <span class="n">kon_i</span>  <span class="o">=</span> <span class="n">kons</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-        <span class="n">F_i</span>    <span class="o">=</span> <span class="n">Fis</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-        <span class="n">Rmax_i</span> <span class="o">=</span> <span class="n">Ris_max</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-        <span class="n">koff_i</span> <span class="o">=</span> <span class="n">koffs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-
-        <span class="n">dRi_dt</span> <span class="o">=</span> <span class="n">kon_i</span> <span class="o">*</span> <span class="n">F_i</span> <span class="o">*</span> <span class="n">C_TOT</span> <span class="o">*</span> <span class="n">Rmax_i</span> <span class="o">*</span> <span class="n">choclo</span> <span class="o">-</span> <span class="n">koff_i</span> <span class="o">*</span> <span class="n">r_i</span>
-        <span class="n">dRis</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">dRi_dt</span>
+    <span class="n">dRis</span> <span class="o">=</span> <span class="n">kons</span> <span class="o">*</span> <span class="n">Fis</span> <span class="o">*</span> <span class="n">C_TOT</span> <span class="o">*</span> <span class="n">Ris_max</span> <span class="o">*</span> <span class="n">choclo</span> <span class="o">-</span> <span class="n">koffs</span> <span class="o">*</span> <span class="n">Ris</span>
 
     <span class="k">return</span> <span class="n">dRis</span></div>
 

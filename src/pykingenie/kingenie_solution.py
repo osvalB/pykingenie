@@ -4,46 +4,74 @@ import numpy  as np
 from .solution_exp import SolutionBasedExp
 
 class KinGenieCsvSolution(SolutionBasedExp):
-
     """
-    A class used to represent a KinGenie simulation (solution-based), which can be exported from the Simulation panel
+    A class used to represent a KinGenie simulation (solution-based).
+    
+    This class handles KinGenie solution simulation data that can be exported from the Simulation panel.
+
+    Parameters
+    ----------
+    name : str
+        Name of the experiment.
 
     Attributes
     ----------
-        name (str):                 name of the experiment
-        xs (np.array):              list of x values (time, length n, one per sensor)
-        ys (np.array):              list of y values (length n, one per sensor)
-        no_sensors (int):           number of sensors
-        sensor_names (list):        list of sensor names (length n, one per sensor)
-        sensor_names_unique (list): list of unique sensor names (length n, one per sensor)
-        ligand_conc_df (pd.DataFrame): dataframe with the ligand concentration information
-
+    name : str
+        Name of the experiment.
+    xs : list of numpy.ndarray
+        List of x values (time), one array per trace.
+    ys : list of numpy.ndarray
+        List of y values (signal), one array per trace.
+    no_traces : int
+        Number of traces.
+    traces_names : list of str
+        List of trace names, one per trace.
+    traces_names_unique : list of str
+        List of unique trace names.
+    conc_df : pandas.DataFrame
+        DataFrame with the concentration information for each trace.
+    traces_loaded : bool
+        Whether traces have been loaded.
     """
 
     def __init__(self, name):
 
         super().__init__(name, 'kingenie_csv_solution')
-
+        
     def read_csv(self, file):
         """
-        Read the KinGenie csv file
-
-        Example:
-
-            Time	Signal	Protein_concentration_micromolar Ligand_concentration_micromolar
-            0	    0	    5	                                0.1
-            0.5	    1	    5	                                0.1
-
-        Results:
-
-            It creates the attributes
-
-                self.xs
-                self.ys
-                self.no_sensors
-                self.sensor_names
-                self.sensor_names_unique
-
+        Read the KinGenie CSV file containing solution-based simulation data.
+        
+        Parameters
+        ----------
+        file : str
+            Path to the CSV file.
+            
+        Returns
+        -------
+        None
+            The method populates class attributes with data from the CSV file.
+            
+        Notes
+        -----
+        The CSV file should have the following columns:
+        - Time: time points of the simulation
+        - Signal: signal values at each time point
+        - Protein_concentration_micromolar: protein concentration
+        - Ligand_concentration_micromolar: ligand concentration
+        
+        Example CSV format:
+        
+            Time    Signal  Protein_concentration_micromolar Ligand_concentration_micromolar
+            0       0       5                                0.1
+            0.5     1       5                                0.1
+        
+        After reading, this method creates the following attributes:
+        - self.xs: list of time values for each trace
+        - self.ys: list of signal values for each trace
+        - self.no_traces: number of unique traces
+        - self.traces_names: list of trace names
+        - self.conc_df: DataFrame with concentration information
         """
 
         df = pd.read_csv(file)

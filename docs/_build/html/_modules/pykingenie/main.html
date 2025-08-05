@@ -132,6 +132,34 @@
   </a>
 </li>
 
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../pykingenie.utils.html">
+    pykingenie.utils package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../pykingenie.utils.html">
+    pykingenie.utils package
+  </a>
+</li>
+
   </ul>
 </nav></div>
       
@@ -222,6 +250,34 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../modules.html">
     pykingenie
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../pykingenie.utils.html">
+    pykingenie.utils package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../pykingenie.utils.html">
+    pykingenie.utils package
   </a>
 </li>
 
@@ -323,6 +379,8 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.fitter</span><span class="w">          </span><span class="kn">import</span> <span class="n">KineticsFitter</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.fitter_solution</span><span class="w"> </span><span class="kn">import</span> <span class="n">KineticsFitterSolution</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.utils.processing</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_plotting_df</span>
 
 <div class="viewcode-block" id="KineticsAnalyzer">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.main.KineticsAnalyzer">[docs]</a>
@@ -748,11 +806,31 @@
 
 <div class="viewcode-block" id="KineticsAnalyzer.submit_fitting_solution">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.main.KineticsAnalyzer.submit_fitting_solution">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">submit_fitting_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">fitting_model</span><span class="o">=</span><span class="s1">&#39;single&#39;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">submit_fitting_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">fitting_model</span><span class="o">=</span><span class="s1">&#39;single&#39;</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Fit a variety of models to the kinetics data in the solution-based experiments.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            fitting_model (str): The model to fit. Options are:</span>
+<span class="sd">                - &#39;single&#39;: Fit single exponentials</span>
+<span class="sd">                - &#39;double&#39;: Fit double exponentials</span>
+<span class="sd">                - &#39;one_binding_site&#39;: Fit one binding site model</span>
+<span class="sd">                - &#39;one_binding_site_if&#39;: Fit one binding site model with induced fit</span>
+<span class="sd">            **kwargs: Additional keyword arguments for the fitting methods.</span>
+
+<span class="sd">        For example with &#39;one_binding_site_if&#39; you can use</span>
+<span class="sd">            kwargs = {</span>
+<span class="sd">            &quot;fit_signal_E&quot;: False,</span>
+<span class="sd">            &quot;fit_signal_S&quot;: False,</span>
+<span class="sd">            &quot;fit_signal_ES&quot;: True,</span>
+<span class="sd">            &quot;ESint_equals_ES&quot;: True,</span>
+<span class="sd">            &quot;fixed_t0&quot;: True</span>
+<span class="sd">            }</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">fitting_model</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;single&#39;</span><span class="p">,</span> <span class="s1">&#39;double&#39;</span><span class="p">,</span> <span class="s1">&#39;one_binding_site&#39;</span><span class="p">,</span> <span class="s1">&#39;one_binding_site_if&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown fitting model: &quot;</span> <span class="o">+</span> <span class="n">fitting_model</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">kf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fittings</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
 
@@ -763,13 +841,11 @@
                 <span class="n">kf</span><span class="o">.</span><span class="n">fit_double_exponentials</span><span class="p">()</span>
 
             <span class="k">elif</span> <span class="n">fitting_model</span> <span class="o">==</span> <span class="s1">&#39;one_binding_site&#39;</span><span class="p">:</span>
-                <span class="n">kf</span><span class="o">.</span><span class="n">fit_one_binding_site</span><span class="p">()</span>
+                <span class="n">kf</span><span class="o">.</span><span class="n">fit_one_binding_site</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
             <span class="k">elif</span> <span class="n">fitting_model</span> <span class="o">==</span> <span class="s1">&#39;one_binding_site_if&#39;</span><span class="p">:</span>
-                <span class="n">kf</span><span class="o">.</span><span class="n">fit_induced_fit</span><span class="p">()</span>
-
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown fitting model: &quot;</span> <span class="o">+</span> <span class="n">fitting_model</span><span class="p">)</span>
+                <span class="n">kf</span><span class="o">.</span><span class="n">find_initial_params_if</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">kf</span><span class="o">.</span><span class="n">fit_induced_fit</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
@@ -780,32 +856,29 @@
                                 <span class="n">fitting_region</span><span class="o">=</span><span class="s1">&#39;association_dissociation&#39;</span><span class="p">,</span>
                                 <span class="n">linkedSmax</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 
+        <span class="k">if</span> <span class="n">fitting_model</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;one_to_one&#39;</span><span class="p">,</span> <span class="s1">&#39;one_to_one_mtl&#39;</span><span class="p">,</span> <span class="s1">&#39;one_to_one_if&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown fitting model: &quot;</span> <span class="o">+</span> <span class="n">fitting_model</span><span class="p">)</span>
+
         <span class="k">for</span> <span class="n">kf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fittings</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
 
-            <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">fitting_model</span> <span class="o">==</span> <span class="s1">&#39;one_to_one&#39;</span> <span class="ow">and</span> <span class="n">fitting_region</span> <span class="o">==</span> <span class="s1">&#39;association_dissociation&#39;</span><span class="p">:</span>
+                <span class="n">kf</span><span class="o">.</span><span class="n">fit_one_site_assoc_and_disso</span><span class="p">(</span><span class="n">shared_smax</span><span class="o">=</span><span class="n">linkedSmax</span><span class="p">)</span>
+                <span class="n">kf</span><span class="o">.</span><span class="n">fit_single_exponentials</span><span class="p">()</span>
 
-                <span class="k">if</span> <span class="n">fitting_model</span> <span class="o">==</span> <span class="s1">&#39;one_to_one&#39;</span> <span class="ow">and</span> <span class="n">fitting_region</span> <span class="o">==</span> <span class="s1">&#39;association_dissociation&#39;</span><span class="p">:</span>
-                    <span class="n">kf</span><span class="o">.</span><span class="n">fit_one_site_assoc_and_disso</span><span class="p">(</span><span class="n">shared_smax</span><span class="o">=</span><span class="n">linkedSmax</span><span class="p">)</span>
-                    <span class="n">kf</span><span class="o">.</span><span class="n">fit_single_exponentials</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">fitting_model</span> <span class="o">==</span> <span class="s1">&#39;one_to_one_mtl&#39;</span> <span class="ow">and</span> <span class="n">fitting_region</span> <span class="o">==</span> <span class="s1">&#39;association_dissociation&#39;</span><span class="p">:</span>
+                <span class="n">kf</span><span class="o">.</span><span class="n">fit_one_site_assoc_and_disso</span><span class="p">(</span><span class="n">shared_smax</span><span class="o">=</span><span class="n">linkedSmax</span><span class="p">,</span> <span class="n">fit_ktr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-                <span class="k">if</span> <span class="n">fitting_model</span> <span class="o">==</span> <span class="s1">&#39;one_to_one_mtl&#39;</span> <span class="ow">and</span> <span class="n">fitting_region</span> <span class="o">==</span> <span class="s1">&#39;association_dissociation&#39;</span><span class="p">:</span>
-                    <span class="n">kf</span><span class="o">.</span><span class="n">fit_one_site_assoc_and_disso</span><span class="p">(</span><span class="n">shared_smax</span><span class="o">=</span><span class="n">linkedSmax</span><span class="p">,</span> <span class="n">fit_ktr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">fitting_model</span> <span class="o">==</span> <span class="s1">&#39;one_to_one&#39;</span> <span class="ow">and</span> <span class="n">fitting_region</span> <span class="o">==</span> <span class="s1">&#39;association&#39;</span><span class="p">:</span>
+                <span class="n">kf</span><span class="o">.</span><span class="n">fit_one_site_association</span><span class="p">(</span><span class="n">shared_smax</span><span class="o">=</span><span class="n">linkedSmax</span><span class="p">)</span>
+                <span class="n">kf</span><span class="o">.</span><span class="n">fit_single_exponentials</span><span class="p">()</span>
 
-                <span class="k">if</span> <span class="n">fitting_model</span> <span class="o">==</span> <span class="s1">&#39;one_to_one&#39;</span> <span class="ow">and</span> <span class="n">fitting_region</span> <span class="o">==</span> <span class="s1">&#39;association&#39;</span><span class="p">:</span>
-                    <span class="n">kf</span><span class="o">.</span><span class="n">fit_one_site_association</span><span class="p">(</span><span class="n">shared_smax</span><span class="o">=</span><span class="n">linkedSmax</span><span class="p">)</span>
-                    <span class="n">kf</span><span class="o">.</span><span class="n">fit_single_exponentials</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">fitting_model</span> <span class="o">==</span> <span class="s1">&#39;one_to_one&#39;</span> <span class="ow">and</span> <span class="n">fitting_region</span> <span class="o">==</span> <span class="s1">&#39;dissociation&#39;</span><span class="p">:</span>
+                <span class="n">kf</span><span class="o">.</span><span class="n">fit_one_site_dissociation</span><span class="p">()</span>
 
-                <span class="k">if</span> <span class="n">fitting_model</span> <span class="o">==</span> <span class="s1">&#39;one_to_one&#39;</span> <span class="ow">and</span> <span class="n">fitting_region</span> <span class="o">==</span> <span class="s1">&#39;dissociation&#39;</span><span class="p">:</span>
-                    <span class="n">kf</span><span class="o">.</span><span class="n">fit_one_site_dissociation</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">fitting_model</span> <span class="o">==</span> <span class="s1">&#39;one_to_one_if&#39;</span> <span class="ow">and</span> <span class="n">fitting_region</span> <span class="o">==</span> <span class="s1">&#39;association_dissociation&#39;</span><span class="p">:</span>
+                <span class="n">kf</span><span class="o">.</span><span class="n">fit_one_site_if_assoc_and_disso</span><span class="p">(</span><span class="n">shared_smax</span><span class="o">=</span><span class="n">linkedSmax</span><span class="p">)</span>
 
-                <span class="k">if</span> <span class="n">fitting_model</span> <span class="o">==</span> <span class="s1">&#39;one_to_one_if&#39;</span> <span class="ow">and</span> <span class="n">fitting_region</span> <span class="o">==</span> <span class="s1">&#39;association_dissociation&#39;</span><span class="p">:</span>
-                    <span class="n">kf</span><span class="o">.</span><span class="n">fit_one_site_if_assoc_and_disso</span><span class="p">(</span><span class="n">shared_smax</span><span class="o">=</span><span class="n">linkedSmax</span><span class="p">)</span>
-
-                <span class="n">kf</span><span class="o">.</span><span class="n">create_fitting_bounds_table</span><span class="p">()</span>
-
-            <span class="k">except</span><span class="p">:</span>
-
-                <span class="k">pass</span>
+            <span class="n">kf</span><span class="o">.</span><span class="n">create_fitting_bounds_table</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
@@ -845,8 +918,23 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">fit_params_kinetics_all</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="kc">None</span></div>
-</div>
 
+
+<div class="viewcode-block" id="KineticsAnalyzer.get_legends_table">
+<a class="viewcode-back" href="../../pykingenie.html#pykingenie.main.KineticsAnalyzer.get_legends_table">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_legends_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the legends table for plotting the kinetics data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="n">labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_experiment_properties</span><span class="p">(</span><span class="s1">&#39;sensor_names&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Flatten the lists</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">labels</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">get_plotting_df</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span></div>
+</div>
 
 </pre></div>
 

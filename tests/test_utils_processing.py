@@ -13,7 +13,8 @@ from pykingenie.utils.processing import (
     combine_sequences,
     get_colors_from_numeric_values,
     if_string_to_list,
-    find_loading_column)
+    find_loading_column,
+    find_index_of_previous_step_type)
 
 def test_guess_experiment_name():
     # Create a temporary file with known content
@@ -130,3 +131,19 @@ def test_combine_sequences():
 
     expected = [(1, 3), (1, 4)]
     np.testing.assert_array_equal(combined, expected, "The combined sequence should match the expected result")
+
+def test_find_index_of_previous_step_type():
+
+    # Create a mock DataFrame
+    data = {
+        'Type': ['BASELINE','ASSOC', 'DISASSOC','ASSOC', 'DISASSOC']
+    }
+
+    df_steps = pd.DataFrame(data)
+
+    # Test with a valid step index and type
+    step_index = 3
+    step_type = 'DISASSOC'
+    index = find_index_of_previous_step_type(df_steps, step_index, step_type)
+
+    assert index == 1, "The index of the previous association should be 1"

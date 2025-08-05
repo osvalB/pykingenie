@@ -3,13 +3,55 @@ import numpy  as np
 
 import copy
 
-from pykingenie.utils.processing import if_string_to_list
+from pykingenie.utils.processing import if_string_to_list, find_index_of_previous_step_type
 
 class SurfaceBasedExperiment:
+    """A class representing surface-based kinetics experiments.
+    
+    This class handles operations related to surface-based experiments,
+    such as biolayer interferometry (BLI) or surface plasmon resonance (SPR).
+    It provides functionality for data processing, analysis, and visualization.
+    
+    Parameters
+    ----------
+    name : str
+        The name of the experiment.
+    type : str
+        The type of the experiment (e.g., 'Octet', 'SPR').
+        
+    Attributes
+    ----------
+    name : str
+        The name of the experiment.
+    type : str
+        The type of the experiment.
+    xs : list of list
+        Time values for each sensor and step.
+    ys : list of list
+        Signal values for each sensor and step.
+    sensor_names : list
+        Names of the sensors.
+    ligand_conc_df : pandas.DataFrame
+        DataFrame containing ligand concentration information.
+    df_steps : pandas.DataFrame
+        DataFrame containing step information.
+    steps_performed : list
+        List of steps performed in the experiment.
+    traces_loaded : bool
+        Whether traces have been loaded.
+    sample_plate_loaded : bool
+        Whether the sample plate information has been loaded.
+    """
 
-    def __init__(self,name,type):
-        """
-        Initialize the instance
+    def __init__(self, name, type):
+        """Initialize the SurfaceBasedExperiment instance.
+        
+        Parameters
+        ----------
+        name : str
+            The name of the experiment.
+        type : str
+            The type of the experiment (e.g., 'Octet', 'SPR').
         """
 
         self.name                = name
@@ -38,38 +80,70 @@ class SurfaceBasedExperiment:
         self.sample_conc_labeled = None
 
     def create_unique_sensor_names(self):
-
-        """
-        Create unique sensor names by adding the name of the experiment to the sensor names
+        """Create unique sensor names by adding the experiment name to each sensor name.
+        
+        This method updates the `sensor_names_unique` attribute by prefixing
+        each sensor name with the experiment name.
+        
+        Returns
+        -------
+        None
+            The method modifies the `sensor_names_unique` attribute in-place.
         """
 
         self.sensor_names_unique = [self.name + ' ' + sensor_name for sensor_name in self.sensor_names]
 
         return None
 
-    def check_sensor_name(self,new_sensor_name):
-
+    def check_sensor_name(self, new_sensor_name):
+        """Check if a sensor name already exists and modify it if necessary.
+        
+        Parameters
+        ----------
+        new_sensor_name : str
+            The proposed name for a new sensor.
+            
+        Returns
+        -------
+        str
+            A unique sensor name, either the original if it doesn't exist 
+            or a modified version with ' rep' appended.
+        """
         if new_sensor_name in self.sensor_names:
             new_sensor_name += ' rep'
 
         return new_sensor_name
 
-    def subtraction_one_to_one(self, sensor_name1, sensor_name2,inplace=True):
-
-        """
-
-        Subtract the signal of sensor2 from sensor1
-
-        Args:
-
-            sensor_name1 (str): name of the sensor to subtract from
-            sensor_name2 (str): name of the sensor to subtract
-            inplace (bool):     if True, the subtraction is done in place, otherwise a new sensor is created
-
-        Results:
-
-            It modifies the attributes self.xs, self.ys, self.sensor_names and self.ligand_conc_df
-
+    def subtraction_one_to_one(self, sensor_name1, sensor_name2, inplace=True):
+        """Subtract the signal of one sensor from another.
+        
+        Parameters
+        ----------
+        sensor_name1 : str
+            Name of the sensor to subtract from.
+        sensor_name2 : str
+            Name of the sensor to subtract.
+        inplace : bool, optional
+            If True, the subtraction is done in place, otherwise a new sensor
+            is created, by default True.
+            
+        Returns
+        -------
+        None
+            The method modifies the instance attributes in-place.
+            
+        Notes
+        -----
+        This method modifies the following attributes:
+        - self.xs
+        - self.ys
+        - self.sensor_names
+        - self.ligand_conc_df
+        
+        Raises
+        ------
+        RuntimeError
+            If no traces are loaded or if sensors are incompatible.
         """
 
         if not self.traces_loaded:
@@ -121,17 +195,32 @@ class SurfaceBasedExperiment:
 
         return None
 
-    def subtraction(self,list_of_sensor_names,reference_sensor,inplace=True):
-
-        """
-        Apply the subtract operation to a list of sensors
-
-        Args:
-            list_of_sensor_names (list): list of sensor names to subtract
-            reference_sensor (str): name of the sensor to subtract from
-            inplace (bool):     if True, the subtraction is done in place, otherwise a new sensor is created
-        Results:
-            It modifies the attributes self.xs, self.ys, self.sensor_names and self.ligand_conc_df
+    def subtraction(self, list_of_sensor_names, reference_sensor, inplace=True):
+        """Apply subtraction operation to a list of sensors.
+        
+        Parameters
+        ----------
+        list_of_sensor_names : list or str
+            List of sensor names to subtract from. If a string is provided,
+            it will be converted to a list.
+        reference_sensor : str
+            Name of the sensor to subtract.
+        inplace : bool, optional
+            If True, the subtraction is done in place, otherwise new sensors
+            are created, by default True.
+            
+        Returns
+        -------
+        None
+            The method modifies the instance attributes in-place.
+            
+        Notes
+        -----
+        This method modifies the following attributes:
+        - self.xs
+        - self.ys
+        - self.sensor_names
+        - self.ligand_conc_df
         """
 
         list_of_sensor_names = if_string_to_list(list_of_sensor_names)
@@ -141,21 +230,33 @@ class SurfaceBasedExperiment:
 
         return  None
 
-    def average(self,list_of_sensor_names,new_sensor_name='Average'):
-
-        """
-
-        Average the signals of the sensors in the list
-
-        Args:
-
-            list_of_sensor_names (list): list of sensor names to average
-            new_sensor_name (str):       name of the new sensor
-
-        Results:
-
-            It modifies the attributes self.xs, self.ys, self.sensor_names and self.ligand_conc_df
-
+    def average(self, list_of_sensor_names, new_sensor_name='Average'):
+        """Average the signals of the sensors in the list.
+        
+        Parameters
+        ----------
+        list_of_sensor_names : list
+            List of sensor names to average.
+        new_sensor_name : str, optional
+            Name of the new sensor, by default 'Average'.
+            
+        Returns
+        -------
+        None
+            The method modifies the instance attributes in-place.
+            
+        Notes
+        -----
+        This method modifies the following attributes:
+        - self.xs
+        - self.ys
+        - self.sensor_names
+        - self.ligand_conc_df
+            
+        Raises
+        ------
+        RuntimeError
+            If no traces are loaded.
         """
 
         # Check if sensors are loaded
@@ -193,22 +294,39 @@ class SurfaceBasedExperiment:
 
         return None
 
-    def align_association(self,sensor_names,inplace=True,new_names = False, npoints=10):
-
-        """
-
-        Align the BLI traces based on the signal before the association step(s)
-
-        Args:
-
-            sensor_names (str or list): name of the sensor(s) to align
-            inplace (bool):             if True, the alignment is done in place, otherwise a new sensor is created
-            new_names (bool):          if True, the new sensor name is used, otherwise the old one is used
-
-        Results:
-
-            It modifies the attributes self.xs, self.ys, self.sensor_names and self.ligand_conc_df
-
+    def align_association(self, sensor_names, inplace=True, new_names=False, npoints=10):
+        """Align BLI traces based on the signal before the association step(s).
+        
+        Parameters
+        ----------
+        sensor_names : str or list
+            Name of the sensor(s) to align. If a string is provided,
+            it will be converted to a list.
+        inplace : bool, optional
+            If True, the alignment is done in place, otherwise new sensors
+            are created, by default True.
+        new_names : bool, optional
+            If True, new sensor names are generated, otherwise the original
+            names are kept, by default False.
+        npoints : int, optional
+            Number of points to use for averaging at alignment positions,
+            by default 10.
+            
+        Returns
+        -------
+        None
+            The method modifies the instance attributes in-place.
+            
+        Notes
+        -----
+        This method modifies the following attributes:
+        - self.xs
+        - self.ys
+        - self.sensor_names
+        - self.ligand_conc_df
+        
+        The alignment is performed by subtracting the average signal of the
+        last `npoints` points before each association step.
         """
         sensor_names = if_string_to_list(sensor_names)
 
@@ -241,6 +359,11 @@ class SurfaceBasedExperiment:
             ys = copy.deepcopy(self.ys[sensor])
 
             for i, association_step_index in enumerate(association_steps_indices):
+
+                # Skip if the association step is the first one - in other words, there is no previous baseline step
+                # Because there will be no last point to subtract...
+                if association_step_index == 0:
+                    continue
 
                 #  Subtract the first point of the previous baseline step
                 last_point = np.mean(self.ys[sensor][association_step_index-1][-npoints:])
@@ -297,20 +420,39 @@ class SurfaceBasedExperiment:
 
         return None
 
-    def align_dissociation(self,sensor_names,inplace=True,new_names = False,npoints=10):
-
-        """
-        Align the BLI traces based on the signal before the dissociation step(s)
-
-        Args:
-
-            sensor_names (str or list): name of the sensor(s) to align
-            inplace (bool):             if True, the alignment is done in place, otherwise a new sensor is created
-
-        Results:
-
-            It modifies the attributes self.xs, self.ys, self.sensor_names and self.ligand_conc_df
-
+    def align_dissociation(self, sensor_names, inplace=True, new_names=False, npoints=10):
+        """Align BLI traces based on the signal before the dissociation step(s).
+        
+        Parameters
+        ----------
+        sensor_names : str or list
+            Name of the sensor(s) to align. If a string is provided,
+            it will be converted to a list.
+        inplace : bool, optional
+            If True, the alignment is done in place, otherwise new sensors
+            are created, by default True.
+        new_names : bool, optional
+            If True, new sensor names are generated, otherwise the original
+            names are kept, by default False.
+        npoints : int, optional
+            Number of points to use for averaging at alignment positions,
+            by default 10.
+            
+        Returns
+        -------
+        None
+            The method modifies the instance attributes in-place.
+            
+        Notes
+        -----
+        This method modifies the following attributes:
+        - self.xs
+        - self.ys
+        - self.sensor_names
+        - self.ligand_conc_df
+        
+        The alignment is performed by smoothing the transition between association
+        and dissociation steps.
         """
         sensor_names = if_string_to_list(sensor_names)
 
@@ -374,21 +516,29 @@ class SurfaceBasedExperiment:
 
         return None
 
-    def discard_steps(self,sensor_names,step_types=['KREGENERATION','LOADING']):
-
-        """
-
-        Discard the steps of the sensors in the list
-
-        Args:
-
-            sensor_names (str or list): name of the sensor(s) to analyse
-            step_types (str or list):    type of the steps to discard
-
-        Results:
-
-            It modifies the attributes self.xs, self.ys, self.sensor_names and self.ligand_conc_df
-
+    def discard_steps(self, sensor_names, step_types=['KREGENERATION', 'LOADING']):
+        """Discard specific step types from the sensors in the list.
+        
+        Parameters
+        ----------
+        sensor_names : str or list
+            Name of the sensor(s) to process. If a string is provided,
+            it will be converted to a list.
+        step_types : str or list, optional
+            Type(s) of steps to discard, by default ['KREGENERATION', 'LOADING'].
+            If a string is provided, it will be converted to a list.
+            
+        Returns
+        -------
+        None
+            The method modifies the instance attributes in-place.
+            
+        Notes
+        -----
+        This method modifies the following attributes:
+        - self.ys
+        
+        The discarded steps are replaced with NaN values.
         """
         sensor_names = if_string_to_list(sensor_names)
         step_types   = if_string_to_list(step_types)
@@ -407,26 +557,43 @@ class SurfaceBasedExperiment:
 
         return None
 
-    def get_step_xy(self,sensor_name,location_loading,
-                    location_sample,step_type='ASSOC',
-                    replicate=1,type='y'):
-
-        """
-        Return the x or y values of a certain step
-
-        Args:
-
-            sensor_name (str): name of the sensor
-            location_sample (int):    column location of the sample. If zero, we assume we only have one location
-            location_loading (int):    column location of the loading. If zero, we assume we only have one location
-            step_type (str):   type of the step, ASSOC or DISASSOC only
-            replicate (int):   replicate number
-            type (str):        x or y
-
-        Returns:
-
-            x or y (np.n) values of the step
-
+    def get_step_xy(self, sensor_name, location_loading, 
+                 location_sample, step_type='ASSOC',
+                 replicate=1, type='y'):
+        """Return the x or y values of a specific step.
+        
+        Parameters
+        ----------
+        sensor_name : str
+            Name of the sensor.
+        location_loading : int
+            Column location of the loading. If zero, assumes only one location.
+        location_sample : int
+            Column location of the sample. If zero, assumes only one location.
+        step_type : str, optional
+            Type of step, only 'ASSOC' or 'DISASSOC' are valid, by default 'ASSOC'.
+        replicate : int, optional
+            Replicate number, by default 1.
+        type : str, optional
+            Data type to return, either 'x' or 'y', by default 'y'.
+            
+        Returns
+        -------
+        numpy.ndarray
+            The x (time) or y (signal) values of the specified step.
+            
+        Raises
+        ------
+        ValueError
+            If location_sample, location_loading, or replicate are not valid integers.
+        TypeError
+            If any parameter has an incorrect type.
+            
+        Notes
+        -----
+        For 'x' type data, time values are processed to start from zero for each step.
+        For association steps, time starts at the beginning of the step.
+        For dissociation steps, time continues from the association step.
         """
 
         # Try to convert to integer, the variables location_sample, location_loading and Replicate
@@ -492,15 +659,10 @@ class SurfaceBasedExperiment:
 
             else:
 
-                i = None
-                # Find the index of the first association, from the single cycle
+                # Find the index of the first step_type, from the single cycle
                 # Iterate over the previous steps, two at a time, until we find a step that is not a step of the same type
-
-                for idx in range(step_index-2,0,-2):
-                    if self.df_steps['Type'][idx] != step_type:
-                        i = idx
-                        break
-
+                i = find_index_of_previous_step_type(self.df_steps, step_index, step_type)
+                
                 # If we did not find a previous step of a different type
                 # Assign i to the first step index of the same type
                 # This is useful for single-cycle kinetics where we do not have a previous step (e.g., baseline) of a different type

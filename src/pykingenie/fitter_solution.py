@@ -6,40 +6,62 @@ from .utils.fitting_general import *
 from .utils.fitting_solution import *
 
 class KineticsFitterSolution:
-
     """
-    A class used to fit solution-based kinetics data with shared thermodynamic parameters
-
-        Attributes
+    A class used to fit solution-based kinetics data with shared thermodynamic parameters.
+    
+    Parameters
     ----------
-
-        name (str):                     name of the experiment
-        assoc_lst (list):                   list containing the association signals
-
-        lig_conc (list):                list of ligand concentrations, one per element in assoc
-        prot_conc (list):               list of protein concentrations, one per element in assoc
-
-        time_assoc_lst (list):              list of time points for the association signals
-
-        signal_ss (list):               list of steady state signals
-        signal_ss_fit (list):           list of steady state fitted signals
-        signal_assoc_fit (list):        list of association kinetics fitted signals
-        fit_params_kinetics (pd.Dataframe):     dataframe with the fitted parameters
-        fit_params_ss (pd.Dataframe):           dataframe with the values of the fitted parameters - steady state
-
+    name : str
+        Name of the experiment.
+    assoc : list
+        List containing the association signals.
+    lig_conc : list
+        List of ligand concentrations, one per element in assoc.
+    protein_conc : list
+        List of protein concentrations, one per element in assoc.
+    time_assoc : list
+        List of time points for the association signals.
+        
+    Attributes
+    ----------
+    name : str
+        Name of the experiment.
+    assoc_lst : list
+        List containing the association signals.
+    lig_conc : list
+        List of ligand concentrations, one per element in assoc.
+    prot_conc : list
+        List of protein concentrations, one per element in assoc.
+    time_assoc_lst : list
+        List of time points for the association signals.
+    signal_ss : list
+        List of steady state signals.
+    signal_ss_fit : list
+        List of steady state fitted signals.
+    signal_assoc_fit : list
+        List of association kinetics fitted signals.
+    fit_params_kinetics : pd.DataFrame
+        DataFrame with the fitted parameters.
+    fit_params_ss : pd.DataFrame
+        DataFrame with the values of the fitted parameters - steady state.
     """
 
     def __init__(self, name, assoc, lig_conc, protein_conc, time_assoc):
         """
-        Initialize the KineticsFitterSolution class
-
-        Args:
-            name (str):                     name of the experiment
-            assoc (list):                   list containing the association signals
-            lig_conc (list):                list of ligand concentrations, one per element in assoc
-            protein_conc (list):            list of protein concentrations, one per element in assoc
-            time_assoc (list):              list of time points for the association signals, one per replicate
-
+        Initialize the KineticsFitterSolution class.
+        
+        Parameters
+        ----------
+        name : str
+            Name of the experiment.
+        assoc : list
+            List containing the association signals.
+        lig_conc : list
+            List of ligand concentrations, one per element in assoc.
+        protein_conc : list
+            List of protein concentrations, one per element in assoc.
+        time_assoc : list
+            List of time points for the association signals.
         """
         self.name  = name
         self.assoc_lst = assoc
@@ -57,13 +79,19 @@ class KineticsFitterSolution:
         self.fit_params_ss       = None
 
     def get_steady_state(self):
-
         """
         Get the steady state signals from the association signals.
-        The steady state signal is the last value of each association signal.
-
-        We calculate the steady signal grouped by protein concentration.
-
+        
+        The steady state signal is calculated as the median of the last 5 values
+        of each association signal. The signals are grouped by protein concentration.
+        
+        Returns
+        -------
+        None
+            Updates the following instance attributes:
+            - unq_prot_conc: Unique protein concentrations
+            - signal_ss_per_protein: Steady state signals grouped by protein concentration
+            - lig_conc_per_protein: Ligand concentrations grouped by protein concentration
         """
 
         signal_ss_per_protein   = []
@@ -95,7 +123,15 @@ class KineticsFitterSolution:
         return None
 
     def clear_fittings(self):
-
+        """
+        Clear all fitting results.
+        
+        Resets the fitted signal arrays and parameter dataframes to None.
+        
+        Returns
+        -------
+        None
+        """
         self.signal_assoc_fit    = None
         self.fit_params_kinetics = None
         self.fit_params_ss       = None
@@ -106,6 +142,18 @@ class KineticsFitterSolution:
 
         """
         Fit single exponentials to the association signals in the solution kinetics experiment.
+        
+        This method fits each association curve with a single exponential function
+        and extracts the observed rate constants (k_obs). The results are then grouped
+        by protein concentration.
+        
+        Returns
+        -------
+        None
+            Updates the following instance attributes:
+            - k_obs: List of observed rate constants for each association curve
+            - signal_assoc_fit: List of fitted association signals
+            - fit_params_kinetics: DataFrame with the fitted parameters
         """
         self.clear_fittings()
 
@@ -137,10 +185,17 @@ class KineticsFitterSolution:
         return None
 
     def group_k_obs_by_protein_concentration(self):
-
         """
         Group the observed rate constants by protein concentration.
-        This is useful for plotting the rate constants against the protein concentration.
+        
+        This is useful for plotting the rate constants against the protein concentration
+        and for subsequent analysis of the concentration dependence of the kinetics.
+        
+        Returns
+        -------
+        None
+            Updates the k_obs_per_prot attribute with a dictionary mapping
+            protein concentrations to arrays of observed rate constants.
         """
         k_obs_per_prot = {}
 
@@ -161,6 +216,28 @@ class KineticsFitterSolution:
 
         """
         Fit double exponentials to the association signals in the solution kinetics experiment.
+        
+        This method fits each association curve with a double exponential function
+        and extracts two observed rate constants (k_obs_1 and k_obs_2). The results 
+        are then grouped by protein concentration.
+        
+        Parameters
+        ----------
+        min_log_k : float, optional
+            Minimum value of log10(k) to search, default is -4.
+        max_log_k : float, optional
+            Maximum value of log10(k) to search, default is 4.
+        log_k_points : int, optional
+            Number of points to sample in the log(k) space, default is 22.
+            
+        Returns
+        -------
+        None
+            Updates the following instance attributes:
+            - k_obs_1: List of first observed rate constants for each association curve
+            - k_obs_2: List of second observed rate constants for each association curve
+            - signal_assoc_fit: List of fitted association signals
+            - fit_params_kinetics: DataFrame with the fitted parameters
         """
 
         k_obs_1, k_obs_2, y_pred = fit_many_double_exponential(self.assoc_lst,self.time_assoc_lst,min_log_k, max_log_k, log_k_points)
@@ -185,7 +262,17 @@ class KineticsFitterSolution:
 
         """
         Group the observed rate constants by protein concentration for double exponential fits.
-        This is useful for plotting the rate constants against the protein concentration.
+        
+        This is useful for plotting the rate constants against the protein concentration
+        and for subsequent analysis of the concentration dependence of the kinetics
+        when using double exponential fits.
+        
+        Returns
+        -------
+        None
+            Updates the following instance attributes:
+            - k_obs_1_per_prot: Dictionary mapping protein concentrations to arrays of first observed rate constants
+            - k_obs_2_per_prot: Dictionary mapping protein concentrations to arrays of second observed rate constants
         """
         k_obs_1_per_prot = {}
         k_obs_2_per_prot = {}
@@ -208,10 +295,18 @@ class KineticsFitterSolution:
         return None
 
     def fit_one_binding_site(self):
-
         """
         Fit the association signals assuming one binding site.
-        This is a simplified model that assumes a single binding site for the ligand on the protein.
+        
+        This is a simplified model that assumes a single binding site for the ligand 
+        on the protein. The model fits global parameters to all curves simultaneously.
+        
+        Returns
+        -------
+        None
+            Updates the following instance attributes:
+            - signal_assoc_fit: List of fitted association signals
+            - fit_params_kinetics: DataFrame with the fitted parameters
         """
 
         initial_parameters = [1,np.mean(self.lig_conc),1] # Signal amplitude of the complex, Kd, and koff
@@ -257,6 +352,31 @@ class KineticsFitterSolution:
                                ESint_equals_ES=True,
                                fixed_t0=True
                                ):
+        """
+        Find optimal initial parameters for the induced fit model.
+        
+        Heuristically finds the best initial parameters for the fit by exploring
+        fixed values of kc and krev and fitting kon and koff (and the signal of the complex).
+        
+        Parameters
+        ----------
+        fit_signal_E : bool, optional
+            If True, fit the signal of the free protein E, default is False.
+        fit_signal_S : bool, optional
+            If True, fit the signal of the free ligand S, default is False.
+        fit_signal_ES : bool, optional
+            If True, fit the signal of the complex ES, default is True.
+        ESint_equals_ES : bool, optional
+            If True, assume that the signal of the intermediate ESint is equal 
+            to the signal of the complex ES, default is True.
+        fixed_t0 : bool, optional
+            If True, fix the t0 parameter to 0, default is True.
+            
+        Returns
+        -------
+        None
+            Updates the params_guess attribute with the best initial parameters.
+        """
 
         # Heuristically find the best initial parameters for the fit
         # We explore fixed values of kc and krev and fit kon and koff (and the signal of the complex)
@@ -282,16 +402,32 @@ class KineticsFitterSolution:
                         ESint_equals_ES=True,
                         fixed_t0=True
                         ):
-
         """
-        Fit the association signals assuming induced fit.
+        Fit the association signals assuming induced fit mechanism.
+        
         This model accounts for conformational changes in the protein upon ligand binding.
-        Args:
-            fit_signal_E (bool): If True, fit the signal of the free protein E.
-            fit_signal_S (bool): If True, fit the signal of the free ligand S.
-            fit_signal_ES (bool): If True, fit the signal of the complex ES.
-            ESint_equals_ES (bool): If True, assume that the signal of the intermediate ESint is equal to the signal of the complex ES.
-            fixed_t0 (bool): If True, fix the t0 parameter to 0.
+        The method first calls find_initial_params_if to get good starting values, then
+        performs the actual fitting with those values.
+        
+        Parameters
+        ----------
+        fit_signal_E : bool, optional
+            If True, fit the signal of the free protein E, default is False.
+        fit_signal_S : bool, optional
+            If True, fit the signal of the free ligand S, default is False.
+        fit_signal_ES : bool, optional
+            If True, fit the signal of the complex ES, default is True.
+        ESint_equals_ES : bool, optional
+            If True, assume that the signal of the intermediate ESint is equal to the signal of the complex ES, default is True.
+        fixed_t0 : bool, optional
+            If True, fix the t0 parameter to 0, default is True.
+            
+        Returns
+        -------
+        None
+            Updates the following instance attributes:
+            - signal_assoc_fit: List of fitted association signals
+            - fit_params_kinetics: DataFrame with the fitted parameters
         """
 
         # fit using as initial parameters the best found parameters

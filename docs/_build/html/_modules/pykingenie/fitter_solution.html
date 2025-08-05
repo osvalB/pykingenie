@@ -132,6 +132,34 @@
   </a>
 </li>
 
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../pykingenie.utils.html">
+    pykingenie.utils package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../pykingenie.utils.html">
+    pykingenie.utils package
+  </a>
+</li>
+
   </ul>
 </nav></div>
       
@@ -222,6 +250,34 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../modules.html">
     pykingenie
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../pykingenie.utils.html">
+    pykingenie.utils package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../pykingenie.utils.html">
+    pykingenie.utils package
   </a>
 </li>
 
@@ -319,7 +375,10 @@
                 <article class="bd-article">
                   
   <h1>Source code for pykingenie.fitter_solution</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">.utils.math</span><span class="w">            </span><span class="kn">import</span> <span class="o">*</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.utils.fitting_general</span><span class="w"> </span><span class="kn">import</span> <span class="n">fit_many_double_exponential</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.utils.math</span><span class="w">            </span><span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.utils.fitting_general</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.utils.fitting_solution</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 
@@ -440,22 +499,18 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">clear_fittings</span><span class="p">()</span>
 
-        <span class="n">k_obs</span>  <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">y_pred</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">k_obs</span>  <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="p">))]</span>
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="p">))]</span>
 
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">y</span><span class="p">,</span><span class="n">t</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">time_assoc_lst</span><span class="p">):</span>
 
-            <span class="k">try</span><span class="p">:</span>
+            <span class="n">fit_params</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">fit_y</span> <span class="o">=</span> <span class="n">fit_single_exponential</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">t</span><span class="p">)</span>
 
-                <span class="n">fit_params</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">fit_y</span> <span class="o">=</span> <span class="n">fit_single_exponential</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">t</span><span class="p">)</span>
+            <span class="n">k_obs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">fit_params</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">y_pred</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">fit_y</span>
 
-                <span class="n">k_obs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fit_params</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
-                <span class="n">y_pred</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fit_y</span><span class="p">)</span>
-
-            <span class="k">except</span><span class="p">:</span>
-
-                <span class="n">k_obs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
-                <span class="n">y_pred</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">k_obs</span>            <span class="o">=</span> <span class="n">k_obs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">signal_assoc_fit</span> <span class="o">=</span> <span class="n">y_pred</span>
@@ -503,28 +558,8 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Fit double exponentials to the association signals in the solution kinetics experiment.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">k_obs_1</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">k_obs_2</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">y_pred</span>  <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="k">for</span> <span class="n">y</span><span class="p">,</span><span class="n">t</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">time_assoc_lst</span><span class="p">):</span>
-
-            <span class="k">try</span><span class="p">:</span>
-
-                <span class="n">params</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">fitted_y</span> <span class="o">=</span> <span class="n">fit_double_exponential</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">t</span><span class="p">,</span><span class="n">min_log_k</span><span class="o">=</span><span class="n">min_log_k</span><span class="p">,</span><span class="n">max_log_k</span><span class="o">=</span><span class="n">max_log_k</span><span class="p">,</span><span class="n">log_k_points</span><span class="o">=</span><span class="n">log_k_points</span><span class="p">)</span>
-
-                <span class="n">slowest_k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">([</span><span class="n">params</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">params</span><span class="p">[</span><span class="mi">4</span><span class="p">]])</span>
-                <span class="n">second_k</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="n">params</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">params</span><span class="p">[</span><span class="mi">4</span><span class="p">]])</span>
-
-                <span class="n">k_obs_1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">slowest_k</span><span class="p">)</span>
-                <span class="n">k_obs_2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">second_k</span><span class="p">)</span>
-                <span class="n">y_pred</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fitted_y</span><span class="p">)</span>
-
-            <span class="k">except</span><span class="p">:</span>
-
-                <span class="n">k_obs_1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
-                <span class="n">k_obs_2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
-                <span class="n">y_pred</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">k_obs_1</span><span class="p">,</span> <span class="n">k_obs_2</span><span class="p">,</span> <span class="n">y_pred</span> <span class="o">=</span> <span class="n">fit_many_double_exponential</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">time_assoc_lst</span><span class="p">,</span><span class="n">min_log_k</span><span class="p">,</span> <span class="n">max_log_k</span><span class="p">,</span> <span class="n">log_k_points</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">k_obs_1</span> <span class="o">=</span> <span class="n">k_obs_1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">k_obs_2</span> <span class="o">=</span> <span class="n">k_obs_2</span>

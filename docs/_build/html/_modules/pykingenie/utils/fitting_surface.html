@@ -132,6 +132,34 @@
   </a>
 </li>
 
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
+    pykingenie.utils package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
+    pykingenie.utils package
+  </a>
+</li>
+
   </ul>
 </nav></div>
       
@@ -222,6 +250,34 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../modules.html">
     pykingenie
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
+    pykingenie.utils package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
+    pykingenie.utils package
   </a>
 </li>
 
@@ -323,10 +379,24 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.processing</span><span class="w">      </span><span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.signal_surface</span><span class="w">  </span><span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.math</span><span class="w">            </span><span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.fitting_general</span><span class="w"> </span><span class="kn">import</span> <span class="n">fit_single_exponential</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.fitting_general</span><span class="w"> </span><span class="kn">import</span> <span class="n">fit_single_exponential</span><span class="p">,</span> <span class="n">re_fit</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">curve_fit</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">minimize_scalar</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;guess_initial_signal&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;fit_steady_state_one_site&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;steady_state_one_site_asymmetric_ci95&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;fit_one_site_association&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;fit_one_site_dissociation&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;fit_one_site_assoc_and_disso&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;fit_induced_fit_sites_assoc_and_disso&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;fit_one_site_assoc_and_disso_ktr&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;one_site_assoc_and_disso_asymmetric_ci95&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;one_site_assoc_and_disso_asymmetric_ci95_koff&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;get_smax_upper_bound_factor&#39;</span>
+<span class="p">]</span>
 
 <div class="viewcode-block" id="guess_initial_signal">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.fitting_surface.guess_initial_signal">[docs]</a>
@@ -363,6 +433,20 @@
             <span class="n">s0s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
     <span class="k">return</span> <span class="n">s0s</span></div>
+
+
+<div class="viewcode-block" id="get_smax_upper_bound_factor">
+<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.fitting_surface.get_smax_upper_bound_factor">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_smax_upper_bound_factor</span><span class="p">(</span><span class="n">Kd_ss</span><span class="p">):</span>
+    <span class="n">factor_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)):</span> <span class="mf">1e3</span><span class="p">,</span>
+        <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">):</span> <span class="mf">1e2</span><span class="p">,</span>
+        <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;-inf&#39;</span><span class="p">),</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">50</span>
+    <span class="p">}</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">),</span> <span class="n">factor</span> <span class="ow">in</span> <span class="n">factor_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">low</span> <span class="o">&lt;=</span> <span class="n">Kd_ss</span> <span class="o">&lt;</span> <span class="n">high</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">factor</span>
+    <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># or raise an error if needed</span></div>
 
 
 <div class="viewcode-block" id="fit_steady_state_one_site">
@@ -1255,7 +1339,6 @@
     <span class="n">k_min95</span><span class="p">,</span> <span class="n">k_max95</span> <span class="o">=</span> <span class="n">k_min95</span> <span class="o">/</span> <span class="mf">1e3</span><span class="p">,</span> <span class="n">k_max95</span> <span class="o">/</span> <span class="mf">1e3</span>
 
     <span class="k">return</span> <span class="n">k_min95</span><span class="p">,</span> <span class="n">k_max95</span></div>
-
 
 </pre></div>
 
