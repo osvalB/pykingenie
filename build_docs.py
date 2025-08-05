@@ -12,8 +12,15 @@ from pathlib import Path
 def setup_docs():
     """Set up Sphinx documentation structure."""
     docs_dir = Path("docs")
+    
+    # Create docs directory if it doesn't exist
     docs_dir.mkdir(exist_ok=True)
-
+    
+    # Ensure the directory exists before changing to it
+    if not docs_dir.exists():
+        print(f"Error: Could not create docs directory at {docs_dir.absolute()}")
+        sys.exit(1)
+        
     # Change to docs directory
     os.chdir(docs_dir)
 
