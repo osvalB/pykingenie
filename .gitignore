@@ -15,5 +15,4 @@ test11.py
 .cache
 coverage.xml
 htmlcov
-docs/_build/
 view_docs.sh
