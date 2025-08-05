@@ -16,3 +16,4 @@ test11.py
 coverage.xml
 htmlcov
 docs/_build/
+view_docs.sh

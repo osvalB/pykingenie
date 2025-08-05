@@ -105,25 +105,29 @@ Welcome to PyKinGenie, a Python package for analyzing binding kinetics data with
    :caption: Contents:
 
    modules
-   pykingenie
-   pykingenie.utils
 
 Installation
 ============
 
-Install PyKinGenie using pip:
+Install PyKinGenie using uv:
+
+.. code-block:: bash
+
+   uv install pykingenie
+
+Or using pip:
 
 .. code-block:: bash
 
    pip install pykingenie
 
-Or for development:
+For development:
 
 .. code-block:: bash
 
    git clone https://github.com/osvalB/pykingenie
    cd pykingenie
-   pip install -e ".[dev]"
+   uv pip install -e ".[dev]"
 
 
 API Reference
@@ -159,6 +163,17 @@ def build_docs():
 
     os.chdir(docs_dir)
 
+    # Clean the build directory to ensure a fresh build
+    build_dir = Path("_build")
+    if build_dir.exists():
+        import shutil
+        print("Cleaning previous build...")
+        shutil.rmtree(build_dir)
+    
+    # Recreate the build directory
+    html_dir = build_dir / "html"
+    html_dir.mkdir(parents=True, exist_ok=True)
+
     print("Generating API documentation...")
     subprocess.run([
         sys.executable, "-m", "sphinx.ext.apidoc",
@@ -170,7 +185,7 @@ def build_docs():
         sys.executable, "-m", "sphinx", "-b", "html", ".", "_build/html"
     ])
 
-    html_path = docs_dir / "_build" / "html" / "index.html"
+    html_path = Path("_build") / "html" / "index.html"
     print(f"✅ Documentation built successfully!")
     print(f"📖 Open: {html_path.absolute()}")
 

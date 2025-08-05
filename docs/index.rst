@@ -9,8 +9,6 @@ Welcome to PyKinGenie, a Python package for analyzing binding kinetics data with
    :caption: Contents:
 
    modules
-   pykingenie
-   pykingenie.utils
 
 Installation
 ============
