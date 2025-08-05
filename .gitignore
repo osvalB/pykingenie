@@ -11,3 +11,8 @@ test3.py
 test4.py
 test11.py
 *png
+.coverage
+.cache
+coverage.xml
+htmlcov
+docs/_build/
