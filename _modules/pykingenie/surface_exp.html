@@ -139,27 +139,6 @@
   </a>
 </li>
 
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../pykingenie.utils.html">
-    pykingenie.utils package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../pykingenie.html">
-    pykingenie package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../pykingenie.utils.html">
-    pykingenie.utils package
-  </a>
-</li>
-
   </ul>
 </nav></div>
       
@@ -257,27 +236,6 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../pykingenie.html">
     pykingenie package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../pykingenie.utils.html">
-    pykingenie.utils package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../pykingenie.html">
-    pykingenie package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../pykingenie.utils.html">
-    pykingenie.utils package
   </a>
 </li>
 
@@ -385,12 +343,54 @@
 <div class="viewcode-block" id="SurfaceBasedExperiment">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.surface_exp.SurfaceBasedExperiment">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SurfaceBasedExperiment</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class representing surface-based kinetics experiments.</span>
+<span class="sd">    </span>
+<span class="sd">    This class handles operations related to surface-based experiments,</span>
+<span class="sd">    such as biolayer interferometry (BLI) or surface plasmon resonance (SPR).</span>
+<span class="sd">    It provides functionality for data processing, analysis, and visualization.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str</span>
+<span class="sd">        The name of the experiment.</span>
+<span class="sd">    type : str</span>
+<span class="sd">        The type of the experiment (e.g., &#39;Octet&#39;, &#39;SPR&#39;).</span>
+<span class="sd">        </span>
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str</span>
+<span class="sd">        The name of the experiment.</span>
+<span class="sd">    type : str</span>
+<span class="sd">        The type of the experiment.</span>
+<span class="sd">    xs : list of list</span>
+<span class="sd">        Time values for each sensor and step.</span>
+<span class="sd">    ys : list of list</span>
+<span class="sd">        Signal values for each sensor and step.</span>
+<span class="sd">    sensor_names : list</span>
+<span class="sd">        Names of the sensors.</span>
+<span class="sd">    ligand_conc_df : pandas.DataFrame</span>
+<span class="sd">        DataFrame containing ligand concentration information.</span>
+<span class="sd">    df_steps : pandas.DataFrame</span>
+<span class="sd">        DataFrame containing step information.</span>
+<span class="sd">    steps_performed : list</span>
+<span class="sd">        List of steps performed in the experiment.</span>
+<span class="sd">    traces_loaded : bool</span>
+<span class="sd">        Whether traces have been loaded.</span>
+<span class="sd">    sample_plate_loaded : bool</span>
+<span class="sd">        Whether the sample plate information has been loaded.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="SurfaceBasedExperiment.__init__">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.surface_exp.SurfaceBasedExperiment.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="nb">type</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialize the instance</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the SurfaceBasedExperiment instance.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name : str</span>
+<span class="sd">            The name of the experiment.</span>
+<span class="sd">        type : str</span>
+<span class="sd">            The type of the experiment (e.g., &#39;Octet&#39;, &#39;SPR&#39;).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span>                <span class="o">=</span> <span class="n">name</span>
@@ -422,9 +422,15 @@
 <div class="viewcode-block" id="SurfaceBasedExperiment.create_unique_sensor_names">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.surface_exp.SurfaceBasedExperiment.create_unique_sensor_names">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">create_unique_sensor_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Create unique sensor names by adding the name of the experiment to the sensor names</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create unique sensor names by adding the experiment name to each sensor name.</span>
+<span class="sd">        </span>
+<span class="sd">        This method updates the `sensor_names_unique` attribute by prefixing</span>
+<span class="sd">        each sensor name with the experiment name.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            The method modifies the `sensor_names_unique` attribute in-place.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">sensor_names_unique</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">sensor_name</span> <span class="k">for</span> <span class="n">sensor_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sensor_names</span><span class="p">]</span>
@@ -434,8 +440,20 @@
 
 <div class="viewcode-block" id="SurfaceBasedExperiment.check_sensor_name">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.surface_exp.SurfaceBasedExperiment.check_sensor_name">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">check_sensor_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">new_sensor_name</span><span class="p">):</span>
-
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_sensor_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_sensor_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if a sensor name already exists and modify it if necessary.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        new_sensor_name : str</span>
+<span class="sd">            The proposed name for a new sensor.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            A unique sensor name, either the original if it doesn&#39;t exist </span>
+<span class="sd">            or a modified version with &#39; rep&#39; appended.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">new_sensor_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sensor_names</span><span class="p">:</span>
             <span class="n">new_sensor_name</span> <span class="o">+=</span> <span class="s1">&#39; rep&#39;</span>
 
@@ -444,22 +462,36 @@
 
 <div class="viewcode-block" id="SurfaceBasedExperiment.subtraction_one_to_one">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.surface_exp.SurfaceBasedExperiment.subtraction_one_to_one">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">subtraction_one_to_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sensor_name1</span><span class="p">,</span> <span class="n">sensor_name2</span><span class="p">,</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        Subtract the signal of sensor2 from sensor1</span>
-
-<span class="sd">        Args:</span>
-
-<span class="sd">            sensor_name1 (str): name of the sensor to subtract from</span>
-<span class="sd">            sensor_name2 (str): name of the sensor to subtract</span>
-<span class="sd">            inplace (bool):     if True, the subtraction is done in place, otherwise a new sensor is created</span>
-
-<span class="sd">        Results:</span>
-
-<span class="sd">            It modifies the attributes self.xs, self.ys, self.sensor_names and self.ligand_conc_df</span>
-
+    <span class="k">def</span><span class="w"> </span><span class="nf">subtraction_one_to_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sensor_name1</span><span class="p">,</span> <span class="n">sensor_name2</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Subtract the signal of one sensor from another.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sensor_name1 : str</span>
+<span class="sd">            Name of the sensor to subtract from.</span>
+<span class="sd">        sensor_name2 : str</span>
+<span class="sd">            Name of the sensor to subtract.</span>
+<span class="sd">        inplace : bool, optional</span>
+<span class="sd">            If True, the subtraction is done in place, otherwise a new sensor</span>
+<span class="sd">            is created, by default True.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            The method modifies the instance attributes in-place.</span>
+<span class="sd">            </span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method modifies the following attributes:</span>
+<span class="sd">        - self.xs</span>
+<span class="sd">        - self.ys</span>
+<span class="sd">        - self.sensor_names</span>
+<span class="sd">        - self.ligand_conc_df</span>
+<span class="sd">        </span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">            If no traces are loaded or if sensors are incompatible.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">traces_loaded</span><span class="p">:</span>
@@ -514,17 +546,32 @@
 
 <div class="viewcode-block" id="SurfaceBasedExperiment.subtraction">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.surface_exp.SurfaceBasedExperiment.subtraction">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">subtraction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">list_of_sensor_names</span><span class="p">,</span><span class="n">reference_sensor</span><span class="p">,</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Apply the subtract operation to a list of sensors</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            list_of_sensor_names (list): list of sensor names to subtract</span>
-<span class="sd">            reference_sensor (str): name of the sensor to subtract from</span>
-<span class="sd">            inplace (bool):     if True, the subtraction is done in place, otherwise a new sensor is created</span>
-<span class="sd">        Results:</span>
-<span class="sd">            It modifies the attributes self.xs, self.ys, self.sensor_names and self.ligand_conc_df</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">subtraction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">list_of_sensor_names</span><span class="p">,</span> <span class="n">reference_sensor</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply subtraction operation to a list of sensors.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        list_of_sensor_names : list or str</span>
+<span class="sd">            List of sensor names to subtract from. If a string is provided,</span>
+<span class="sd">            it will be converted to a list.</span>
+<span class="sd">        reference_sensor : str</span>
+<span class="sd">            Name of the sensor to subtract.</span>
+<span class="sd">        inplace : bool, optional</span>
+<span class="sd">            If True, the subtraction is done in place, otherwise new sensors</span>
+<span class="sd">            are created, by default True.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            The method modifies the instance attributes in-place.</span>
+<span class="sd">            </span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method modifies the following attributes:</span>
+<span class="sd">        - self.xs</span>
+<span class="sd">        - self.ys</span>
+<span class="sd">        - self.sensor_names</span>
+<span class="sd">        - self.ligand_conc_df</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">list_of_sensor_names</span> <span class="o">=</span> <span class="n">if_string_to_list</span><span class="p">(</span><span class="n">list_of_sensor_names</span><span class="p">)</span>
@@ -537,21 +584,33 @@
 
 <div class="viewcode-block" id="SurfaceBasedExperiment.average">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.surface_exp.SurfaceBasedExperiment.average">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">average</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">list_of_sensor_names</span><span class="p">,</span><span class="n">new_sensor_name</span><span class="o">=</span><span class="s1">&#39;Average&#39;</span><span class="p">):</span>
-
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        Average the signals of the sensors in the list</span>
-
-<span class="sd">        Args:</span>
-
-<span class="sd">            list_of_sensor_names (list): list of sensor names to average</span>
-<span class="sd">            new_sensor_name (str):       name of the new sensor</span>
-
-<span class="sd">        Results:</span>
-
-<span class="sd">            It modifies the attributes self.xs, self.ys, self.sensor_names and self.ligand_conc_df</span>
-
+    <span class="k">def</span><span class="w"> </span><span class="nf">average</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">list_of_sensor_names</span><span class="p">,</span> <span class="n">new_sensor_name</span><span class="o">=</span><span class="s1">&#39;Average&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Average the signals of the sensors in the list.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        list_of_sensor_names : list</span>
+<span class="sd">            List of sensor names to average.</span>
+<span class="sd">        new_sensor_name : str, optional</span>
+<span class="sd">            Name of the new sensor, by default &#39;Average&#39;.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            The method modifies the instance attributes in-place.</span>
+<span class="sd">            </span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method modifies the following attributes:</span>
+<span class="sd">        - self.xs</span>
+<span class="sd">        - self.ys</span>
+<span class="sd">        - self.sensor_names</span>
+<span class="sd">        - self.ligand_conc_df</span>
+<span class="sd">            </span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">            If no traces are loaded.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># Check if sensors are loaded</span>
@@ -592,22 +651,39 @@
 
 <div class="viewcode-block" id="SurfaceBasedExperiment.align_association">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.surface_exp.SurfaceBasedExperiment.align_association">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">align_association</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">sensor_names</span><span class="p">,</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">new_names</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">npoints</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
-
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        Align the BLI traces based on the signal before the association step(s)</span>
-
-<span class="sd">        Args:</span>
-
-<span class="sd">            sensor_names (str or list): name of the sensor(s) to align</span>
-<span class="sd">            inplace (bool):             if True, the alignment is done in place, otherwise a new sensor is created</span>
-<span class="sd">            new_names (bool):          if True, the new sensor name is used, otherwise the old one is used</span>
-
-<span class="sd">        Results:</span>
-
-<span class="sd">            It modifies the attributes self.xs, self.ys, self.sensor_names and self.ligand_conc_df</span>
-
+    <span class="k">def</span><span class="w"> </span><span class="nf">align_association</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sensor_names</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">new_names</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">npoints</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Align BLI traces based on the signal before the association step(s).</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sensor_names : str or list</span>
+<span class="sd">            Name of the sensor(s) to align. If a string is provided,</span>
+<span class="sd">            it will be converted to a list.</span>
+<span class="sd">        inplace : bool, optional</span>
+<span class="sd">            If True, the alignment is done in place, otherwise new sensors</span>
+<span class="sd">            are created, by default True.</span>
+<span class="sd">        new_names : bool, optional</span>
+<span class="sd">            If True, new sensor names are generated, otherwise the original</span>
+<span class="sd">            names are kept, by default False.</span>
+<span class="sd">        npoints : int, optional</span>
+<span class="sd">            Number of points to use for averaging at alignment positions,</span>
+<span class="sd">            by default 10.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            The method modifies the instance attributes in-place.</span>
+<span class="sd">            </span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method modifies the following attributes:</span>
+<span class="sd">        - self.xs</span>
+<span class="sd">        - self.ys</span>
+<span class="sd">        - self.sensor_names</span>
+<span class="sd">        - self.ligand_conc_df</span>
+<span class="sd">        </span>
+<span class="sd">        The alignment is performed by subtracting the average signal of the</span>
+<span class="sd">        last `npoints` points before each association step.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">sensor_names</span> <span class="o">=</span> <span class="n">if_string_to_list</span><span class="p">(</span><span class="n">sensor_names</span><span class="p">)</span>
 
@@ -704,20 +780,39 @@
 
 <div class="viewcode-block" id="SurfaceBasedExperiment.align_dissociation">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.surface_exp.SurfaceBasedExperiment.align_dissociation">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">align_dissociation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">sensor_names</span><span class="p">,</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">new_names</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span><span class="n">npoints</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
-
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Align the BLI traces based on the signal before the dissociation step(s)</span>
-
-<span class="sd">        Args:</span>
-
-<span class="sd">            sensor_names (str or list): name of the sensor(s) to align</span>
-<span class="sd">            inplace (bool):             if True, the alignment is done in place, otherwise a new sensor is created</span>
-
-<span class="sd">        Results:</span>
-
-<span class="sd">            It modifies the attributes self.xs, self.ys, self.sensor_names and self.ligand_conc_df</span>
-
+    <span class="k">def</span><span class="w"> </span><span class="nf">align_dissociation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sensor_names</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">new_names</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">npoints</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Align BLI traces based on the signal before the dissociation step(s).</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sensor_names : str or list</span>
+<span class="sd">            Name of the sensor(s) to align. If a string is provided,</span>
+<span class="sd">            it will be converted to a list.</span>
+<span class="sd">        inplace : bool, optional</span>
+<span class="sd">            If True, the alignment is done in place, otherwise new sensors</span>
+<span class="sd">            are created, by default True.</span>
+<span class="sd">        new_names : bool, optional</span>
+<span class="sd">            If True, new sensor names are generated, otherwise the original</span>
+<span class="sd">            names are kept, by default False.</span>
+<span class="sd">        npoints : int, optional</span>
+<span class="sd">            Number of points to use for averaging at alignment positions,</span>
+<span class="sd">            by default 10.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            The method modifies the instance attributes in-place.</span>
+<span class="sd">            </span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method modifies the following attributes:</span>
+<span class="sd">        - self.xs</span>
+<span class="sd">        - self.ys</span>
+<span class="sd">        - self.sensor_names</span>
+<span class="sd">        - self.ligand_conc_df</span>
+<span class="sd">        </span>
+<span class="sd">        The alignment is performed by smoothing the transition between association</span>
+<span class="sd">        and dissociation steps.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">sensor_names</span> <span class="o">=</span> <span class="n">if_string_to_list</span><span class="p">(</span><span class="n">sensor_names</span><span class="p">)</span>
 
@@ -784,21 +879,29 @@
 
 <div class="viewcode-block" id="SurfaceBasedExperiment.discard_steps">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.surface_exp.SurfaceBasedExperiment.discard_steps">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">discard_steps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">sensor_names</span><span class="p">,</span><span class="n">step_types</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;KREGENERATION&#39;</span><span class="p">,</span><span class="s1">&#39;LOADING&#39;</span><span class="p">]):</span>
-
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        Discard the steps of the sensors in the list</span>
-
-<span class="sd">        Args:</span>
-
-<span class="sd">            sensor_names (str or list): name of the sensor(s) to analyse</span>
-<span class="sd">            step_types (str or list):    type of the steps to discard</span>
-
-<span class="sd">        Results:</span>
-
-<span class="sd">            It modifies the attributes self.xs, self.ys, self.sensor_names and self.ligand_conc_df</span>
-
+    <span class="k">def</span><span class="w"> </span><span class="nf">discard_steps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sensor_names</span><span class="p">,</span> <span class="n">step_types</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;KREGENERATION&#39;</span><span class="p">,</span> <span class="s1">&#39;LOADING&#39;</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Discard specific step types from the sensors in the list.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sensor_names : str or list</span>
+<span class="sd">            Name of the sensor(s) to process. If a string is provided,</span>
+<span class="sd">            it will be converted to a list.</span>
+<span class="sd">        step_types : str or list, optional</span>
+<span class="sd">            Type(s) of steps to discard, by default [&#39;KREGENERATION&#39;, &#39;LOADING&#39;].</span>
+<span class="sd">            If a string is provided, it will be converted to a list.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            The method modifies the instance attributes in-place.</span>
+<span class="sd">            </span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method modifies the following attributes:</span>
+<span class="sd">        - self.ys</span>
+<span class="sd">        </span>
+<span class="sd">        The discarded steps are replaced with NaN values.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">sensor_names</span> <span class="o">=</span> <span class="n">if_string_to_list</span><span class="p">(</span><span class="n">sensor_names</span><span class="p">)</span>
         <span class="n">step_types</span>   <span class="o">=</span> <span class="n">if_string_to_list</span><span class="p">(</span><span class="n">step_types</span><span class="p">)</span>
@@ -820,26 +923,43 @@
 
 <div class="viewcode-block" id="SurfaceBasedExperiment.get_step_xy">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.surface_exp.SurfaceBasedExperiment.get_step_xy">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_step_xy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">sensor_name</span><span class="p">,</span><span class="n">location_loading</span><span class="p">,</span>
-                    <span class="n">location_sample</span><span class="p">,</span><span class="n">step_type</span><span class="o">=</span><span class="s1">&#39;ASSOC&#39;</span><span class="p">,</span>
-                    <span class="n">replicate</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">):</span>
-
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return the x or y values of a certain step</span>
-
-<span class="sd">        Args:</span>
-
-<span class="sd">            sensor_name (str): name of the sensor</span>
-<span class="sd">            location_sample (int):    column location of the sample. If zero, we assume we only have one location</span>
-<span class="sd">            location_loading (int):    column location of the loading. If zero, we assume we only have one location</span>
-<span class="sd">            step_type (str):   type of the step, ASSOC or DISASSOC only</span>
-<span class="sd">            replicate (int):   replicate number</span>
-<span class="sd">            type (str):        x or y</span>
-
-<span class="sd">        Returns:</span>
-
-<span class="sd">            x or y (np.n) values of the step</span>
-
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_step_xy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sensor_name</span><span class="p">,</span> <span class="n">location_loading</span><span class="p">,</span> 
+                 <span class="n">location_sample</span><span class="p">,</span> <span class="n">step_type</span><span class="o">=</span><span class="s1">&#39;ASSOC&#39;</span><span class="p">,</span>
+                 <span class="n">replicate</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the x or y values of a specific step.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sensor_name : str</span>
+<span class="sd">            Name of the sensor.</span>
+<span class="sd">        location_loading : int</span>
+<span class="sd">            Column location of the loading. If zero, assumes only one location.</span>
+<span class="sd">        location_sample : int</span>
+<span class="sd">            Column location of the sample. If zero, assumes only one location.</span>
+<span class="sd">        step_type : str, optional</span>
+<span class="sd">            Type of step, only &#39;ASSOC&#39; or &#39;DISASSOC&#39; are valid, by default &#39;ASSOC&#39;.</span>
+<span class="sd">        replicate : int, optional</span>
+<span class="sd">            Replicate number, by default 1.</span>
+<span class="sd">        type : str, optional</span>
+<span class="sd">            Data type to return, either &#39;x&#39; or &#39;y&#39;, by default &#39;y&#39;.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        numpy.ndarray</span>
+<span class="sd">            The x (time) or y (signal) values of the specified step.</span>
+<span class="sd">            </span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If location_sample, location_loading, or replicate are not valid integers.</span>
+<span class="sd">        TypeError</span>
+<span class="sd">            If any parameter has an incorrect type.</span>
+<span class="sd">            </span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        For &#39;x&#39; type data, time values are processed to start from zero for each step.</span>
+<span class="sd">        For association steps, time starts at the beginning of the step.</span>
+<span class="sd">        For dissociation steps, time continues from the association step.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># Try to convert to integer, the variables location_sample, location_loading and Replicate</span>

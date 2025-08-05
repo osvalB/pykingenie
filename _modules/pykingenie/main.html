@@ -139,27 +139,6 @@
   </a>
 </li>
 
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../pykingenie.utils.html">
-    pykingenie.utils package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../pykingenie.html">
-    pykingenie package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../pykingenie.utils.html">
-    pykingenie.utils package
-  </a>
-</li>
-
   </ul>
 </nav></div>
       
@@ -257,27 +236,6 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../pykingenie.html">
     pykingenie package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../pykingenie.utils.html">
-    pykingenie.utils package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../pykingenie.html">
-    pykingenie package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../pykingenie.utils.html">
-    pykingenie.utils package
   </a>
 </li>
 
@@ -389,7 +347,24 @@
 <div class="viewcode-block" id="KineticsAnalyzer.__init__">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.main.KineticsAnalyzer.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the KineticsAnalyzer instance.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
+<span class="sd">        </span>
+<span class="sd">        Attributes</span>
+<span class="sd">        ----------</span>
+<span class="sd">        experiments : dict</span>
+<span class="sd">            Dictionary of experiment objects with experiment names as keys.</span>
+<span class="sd">        experiment_names : list</span>
+<span class="sd">            List of experiment names.</span>
+<span class="sd">        fittings : dict</span>
+<span class="sd">            Dictionary of fitting objects with fitting names as keys.</span>
+<span class="sd">        fittings_names : list</span>
+<span class="sd">            List of fitting names.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">experiments</span>      <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">experiment_names</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fittings</span>         <span class="o">=</span> <span class="p">{}</span>
@@ -398,75 +373,113 @@
 
 <div class="viewcode-block" id="KineticsAnalyzer.delete_experiment">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.main.KineticsAnalyzer.delete_experiment">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">delete_experiment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">experiment_names</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete_experiment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment_names</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Delete experiment(s) from the analyzer.</span>
 
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        experiment_names : str or list of str</span>
+<span class="sd">            Name(s) of the experiment(s) to delete.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">experiment_names</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="n">experiment_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">experiment_names</span><span class="p">]</span>
-
         <span class="k">for</span> <span class="n">experiment_name</span> <span class="ow">in</span> <span class="n">experiment_names</span><span class="p">:</span>
-
             <span class="k">if</span> <span class="n">experiment_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_names</span><span class="p">:</span>
-
                 <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiments</span><span class="p">[</span><span class="n">experiment_name</span><span class="p">]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">experiment_names</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">experiment_name</span><span class="p">)</span>
-
         <span class="k">return</span> <span class="kc">None</span></div>
 
 
 <div class="viewcode-block" id="KineticsAnalyzer.add_experiment">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.main.KineticsAnalyzer.add_experiment">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">add_experiment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">experiment</span><span class="p">,</span><span class="n">experiment_name</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_experiment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment</span><span class="p">,</span> <span class="n">experiment_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add an experiment to the analyzer.</span>
 
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        experiment : object</span>
+<span class="sd">            Experiment instance to add.</span>
+<span class="sd">        experiment_name : str</span>
+<span class="sd">            Name of the experiment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">delete_experiment</span><span class="p">(</span><span class="n">experiment_name</span><span class="p">)</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">experiments</span><span class="p">[</span><span class="n">experiment_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">experiment</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">experiment_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">experiment_name</span><span class="p">)</span>
-
         <span class="k">return</span> <span class="kc">None</span></div>
 
 
 <div class="viewcode-block" id="KineticsAnalyzer.init_fittings">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.main.KineticsAnalyzer.init_fittings">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">init_fittings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize (reset) the fittings dictionary and names list.</span>
 
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fittings</span>       <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fittings_names</span> <span class="o">=</span> <span class="p">[]</span>
-
         <span class="k">return</span> <span class="kc">None</span></div>
 
 
 <div class="viewcode-block" id="KineticsAnalyzer.add_fitting">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.main.KineticsAnalyzer.add_fitting">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">add_fitting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">fitting</span><span class="p">,</span><span class="n">fitting_name</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_fitting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fitting</span><span class="p">,</span> <span class="n">fitting_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a fitting object to the analyzer.</span>
 
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fitting : object</span>
+<span class="sd">            Fitting object to add.</span>
+<span class="sd">        fitting_name : str</span>
+<span class="sd">            Name of the fitting.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">fitting_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fittings_names</span><span class="p">:</span>
-
-                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">fittings</span><span class="p">[</span><span class="n">fitting_name</span><span class="p">]</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">fittings_names</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">fitting_name</span><span class="p">)</span>
-
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">fittings</span><span class="p">[</span><span class="n">fitting_name</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fittings_names</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">fitting_name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fittings</span><span class="p">[</span><span class="n">fitting_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">fitting</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fittings_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fitting_name</span><span class="p">)</span>
-
         <span class="k">return</span> <span class="kc">None</span></div>
 
 
 <div class="viewcode-block" id="KineticsAnalyzer.get_experiment_properties">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.main.KineticsAnalyzer.get_experiment_properties">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_experiment_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span><span class="n">fittings</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_experiment_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">fittings</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a list of properties from experiments or fittings.</span>
 
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        variable : str</span>
+<span class="sd">            Name of the property to retrieve.</span>
+<span class="sd">        fittings : bool, optional</span>
+<span class="sd">            If True, get from fittings; else from experiments. Default is False.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            List of property values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">fittings</span><span class="p">:</span>
-
             <span class="k">return</span> <span class="p">[</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fittings</span><span class="p">[</span><span class="n">fitting_name</span><span class="p">],</span> <span class="n">variable</span><span class="p">)</span> <span class="k">for</span> <span class="n">fitting_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fittings_names</span><span class="p">]</span>
-
         <span class="k">else</span><span class="p">:</span>
-
             <span class="k">return</span> <span class="p">[</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">experiments</span><span class="p">[</span><span class="n">exp_name</span><span class="p">],</span> <span class="n">variable</span><span class="p">)</span> <span class="k">for</span> <span class="n">exp_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_names</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="KineticsAnalyzer.merge_ligand_conc_df">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.main.KineticsAnalyzer.merge_ligand_conc_df">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">merge_ligand_conc_df</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Merge ligand concentration DataFrames from all experiments.</span>
 
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Combine ligand concentration data frames from experiments</span>
         <span class="n">dfs</span> <span class="o">=</span> <span class="p">[</span><span class="n">exp</span><span class="o">.</span><span class="n">ligand_conc_df</span> <span class="k">for</span> <span class="n">exp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiments</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
         <span class="n">df</span>  <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -505,7 +518,24 @@
 <div class="viewcode-block" id="KineticsAnalyzer.merge_conc_df_solution">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.main.KineticsAnalyzer.merge_conc_df_solution">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">merge_conc_df_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Merge concentration DataFrames from all solution-based experiments.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Creates a combined_conc_df attribute containing the merged concentration data.</span>
+<span class="sd">            </span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method combines the concentration DataFrames from all solution-based </span>
+<span class="sd">        experiments in the analyzer. It adds a &#39;Select&#39; column with all values set to True,</span>
+<span class="sd">        which can be used for filtering data in subsequent analyses.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Combine concentration data frames from solution-based experiments</span>
         <span class="n">dfs</span> <span class="o">=</span> <span class="p">[</span><span class="n">exp</span><span class="o">.</span><span class="n">conc_df</span> <span class="k">for</span> <span class="n">exp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiments</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
         <span class="n">df</span>  <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -531,21 +561,19 @@
 
 <div class="viewcode-block" id="KineticsAnalyzer.generate_fittings">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.main.KineticsAnalyzer.generate_fittings">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">generate_fittings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">df</span><span class="p">):</span>
-
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_fittings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Given a data frame, extract the kinetics data and create a fitting object for each sample.</span>
-<span class="sd">        The data frame should contain the following columns:</span>
-<span class="sd">        - &#39;Sensor&#39;: The sensor ID</span>
-<span class="sd">        - &#39;Experiment&#39;: The experiment ID</span>
-<span class="sd">        - &#39;Replicate&#39;: The replicate number</span>
-<span class="sd">        - &#39;Analyte_location&#39;: The location of the analyte</span>
-<span class="sd">        - &#39;Loading_location&#39;: The location of the loading</span>
-<span class="sd">        - &#39;Concentration_micromolar&#39;: The concentration of the analyte in micromolar</span>
-<span class="sd">        - &#39;SampleID&#39;: The sample ID</span>
-<span class="sd">        - &#39;Smax_ID&#39;: The Smax ID</span>
-<span class="sd">        - &#39;Select&#39;: A boolean value indicating whether to select the sample or not</span>
+<span class="sd">        Generate fitting objects for surface-based experiments from a DataFrame.</span>
 
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        df : pandas.DataFrame</span>
+<span class="sd">            DataFrame containing experiment data.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            List of messages about fitting creation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># List of messages to be printed to the console</span>
@@ -691,17 +719,19 @@
 
 <div class="viewcode-block" id="KineticsAnalyzer.generate_fittings_solution">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.main.KineticsAnalyzer.generate_fittings_solution">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">generate_fittings_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">df</span><span class="p">):</span>
-
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_fittings_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Given a data frame, extract the kinetics data and create a fitting object for each sample.</span>
-<span class="sd">        The data frame should contain the following columns:</span>
-<span class="sd">        - &#39;Trace&#39;: The trace ID</span>
-<span class="sd">        - &#39;Experiment&#39;: The experiment ID</span>
-<span class="sd">        - &#39;[Protein] (μM)&#39;: The protein concentration in micromolar</span>
-<span class="sd">        - &#39;[Ligand] (μM)&#39;: The ligand concentration in micromolar</span>
-<span class="sd">        - &#39;SampleID&#39;: The sample ID</span>
-<span class="sd">        - &#39;Select&#39;: A boolean value indicating whether to select the sample or not</span>
+<span class="sd">        Generate fitting objects for solution-based experiments from a DataFrame.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        df : pandas.DataFrame</span>
+<span class="sd">            DataFrame containing experiment data.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            List of messages about fitting creation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># List of messages to be printed to the console</span>
@@ -790,45 +820,39 @@
 <div class="viewcode-block" id="KineticsAnalyzer.submit_steady_state_fitting">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.main.KineticsAnalyzer.submit_steady_state_fitting">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">submit_steady_state_fitting</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Submit steady-state fitting for all fitting objects.</span>
 
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">kf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fittings</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-
             <span class="k">if</span> <span class="ow">not</span> <span class="n">kf</span><span class="o">.</span><span class="n">is_single_cycle</span><span class="p">:</span>
                 <span class="n">kf</span><span class="o">.</span><span class="n">fit_steady_state</span><span class="p">()</span>
                 <span class="n">kf</span><span class="o">.</span><span class="n">create_fitting_bounds_table</span><span class="p">()</span>
-
             <span class="k">else</span><span class="p">:</span>
-
                 <span class="n">kf</span><span class="o">.</span><span class="n">Smax_upper_bound_factor</span> <span class="o">=</span> <span class="mf">1e2</span> <span class="c1"># Normal values for lower than micromolar affinity</span>
-
         <span class="k">return</span> <span class="kc">None</span></div>
 
 
 <div class="viewcode-block" id="KineticsAnalyzer.submit_fitting_solution">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.main.KineticsAnalyzer.submit_fitting_solution">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">submit_fitting_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">fitting_model</span><span class="o">=</span><span class="s1">&#39;single&#39;</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-
+    <span class="k">def</span><span class="w"> </span><span class="nf">submit_fitting_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fitting_model</span><span class="o">=</span><span class="s1">&#39;single&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Fit a variety of models to the kinetics data in the solution-based experiments.</span>
-<span class="sd">        Args:</span>
-<span class="sd">            fitting_model (str): The model to fit. Options are:</span>
-<span class="sd">                - &#39;single&#39;: Fit single exponentials</span>
-<span class="sd">                - &#39;double&#39;: Fit double exponentials</span>
-<span class="sd">                - &#39;one_binding_site&#39;: Fit one binding site model</span>
-<span class="sd">                - &#39;one_binding_site_if&#39;: Fit one binding site model with induced fit</span>
-<span class="sd">            **kwargs: Additional keyword arguments for the fitting methods.</span>
+<span class="sd">        Fit models to solution-based kinetics data.</span>
 
-<span class="sd">        For example with &#39;one_binding_site_if&#39; you can use</span>
-<span class="sd">            kwargs = {</span>
-<span class="sd">            &quot;fit_signal_E&quot;: False,</span>
-<span class="sd">            &quot;fit_signal_S&quot;: False,</span>
-<span class="sd">            &quot;fit_signal_ES&quot;: True,</span>
-<span class="sd">            &quot;ESint_equals_ES&quot;: True,</span>
-<span class="sd">            &quot;fixed_t0&quot;: True</span>
-<span class="sd">            }</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fitting_model : str, optional</span>
+<span class="sd">            Model to fit. Options: &#39;single&#39;, &#39;double&#39;, &#39;one_binding_site&#39;, &#39;one_binding_site_if&#39;. Default is &#39;single&#39;.</span>
+<span class="sd">        **kwargs : dict</span>
+<span class="sd">            Additional keyword arguments for fitting methods.</span>
 
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="k">if</span> <span class="n">fitting_model</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;single&#39;</span><span class="p">,</span> <span class="s1">&#39;double&#39;</span><span class="p">,</span> <span class="s1">&#39;one_binding_site&#39;</span><span class="p">,</span> <span class="s1">&#39;one_binding_site_if&#39;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown fitting model: &quot;</span> <span class="o">+</span> <span class="n">fitting_model</span><span class="p">)</span>
 
@@ -852,10 +876,25 @@
 
 <div class="viewcode-block" id="KineticsAnalyzer.submit_kinetics_fitting">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.main.KineticsAnalyzer.submit_kinetics_fitting">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">submit_kinetics_fitting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">fitting_model</span><span class="o">=</span><span class="s1">&#39;one_to_one&#39;</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">submit_kinetics_fitting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fitting_model</span><span class="o">=</span><span class="s1">&#39;one_to_one&#39;</span><span class="p">,</span>
                                 <span class="n">fitting_region</span><span class="o">=</span><span class="s1">&#39;association_dissociation&#39;</span><span class="p">,</span>
                                 <span class="n">linkedSmax</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fit models to surface-based kinetics data.</span>
 
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fitting_model : str, optional</span>
+<span class="sd">            Model to fit. Options: &#39;one_to_one&#39;, &#39;one_to_one_mtl&#39;, &#39;one_to_one_if&#39;. Default is &#39;one_to_one&#39;.</span>
+<span class="sd">        fitting_region : str, optional</span>
+<span class="sd">            Region to fit. Options: &#39;association_dissociation&#39;, &#39;association&#39;, &#39;dissociation&#39;. Default is &#39;association_dissociation&#39;.</span>
+<span class="sd">        linkedSmax : bool, optional</span>
+<span class="sd">            Whether to link Smax values across curves. Default is False.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">fitting_model</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;one_to_one&#39;</span><span class="p">,</span> <span class="s1">&#39;one_to_one_mtl&#39;</span><span class="p">,</span> <span class="s1">&#39;one_to_one_if&#39;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown fitting model: &quot;</span> <span class="o">+</span> <span class="n">fitting_model</span><span class="p">)</span>
 
@@ -885,8 +924,31 @@
 
 <div class="viewcode-block" id="KineticsAnalyzer.calculate_asymmetric_error">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.main.KineticsAnalyzer.calculate_asymmetric_error">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_asymmetric_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">shared_smax</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">fixed_t0</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">fit_ktr</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_asymmetric_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shared_smax</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fixed_t0</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fit_ktr</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate asymmetric error (confidence intervals) for all fitting objects.</span>
 
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        shared_smax : bool, optional</span>
+<span class="sd">            Whether Smax is shared across different curves. Default is True.</span>
+<span class="sd">        fixed_t0 : bool, optional</span>
+<span class="sd">            Whether t0 (start time) is fixed during fitting. Default is True.</span>
+<span class="sd">        fit_ktr : bool, optional</span>
+<span class="sd">            Whether to fit mass transport limitation parameter ktr. Default is False.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Updates the fitting objects with confidence intervals for the fitted parameters.</span>
+<span class="sd">            </span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method calculates asymmetric confidence intervals for the kinetic </span>
+<span class="sd">        parameters (kon, koff, Kd) for each fitting object. The confidence intervals</span>
+<span class="sd">        are stored in the fitting objects and can be accessed through the </span>
+<span class="sd">        get_fitting_results method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">kf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fittings</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
 
             <span class="n">kf</span><span class="o">.</span><span class="n">calculate_ci95</span><span class="p">(</span>
@@ -902,7 +964,18 @@
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.main.KineticsAnalyzer.get_fitting_results">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_fitting_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the results of the fitting process into a nice dataframe</span>
+<span class="sd">        Get the results of the fitting process as a DataFrame.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pandas.DataFrame or None</span>
+<span class="sd">            DataFrame containing fitting results from all fitting objects.</span>
+<span class="sd">            The DataFrame includes parameters like kon, koff, Kd, and their</span>
+<span class="sd">            confidence intervals. Returns None if no fitting results are available.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -923,9 +996,13 @@
 <div class="viewcode-block" id="KineticsAnalyzer.get_legends_table">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.main.KineticsAnalyzer.get_legends_table">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_legends_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the legends table for plotting the kinetics data</span>
+<span class="sd">        Get the legends table for plotting the kinetics data.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pandas.DataFrame</span>
+<span class="sd">            DataFrame containing legend information for plotting.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         
         <span class="n">labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_experiment_properties</span><span class="p">(</span><span class="s1">&#39;sensor_names&#39;</span><span class="p">)</span>

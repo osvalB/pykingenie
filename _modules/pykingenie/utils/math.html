@@ -139,27 +139,6 @@
   </a>
 </li>
 
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
-    pykingenie.utils package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.html">
-    pykingenie package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
-    pykingenie.utils package
-  </a>
-</li>
-
   </ul>
 </nav></div>
       
@@ -257,27 +236,6 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../pykingenie.html">
     pykingenie package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
-    pykingenie.utils package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.html">
-    pykingenie package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
-    pykingenie.utils package
   </a>
 </li>
 
@@ -390,18 +348,24 @@
 <div class="viewcode-block" id="single_exponential">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.math.single_exponential">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">single_exponential</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">kobs</span><span class="p">):</span>
-
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Single exponential function for fitting</span>
+<span class="sd">    Single exponential function for fitting.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        t (np.ndarray): time</span>
-<span class="sd">        a0 (float): offset</span>
-<span class="sd">        a1 (float): amplitude</span>
-<span class="sd">        kobs (float): observed rate constant</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    t : np.ndarray</span>
+<span class="sd">        Time values.</span>
+<span class="sd">    a0 : float</span>
+<span class="sd">        Offset.</span>
+<span class="sd">    a1 : float</span>
+<span class="sd">        Amplitude.</span>
+<span class="sd">    kobs : float</span>
+<span class="sd">        Observed rate constant.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        np.ndarray: computed values of the single exponential function</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Computed values of the single exponential function.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">a0</span> <span class="o">+</span> <span class="n">a1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">kobs</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span></div>
 
@@ -410,36 +374,53 @@
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.math.double_exponential">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">double_exponential</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">kobs1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">kobs2</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Double exponential function for fitting</span>
+<span class="sd">    Double exponential function for fitting.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        t (np.ndarray): time</span>
-<span class="sd">        a0 (float): offset</span>
-<span class="sd">        a1 (float): amplitude of the first exponential</span>
-<span class="sd">        kobs1 (float): observed rate constant of the first exponential</span>
-<span class="sd">        a2 (float): amplitude of the second exponential</span>
-<span class="sd">        kobs2 (float): observed rate constant of the second exponential</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    t : np.ndarray</span>
+<span class="sd">        Time values.</span>
+<span class="sd">    a0 : float</span>
+<span class="sd">        Offset.</span>
+<span class="sd">    a1 : float</span>
+<span class="sd">        Amplitude of the first exponential.</span>
+<span class="sd">    kobs1 : float</span>
+<span class="sd">        Observed rate constant of the first exponential.</span>
+<span class="sd">    a2 : float</span>
+<span class="sd">        Amplitude of the second exponential.</span>
+<span class="sd">    kobs2 : float</span>
+<span class="sd">        Observed rate constant of the second exponential.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        np.ndarray: computed values of the double exponential function</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Computed values of the double exponential function.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">a0</span> <span class="o">+</span> <span class="n">a1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">kobs1</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">+</span> <span class="n">a2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">kobs2</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="median_filter">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.math.median_filter">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">median_filter</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">rolling_window</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">median_filter</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">rolling_window</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the median filter of the input signal using a rolling window.</span>
 
-<span class="sd">    Compute the median filter of the x vector using a rolling window</span>
+<span class="sd">    The x vector is converted into an integer vector and then into a time variable to take advantage of pandas rolling().median().</span>
+<span class="sd">    Returns the y vector passed through the median filter.</span>
 
-<span class="sd">    First, we convert the x vector into an integer vector and then</span>
-<span class="sd">        into time variable to take advantage of pandas function</span>
-<span class="sd">            rolling().median()</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y : np.ndarray</span>
+<span class="sd">        Input signal values.</span>
+<span class="sd">    x : np.ndarray</span>
+<span class="sd">        Time or index values corresponding to the signal.</span>
+<span class="sd">    rolling_window : int or float</span>
+<span class="sd">        Size of the median filter window.</span>
 
-<span class="sd">	Returns the y vector passed through the median filter</span>
-
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Filtered signal.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># Check the average time step in the x vector</span>
@@ -447,7 +428,6 @@
 
     <span class="n">scaling_factor</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="k">if</span> <span class="n">dx</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
-        
         <span class="n">scaling_factor</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">dx</span> <span class="o">*</span> <span class="mi">10</span> <span class="c1"># Rescale </span>
     
     <span class="n">temp_vec</span>     <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">scaling_factor</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
@@ -465,20 +445,26 @@
 <div class="viewcode-block" id="rss_p">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.math.rss_p">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">rss_p</span><span class="p">(</span><span class="n">rrs0</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">alfa</span><span class="p">):</span>
-
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Given the residuals of the best fitted model,</span>
-<span class="sd">    compute the desired residual sum of squares for a 1-alpha confidence interval</span>
-<span class="sd">    This is used to compute asymmetric confidence intervals for the fitted parameters</span>
+<span class="sd">    Compute the desired residual sum of squares for a 1-alpha confidence interval.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        rrs0 (float): residual sum of squares of the model with the best fit</span>
-<span class="sd">        n (int): number of data points</span>
-<span class="sd">        p (int): number of parameters</span>
-<span class="sd">        alfa (float): desired confidence interval</span>
+<span class="sd">    Given the residuals of the best fitted model, this is used to compute asymmetric confidence intervals for the fitted parameters.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        rss (float): residual sum of squares for the desired confidence interval</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rrs0 : float</span>
+<span class="sd">        Residual sum of squares of the model with the best fit.</span>
+<span class="sd">    n : int</span>
+<span class="sd">        Number of data points.</span>
+<span class="sd">    p : int</span>
+<span class="sd">        Number of parameters.</span>
+<span class="sd">    alfa : float</span>
+<span class="sd">        Desired confidence interval (1 - alpha).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float</span>
+<span class="sd">        Residual sum of squares for the desired confidence interval.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">critical_value</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="n">q</span><span class="o">=</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alfa</span><span class="p">,</span> <span class="n">dfn</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dfd</span><span class="o">=</span><span class="n">n</span> <span class="o">-</span> <span class="n">p</span><span class="p">)</span>
@@ -489,19 +475,20 @@
 <div class="viewcode-block" id="get_rss">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.math.get_rss">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_rss</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_fit</span><span class="p">):</span>
-
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute the residual sum of squares</span>
+<span class="sd">    Compute the residual sum of squares.</span>
 
-<span class="sd">    Args:</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y : np.ndarray</span>
+<span class="sd">        Observed values.</span>
+<span class="sd">    y_fit : np.ndarray</span>
+<span class="sd">        Fitted values.</span>
 
-<span class="sd">        y (np.ndarray): observed values</span>
-<span class="sd">        y_fit (np.ndarray): fitted values</span>
-
-<span class="sd">    Returns:</span>
-
-<span class="sd">        rss (np.ndarray): residual sum of squares</span>
-
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float</span>
+<span class="sd">        Residual sum of squares.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">residuals</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">y_fit</span>
@@ -512,24 +499,29 @@
 
 <div class="viewcode-block" id="get_desired_rss">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.math.get_desired_rss">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">get_desired_rss</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_fit</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">get_desired_rss</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_fit</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Given the observed and fitted data,</span>
-<span class="sd">    find the residual sum of squares required for a 1-alpha confidence interval</span>
+<span class="sd">    Find the residual sum of squares required for a 1-alpha confidence interval.</span>
 
-<span class="sd">    Args:</span>
+<span class="sd">    Given the observed and fitted data, computes the RSS for the desired confidence interval.</span>
 
-<span class="sd">        y (np.ndarray): observed values</span>
-<span class="sd">        y_fit (np.ndarray): fitted values</span>
-<span class="sd">        n (int): number of data points</span>
-<span class="sd">        p (int): number of parameters</span>
-<span class="sd">        alpha (float): desired confidence interval</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y : np.ndarray</span>
+<span class="sd">        Observed values.</span>
+<span class="sd">    y_fit : np.ndarray</span>
+<span class="sd">        Fitted values.</span>
+<span class="sd">    n : int</span>
+<span class="sd">        Number of data points.</span>
+<span class="sd">    p : int</span>
+<span class="sd">        Number of parameters.</span>
+<span class="sd">    alpha : float, optional</span>
+<span class="sd">        Desired confidence interval (default is 0.05).</span>
 
-<span class="sd">    Returns:</span>
-
-<span class="sd">        rss (np.ndarray): residual sum of squares</span>
-
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float</span>
+<span class="sd">        Residual sum of squares for the desired confidence interval.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">rss</span> <span class="o">=</span> <span class="n">get_rss</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_fit</span><span class="p">)</span>

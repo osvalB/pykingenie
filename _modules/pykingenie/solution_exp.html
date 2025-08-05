@@ -132,6 +132,13 @@
   </a>
 </li>
 
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
   </ul>
 </nav></div>
       
@@ -222,6 +229,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../modules.html">
     pykingenie
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../pykingenie.html">
+    pykingenie package
   </a>
 </li>
 
@@ -323,10 +337,53 @@
 <div class="viewcode-block" id="SolutionBasedExp">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.solution_exp.SolutionBasedExp">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SolutionBasedExp</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for solution-based kinetics experiments.</span>
+<span class="sd">    </span>
+<span class="sd">    This class serves as a foundation for classes that handle solution-based</span>
+<span class="sd">    kinetic experiments data.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str</span>
+<span class="sd">        Name of the experiment.</span>
+<span class="sd">    type : str</span>
+<span class="sd">        Type of the experiment.</span>
+<span class="sd">        </span>
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str</span>
+<span class="sd">        Name of the experiment.</span>
+<span class="sd">    type : str</span>
+<span class="sd">        Type of the experiment.</span>
+<span class="sd">    xs : list of numpy.ndarray or None</span>
+<span class="sd">        List of x values (time) for each trace.</span>
+<span class="sd">    ys : list of numpy.ndarray or None</span>
+<span class="sd">        List of y values (signal) for each trace.</span>
+<span class="sd">    no_traces : int or None</span>
+<span class="sd">        Number of traces.</span>
+<span class="sd">    traces_names : list of str or None</span>
+<span class="sd">        List of trace names.</span>
+<span class="sd">    traces_names_unique : list of str or None</span>
+<span class="sd">        List of unique trace names (includes experiment name).</span>
+<span class="sd">    conc_df : pandas.DataFrame or None</span>
+<span class="sd">        DataFrame with concentration information.</span>
+<span class="sd">    traces_loaded : bool</span>
+<span class="sd">        Whether traces have been loaded.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="SolutionBasedExp.__init__">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.solution_exp.SolutionBasedExp.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="nb">type</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the SolutionBasedExp instance.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name : str</span>
+<span class="sd">            Name of the experiment.</span>
+<span class="sd">        type : str</span>
+<span class="sd">            Type of the experiment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span>                <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span>                <span class="o">=</span> <span class="nb">type</span>
@@ -343,9 +400,22 @@
 <div class="viewcode-block" id="SolutionBasedExp.create_unique_traces_names">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.solution_exp.SolutionBasedExp.create_unique_traces_names">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">create_unique_traces_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Create unique traces names by appending the name of the experiment to the trace names.</span>
+<span class="sd">        Create unique trace names by appending the experiment name to the trace names.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Updates the traces_names_unique attribute.</span>
+<span class="sd">        </span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method creates unique identifiers for each trace by combining</span>
+<span class="sd">        the experiment name with the individual trace names.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">traces_names_unique</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">trace_name</span> <span class="k">for</span> <span class="n">trace_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">traces_names</span><span class="p">]</span>
@@ -355,20 +425,26 @@
 
 <div class="viewcode-block" id="SolutionBasedExp.get_trace_xy">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.solution_exp.SolutionBasedExp.get_trace_xy">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_trace_xy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">trace_name</span><span class="p">,</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">):</span>
-
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_trace_xy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace_name</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return the x or y values of a certain step</span>
-
-<span class="sd">        Args:</span>
-
-<span class="sd">            trace_name (str): name of the trace</span>
-<span class="sd">            type (str):        x or y</span>
-
-<span class="sd">        Returns:</span>
-
-<span class="sd">            x or y (np.n) values of the step</span>
-
+<span class="sd">        Return the x or y values of a specific trace.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        trace_name : str</span>
+<span class="sd">            Name of the trace to retrieve data from.</span>
+<span class="sd">        type : {&#39;x&#39;, &#39;y&#39;}, optional</span>
+<span class="sd">            Type of data to return. Default is &#39;y&#39;.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        numpy.ndarray</span>
+<span class="sd">            The x or y values of the specified trace.</span>
+<span class="sd">            </span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method finds the trace by name in the traces_names list</span>
+<span class="sd">        and returns either its x values (time) or y values (signal).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">trace_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">traces_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">trace_name</span><span class="p">)</span>

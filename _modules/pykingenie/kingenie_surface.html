@@ -132,6 +132,13 @@
   </a>
 </li>
 
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
   </ul>
 </nav></div>
       
@@ -222,6 +229,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../modules.html">
     pykingenie
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../pykingenie.html">
+    pykingenie package
   </a>
 </li>
 
@@ -327,36 +341,47 @@
 <div class="viewcode-block" id="KinGenieCsv">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.kingenie_surface.KinGenieCsv">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">KinGenieCsv</span><span class="p">(</span><span class="n">SurfaceBasedExperiment</span><span class="p">):</span>
-
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A class used to represent a KinGenie csv file, which can be exported from the Simulation panel</span>
+<span class="sd">    A class used to represent a KinGenie surface-based simulation.</span>
+<span class="sd">    </span>
+<span class="sd">    This class handles data from KinGenie simulation CSV files that can be exported </span>
+<span class="sd">    from the Simulation panel.</span>
 
-<span class="sd">    Example:</span>
-
-<span class="sd">        Time	Signal	Smax	Analyte_concentration_micromolar_constant	Cycle</span>
-<span class="sd">        0	0	5	0.1	1</span>
-<span class="sd">        0.5	0.00498512709952641	5	0.1	1</span>
-<span class="sd">        1	0.00994051854979453	5	0.1	1</span>
-<span class="sd">        1.5	0.0148661741864963	5	0.1	1</span>
-<span class="sd">        2	0.0197623830271752	5	0.1	1</span>
-<span class="sd">        2.5	0.0246293723316269	5	0.1	1</span>
-<span class="sd">        3	0.0294671469344429	5	0.1	1</span>
-<span class="sd">        3.5	0.0342760214300913	5	0.1	1</span>
-<span class="sd">        4	0.0390561847030298	5	0.1	1</span>
-<span class="sd">        4.5	0.043807638803537	5	0.1	1</span>
-<span class="sd">        5	0.0485304884515415	5	0.1	1</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str, optional</span>
+<span class="sd">        Name of the experiment. Default is &#39;kingenie_csv&#39;.</span>
 
 <span class="sd">    Attributes</span>
-
-<span class="sd">        name (str):                 name of the experiment</span>
-<span class="sd">        fn (str):                   file name</span>
-<span class="sd">        xs (np.array):              list of x values (time, length n, one per sensor)</span>
-<span class="sd">        ys (np.array):              list of y values (length n, one per sensor)</span>
-<span class="sd">        no_sensors (int):           number of sensors</span>
-<span class="sd">        sensor_names (list):        list of sensor names (length n, one per sensor)</span>
-<span class="sd">        sensor_names_unique (list): list of unique sensor names (length n, one per sensor)</span>
-<span class="sd">        ligand_conc_df (pd.DataFrame): dataframe with the ligand concentration information</span>
-
+<span class="sd">    ----------</span>
+<span class="sd">    name : str</span>
+<span class="sd">        Name of the experiment.</span>
+<span class="sd">    fn : str</span>
+<span class="sd">        File name.</span>
+<span class="sd">    xs : list of list of numpy.ndarray</span>
+<span class="sd">        List of time values for each sensor and phase. Structure is:</span>
+<span class="sd">        [sensor_1[assoc_phase, disso_phase], sensor_2[assoc_phase, disso_phase], ...].</span>
+<span class="sd">    ys : list of list of numpy.ndarray</span>
+<span class="sd">        List of signal values for each sensor and phase. Structure is:</span>
+<span class="sd">        [sensor_1[assoc_phase, disso_phase], sensor_2[assoc_phase, disso_phase], ...].</span>
+<span class="sd">    no_sensors : int</span>
+<span class="sd">        Number of sensors.</span>
+<span class="sd">    sensor_names : list of str</span>
+<span class="sd">        List of sensor names, one per sensor.</span>
+<span class="sd">    sensor_names_unique : list of str</span>
+<span class="sd">        List of unique sensor names.</span>
+<span class="sd">    ligand_conc_df : pandas.DataFrame</span>
+<span class="sd">        DataFrame with the ligand concentration information.</span>
+<span class="sd">    df_steps : pandas.DataFrame</span>
+<span class="sd">        DataFrame with step information (association, dissociation).</span>
+<span class="sd">    traces_loaded : bool</span>
+<span class="sd">        Whether traces have been loaded.</span>
+<span class="sd">        </span>
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The CSV file should contain columns for Time, Signal, Smax, and </span>
+<span class="sd">    Analyte_concentration_micromolar_constant. For single cycle kinetics,</span>
+<span class="sd">    it should also include a Cycle column.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="KinGenieCsv.__init__">
@@ -368,21 +393,38 @@
 
 <div class="viewcode-block" id="KinGenieCsv.read_csv">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.kingenie_surface.KinGenieCsv.read_csv">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">read_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">file</span><span class="p">):</span>
-
+    <span class="k">def</span><span class="w"> </span><span class="nf">read_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Read the KinGenie csv file</span>
-
-<span class="sd">        Results:</span>
-
-<span class="sd">            It creates the attributes</span>
-
-<span class="sd">                self.xs</span>
-<span class="sd">                self.ys</span>
-<span class="sd">                self.no_sensors</span>
-<span class="sd">                self.sensor_names</span>
-<span class="sd">                self.sensor_names_unique</span>
-
+<span class="sd">        Read the KinGenie CSV file containing surface-based simulation data.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        file : str</span>
+<span class="sd">            Path to the CSV file.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            The method populates class attributes with data from the CSV file.</span>
+<span class="sd">            </span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The CSV file should have the following columns:</span>
+<span class="sd">        - Time: time points of the simulation</span>
+<span class="sd">        - Signal: signal values at each time point</span>
+<span class="sd">        - Smax: maximum signal value</span>
+<span class="sd">        - Analyte_concentration_micromolar_constant: analyte concentration</span>
+<span class="sd">        - Cycle: (optional) cycle number for single cycle kinetics</span>
+<span class="sd">        </span>
+<span class="sd">        This method creates the following attributes:</span>
+<span class="sd">        - self.xs: list of time values for each sensor and phase</span>
+<span class="sd">        - self.ys: list of signal values for each sensor and phase</span>
+<span class="sd">        - self.no_sensors: number of sensors</span>
+<span class="sd">        - self.sensor_names: list of sensor names</span>
+<span class="sd">        - self.ligand_conc_df: DataFrame with concentration information</span>
+<span class="sd">        - self.df_steps: DataFrame with step information</span>
+<span class="sd">        </span>
+<span class="sd">        The method handles both multi-cycle and single-cycle kinetics data.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>

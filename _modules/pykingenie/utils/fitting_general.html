@@ -139,27 +139,6 @@
   </a>
 </li>
 
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
-    pykingenie.utils package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.html">
-    pykingenie package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
-    pykingenie.utils package
-  </a>
-</li>
-
   </ul>
 </nav></div>
       
@@ -260,27 +239,6 @@
   </a>
 </li>
 
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
-    pykingenie.utils package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.html">
-    pykingenie package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
-    pykingenie.utils package
-  </a>
-</li>
-
   </ul>
 </nav></div>
           
@@ -377,6 +335,7 @@
   <h1>Source code for pykingenie.utils.fitting_general</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">curve_fit</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.math</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 
@@ -386,11 +345,15 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert input data to a numpy array if it is not already one.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        data (list or np.ndarray): Input data to be converted.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : list or np.ndarray</span>
+<span class="sd">        Input data to be converted.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        np.ndarray: Converted numpy array.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Converted numpy array.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -399,24 +362,32 @@
 
 <div class="viewcode-block" id="fit_single_exponential">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.fitting_general.fit_single_exponential">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">fit_single_exponential</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">t</span><span class="p">,</span><span class="n">min_log_k</span><span class="o">=-</span><span class="mi">5</span><span class="p">,</span> <span class="n">max_log_k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">log_k_points</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">fit_single_exponential</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">min_log_k</span><span class="o">=-</span><span class="mi">5</span><span class="p">,</span> <span class="n">max_log_k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">log_k_points</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fit a single exponential to a signal.</span>
 
-<span class="sd">    Fit a single exponential to a signal</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y : np.ndarray</span>
+<span class="sd">        Signal values.</span>
+<span class="sd">    t : np.ndarray</span>
+<span class="sd">        Time values.</span>
+<span class="sd">    min_log_k : float, optional</span>
+<span class="sd">        Minimum logarithmic value for k_obs initial estimation, default is -5.</span>
+<span class="sd">    max_log_k : float, optional</span>
+<span class="sd">        Maximum logarithmic value for k_obs initial estimation, default is 5.</span>
+<span class="sd">    log_k_points : int, optional</span>
+<span class="sd">        Number of points in the logarithmic scale for k_obs initial estimation, default is 50.</span>
 
-<span class="sd">    Args:</span>
-
-<span class="sd">        y (np.ndarray): signal</span>
-<span class="sd">        t (np.ndarray): time</span>
-
-<span class="sd">    Returns:</span>
-
-<span class="sd">        fit_params (np.ndarray): fitted parameters</span>
-
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Fitted parameters (a0, a1, k_obs).</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Covariance matrix of the fitted parameters.</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Fitted y values.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-
     <span class="c1"># Convert to numpy array, if needed,</span>
     <span class="n">y</span> <span class="o">=</span> <span class="n">convert_to_numpy_array</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
     <span class="n">t</span> <span class="o">=</span> <span class="n">convert_to_numpy_array</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
@@ -454,7 +425,7 @@
 
     <span class="n">p0</span> <span class="o">=</span> <span class="p">[</span><span class="n">best_params</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">best_params</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">best_k_obs</span><span class="p">]</span>
 
-    <span class="n">fit_params</span><span class="p">,</span> <span class="n">cov</span> <span class="o">=</span> <span class="n">curve_fit</span><span class="p">(</span><span class="n">single_exponential</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span><span class="n">p0</span><span class="o">=</span><span class="n">p0</span><span class="p">)</span>
+    <span class="n">fit_params</span><span class="p">,</span> <span class="n">cov</span> <span class="o">=</span> <span class="n">curve_fit</span><span class="p">(</span><span class="n">single_exponential</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p0</span><span class="o">=</span><span class="n">p0</span><span class="p">)</span>
 
     <span class="n">fit_y</span> <span class="o">=</span> <span class="n">single_exponential</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="o">*</span><span class="n">fit_params</span><span class="p">)</span>
 
@@ -463,23 +434,32 @@
 
 <div class="viewcode-block" id="fit_double_exponential">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.fitting_general.fit_double_exponential">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">fit_double_exponential</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">t</span><span class="p">,</span><span class="n">min_log_k</span><span class="o">=-</span><span class="mi">4</span><span class="p">,</span> <span class="n">max_log_k</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">log_k_points</span><span class="o">=</span><span class="mi">22</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">fit_double_exponential</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">min_log_k</span><span class="o">=-</span><span class="mi">4</span><span class="p">,</span> <span class="n">max_log_k</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">log_k_points</span><span class="o">=</span><span class="mi">22</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fit a double exponential to a signal.</span>
 
-<span class="sd">    Fit a double exponential to a signal</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y : np.ndarray</span>
+<span class="sd">        Signal values.</span>
+<span class="sd">    t : np.ndarray</span>
+<span class="sd">        Time values.</span>
+<span class="sd">    min_log_k : float, optional</span>
+<span class="sd">        Minimum logarithmic value for k_obs initial estimation, default is -4.</span>
+<span class="sd">    max_log_k : float, optional</span>
+<span class="sd">        Maximum logarithmic value for k_obs initial estimation, default is 4.</span>
+<span class="sd">    log_k_points : int, optional</span>
+<span class="sd">        Number of points in the logarithmic scale for k_obs initial estimation, default is 22.</span>
 
-<span class="sd">    Args:</span>
-
-<span class="sd">        y (np.ndarray): signal</span>
-<span class="sd">        t (np.ndarray): time</span>
-
-<span class="sd">    Returns:</span>
-
-<span class="sd">        fit_params (np.ndarray): fitted parameters</span>
-
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Fitted parameters (a0, a1, k_obs1, a2, k_obs2).</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Covariance matrix of the fitted parameters.</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Fitted y values.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="c1"># Convert to numpy array, if needed,</span>
     <span class="n">y</span> <span class="o">=</span> <span class="n">convert_to_numpy_array</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
     <span class="n">t</span> <span class="o">=</span> <span class="n">convert_to_numpy_array</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
@@ -537,26 +517,39 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">fit_many_double_exponential</span><span class="p">(</span><span class="n">signal_lst</span><span class="p">,</span> <span class="n">time_lst</span><span class="p">,</span> <span class="n">min_log_k</span><span class="o">=-</span><span class="mi">4</span><span class="p">,</span> <span class="n">max_log_k</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">log_k_points</span><span class="o">=</span><span class="mi">22</span><span class="p">):</span>
-
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Fit a double exponential to many signals.</span>
-<span class="sd">    Args:</span>
-<span class="sd">        signal_lst (list of np.ndarray): List of signals to fit</span>
-<span class="sd">        time_lst (list of np.ndarray): List of time arrays corresponding to each signal</span>
-<span class="sd">        min_log_k (float): Minimum logarithmic value for k_obs</span>
-<span class="sd">        max_log_k (float): Maximum logarithmic value for k_obs</span>
-<span class="sd">        log_k_points (int): Number of points in the logarithmic scale for k_obs</span>
-<span class="sd">    Returns:</span>
-<span class="sd">        k_obs_1 (list): List of slowest k_obs values for each signal</span>
-<span class="sd">        k_obs_2 (list): List of second slowest k_obs values for each signal</span>
-<span class="sd">        y_pred (list): List of fitted values for each signal</span>
-
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    signal_lst : list of np.ndarray</span>
+<span class="sd">        List of signals to fit.</span>
+<span class="sd">    time_lst : list of np.ndarray</span>
+<span class="sd">        List of time arrays corresponding to each signal.</span>
+<span class="sd">    min_log_k : float, optional</span>
+<span class="sd">        Minimum logarithmic value for k_obs initial estimation, default is -4.</span>
+<span class="sd">    max_log_k : float, optional</span>
+<span class="sd">        Maximum logarithmic value for k_obs initial estimation, default is 4.</span>
+<span class="sd">    log_k_points : int, optional</span>
+<span class="sd">        Number of points in the logarithmic scale for k_obs initial estimation, default is 22.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        List of slowest k_obs values for each signal.</span>
+<span class="sd">    list</span>
+<span class="sd">        List of second slowest k_obs values for each signal.</span>
+<span class="sd">    list</span>
+<span class="sd">        List of fitted values for each signal.</span>
+<span class="sd">        </span>
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
 <span class="sd">    This function iterates over each signal and time pair, fits a double exponential model,</span>
 <span class="sd">    and returns the slowest and second slowest k_obs values along with the fitted values.</span>
-<span class="sd">    If fitting fails for a signal, it will skip that signal and return NaN for k_obs values and None for fitted values.</span>
-<span class="sd">    Note: The function assumes that the input signals and time arrays are of the same length.</span>
+<span class="sd">    If fitting fails for a signal, it will skip that signal and return NaN for k_obs values </span>
+<span class="sd">    and None for fitted values. The function assumes that the input signals and time arrays </span>
+<span class="sd">    are of the same length.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">k_obs_1</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">signal_lst</span><span class="p">))]</span>
     <span class="n">k_obs_2</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">signal_lst</span><span class="p">))]</span>
     <span class="n">y_pred</span> <span class="o">=</span>  <span class="p">[</span><span class="kc">None</span>   <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">signal_lst</span><span class="p">))]</span>
@@ -584,65 +577,91 @@
 
     <span class="k">return</span> <span class="n">k_obs_1</span><span class="p">,</span> <span class="n">k_obs_2</span><span class="p">,</span> <span class="n">y_pred</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">expand_high_bound</span><span class="p">(</span><span class="n">value</span><span class="p">,</span><span class="n">factor</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">expand_high_bound</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">factor</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Multiply/divide the value by a factor and return the new value.</span>
+<span class="sd">    </span>
 <span class="sd">    If the parameter is negative, we divide by the factor, otherwise we multiply.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        value (float): Parameter to expand</span>
-<span class="sd">    Returns:</span>
-<span class="sd">        new_param (float): New parameter value after expansion</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    value : float</span>
+<span class="sd">        Parameter to expand.</span>
+<span class="sd">    factor : float, optional</span>
+<span class="sd">        Factor to multiply/divide by, default is 10.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float</span>
+<span class="sd">        New parameter value after expansion.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">new_value</span> <span class="o">=</span> <span class="n">value</span> <span class="o">*</span> <span class="n">factor</span> <span class="k">if</span> <span class="n">value</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">value</span> <span class="o">/</span> <span class="n">factor</span>
 
     <span class="k">return</span> <span class="n">new_value</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">expand_low_bound</span><span class="p">(</span><span class="n">value</span><span class="p">,</span><span class="n">factor</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">expand_low_bound</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">factor</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Multiply/divide the value by a factor and return the new value.</span>
+<span class="sd">    </span>
 <span class="sd">    If the parameter is negative, we multiply by the factor, otherwise we divide.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        value (float): Parameter to expand</span>
-<span class="sd">    Returns:</span>
-<span class="sd">        new_param (float): New parameter value after expansion</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    value : float</span>
+<span class="sd">        Parameter to expand.</span>
+<span class="sd">    factor : float, optional</span>
+<span class="sd">        Factor to multiply/divide by, default is 10.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float</span>
+<span class="sd">        New parameter value after expansion.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">new_value</span> <span class="o">=</span> <span class="n">value</span> <span class="o">*</span> <span class="n">factor</span> <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">value</span> <span class="o">/</span> <span class="n">factor</span>
 
     <span class="k">return</span> <span class="n">new_value</span>
 
 <div class="viewcode-block" id="re_fit">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.fitting_general.re_fit">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">re_fit</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">fit_vals</span><span class="p">,</span><span class="n">fit_fx</span><span class="p">,</span><span class="n">low_bounds</span><span class="p">,</span><span class="n">high_bounds</span><span class="p">,</span><span class="n">times</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">re_fit</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">fit_vals</span><span class="p">,</span> <span class="n">fit_fx</span><span class="p">,</span> <span class="n">low_bounds</span><span class="p">,</span> <span class="n">high_bounds</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Evaluate the difference between the fitted parameters and the initial parameters</span>
+<span class="sd">    Re-fit data by evaluating the difference between fitted parameters and bounds.</span>
+<span class="sd">    </span>
 <span class="sd">    If the difference is less than 2 percent, the bounds are relaxed by a factor of 10</span>
-<span class="sd">    and the fitting is repeated</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        fit (list): Fitted parameters</span>
-<span class="sd">        cov (np.ndarray): Covariance matrix of the fitted parameters</span>
-<span class="sd">        fit_vals (list): Fitted values for each signal, same dimensions as signal_lst</span>
-<span class="sd">        fit_fx (function): Function to fit the data - returns fit, cov, fit_vals</span>
-<span class="sd">        low_bounds (list): Lower bounds for the parameters</span>
-<span class="sd">        high_bounds (list): Upper bounds for the parameters</span>
-<span class="sd">        times (int): Number of times to re-fit the data</span>
-<span class="sd">        **kwargs: Additional arguments to pass to the fitting function</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        fit (list): Fitted parameters after re-fitting</span>
-<span class="sd">        cov (np.ndarray): Covariance matrix of the fitted parameters after re-fitting</span>
-<span class="sd">        fit_vals (list): Fitted values for each signal after re-fitting, same dimensions as signal_lst</span>
-<span class="sd">        low_bounds (list): Lower bounds for the parameters after re-fitting</span>
-<span class="sd">        high_bounds (list): Upper bounds for the parameters after re-fitting</span>
+<span class="sd">    and the fitting is repeated.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fit : list</span>
+<span class="sd">        Fitted parameters.</span>
+<span class="sd">    cov : np.ndarray</span>
+<span class="sd">        Covariance matrix of the fitted parameters.</span>
+<span class="sd">    fit_vals : list</span>
+<span class="sd">        Fitted values for each signal, same dimensions as signal_lst.</span>
+<span class="sd">    fit_fx : callable</span>
+<span class="sd">        Function to fit the data - returns fit, cov, fit_vals.</span>
+<span class="sd">    low_bounds : list</span>
+<span class="sd">        Lower bounds for the parameters.</span>
+<span class="sd">    high_bounds : list</span>
+<span class="sd">        Upper bounds for the parameters.</span>
+<span class="sd">    times : int</span>
+<span class="sd">        Number of times to re-fit the data.</span>
+<span class="sd">    **kwargs</span>
+<span class="sd">        Additional arguments to pass to the fitting function.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Fitted parameters after re-fitting.</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Covariance matrix of the fitted parameters after re-fitting.</span>
+<span class="sd">    list</span>
+<span class="sd">        Fitted values for each signal after re-fitting.</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Lower bounds for the parameters after re-fitting.</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Upper bounds for the parameters after re-fitting.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">fit</span>         <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
     <span class="n">low_bounds</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">low_bounds</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
     <span class="n">high_bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">high_bounds</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
@@ -679,34 +698,50 @@
 
 <div class="viewcode-block" id="re_fit_2">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.fitting_general.re_fit_2">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">re_fit_2</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">fit_vals_a</span><span class="p">,</span><span class="n">fit_vals_b</span><span class="p">,</span><span class="n">fit_fx</span><span class="p">,</span><span class="n">low_bounds</span><span class="p">,</span><span class="n">high_bounds</span><span class="p">,</span><span class="n">times</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">re_fit_2</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">fit_vals_a</span><span class="p">,</span> <span class="n">fit_vals_b</span><span class="p">,</span> <span class="n">fit_fx</span><span class="p">,</span> <span class="n">low_bounds</span><span class="p">,</span> <span class="n">high_bounds</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Evaluate the difference between the fitted parameters and the initial parameters</span>
+<span class="sd">    Re-fit data for two signals by evaluating the difference between fitted parameters and bounds.</span>
+<span class="sd">    </span>
 <span class="sd">    If the difference is less than 2 percent, the bounds are relaxed by a factor of 10</span>
-<span class="sd">    and the fitting is repeated.</span>
-<span class="sd">    The difference with re_fit() is that this function is used for fitting two signals at once,</span>
+<span class="sd">    and the fitting is repeated. This function is used for fitting two signals at once,</span>
 <span class="sd">    e.g. fitting association and dissociation signals simultaneously.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        fit (list): Fitted parameters</span>
-<span class="sd">        cov (np.ndarray): Covariance matrix of the fitted parameters</span>
-<span class="sd">        fit_vals_a (list): Fitted values for each signal, same dimensions as signal_lst</span>
-<span class="sd">        fit_vals_b (list): Fitted values for each signal, same dimensions as signal_lst</span>
-<span class="sd">        fit_fx (function): Function to fit the data - returns fit, cov, fit_vals_a, fit_vals_b</span>
-<span class="sd">        low_bounds (list): Lower bounds for the parameters</span>
-<span class="sd">        high_bounds (list): Upper bounds for the parameters</span>
-<span class="sd">        times (int): Number of times to re-fit the data</span>
-<span class="sd">        **kwargs: Additional arguments to pass to the fitting function</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        fit (list): Fitted parameters after re-fitting</span>
-<span class="sd">        cov (np.ndarray): Covariance matrix of the fitted parameters after re-fitting</span>
-<span class="sd">        fit_vals (list): Fitted values for each signal after re-fitting, same dimensions as signal_lst</span>
-<span class="sd">        low_bounds (list): Lower bounds for the parameters after re-fitting</span>
-<span class="sd">        high_bounds (list): Upper bounds for the parameters after re-fitting</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fit : list</span>
+<span class="sd">        Fitted parameters.</span>
+<span class="sd">    cov : np.ndarray</span>
+<span class="sd">        Covariance matrix of the fitted parameters.</span>
+<span class="sd">    fit_vals_a : list</span>
+<span class="sd">        Fitted values for the first set of signals.</span>
+<span class="sd">    fit_vals_b : list</span>
+<span class="sd">        Fitted values for the second set of signals.</span>
+<span class="sd">    fit_fx : callable</span>
+<span class="sd">        Function to fit the data - returns fit, cov, fit_vals_a, fit_vals_b.</span>
+<span class="sd">    low_bounds : list</span>
+<span class="sd">        Lower bounds for the parameters.</span>
+<span class="sd">    high_bounds : list</span>
+<span class="sd">        Upper bounds for the parameters.</span>
+<span class="sd">    times : int</span>
+<span class="sd">        Number of times to re-fit the data.</span>
+<span class="sd">    **kwargs</span>
+<span class="sd">        Additional arguments to pass to the fitting function.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Fitted parameters after re-fitting.</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Covariance matrix of the fitted parameters after re-fitting.</span>
+<span class="sd">    list</span>
+<span class="sd">        Fitted values for the first set of signals after re-fitting.</span>
+<span class="sd">    list</span>
+<span class="sd">        Fitted values for the second set of signals after re-fitting.</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Lower bounds for the parameters after re-fitting.</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Upper bounds for the parameters after re-fitting.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">fit</span>         <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
     <span class="n">low_bounds</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">low_bounds</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
     <span class="n">high_bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">high_bounds</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>

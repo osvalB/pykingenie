@@ -139,27 +139,6 @@
   </a>
 </li>
 
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../pykingenie.utils.html">
-    pykingenie.utils package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../pykingenie.html">
-    pykingenie package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../pykingenie.utils.html">
-    pykingenie.utils package
-  </a>
-</li>
-
   </ul>
 </nav></div>
       
@@ -257,27 +236,6 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../pykingenie.html">
     pykingenie package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../pykingenie.utils.html">
-    pykingenie.utils package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../pykingenie.html">
-    pykingenie package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../pykingenie.utils.html">
-    pykingenie.utils package
   </a>
 </li>
 
@@ -385,42 +343,64 @@
 <div class="viewcode-block" id="KineticsFitterSolution">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.fitter_solution.KineticsFitterSolution">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">KineticsFitterSolution</span><span class="p">:</span>
-
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A class used to fit solution-based kinetics data with shared thermodynamic parameters</span>
-
-<span class="sd">        Attributes</span>
+<span class="sd">    A class used to fit solution-based kinetics data with shared thermodynamic parameters.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-
-<span class="sd">        name (str):                     name of the experiment</span>
-<span class="sd">        assoc_lst (list):                   list containing the association signals</span>
-
-<span class="sd">        lig_conc (list):                list of ligand concentrations, one per element in assoc</span>
-<span class="sd">        prot_conc (list):               list of protein concentrations, one per element in assoc</span>
-
-<span class="sd">        time_assoc_lst (list):              list of time points for the association signals</span>
-
-<span class="sd">        signal_ss (list):               list of steady state signals</span>
-<span class="sd">        signal_ss_fit (list):           list of steady state fitted signals</span>
-<span class="sd">        signal_assoc_fit (list):        list of association kinetics fitted signals</span>
-<span class="sd">        fit_params_kinetics (pd.Dataframe):     dataframe with the fitted parameters</span>
-<span class="sd">        fit_params_ss (pd.Dataframe):           dataframe with the values of the fitted parameters - steady state</span>
-
+<span class="sd">    name : str</span>
+<span class="sd">        Name of the experiment.</span>
+<span class="sd">    assoc : list</span>
+<span class="sd">        List containing the association signals.</span>
+<span class="sd">    lig_conc : list</span>
+<span class="sd">        List of ligand concentrations, one per element in assoc.</span>
+<span class="sd">    protein_conc : list</span>
+<span class="sd">        List of protein concentrations, one per element in assoc.</span>
+<span class="sd">    time_assoc : list</span>
+<span class="sd">        List of time points for the association signals.</span>
+<span class="sd">        </span>
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str</span>
+<span class="sd">        Name of the experiment.</span>
+<span class="sd">    assoc_lst : list</span>
+<span class="sd">        List containing the association signals.</span>
+<span class="sd">    lig_conc : list</span>
+<span class="sd">        List of ligand concentrations, one per element in assoc.</span>
+<span class="sd">    prot_conc : list</span>
+<span class="sd">        List of protein concentrations, one per element in assoc.</span>
+<span class="sd">    time_assoc_lst : list</span>
+<span class="sd">        List of time points for the association signals.</span>
+<span class="sd">    signal_ss : list</span>
+<span class="sd">        List of steady state signals.</span>
+<span class="sd">    signal_ss_fit : list</span>
+<span class="sd">        List of steady state fitted signals.</span>
+<span class="sd">    signal_assoc_fit : list</span>
+<span class="sd">        List of association kinetics fitted signals.</span>
+<span class="sd">    fit_params_kinetics : pd.DataFrame</span>
+<span class="sd">        DataFrame with the fitted parameters.</span>
+<span class="sd">    fit_params_ss : pd.DataFrame</span>
+<span class="sd">        DataFrame with the values of the fitted parameters - steady state.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="KineticsFitterSolution.__init__">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.fitter_solution.KineticsFitterSolution.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">assoc</span><span class="p">,</span> <span class="n">lig_conc</span><span class="p">,</span> <span class="n">protein_conc</span><span class="p">,</span> <span class="n">time_assoc</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialize the KineticsFitterSolution class</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            name (str):                     name of the experiment</span>
-<span class="sd">            assoc (list):                   list containing the association signals</span>
-<span class="sd">            lig_conc (list):                list of ligand concentrations, one per element in assoc</span>
-<span class="sd">            protein_conc (list):            list of protein concentrations, one per element in assoc</span>
-<span class="sd">            time_assoc (list):              list of time points for the association signals, one per replicate</span>
-
+<span class="sd">        Initialize the KineticsFitterSolution class.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name : str</span>
+<span class="sd">            Name of the experiment.</span>
+<span class="sd">        assoc : list</span>
+<span class="sd">            List containing the association signals.</span>
+<span class="sd">        lig_conc : list</span>
+<span class="sd">            List of ligand concentrations, one per element in assoc.</span>
+<span class="sd">        protein_conc : list</span>
+<span class="sd">            List of protein concentrations, one per element in assoc.</span>
+<span class="sd">        time_assoc : list</span>
+<span class="sd">            List of time points for the association signals.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span>  <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span> <span class="o">=</span> <span class="n">assoc</span>
@@ -441,13 +421,19 @@
 <div class="viewcode-block" id="KineticsFitterSolution.get_steady_state">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.fitter_solution.KineticsFitterSolution.get_steady_state">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_steady_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the steady state signals from the association signals.</span>
-<span class="sd">        The steady state signal is the last value of each association signal.</span>
-
-<span class="sd">        We calculate the steady signal grouped by protein concentration.</span>
-
+<span class="sd">        </span>
+<span class="sd">        The steady state signal is calculated as the median of the last 5 values</span>
+<span class="sd">        of each association signal. The signals are grouped by protein concentration.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Updates the following instance attributes:</span>
+<span class="sd">            - unq_prot_conc: Unique protein concentrations</span>
+<span class="sd">            - signal_ss_per_protein: Steady state signals grouped by protein concentration</span>
+<span class="sd">            - lig_conc_per_protein: Ligand concentrations grouped by protein concentration</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">signal_ss_per_protein</span>   <span class="o">=</span> <span class="p">[]</span>
@@ -482,7 +468,15 @@
 <div class="viewcode-block" id="KineticsFitterSolution.clear_fittings">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.fitter_solution.KineticsFitterSolution.clear_fittings">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">clear_fittings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clear all fitting results.</span>
+<span class="sd">        </span>
+<span class="sd">        Resets the fitted signal arrays and parameter dataframes to None.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">signal_assoc_fit</span>    <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fit_params_kinetics</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fit_params_ss</span>       <span class="o">=</span> <span class="kc">None</span>
@@ -496,6 +490,18 @@
 
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Fit single exponentials to the association signals in the solution kinetics experiment.</span>
+<span class="sd">        </span>
+<span class="sd">        This method fits each association curve with a single exponential function</span>
+<span class="sd">        and extracts the observed rate constants (k_obs). The results are then grouped</span>
+<span class="sd">        by protein concentration.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Updates the following instance attributes:</span>
+<span class="sd">            - k_obs: List of observed rate constants for each association curve</span>
+<span class="sd">            - signal_assoc_fit: List of fitted association signals</span>
+<span class="sd">            - fit_params_kinetics: DataFrame with the fitted parameters</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">clear_fittings</span><span class="p">()</span>
 
@@ -530,10 +536,17 @@
 <div class="viewcode-block" id="KineticsFitterSolution.group_k_obs_by_protein_concentration">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.fitter_solution.KineticsFitterSolution.group_k_obs_by_protein_concentration">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">group_k_obs_by_protein_concentration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Group the observed rate constants by protein concentration.</span>
-<span class="sd">        This is useful for plotting the rate constants against the protein concentration.</span>
+<span class="sd">        </span>
+<span class="sd">        This is useful for plotting the rate constants against the protein concentration</span>
+<span class="sd">        and for subsequent analysis of the concentration dependence of the kinetics.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Updates the k_obs_per_prot attribute with a dictionary mapping</span>
+<span class="sd">            protein concentrations to arrays of observed rate constants.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">k_obs_per_prot</span> <span class="o">=</span> <span class="p">{}</span>
 
@@ -557,6 +570,28 @@
 
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Fit double exponentials to the association signals in the solution kinetics experiment.</span>
+<span class="sd">        </span>
+<span class="sd">        This method fits each association curve with a double exponential function</span>
+<span class="sd">        and extracts two observed rate constants (k_obs_1 and k_obs_2). The results </span>
+<span class="sd">        are then grouped by protein concentration.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        min_log_k : float, optional</span>
+<span class="sd">            Minimum value of log10(k) to search, default is -4.</span>
+<span class="sd">        max_log_k : float, optional</span>
+<span class="sd">            Maximum value of log10(k) to search, default is 4.</span>
+<span class="sd">        log_k_points : int, optional</span>
+<span class="sd">            Number of points to sample in the log(k) space, default is 22.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Updates the following instance attributes:</span>
+<span class="sd">            - k_obs_1: List of first observed rate constants for each association curve</span>
+<span class="sd">            - k_obs_2: List of second observed rate constants for each association curve</span>
+<span class="sd">            - signal_assoc_fit: List of fitted association signals</span>
+<span class="sd">            - fit_params_kinetics: DataFrame with the fitted parameters</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">k_obs_1</span><span class="p">,</span> <span class="n">k_obs_2</span><span class="p">,</span> <span class="n">y_pred</span> <span class="o">=</span> <span class="n">fit_many_double_exponential</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">time_assoc_lst</span><span class="p">,</span><span class="n">min_log_k</span><span class="p">,</span> <span class="n">max_log_k</span><span class="p">,</span> <span class="n">log_k_points</span><span class="p">)</span>
@@ -584,7 +619,17 @@
 
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Group the observed rate constants by protein concentration for double exponential fits.</span>
-<span class="sd">        This is useful for plotting the rate constants against the protein concentration.</span>
+<span class="sd">        </span>
+<span class="sd">        This is useful for plotting the rate constants against the protein concentration</span>
+<span class="sd">        and for subsequent analysis of the concentration dependence of the kinetics</span>
+<span class="sd">        when using double exponential fits.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Updates the following instance attributes:</span>
+<span class="sd">            - k_obs_1_per_prot: Dictionary mapping protein concentrations to arrays of first observed rate constants</span>
+<span class="sd">            - k_obs_2_per_prot: Dictionary mapping protein concentrations to arrays of second observed rate constants</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">k_obs_1_per_prot</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">k_obs_2_per_prot</span> <span class="o">=</span> <span class="p">{}</span>
@@ -610,10 +655,18 @@
 <div class="viewcode-block" id="KineticsFitterSolution.fit_one_binding_site">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.fitter_solution.KineticsFitterSolution.fit_one_binding_site">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">fit_one_binding_site</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Fit the association signals assuming one binding site.</span>
-<span class="sd">        This is a simplified model that assumes a single binding site for the ligand on the protein.</span>
+<span class="sd">        </span>
+<span class="sd">        This is a simplified model that assumes a single binding site for the ligand </span>
+<span class="sd">        on the protein. The model fits global parameters to all curves simultaneously.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Updates the following instance attributes:</span>
+<span class="sd">            - signal_assoc_fit: List of fitted association signals</span>
+<span class="sd">            - fit_params_kinetics: DataFrame with the fitted parameters</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">initial_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lig_conc</span><span class="p">),</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># Signal amplitude of the complex, Kd, and koff</span>
@@ -662,6 +715,31 @@
                                <span class="n">ESint_equals_ES</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                <span class="n">fixed_t0</span><span class="o">=</span><span class="kc">True</span>
                                <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find optimal initial parameters for the induced fit model.</span>
+<span class="sd">        </span>
+<span class="sd">        Heuristically finds the best initial parameters for the fit by exploring</span>
+<span class="sd">        fixed values of kc and krev and fitting kon and koff (and the signal of the complex).</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fit_signal_E : bool, optional</span>
+<span class="sd">            If True, fit the signal of the free protein E, default is False.</span>
+<span class="sd">        fit_signal_S : bool, optional</span>
+<span class="sd">            If True, fit the signal of the free ligand S, default is False.</span>
+<span class="sd">        fit_signal_ES : bool, optional</span>
+<span class="sd">            If True, fit the signal of the complex ES, default is True.</span>
+<span class="sd">        ESint_equals_ES : bool, optional</span>
+<span class="sd">            If True, assume that the signal of the intermediate ESint is equal </span>
+<span class="sd">            to the signal of the complex ES, default is True.</span>
+<span class="sd">        fixed_t0 : bool, optional</span>
+<span class="sd">            If True, fix the t0 parameter to 0, default is True.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Updates the params_guess attribute with the best initial parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># Heuristically find the best initial parameters for the fit</span>
         <span class="c1"># We explore fixed values of kc and krev and fit kon and koff (and the signal of the complex)</span>
@@ -690,16 +768,32 @@
                         <span class="n">ESint_equals_ES</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                         <span class="n">fixed_t0</span><span class="o">=</span><span class="kc">True</span>
                         <span class="p">):</span>
-
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Fit the association signals assuming induced fit.</span>
+<span class="sd">        Fit the association signals assuming induced fit mechanism.</span>
+<span class="sd">        </span>
 <span class="sd">        This model accounts for conformational changes in the protein upon ligand binding.</span>
-<span class="sd">        Args:</span>
-<span class="sd">            fit_signal_E (bool): If True, fit the signal of the free protein E.</span>
-<span class="sd">            fit_signal_S (bool): If True, fit the signal of the free ligand S.</span>
-<span class="sd">            fit_signal_ES (bool): If True, fit the signal of the complex ES.</span>
-<span class="sd">            ESint_equals_ES (bool): If True, assume that the signal of the intermediate ESint is equal to the signal of the complex ES.</span>
-<span class="sd">            fixed_t0 (bool): If True, fix the t0 parameter to 0.</span>
+<span class="sd">        The method first calls find_initial_params_if to get good starting values, then</span>
+<span class="sd">        performs the actual fitting with those values.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fit_signal_E : bool, optional</span>
+<span class="sd">            If True, fit the signal of the free protein E, default is False.</span>
+<span class="sd">        fit_signal_S : bool, optional</span>
+<span class="sd">            If True, fit the signal of the free ligand S, default is False.</span>
+<span class="sd">        fit_signal_ES : bool, optional</span>
+<span class="sd">            If True, fit the signal of the complex ES, default is True.</span>
+<span class="sd">        ESint_equals_ES : bool, optional</span>
+<span class="sd">            If True, assume that the signal of the intermediate ESint is equal to the signal of the complex ES, default is True.</span>
+<span class="sd">        fixed_t0 : bool, optional</span>
+<span class="sd">            If True, fix the t0 parameter to 0, default is True.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Updates the following instance attributes:</span>
+<span class="sd">            - signal_assoc_fit: List of fitted association signals</span>
+<span class="sd">            - fit_params_kinetics: DataFrame with the fitted parameters</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># fit using as initial parameters the best found parameters</span>

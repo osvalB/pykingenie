@@ -139,27 +139,6 @@
   </a>
 </li>
 
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
-    pykingenie.utils package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.html">
-    pykingenie package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
-    pykingenie.utils package
-  </a>
-</li>
-
   </ul>
 </nav></div>
       
@@ -257,27 +236,6 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../pykingenie.html">
     pykingenie package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
-    pykingenie.utils package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.html">
-    pykingenie package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
-    pykingenie.utils package
   </a>
 </li>
 
@@ -396,12 +354,23 @@
 <div class="viewcode-block" id="if_string_to_list">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.processing.if_string_to_list">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">if_string_to_list</span><span class="p">(</span><span class="n">string_or_list</span><span class="p">):</span>
-
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Check if input is a string and convert it to a list</span>
-<span class="sd">    Otherwise, return the input as is</span>
-<span class="sd">    Args:</span>
-<span class="sd">        string_or_list (str or list): Input string or list</span>
+<span class="sd">    Convert a string to a list if necessary.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    string_or_list : str or list</span>
+<span class="sd">        Input string or list to convert.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        Converted list.</span>
+<span class="sd">        </span>
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    TypeError</span>
+<span class="sd">        If input is neither a string nor a list.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">string_or_list</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">string_or_list</span><span class="p">]</span>
@@ -414,15 +383,20 @@
 <div class="viewcode-block" id="guess_experiment_name">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.processing.guess_experiment_name">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">guess_experiment_name</span><span class="p">(</span><span class="n">frd_file</span><span class="p">):</span>
-
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Given a certain frd file, try to guess the experiment name</span>
-<span class="sd">    The frd file is the format exported by the Biacore software</span>
+<span class="sd">    Given a certain frd file, try to guess the experiment name.</span>
+<span class="sd">    </span>
+<span class="sd">    The frd file is the format exported by the Biacore software.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        frd_file (str): file name</span>
-<span class="sd">    Returns:</span>
-<span class="sd">        str: experiment name</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    frd_file : str</span>
+<span class="sd">        Path to the FRD file.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        Experiment name extracted from the file, or &#39;Experiment&#39; if no name is found.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># Read the file content</span>
@@ -455,11 +429,17 @@
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.processing.etree_to_dict">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">etree_to_dict</span><span class="p">(</span><span class="n">tree</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Converts xml tree to dictionary</span>
-<span class="sd">    Args:</span>
-<span class="sd">        tree (ElementTree): XML tree to convert</span>
-<span class="sd">    Returns:</span>
-<span class="sd">        dict: Dictionary representation of the XML tree</span>
+<span class="sd">    Converts XML tree to dictionary.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    tree : ElementTree</span>
+<span class="sd">        XML tree to convert.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        Dictionary representation of the XML tree.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">tree_dict</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">tree</span><span class="p">:</span>
@@ -471,12 +451,21 @@
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.processing.combine_dicts">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">combine_dicts</span><span class="p">(</span><span class="n">list_dicts</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Combines dictionaries with the same (!) keys</span>
-<span class="sd">    Outputs dictionary with lists</span>
-<span class="sd">    Args:</span>
-<span class="sd">        list_dicts (list): List of dictionaries to combine</span>
-<span class="sd">    Returns:</span>
-<span class="sd">        dict: Combined dictionary with lists as values</span>
+<span class="sd">    Combines dictionaries with the same keys into a dictionary with lists as values.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    list_dicts : list</span>
+<span class="sd">        List of dictionaries to combine.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        Combined dictionary with lists as values.</span>
+<span class="sd">        </span>
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    All dictionaries must have the same keys.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">new_dict</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">list_dicts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
@@ -487,15 +476,18 @@
 <div class="viewcode-block" id="guess_experiment_type">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.processing.guess_experiment_type">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">guess_experiment_type</span><span class="p">(</span><span class="n">files</span><span class="p">):</span>
-
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Given a certain file, try to guess if it corresponds to surface-based or solution-based binding experiments</span>
+<span class="sd">    Given file paths, try to guess if they correspond to surface-based or solution-based binding experiments.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        files (list): list of file paths</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        str: &#39;surface&#39; or &#39;solution&#39;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    files : str or list</span>
+<span class="sd">        Path or list of paths to the experiment files.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        &#39;surface&#39; or &#39;solution&#39; indicating the experiment type.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># convert to list if it is a string</span>
@@ -526,23 +518,30 @@
 
 <div class="viewcode-block" id="detect_time_list_continuos">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.processing.detect_time_list_continuos">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">detect_time_list_continuos</span><span class="p">(</span><span class="n">assoc_time_lst</span><span class="p">,</span><span class="n">disso_time_lst</span><span class="p">,</span><span class="n">tolerance</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">detect_time_list_continuos</span><span class="p">(</span><span class="n">assoc_time_lst</span><span class="p">,</span> <span class="n">disso_time_lst</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Detect which association steps come directly after a dissociation step</span>
-<span class="sd">    Useful for single-cylce kinetics</span>
+<span class="sd">    Detect which association steps come directly after a dissociation step.</span>
+<span class="sd">    </span>
+<span class="sd">    Useful for single-cycle kinetics.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        assoc_time_lst (list): List of association time arrays</span>
-<span class="sd">        disso_time_lst (list): List of dissociation time arrays</span>
-<span class="sd">        tolerance (float):     Tolerance for the time difference (in seconds)</span>
-<span class="sd">    Returns:</span>
-<span class="sd">        continuos (list): List of booleans indicating if the association phase have a dissociation phase just before</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    assoc_time_lst : list</span>
+<span class="sd">        List of association time arrays.</span>
+<span class="sd">    disso_time_lst : list</span>
+<span class="sd">        List of dissociation time arrays.</span>
+<span class="sd">    tolerance : float, optional</span>
+<span class="sd">        Tolerance for the time difference (in seconds), default is 3.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        List of booleans indicating if the association phase has a dissociation phase just before.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">continuos</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">element</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">assoc_time_lst</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">element</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">assoc_time_lst</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
 
@@ -558,17 +557,21 @@
 
 <div class="viewcode-block" id="find_loading_column">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.processing.find_loading_column">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">find_loading_column</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">step_number</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">find_loading_column</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">step_number</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Given a dataframe with the columns &#39;Column&#39;, &#39;Type&#39; and &#39;StepNumber&#39;,</span>
-<span class="sd">    find the loading column before the given step number.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        df (pd.DataFrame): DataFrame containing the columns &#39;Column&#39;, &#39;Type&#39; and &#39;StepNumber&#39;</span>
-<span class="sd">        step_number (int): The step number to find the loading column before</span>
-<span class="sd">    Returns:</span>
-<span class="sd">        str: The name of the loading column before the given step number</span>
+<span class="sd">    Find the loading column before the given step number.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df : pd.DataFrame</span>
+<span class="sd">        DataFrame containing the columns &#39;Column&#39;, &#39;Type&#39; and &#39;StepNumber&#39;.</span>
+<span class="sd">    step_number : int</span>
+<span class="sd">        The step number to find the loading column before.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str or None</span>
+<span class="sd">        The name of the loading column before the given step number, or None if no loading column is found.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># Filter the dataframe to get the loading columns before the given step number</span>
@@ -588,15 +591,18 @@
 <div class="viewcode-block" id="concat_signal_lst">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.processing.concat_signal_lst">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">concat_signal_lst</span><span class="p">(</span><span class="n">signal_lst</span><span class="p">):</span>
-
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Concatenate a list of signals into a single array</span>
+<span class="sd">    Concatenate a list of signals into a single array.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        signal_lst (list): List of signals to concatenate, each signal is a numpy array</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    signal_lst : list</span>
+<span class="sd">        List of signals to concatenate, each signal is a numpy array.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        allSignal (np.ndarray): Concatenated signal</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Concatenated signal.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">signal_lst</span><span class="p">)</span></div>
@@ -604,20 +610,26 @@
 
 <div class="viewcode-block" id="expand_parameter_list">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.processing.expand_parameter_list">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">expand_parameter_list</span><span class="p">(</span><span class="n">parameter_lst</span><span class="p">,</span><span class="n">id_list</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">expand_parameter_list</span><span class="p">(</span><span class="n">parameter_lst</span><span class="p">,</span> <span class="n">id_list</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-
+<span class="sd">    Expand a parameter list based on ID mapping.</span>
+<span class="sd">    </span>
 <span class="sd">    Given a list of n-parameters, such as [1,3] and another list</span>
-<span class="sd">    containing IDs, such as [0,0,0,0,0,1,1]</span>
-<span class="sd">    we will create a new list where the elements are repeated</span>
+<span class="sd">    containing IDs, such as [0,0,0,0,0,1,1],</span>
+<span class="sd">    create a new list where the elements are repeated</span>
 <span class="sd">    according to the IDs. In this case: [1,1,1,1,1,3,3]</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        parameter_lst (list):   n-Parameters</span>
-<span class="sd">        id_list (list):         m-IDs</span>
-<span class="sd">    Returns:</span>
-<span class="sd">        expanded_parameters (list): m-Parameters according to the IDs</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    parameter_lst : list</span>
+<span class="sd">        List of n-Parameters.</span>
+<span class="sd">    id_list : list</span>
+<span class="sd">        List of m-IDs mapping to parameter indices.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        m-Parameters list expanded according to the IDs.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">expanded_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="n">parameter_lst</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">id_list</span><span class="p">]</span>
@@ -629,11 +641,18 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">combine_sequences</span><span class="p">(</span><span class="n">seq1</span><span class="p">,</span> <span class="n">seq2</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Combine two sequences to generate all possible combinations of their elements.</span>
-<span class="sd">    Args:</span>
-<span class="sd">        seq1 (list): First sequence of elements.</span>
-<span class="sd">        seq2 (list): Second sequence of elements.</span>
-<span class="sd">    Returns:</span>
-<span class="sd">        list: A list of tuples, where each tuple contains one element from seq1 and one from seq2.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    seq1 : list</span>
+<span class="sd">        First sequence of elements.</span>
+<span class="sd">    seq2 : list</span>
+<span class="sd">        Second sequence of elements.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        A list of tuples, where each tuple contains one element from seq1 and one from seq2.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">seq1</span><span class="p">,</span> <span class="n">seq2</span><span class="p">))</span></div>
 
@@ -642,6 +661,24 @@
 <div class="viewcode-block" id="get_palette">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.processing.get_palette">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_palette</span><span class="p">(</span><span class="n">n_colors</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get a color palette with the specified number of colors.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_colors : int</span>
+<span class="sd">        Number of colors to include in the palette.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        List of hex color codes.</span>
+<span class="sd">        </span>
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Uses Set1 from ColorBrewer for n_colors &lt;= 9,</span>
+<span class="sd">    Set3 for n_colors &lt;= 12, and interpolated colors for n_colors &gt; 12.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">n_colors</span> <span class="o">&lt;=</span> <span class="mi">9</span><span class="p">:</span>
         <span class="c1"># Use Set1 from ColorBrewer</span>
         <span class="k">return</span> <span class="n">set1_colors</span><span class="p">[:</span><span class="n">n_colors</span><span class="p">]</span>
@@ -662,11 +699,18 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">get_plotting_df</span><span class="p">(</span><span class="n">ID</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create a DataFrame for plotting purposes with colors and labels.</span>
-<span class="sd">    Args:</span>
-<span class="sd">        ID (list): List of unique identifiers for each entry.</span>
-<span class="sd">        labels (list, optional): List of labels corresponding to each ID. Defaults to None.</span>
-<span class="sd">    Returns:</span>
-<span class="sd">        pd.DataFrame: DataFrame containing Internal_ID, Color, Legend, and Show columns.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ID : list</span>
+<span class="sd">        List of unique identifiers for each entry.</span>
+<span class="sd">    labels : list, optional</span>
+<span class="sd">        List of labels corresponding to each ID. Defaults to None, in which case the ID values are used as labels.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pd.DataFrame</span>
+<span class="sd">        DataFrame containing Internal_ID, Color, Legend, and Show columns.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">labels</span> <span class="o">=</span> <span class="n">ID</span>
@@ -685,11 +729,18 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">subset_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">max_points</span><span class="o">=</span><span class="mi">200</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Subset data to a maximum number of points for plotting.</span>
-<span class="sd">    Args:</span>
-<span class="sd">        data (list or np.ndarray): Data to be subsetted.</span>
-<span class="sd">        max_points (int): Maximum number of points to retain.</span>
-<span class="sd">    Returns:</span>
-<span class="sd">        list or np.ndarray: Subsetted data.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : list or np.ndarray</span>
+<span class="sd">        Data to be subsetted.</span>
+<span class="sd">    max_points : int, optional</span>
+<span class="sd">        Maximum number of points to retain, default is 200.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list or np.ndarray</span>
+<span class="sd">        Subsetted data with at most max_points points.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">total_points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">total_points</span> <span class="o">&gt;</span> <span class="n">max_points</span><span class="p">:</span>
@@ -703,10 +754,26 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">sample_type_to_letter</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert sample type string to a single letter code.</span>
-<span class="sd">    Args:</span>
-<span class="sd">        string (str): Sample type string.</span>
-<span class="sd">    Returns:</span>
-<span class="sd">        str: Single letter code representing the sample type.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    string : str</span>
+<span class="sd">        Sample type string.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        Single letter code representing the sample type.</span>
+<span class="sd">        </span>
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Mapping:</span>
+<span class="sd">    - KSAMPLE/SAMPLE -&gt; S</span>
+<span class="sd">    - LOADING/KLOADING -&gt; L</span>
+<span class="sd">    - NEUTRALIZATION -&gt; N</span>
+<span class="sd">    - REGENERATION -&gt; R</span>
+<span class="sd">    - BASELINE/BUFFER -&gt; B</span>
+<span class="sd">    - Others -&gt; First letter of the string</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">mapping</span> <span class="o">=</span> <span class="p">{</span>
@@ -729,11 +796,22 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">get_colors_from_numeric_values</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">min_val</span><span class="p">,</span> <span class="n">max_val</span><span class="p">,</span> <span class="n">use_log_scale</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Map numeric values to colors in the VIRIDIS palette based on a specified range.</span>
-<span class="sd">    Args:</span>
-<span class="sd">        values (list or np.ndarray): Numeric values to map to colors.</span>
-<span class="sd">        min_val (float): Minimum value of the range.</span>
-<span class="sd">        max_val (float): Maximum value of the range.</span>
-<span class="sd">        use_log_scale (bool): Whether to use logarithmic scaling for the values.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    values : list or np.ndarray</span>
+<span class="sd">        Numeric values to map to colors.</span>
+<span class="sd">    min_val : float</span>
+<span class="sd">        Minimum value of the range.</span>
+<span class="sd">    max_val : float</span>
+<span class="sd">        Maximum value of the range.</span>
+<span class="sd">    use_log_scale : bool, optional</span>
+<span class="sd">        Whether to use logarithmic scaling for the values, default is True.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        List of hex color codes corresponding to the input values.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">use_log_scale</span><span class="p">:</span>
@@ -747,13 +825,30 @@
 
 <div class="viewcode-block" id="find_index_of_previous_step_type">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.processing.find_index_of_previous_step_type">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">find_index_of_previous_step_type</span><span class="p">(</span><span class="n">df_steps</span><span class="p">,</span><span class="n">step_index</span><span class="p">,</span><span class="n">step_type</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">find_index_of_previous_step_type</span><span class="p">(</span><span class="n">df_steps</span><span class="p">,</span> <span class="n">step_index</span><span class="p">,</span> <span class="n">step_type</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find the index of the first step of a given type before a specified step index.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df_steps : pd.DataFrame</span>
+<span class="sd">        DataFrame containing step information with a &#39;Type&#39; column.</span>
+<span class="sd">    step_index : int</span>
+<span class="sd">        Current step index.</span>
+<span class="sd">    step_type : str</span>
+<span class="sd">        Type of step to search for.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    int or None</span>
+<span class="sd">        Index of the first step of the specified type before the given step index,</span>
+<span class="sd">        or None if no matching step is found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">i</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="c1"># Find the index of the first step_type, from the single cycle</span>
     <span class="c1"># Iterate over the previous steps, two at a time, until we find a step that is not a step of the same type</span>
 
-    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">step_index</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">step_index</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">df_steps</span><span class="p">[</span><span class="s1">&#39;Type&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span> <span class="o">!=</span> <span class="n">step_type</span><span class="p">:</span>
             <span class="n">i</span> <span class="o">=</span> <span class="n">idx</span>
             <span class="k">break</span>

@@ -139,27 +139,6 @@
   </a>
 </li>
 
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
-    pykingenie.utils package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.html">
-    pykingenie package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
-    pykingenie.utils package
-  </a>
-</li>
-
   </ul>
 </nav></div>
       
@@ -257,27 +236,6 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../pykingenie.html">
     pykingenie package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
-    pykingenie.utils package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.html">
-    pykingenie package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
-    pykingenie.utils package
   </a>
 </li>
 
@@ -400,21 +358,26 @@
 
 <div class="viewcode-block" id="guess_initial_signal">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.fitting_surface.guess_initial_signal">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">guess_initial_signal</span><span class="p">(</span><span class="n">assoc_time_lst</span><span class="p">,</span> <span class="n">assoc_signal_lst</span><span class="p">,</span><span class="n">time_limit</span><span class="o">=</span><span class="mi">30</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">guess_initial_signal</span><span class="p">(</span><span class="n">assoc_time_lst</span><span class="p">,</span> <span class="n">assoc_signal_lst</span><span class="p">,</span> <span class="n">time_limit</span><span class="o">=</span><span class="mi">30</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Guess the initial signal for each signal in the list, by trying to fit a single exponentials</span>
-<span class="sd">    Used only for the one-to-one binding model in case one of the steps is not present</span>
+<span class="sd">    Guess the initial signal for each signal in the list by fitting single exponentials.</span>
+<span class="sd">    </span>
+<span class="sd">    Used only for the one-to-one binding model in case one of the steps is not present.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        assoc_time_lst (list):   List of association time arrays</span>
-<span class="sd">        assoc_signal_lst (list): List of association signal arrays</span>
-<span class="sd">        time_limit (float):      Time limit to consider for the fit, default is 30 seconds</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    assoc_time_lst : list</span>
+<span class="sd">        List of association time arrays.</span>
+<span class="sd">    assoc_signal_lst : list</span>
+<span class="sd">        List of association signal arrays.</span>
+<span class="sd">    time_limit : float, optional</span>
+<span class="sd">        Time limit to consider for the fit, default is 30 seconds.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        s0s (list): List of initial signals for each association signal</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        List of initial signals for each association signal.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">s0s</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">for</span> <span class="n">t</span><span class="p">,</span><span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">assoc_time_lst</span><span class="p">,</span><span class="n">assoc_signal_lst</span><span class="p">):</span>
@@ -438,6 +401,19 @@
 <div class="viewcode-block" id="get_smax_upper_bound_factor">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.fitting_surface.get_smax_upper_bound_factor">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_smax_upper_bound_factor</span><span class="p">(</span><span class="n">Kd_ss</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get a factor to determine the upper bound for Smax based on Kd_ss value.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Kd_ss : float</span>
+<span class="sd">        Steady state Kd value.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float or None</span>
+<span class="sd">        Factor to multiply for setting Smax upper bound, or None if no matching range found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">factor_dict</span> <span class="o">=</span> <span class="p">{</span>
         <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)):</span> <span class="mf">1e3</span><span class="p">,</span>
         <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">):</span> <span class="mf">1e2</span><span class="p">,</span>
@@ -451,25 +427,37 @@
 
 <div class="viewcode-block" id="fit_steady_state_one_site">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.fitting_surface.fit_steady_state_one_site">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">fit_steady_state_one_site</span><span class="p">(</span><span class="n">signal_lst</span><span class="p">,</span> <span class="n">ligand_lst</span><span class="p">,</span><span class="n">initial_parameters</span><span class="p">,</span>
-                              <span class="n">low_bounds</span><span class="p">,</span> <span class="n">high_bounds</span><span class="p">,</span><span class="n">fixed_Kd</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span><span class="n">Kd_value</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">fit_steady_state_one_site</span><span class="p">(</span><span class="n">signal_lst</span><span class="p">,</span> <span class="n">ligand_lst</span><span class="p">,</span> <span class="n">initial_parameters</span><span class="p">,</span>
+                              <span class="n">low_bounds</span><span class="p">,</span> <span class="n">high_bounds</span><span class="p">,</span> <span class="n">fixed_Kd</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">Kd_value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Fits a one-site binding model to a set of steady state signals</span>
-<span class="sd">    Args:</span>
-<span class="sd">        signal_lst (list): List of signals to fit, each signal is a numpy array</span>
-<span class="sd">        ligand_lst (list): List of ligand concentrations, each concentration is a numpy array</span>
-<span class="sd">        initial_parameters (list): Initial guess for the parameters</span>
-<span class="sd">        low_bounds (list): Lower bounds for the parameters</span>
-<span class="sd">        high_bounds (list): Upper bounds for the parameters</span>
-<span class="sd">        fixed_Kd (bool): If True, Kd is fixed to Kd_value</span>
-<span class="sd">        Kd_value (float): Value of Kd to use if fixed_Kd is True</span>
-<span class="sd">    Returns:</span>
-<span class="sd">        global_fit_params (list): Fitted parameters</span>
-<span class="sd">        cov (np.ndarray): Covariance matrix of the fitted parameters</span>
-<span class="sd">        fitted_values (list): Fitted values for each signal, same dimensions as signal_lst</span>
+<span class="sd">    Fit a one-site binding model to a set of steady state signals.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    signal_lst : list</span>
+<span class="sd">        List of signals to fit, each signal is a numpy array.</span>
+<span class="sd">    ligand_lst : list</span>
+<span class="sd">        List of ligand concentrations, each concentration is a numpy array.</span>
+<span class="sd">    initial_parameters : list</span>
+<span class="sd">        Initial guess for the parameters.</span>
+<span class="sd">    low_bounds : list</span>
+<span class="sd">        Lower bounds for the parameters.</span>
+<span class="sd">    high_bounds : list</span>
+<span class="sd">        Upper bounds for the parameters.</span>
+<span class="sd">    fixed_Kd : bool, optional</span>
+<span class="sd">        If True, Kd is fixed to Kd_value, default is False.</span>
+<span class="sd">    Kd_value : float, optional</span>
+<span class="sd">        Value of Kd to use if fixed_Kd is True.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        Fitted parameters.</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Covariance matrix of the fitted parameters.</span>
+<span class="sd">    list</span>
+<span class="sd">        Fitted values for each signal, same dimensions as signal_lst.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">all_signal</span> <span class="o">=</span> <span class="n">concat_signal_lst</span><span class="p">(</span><span class="n">signal_lst</span><span class="p">)</span>
 
     <span class="n">start</span> <span class="o">=</span> <span class="mi">1</span>
@@ -504,25 +492,33 @@
 
 <div class="viewcode-block" id="steady_state_one_site_asymmetric_ci95">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.fitting_surface.steady_state_one_site_asymmetric_ci95">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">steady_state_one_site_asymmetric_ci95</span><span class="p">(</span><span class="n">kd_estimated</span><span class="p">,</span><span class="n">signal_lst</span><span class="p">,</span> <span class="n">ligand_lst</span><span class="p">,</span><span class="n">initial_parameters</span><span class="p">,</span>
-                                          <span class="n">low_bounds</span><span class="p">,</span> <span class="n">high_bounds</span><span class="p">,</span><span class="n">rss_desired</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">steady_state_one_site_asymmetric_ci95</span><span class="p">(</span><span class="n">kd_estimated</span><span class="p">,</span> <span class="n">signal_lst</span><span class="p">,</span> <span class="n">ligand_lst</span><span class="p">,</span> <span class="n">initial_parameters</span><span class="p">,</span>
+                                          <span class="n">low_bounds</span><span class="p">,</span> <span class="n">high_bounds</span><span class="p">,</span> <span class="n">rss_desired</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate the asymmetric confidence interval for the steady-state signal</span>
-<span class="sd">    Args:</span>
-<span class="sd">        kd_estimated (float): Estimated Kd value</span>
-<span class="sd">        signal_lst (list): List of signals to fit, each signal is a numpy array</span>
-<span class="sd">        ligand_lst (list): List of ligand concentrations, each concentration is a numpy array</span>
-<span class="sd">        initial_parameters (list): Initial guess for the parameters (without the Kd!)</span>
-<span class="sd">        low_bounds (list): Lower bounds for the parameters (without the Kd!)</span>
-<span class="sd">        high_bounds (list): Upper bounds for the parameters (without the Kd!)</span>
-<span class="sd">        rss_desired (float): Maximum residual sum of squares</span>
+<span class="sd">    Calculate the asymmetric confidence interval for the steady-state signal.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    kd_estimated : float</span>
+<span class="sd">        Estimated Kd value.</span>
+<span class="sd">    signal_lst : list</span>
+<span class="sd">        List of signals to fit, each signal is a numpy array.</span>
+<span class="sd">    ligand_lst : list</span>
+<span class="sd">        List of ligand concentrations, each concentration is a numpy array.</span>
+<span class="sd">    initial_parameters : list</span>
+<span class="sd">        Initial guess for the parameters (without the Kd!).</span>
+<span class="sd">    low_bounds : list</span>
+<span class="sd">        Lower bounds for the parameters (without the Kd!).</span>
+<span class="sd">    high_bounds : list</span>
+<span class="sd">        Upper bounds for the parameters (without the Kd!).</span>
+<span class="sd">    rss_desired : float</span>
+<span class="sd">        Maximum residual sum of squares.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        ci95 (np.ndarray): 95 % asymmetric confidence interval for the Kd value</span>
-
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        95% asymmetric confidence interval for the Kd value [lower_bound, upper_bound].</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="k">def</span><span class="w"> </span><span class="nf">f_to_optimize</span><span class="p">(</span><span class="n">Kd</span><span class="p">):</span>
 
         <span class="n">fit_params</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">fit_vals</span> <span class="o">=</span> <span class="n">fit_steady_state_one_site</span><span class="p">(</span><span class="n">signal_lst</span><span class="p">,</span> <span class="n">ligand_lst</span><span class="p">,</span>
@@ -552,38 +548,53 @@
 <div class="viewcode-block" id="fit_one_site_association">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.fitting_surface.fit_one_site_association">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">fit_one_site_association</span><span class="p">(</span><span class="n">signal_lst</span><span class="p">,</span> <span class="n">time_lst</span><span class="p">,</span> <span class="n">analyte_conc_lst</span><span class="p">,</span>
-                             <span class="n">initial_parameters</span><span class="p">,</span><span class="n">low_bounds</span><span class="p">,</span> <span class="n">high_bounds</span><span class="p">,</span>
+                             <span class="n">initial_parameters</span><span class="p">,</span> <span class="n">low_bounds</span><span class="p">,</span> <span class="n">high_bounds</span><span class="p">,</span>
                              <span class="n">smax_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                             <span class="n">shared_smax</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                             <span class="n">fixed_t0</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-                             <span class="n">fixed_Kd</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">Kd_value</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                             <span class="n">fixed_koff</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">koff_value</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-
+                             <span class="n">shared_smax</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                             <span class="n">fixed_t0</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                             <span class="n">fixed_Kd</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">Kd_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                             <span class="n">fixed_koff</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">koff_value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Global fit to a list of association traces - one-to-one binding model</span>
+<span class="sd">    Global fit to a list of association traces - one-to-one binding model.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        signal_lst (list): List of signals to fit, each signal is a numpy array</span>
-<span class="sd">        time_lst (list): List of time arrays</span>
-<span class="sd">        analyte_conc_lst (list): List of analyte concentrations, each element is a numpy array</span>
-<span class="sd">        initial_parameters (list): Initial guess for the parameters</span>
-<span class="sd">        low_bounds (list): Lower bounds for the parameters</span>
-<span class="sd">        high_bounds (list): Upper bounds for the parameters</span>
-<span class="sd">        smax_idx (list): List of indices for the s_max parameters, used if shared_smax is TRUE</span>
-<span class="sd">        shared_smax (bool): If True, the s_max parameters are shared between the signals</span>
-<span class="sd">        fixed_t0 (bool): If True, t0 is fixed to 0, otherwise we fit it</span>
-<span class="sd">        fixed_Kd (bool): If True, Kd is fixed to Kd_value</span>
-<span class="sd">        Kd_value (float): Value of Kd to use if fixed_Kd is True</span>
-<span class="sd">        fixed_koff (bool): If True, koff is fixed to koff_value</span>
-<span class="sd">        koff_value (float): Value of koff to use if fixed_koff is True</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    signal_lst : list</span>
+<span class="sd">        List of signals to fit, each signal is a numpy array.</span>
+<span class="sd">    time_lst : list</span>
+<span class="sd">        List of time arrays.</span>
+<span class="sd">    analyte_conc_lst : list</span>
+<span class="sd">        List of analyte concentrations, each element is a numpy array.</span>
+<span class="sd">    initial_parameters : list</span>
+<span class="sd">        Initial guess for the parameters.</span>
+<span class="sd">    low_bounds : list</span>
+<span class="sd">        Lower bounds for the parameters.</span>
+<span class="sd">    high_bounds : list</span>
+<span class="sd">        Upper bounds for the parameters.</span>
+<span class="sd">    smax_idx : list, optional</span>
+<span class="sd">        List of indices for the s_max parameters, used if shared_smax is True.</span>
+<span class="sd">    shared_smax : bool, optional</span>
+<span class="sd">        If True, the s_max parameters are shared between the signals, default is False.</span>
+<span class="sd">    fixed_t0 : bool, optional</span>
+<span class="sd">        If True, t0 is fixed to 0, otherwise we fit it, default is True.</span>
+<span class="sd">    fixed_Kd : bool, optional</span>
+<span class="sd">        If True, Kd is fixed to Kd_value, default is False.</span>
+<span class="sd">    Kd_value : float, optional</span>
+<span class="sd">        Value of Kd to use if fixed_Kd is True.</span>
+<span class="sd">    fixed_koff : bool, optional</span>
+<span class="sd">        If True, koff is fixed to koff_value, default is False.</span>
+<span class="sd">    koff_value : float, optional</span>
+<span class="sd">        Value of koff to use if fixed_koff is True.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        global_fit_params (list): Fitted parameters</span>
-<span class="sd">        cov (np.ndarray): Covariance matrix of the fitted parameters</span>
-<span class="sd">        fitted_values (list): Fitted values for each signal, same dimensions as signal_lst</span>
-
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        Fitted parameters.</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Covariance matrix of the fitted parameters.</span>
+<span class="sd">    list</span>
+<span class="sd">        Fitted values for each signal, same dimensions as signal_lst.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">all_signal</span> <span class="o">=</span> <span class="n">concat_signal_lst</span><span class="p">(</span><span class="n">signal_lst</span><span class="p">)</span>
 
     <span class="n">time_lst</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">time_lst</span><span class="p">]</span>
@@ -591,12 +602,10 @@
     <span class="n">start</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">([</span><span class="n">fixed_t0</span><span class="p">,</span> <span class="n">fixed_Kd</span><span class="p">,</span> <span class="n">fixed_koff</span><span class="p">])</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">fit_fx</span><span class="p">(</span><span class="n">dummyVariable</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Arguments order:</span>
 <span class="sd">            Kd, Koff, T0, Smax1, Smax2, Smax3, ...</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="n">Kd</span> <span class="o">=</span> <span class="n">Kd_value</span> <span class="k">if</span> <span class="n">fixed_Kd</span> <span class="k">else</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="n">Koff</span> <span class="o">=</span> <span class="n">koff_value</span> <span class="k">if</span> <span class="n">fixed_koff</span> <span class="k">else</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">([</span><span class="n">fixed_Kd</span><span class="p">])]</span>
@@ -643,32 +652,43 @@
 <div class="viewcode-block" id="fit_one_site_dissociation">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.fitting_surface.fit_one_site_dissociation">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">fit_one_site_dissociation</span><span class="p">(</span><span class="n">signal_lst</span><span class="p">,</span> <span class="n">time_lst</span><span class="p">,</span>
-                             <span class="n">initial_parameters</span><span class="p">,</span><span class="n">low_bounds</span><span class="p">,</span> <span class="n">high_bounds</span><span class="p">,</span>
-                             <span class="n">fixed_t0</span>   <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-                             <span class="n">fixed_koff</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">koff_value</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                             <span class="n">initial_parameters</span><span class="p">,</span> <span class="n">low_bounds</span><span class="p">,</span> <span class="n">high_bounds</span><span class="p">,</span>
+                             <span class="n">fixed_t0</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                             <span class="n">fixed_koff</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">koff_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                              <span class="n">fit_s0</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Global fit to a list of dissociation traces - one-to-one binding model</span>
+<span class="sd">    Global fit to a list of dissociation traces - one-to-one binding model.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        signal_lst (list): List of signals to fit, each signal is a numpy array</span>
-<span class="sd">        time_lst (list): List of time arrays</span>
-<span class="sd">        initial_parameters (list): Initial guess for the parameters</span>
-<span class="sd">        low_bounds (list): Lower bounds for the parameters</span>
-<span class="sd">        high_bounds (list): Upper bounds for the parameters</span>
-<span class="sd">        fixed_t0 (bool): If True, t0 is fixed to 0, otherwise we fit it</span>
-<span class="sd">        fixed_koff (bool): If True, koff is fixed to koff_value</span>
-<span class="sd">        koff_value (float): Value of koff to use if fixed_koff is True</span>
-<span class="sd">        fit_s0 (bool): If True, s0 is fitted, otherwise it is fixed to the first value of the signal</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    signal_lst : list</span>
+<span class="sd">        List of signals to fit, each signal is a numpy array.</span>
+<span class="sd">    time_lst : list</span>
+<span class="sd">        List of time arrays.</span>
+<span class="sd">    initial_parameters : list</span>
+<span class="sd">        Initial guess for the parameters.</span>
+<span class="sd">    low_bounds : list</span>
+<span class="sd">        Lower bounds for the parameters.</span>
+<span class="sd">    high_bounds : list</span>
+<span class="sd">        Upper bounds for the parameters.</span>
+<span class="sd">    fixed_t0 : bool, optional</span>
+<span class="sd">        If True, t0 is fixed to 0, otherwise we fit it, default is True.</span>
+<span class="sd">    fixed_koff : bool, optional</span>
+<span class="sd">        If True, koff is fixed to koff_value, default is False.</span>
+<span class="sd">    koff_value : float, optional</span>
+<span class="sd">        Value of koff to use if fixed_koff is True.</span>
+<span class="sd">    fit_s0 : bool, optional</span>
+<span class="sd">        If True, s0 is fitted, otherwise it is fixed to the first value of the signal, default is True.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        global_fit_params (list): Fitted parameters</span>
-<span class="sd">        cov (np.ndarray): Covariance matrix of the fitted parameters</span>
-<span class="sd">        fitted_values_disso (list): Fitted values for each signal, same dimensions as signal_lst</span>
-
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        Fitted parameters.</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Covariance matrix of the fitted parameters.</span>
+<span class="sd">    list</span>
+<span class="sd">        Fitted values for each signal, same dimensions as signal_lst.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">all_signal</span> <span class="o">=</span> <span class="n">concat_signal_lst</span><span class="p">(</span><span class="n">signal_lst</span><span class="p">)</span>
 
     <span class="n">time_lst</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">time_lst</span><span class="p">]</span>
@@ -681,12 +701,10 @@
         <span class="n">s0_all</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">signal_lst</span><span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">fit_fx</span><span class="p">(</span><span class="n">dummyVariable</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Arguments order:</span>
 <span class="sd">           Koff, T0, S01, S02, S03, ...</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="n">Koff</span> <span class="o">=</span> <span class="n">koff_value</span> <span class="k">if</span> <span class="n">fixed_koff</span> <span class="k">else</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="n">t0</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">([</span><span class="n">fixed_koff</span><span class="p">])]</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">fixed_t0</span> <span class="k">else</span> <span class="mi">0</span>
@@ -725,38 +743,59 @@
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.fitting_surface.fit_one_site_assoc_and_disso">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">fit_one_site_assoc_and_disso</span><span class="p">(</span><span class="n">assoc_signal_lst</span><span class="p">,</span> <span class="n">assoc_time_lst</span><span class="p">,</span> <span class="n">analyte_conc_lst</span><span class="p">,</span>
                                  <span class="n">disso_signal_lst</span><span class="p">,</span> <span class="n">disso_time_lst</span><span class="p">,</span>
-                                 <span class="n">initial_parameters</span><span class="p">,</span><span class="n">low_bounds</span><span class="p">,</span> <span class="n">high_bounds</span><span class="p">,</span>
+                                 <span class="n">initial_parameters</span><span class="p">,</span> <span class="n">low_bounds</span><span class="p">,</span> <span class="n">high_bounds</span><span class="p">,</span>
                                  <span class="n">smax_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                                 <span class="n">shared_smax</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                                 <span class="n">fixed_t0</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-                                 <span class="n">fixed_Kd</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>   <span class="n">Kd_value</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                                 <span class="n">fixed_koff</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">koff_value</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-
+                                 <span class="n">shared_smax</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                 <span class="n">fixed_t0</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                 <span class="n">fixed_Kd</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">Kd_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                 <span class="n">fixed_koff</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">koff_value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Global fit to a set of association and dissociation traces - one-to-one binding model</span>
-<span class="sd">    Args:</span>
-<span class="sd">        assoc_signal_lst (list): List of association signals to fit, each signal is a numpy array</span>
-<span class="sd">        assoc_time_lst (list): List of association time arrays</span>
-<span class="sd">        analyte_conc_lst (list): List of analyte concentrations, each element is a numpy array</span>
-<span class="sd">        disso_signal_lst (list): List of dissociation signals to fit, each signal is a numpy array</span>
-<span class="sd">        disso_time_lst (list): List of dissociation time arrays</span>
-<span class="sd">        initial_parameters (list): Initial guess for the parameters</span>
-<span class="sd">        low_bounds (list): Lower bounds for the parameters</span>
-<span class="sd">        high_bounds (list): Upper bounds for the parameters</span>
-<span class="sd">        smax_idx (list): List of indices for the s_max parameters, used if shared_smax is TRUE</span>
-<span class="sd">        shared_smax (bool): If True, the s_max parameters are shared between traces</span>
-<span class="sd">        fixed_t0 (bool): If True, t0 is fixed to 0, otherwise we fit it</span>
-<span class="sd">        fixed_Kd (bool): If True, Kd is fixed to Kd_value</span>
-<span class="sd">        Kd_value (float): Value of Kd to use if fixed_Kd is True</span>
-<span class="sd">        fixed_koff (bool): If True, koff is fixed to koff_value</span>
-<span class="sd">        koff_value (float): Value of koff to use if fixed_koff is True</span>
-<span class="sd">    Returns:</span>
-<span class="sd">        global_fit_params (list): Fitted parameters</span>
-<span class="sd">        cov (np.ndarray): Covariance matrix of the fitted parameters</span>
-<span class="sd">        fitted_values_assoc (list): Fitted values for each association signal, same dimensions as assoc_signal_lst</span>
-<span class="sd">        fitted_values_disso (list): Fitted values for each dissociation signal, same dimensions as disso_signal_lst</span>
+<span class="sd">    Global fit to a set of association and dissociation traces - one-to-one binding model.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    assoc_signal_lst : list</span>
+<span class="sd">        List of association signals to fit, each signal is a numpy array.</span>
+<span class="sd">    assoc_time_lst : list</span>
+<span class="sd">        List of association time arrays.</span>
+<span class="sd">    analyte_conc_lst : list</span>
+<span class="sd">        List of analyte concentrations, each element is a numpy array.</span>
+<span class="sd">    disso_signal_lst : list</span>
+<span class="sd">        List of dissociation signals to fit, each signal is a numpy array.</span>
+<span class="sd">    disso_time_lst : list</span>
+<span class="sd">        List of dissociation time arrays.</span>
+<span class="sd">    initial_parameters : list</span>
+<span class="sd">        Initial guess for the parameters.</span>
+<span class="sd">    low_bounds : list</span>
+<span class="sd">        Lower bounds for the parameters.</span>
+<span class="sd">    high_bounds : list</span>
+<span class="sd">        Upper bounds for the parameters.</span>
+<span class="sd">    smax_idx : list, optional</span>
+<span class="sd">        List of indices for the s_max parameters, used if shared_smax is True.</span>
+<span class="sd">    shared_smax : bool, optional</span>
+<span class="sd">        If True, the s_max parameters are shared between traces, default is False.</span>
+<span class="sd">    fixed_t0 : bool, optional</span>
+<span class="sd">        If True, t0 is fixed to 0, otherwise we fit it, default is True.</span>
+<span class="sd">    fixed_Kd : bool, optional</span>
+<span class="sd">        If True, Kd is fixed to Kd_value, default is False.</span>
+<span class="sd">    Kd_value : float, optional</span>
+<span class="sd">        Value of Kd to use if fixed_Kd is True.</span>
+<span class="sd">    fixed_koff : bool, optional</span>
+<span class="sd">        If True, koff is fixed to koff_value, default is False.</span>
+<span class="sd">    koff_value : float, optional</span>
+<span class="sd">        Value of koff to use if fixed_koff is True.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        Fitted parameters.</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Covariance matrix of the fitted parameters.</span>
+<span class="sd">    list</span>
+<span class="sd">        Fitted values for each association signal, same dimensions as assoc_signal_lst.</span>
+<span class="sd">    list</span>
+<span class="sd">        Fitted values for each dissociation signal, same dimensions as disso_signal_lst.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="c1"># Set a flag for the association that was done after a dissociation step</span>
     <span class="c1"># We do this empirically by detecting if the initial time is greater than 2 seconds</span>
     <span class="n">initial_signal_at_zero</span> <span class="o">=</span> <span class="p">[</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">time</span> <span class="ow">in</span> <span class="n">assoc_time_lst</span><span class="p">]</span>
@@ -780,12 +819,10 @@
     <span class="n">s0s</span>            <span class="o">=</span> <span class="n">guess_initial_signal</span><span class="p">(</span><span class="n">assoc_time_lst</span><span class="p">,</span> <span class="n">assoc_signal_lst</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">fit_fx</span><span class="p">(</span><span class="n">dummyVariable</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Arguments order:</span>
 <span class="sd">            Kd, Koff, T0, Smax1, Smax2, Smax3, ...</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="n">Kd</span>   <span class="o">=</span> <span class="n">Kd_value</span> <span class="k">if</span> <span class="n">fixed_Kd</span> <span class="k">else</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="n">Koff</span> <span class="o">=</span> <span class="n">koff_value</span> <span class="k">if</span> <span class="n">fixed_koff</span> <span class="k">else</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">([</span><span class="n">fixed_Kd</span><span class="p">])]</span>
@@ -883,9 +920,62 @@
     <span class="n">max_nfev</span><span class="o">=</span><span class="kc">None</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Global fit to association and dissociation traces - one-to-one binding model with induced fit</span>
+<span class="sd">    Global fit to association and dissociation traces - one-to-one binding model with induced fit.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    assoc_signal_lst : list</span>
+<span class="sd">        List of association signals to fit, each signal is a numpy array.</span>
+<span class="sd">    assoc_time_lst : list</span>
+<span class="sd">        List of association time arrays.</span>
+<span class="sd">    analyte_conc_lst : list</span>
+<span class="sd">        List of analyte concentrations, each element is a numpy array.</span>
+<span class="sd">    disso_signal_lst : list</span>
+<span class="sd">        List of dissociation signals to fit, each signal is a numpy array.</span>
+<span class="sd">    disso_time_lst : list</span>
+<span class="sd">        List of dissociation time arrays.</span>
+<span class="sd">    initial_parameters : list</span>
+<span class="sd">        Initial guess for the parameters.</span>
+<span class="sd">    low_bounds : list</span>
+<span class="sd">        Lower bounds for the parameters.</span>
+<span class="sd">    high_bounds : list</span>
+<span class="sd">        Upper bounds for the parameters.</span>
+<span class="sd">    smax_idx : list, optional</span>
+<span class="sd">        List of indices for the s_max parameters, used if shared_smax is True.</span>
+<span class="sd">    shared_smax : bool, optional</span>
+<span class="sd">        If True, the s_max parameters are shared between traces, default is False.</span>
+<span class="sd">    fixed_t0 : bool, optional</span>
+<span class="sd">        If True, t0 is fixed to 0, otherwise we fit it, default is True.</span>
+<span class="sd">    fixed_kon1 : bool, optional</span>
+<span class="sd">        If True, kon1 is fixed to kon1_value, default is False.</span>
+<span class="sd">    kon1_value : float, optional</span>
+<span class="sd">        Value of kon1 to use if fixed_kon1 is True.</span>
+<span class="sd">    fixed_koff1 : bool, optional</span>
+<span class="sd">        If True, koff1 is fixed to koff1_value, default is False.</span>
+<span class="sd">    koff1_value : float, optional</span>
+<span class="sd">        Value of koff1 to use if fixed_koff1 is True.</span>
+<span class="sd">    fixed_kon2 : bool, optional</span>
+<span class="sd">        If True, kon2 is fixed to kon2_value, default is False.</span>
+<span class="sd">    kon2_value : float, optional</span>
+<span class="sd">        Value of kon2 to use if fixed_kon2 is True.</span>
+<span class="sd">    fixed_koff2 : bool, optional</span>
+<span class="sd">        If True, koff2 is fixed to koff2_value, default is False.</span>
+<span class="sd">    koff2_value : float, optional</span>
+<span class="sd">        Value of koff2 to use if fixed_koff2 is True.</span>
+<span class="sd">    max_nfev : int, optional</span>
+<span class="sd">        Maximum number of function evaluations.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        Fitted parameters.</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Covariance matrix of the fitted parameters.</span>
+<span class="sd">    list</span>
+<span class="sd">        Fitted values for each association signal, same dimensions as assoc_signal_lst.</span>
+<span class="sd">    list</span>
+<span class="sd">        Fitted values for each dissociation signal, same dimensions as disso_signal_lst.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="c1"># Set a flag for the association that was done after a dissociation step</span>
     <span class="c1"># We do this empirically by detecting if the initial time is greater than 2 seconds</span>
     <span class="n">initial_signal_at_zero</span> <span class="o">=</span> <span class="p">[</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">time</span> <span class="ow">in</span> <span class="n">assoc_time_lst</span><span class="p">]</span>
@@ -976,38 +1066,59 @@
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.fitting_surface.fit_one_site_assoc_and_disso_ktr">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">fit_one_site_assoc_and_disso_ktr</span><span class="p">(</span><span class="n">assoc_signal_lst</span><span class="p">,</span> <span class="n">assoc_time_lst</span><span class="p">,</span> <span class="n">analyte_conc_lst</span><span class="p">,</span>
                                  <span class="n">disso_signal_lst</span><span class="p">,</span> <span class="n">disso_time_lst</span><span class="p">,</span>
-                                 <span class="n">initial_parameters</span><span class="p">,</span><span class="n">low_bounds</span><span class="p">,</span> <span class="n">high_bounds</span><span class="p">,</span>
+                                 <span class="n">initial_parameters</span><span class="p">,</span> <span class="n">low_bounds</span><span class="p">,</span> <span class="n">high_bounds</span><span class="p">,</span>
                                  <span class="n">smax_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                                 <span class="n">shared_smax</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                                 <span class="n">fixed_t0</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-                                 <span class="n">fixed_Kd</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>   <span class="n">Kd_value</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                                 <span class="n">fixed_koff</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">koff_value</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-
+                                 <span class="n">shared_smax</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                 <span class="n">fixed_t0</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                 <span class="n">fixed_Kd</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">Kd_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                 <span class="n">fixed_koff</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">koff_value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Global fit to a set of association and dissociation traces - one-to-one with mass transport limitation binding model</span>
-<span class="sd">    Args:</span>
-<span class="sd">        assoc_signal_lst (list): List of association signals to fit, each signal is a numpy array</span>
-<span class="sd">        assoc_time_lst (list): List of association time arrays</span>
-<span class="sd">        analyte_conc_lst (list): List of analyte concentrations, each element is a numpy array</span>
-<span class="sd">        disso_signal_lst (list): List of dissociation signals to fit, each signal is a numpy array</span>
-<span class="sd">        disso_time_lst (list): List of dissociation time arrays</span>
-<span class="sd">        initial_parameters (list): Initial guess for the parameters</span>
-<span class="sd">        low_bounds (list): Lower bounds for the parameters</span>
-<span class="sd">        high_bounds (list): Upper bounds for the parameters</span>
-<span class="sd">        smax_idx (list): List of indices for the s_max parameters, used if shared_smax is TRUE</span>
-<span class="sd">        shared_smax (bool): If True, the s_max parameters are shared between traces</span>
-<span class="sd">        fixed_t0 (bool): If True, t0 is fixed to 0, otherwise we fit it</span>
-<span class="sd">        fixed_Kd (bool): If True, Kd is fixed to Kd_value</span>
-<span class="sd">        Kd_value (float): Value of Kd to use if fixed_Kd is True</span>
-<span class="sd">        fixed_koff (bool): If True, koff is fixed to koff_value</span>
-<span class="sd">        koff_value (float): Value of koff to use if fixed_koff is True</span>
-<span class="sd">    Returns:</span>
-<span class="sd">        global_fit_params (list): Fitted parameters</span>
-<span class="sd">        cov (np.ndarray): Covariance matrix of the fitted parameters</span>
-<span class="sd">        fitted_values_assoc (list): Fitted values for each association signal, same dimensions as assoc_signal_lst</span>
-<span class="sd">        fitted_values_disso (list): Fitted values for each dissociation signal, same dimensions as disso_signal_lst</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    Global fit to a set of association and dissociation traces - one-to-one with mass transport limitation binding model.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    assoc_signal_lst : list</span>
+<span class="sd">        List of association signals to fit, each signal is a numpy array.</span>
+<span class="sd">    assoc_time_lst : list</span>
+<span class="sd">        List of association time arrays.</span>
+<span class="sd">    analyte_conc_lst : list</span>
+<span class="sd">        List of analyte concentrations, each element is a numpy array.</span>
+<span class="sd">    disso_signal_lst : list</span>
+<span class="sd">        List of dissociation signals to fit, each signal is a numpy array.</span>
+<span class="sd">    disso_time_lst : list</span>
+<span class="sd">        List of dissociation time arrays.</span>
+<span class="sd">    initial_parameters : list</span>
+<span class="sd">        Initial guess for the parameters.</span>
+<span class="sd">    low_bounds : list</span>
+<span class="sd">        Lower bounds for the parameters.</span>
+<span class="sd">    high_bounds : list</span>
+<span class="sd">        Upper bounds for the parameters.</span>
+<span class="sd">    smax_idx : list, optional</span>
+<span class="sd">        List of indices for the s_max parameters, used if shared_smax is True.</span>
+<span class="sd">    shared_smax : bool, optional</span>
+<span class="sd">        If True, the s_max parameters are shared between traces, default is False.</span>
+<span class="sd">    fixed_t0 : bool, optional</span>
+<span class="sd">        If True, t0 is fixed to 0, otherwise we fit it, default is True.</span>
+<span class="sd">    fixed_Kd : bool, optional</span>
+<span class="sd">        If True, Kd is fixed to Kd_value, default is False.</span>
+<span class="sd">    Kd_value : float, optional</span>
+<span class="sd">        Value of Kd to use if fixed_Kd is True.</span>
+<span class="sd">    fixed_koff : bool, optional</span>
+<span class="sd">        If True, koff is fixed to koff_value, default is False.</span>
+<span class="sd">    koff_value : float, optional</span>
+<span class="sd">        Value of koff to use if fixed_koff is True.</span>
 
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        Fitted parameters.</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Covariance matrix of the fitted parameters.</span>
+<span class="sd">    list</span>
+<span class="sd">        Fitted values for each association signal, same dimensions as assoc_signal_lst.</span>
+<span class="sd">    list</span>
+<span class="sd">        Fitted values for each dissociation signal, same dimensions as disso_signal_lst.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">all_signal_assoc</span> <span class="o">=</span> <span class="n">concat_signal_lst</span><span class="p">(</span><span class="n">assoc_signal_lst</span><span class="p">)</span>
     <span class="n">all_signal_disso</span> <span class="o">=</span> <span class="n">concat_signal_lst</span><span class="p">(</span><span class="n">disso_signal_lst</span><span class="p">)</span>
 
@@ -1113,39 +1224,57 @@
 
 <div class="viewcode-block" id="one_site_assoc_and_disso_asymmetric_ci95">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.fitting_surface.one_site_assoc_and_disso_asymmetric_ci95">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">one_site_assoc_and_disso_asymmetric_ci95</span><span class="p">(</span><span class="n">kd_estimated</span><span class="p">,</span><span class="n">rss_desired</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">one_site_assoc_and_disso_asymmetric_ci95</span><span class="p">(</span><span class="n">kd_estimated</span><span class="p">,</span> <span class="n">rss_desired</span><span class="p">,</span>
                                              <span class="n">assoc_signal_lst</span><span class="p">,</span> <span class="n">assoc_time_lst</span><span class="p">,</span> <span class="n">analyte_conc_lst</span><span class="p">,</span>
                                              <span class="n">disso_signal_lst</span><span class="p">,</span> <span class="n">disso_time_lst</span><span class="p">,</span>
-                                             <span class="n">initial_parameters</span><span class="p">,</span><span class="n">low_bounds</span><span class="p">,</span> <span class="n">high_bounds</span><span class="p">,</span>
+                                             <span class="n">initial_parameters</span><span class="p">,</span> <span class="n">low_bounds</span><span class="p">,</span> <span class="n">high_bounds</span><span class="p">,</span>
                                              <span class="n">smax_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                                             <span class="n">shared_smax</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                                             <span class="n">fixed_t0</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-                                             <span class="n">fixed_koff</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">koff_value</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-
+                                             <span class="n">shared_smax</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                             <span class="n">fixed_t0</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                             <span class="n">fixed_koff</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">koff_value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate the asymmetric confidence interval for the Kd value, given a desired RSS value</span>
-<span class="sd">    Args:</span>
-<span class="sd">        kd_estimated (float): Estimated Kd value</span>
-<span class="sd">        rss_desired (float): Desired RSS value</span>
-<span class="sd">        assoc_signal_lst (list): List of association signals to fit, each signal is a numpy array</span>
-<span class="sd">        assoc_time_lst (list): List of association time arrays</span>
-<span class="sd">        analyte_conc_lst (list): List of analyte concentrations, each element is a numpy array</span>
-<span class="sd">        disso_signal_lst (list): List of dissociation signals to fit, each signal is a numpy array</span>
-<span class="sd">        disso_time_lst (list): List of dissociation time arrays</span>
-<span class="sd">        initial_parameters (list): Initial guess for the parameters, without the Kd value!</span>
-<span class="sd">        low_bounds (list): Lower bounds for the parameters, without the Kd value!</span>
-<span class="sd">        high_bounds (list): Upper bounds for the parameters, without the Kd value!</span>
-<span class="sd">        smax_idx (list): List of indices for the s_max parameters, used if shared_smax is TRUE</span>
-<span class="sd">        shared_smax (bool): If True, the s_max parameters are shared between traces</span>
-<span class="sd">        fixed_t0 (bool): If True, t0 is fixed to 0, otherwise we fit it</span>
-<span class="sd">        fixed_koff (bool): If True, koff is fixed to koff_value</span>
-<span class="sd">        koff_value (float): Value of koff to use if fixed_koff is True</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        kd_min95 (float): Minimum Kd value for the 95% confidence interval</span>
-<span class="sd">        kd_max95 (float): Maximum Kd value for the 95% confidence interval</span>
+<span class="sd">    Calculate the asymmetric confidence interval for the Kd value, given a desired RSS value.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    kd_estimated : float</span>
+<span class="sd">        Estimated Kd value.</span>
+<span class="sd">    rss_desired : float</span>
+<span class="sd">        Desired RSS value.</span>
+<span class="sd">    assoc_signal_lst : list</span>
+<span class="sd">        List of association signals to fit, each signal is a numpy array.</span>
+<span class="sd">    assoc_time_lst : list</span>
+<span class="sd">        List of association time arrays.</span>
+<span class="sd">    analyte_conc_lst : list</span>
+<span class="sd">        List of analyte concentrations, each element is a numpy array.</span>
+<span class="sd">    disso_signal_lst : list</span>
+<span class="sd">        List of dissociation signals to fit, each signal is a numpy array.</span>
+<span class="sd">    disso_time_lst : list</span>
+<span class="sd">        List of dissociation time arrays.</span>
+<span class="sd">    initial_parameters : list</span>
+<span class="sd">        Initial guess for the parameters, without the Kd value!</span>
+<span class="sd">    low_bounds : list</span>
+<span class="sd">        Lower bounds for the parameters, without the Kd value!</span>
+<span class="sd">    high_bounds : list</span>
+<span class="sd">        Upper bounds for the parameters, without the Kd value!</span>
+<span class="sd">    smax_idx : list, optional</span>
+<span class="sd">        List of indices for the s_max parameters, used if shared_smax is True.</span>
+<span class="sd">    shared_smax : bool, optional</span>
+<span class="sd">        If True, the s_max parameters are shared between traces, default is False.</span>
+<span class="sd">    fixed_t0 : bool, optional</span>
+<span class="sd">        If True, t0 is fixed to 0, otherwise we fit it, default is True.</span>
+<span class="sd">    fixed_koff : bool, optional</span>
+<span class="sd">        If True, koff is fixed to koff_value, default is False.</span>
+<span class="sd">    koff_value : float, optional</span>
+<span class="sd">        Value of koff to use if fixed_koff is True.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float</span>
+<span class="sd">        Minimum Kd value for the 95% confidence interval.</span>
+<span class="sd">    float</span>
+<span class="sd">        Maximum Kd value for the 95% confidence interval.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">boundsMax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">kd_estimated</span><span class="o">*</span><span class="mf">1e2</span><span class="p">,</span> <span class="n">kd_estimated</span> <span class="o">*</span> <span class="mf">1e4</span><span class="p">])</span> <span class="o">*</span> <span class="mf">1e3</span>
 
     <span class="c1"># Guess starting point for the upper bound</span>
@@ -1231,35 +1360,52 @@
 
 <div class="viewcode-block" id="one_site_assoc_and_disso_asymmetric_ci95_koff">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.fitting_surface.one_site_assoc_and_disso_asymmetric_ci95_koff">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">one_site_assoc_and_disso_asymmetric_ci95_koff</span><span class="p">(</span><span class="n">koff_estimated</span><span class="p">,</span><span class="n">rss_desired</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">one_site_assoc_and_disso_asymmetric_ci95_koff</span><span class="p">(</span><span class="n">koff_estimated</span><span class="p">,</span> <span class="n">rss_desired</span><span class="p">,</span>
                                              <span class="n">assoc_signal_lst</span><span class="p">,</span> <span class="n">assoc_time_lst</span><span class="p">,</span> <span class="n">analyte_conc_lst</span><span class="p">,</span>
                                              <span class="n">disso_signal_lst</span><span class="p">,</span> <span class="n">disso_time_lst</span><span class="p">,</span>
-                                             <span class="n">initial_parameters</span><span class="p">,</span><span class="n">low_bounds</span><span class="p">,</span> <span class="n">high_bounds</span><span class="p">,</span>
+                                             <span class="n">initial_parameters</span><span class="p">,</span> <span class="n">low_bounds</span><span class="p">,</span> <span class="n">high_bounds</span><span class="p">,</span>
                                              <span class="n">smax_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                                             <span class="n">shared_smax</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                                             <span class="n">fixed_t0</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+                                             <span class="n">shared_smax</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                             <span class="n">fixed_t0</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate the asymmetric confidence interval for the koff value, given a desired RSS value</span>
-<span class="sd">    Args:</span>
-<span class="sd">        koff_estimated (float): Estimated koff value</span>
-<span class="sd">        rss_desired (float): Desired RSS value</span>
-<span class="sd">        assoc_signal_lst (list): List of association signals to fit, each signal is a numpy array</span>
-<span class="sd">        assoc_time_lst (list): List of association time arrays</span>
-<span class="sd">        analyte_conc_lst (list): List of analyte concentrations, each element is a numpy array</span>
-<span class="sd">        disso_signal_lst (list): List of dissociation signals to fit, each signal is a numpy array</span>
-<span class="sd">        disso_time_lst (list): List of dissociation time arrays</span>
-<span class="sd">        initial_parameters (list): Initial guess for the parameters, without the Kd value!</span>
-<span class="sd">        low_bounds (list): Lower bounds for the parameters, without the Kd value!</span>
-<span class="sd">        high_bounds (list): Upper bounds for the parameters, without the Kd value!</span>
-<span class="sd">        smax_idx (list): List of indices for the s_max parameters, used if shared_smax is TRUE</span>
-<span class="sd">        shared_smax (bool): If True, the s_max parameters are shared between traces</span>
-<span class="sd">        fixed_t0 (bool): If True, t0 is fixed to 0, otherwise we fit it</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        k_min95 (float): Minimum koff value for the 95% confidence interval</span>
-<span class="sd">        k_max95 (float): Maximum koff value for the 95% confidence interval</span>
+<span class="sd">    Calculate the asymmetric confidence interval for the koff value, given a desired RSS value.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    koff_estimated : float</span>
+<span class="sd">        Estimated koff value.</span>
+<span class="sd">    rss_desired : float</span>
+<span class="sd">        Desired RSS value.</span>
+<span class="sd">    assoc_signal_lst : list</span>
+<span class="sd">        List of association signals to fit, each signal is a numpy array.</span>
+<span class="sd">    assoc_time_lst : list</span>
+<span class="sd">        List of association time arrays.</span>
+<span class="sd">    analyte_conc_lst : list</span>
+<span class="sd">        List of analyte concentrations, each element is a numpy array.</span>
+<span class="sd">    disso_signal_lst : list</span>
+<span class="sd">        List of dissociation signals to fit, each signal is a numpy array.</span>
+<span class="sd">    disso_time_lst : list</span>
+<span class="sd">        List of dissociation time arrays.</span>
+<span class="sd">    initial_parameters : list</span>
+<span class="sd">        Initial guess for the parameters, without the Kd value!</span>
+<span class="sd">    low_bounds : list</span>
+<span class="sd">        Lower bounds for the parameters, without the Kd value!</span>
+<span class="sd">    high_bounds : list</span>
+<span class="sd">        Upper bounds for the parameters, without the Kd value!</span>
+<span class="sd">    smax_idx : list, optional</span>
+<span class="sd">        List of indices for the s_max parameters, used if shared_smax is TRUE</span>
+<span class="sd">    shared_smax : bool, optional</span>
+<span class="sd">        If True, the s_max parameters are shared between traces</span>
+<span class="sd">    fixed_t0 : bool, optional</span>
+<span class="sd">        If True, t0 is fixed to 0, otherwise we fit it, default is True</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float</span>
+<span class="sd">        Minimum koff value for the 95% confidence interval.</span>
+<span class="sd">    float</span>
+<span class="sd">        Maximum koff value for the 95% confidence interval.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">boundsMax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">koff_estimated</span><span class="o">*</span><span class="mf">1e2</span><span class="p">,</span> <span class="n">koff_estimated</span> <span class="o">*</span> <span class="mf">1e4</span><span class="p">])</span> <span class="o">*</span> <span class="mf">1e3</span>
 
     <span class="c1"># Guess starting point for the upper bound</span>

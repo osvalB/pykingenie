@@ -132,6 +132,13 @@
   </a>
 </li>
 
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
   </ul>
 </nav></div>
       
@@ -222,6 +229,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../modules.html">
     pykingenie
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../pykingenie.html">
+    pykingenie package
   </a>
 </li>
 
@@ -329,6 +343,18 @@
 <div class="viewcode-block" id="GatorExperiment">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.gator.GatorExperiment">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">GatorExperiment</span><span class="p">(</span><span class="n">SurfaceBasedExperiment</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class to handle Gator Bio-Layer Interferometry (BLI) experiments.</span>
+<span class="sd">    </span>
+<span class="sd">    This class extends the SurfaceBasedExperiment to provide functionality</span>
+<span class="sd">    specific to Gator BLI instruments, including parsing experiment files</span>
+<span class="sd">    and loading sensor data.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str, optional</span>
+<span class="sd">        Name of the experiment, default is &#39;Gator_experiment&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="GatorExperiment.__init__">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.gator.GatorExperiment.__init__">[docs]</a>
@@ -340,6 +366,26 @@
 <div class="viewcode-block" id="GatorExperiment.read_all_gator_data">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.gator.GatorExperiment.read_all_gator_data">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">read_all_gator_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read all Gator data files for the experiment.</span>
+<span class="sd">        </span>
+<span class="sd">        This method reads all necessary files for a Gator experiment, including</span>
+<span class="sd">        the experiment settings, step information, and sensor data.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        files : str or list</span>
+<span class="sd">            Path to a zip file containing Gator data files or a list of file paths.</span>
+<span class="sd">            If a zip file is provided, it will be extracted to the same directory.</span>
+<span class="sd">        names : list, optional</span>
+<span class="sd">            List of file names corresponding to the file paths in `files`.</span>
+<span class="sd">            If None, the file names will be extracted from the file paths.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Updates instance attributes with the loaded experiment data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># Check if files is a zipfile and extract it</span>
         <span class="k">if</span> <span class="n">files</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.zip&#39;</span><span class="p">):</span>
@@ -370,13 +416,29 @@
 
 <div class="viewcode-block" id="GatorExperiment.read_experiment_ini">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.gator.GatorExperiment.read_experiment_ini">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">read_experiment_ini</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span><span class="n">nr_max_columns</span><span class="o">=</span><span class="mi">12</span><span class="p">):</span>
-
+    <span class="k">def</span><span class="w"> </span><span class="nf">read_experiment_ini</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">nr_max_columns</span><span class="o">=</span><span class="mi">12</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Read the experiment ini file</span>
-
-<span class="sd">        Example format:</span>
-
+<span class="sd">        Read the experiment initialization file.</span>
+<span class="sd">        </span>
+<span class="sd">        Parses the ExperimentStep.ini file that contains information about the experimental steps,</span>
+<span class="sd">        their durations, and types (baseline, association, dissociation, etc.).</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        file : str</span>
+<span class="sd">            Path to the ExperimentStep.ini file.</span>
+<span class="sd">        nr_max_columns : int, optional</span>
+<span class="sd">            Maximum number of columns in the plate, default is 12.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Updates the df_steps attribute with a DataFrame containing step information.</span>
+<span class="sd">            </span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Example format for ExperimentStep.ini:</span>
+<span class="sd">        </span>
 <span class="sd">            [Experiment]</span>
 <span class="sd">            Num=4</span>
 <span class="sd">            [Experiment1]</span>
@@ -464,18 +526,35 @@
 
 <div class="viewcode-block" id="GatorExperiment.read_settings_ini">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.gator.GatorExperiment.read_settings_ini">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">read_settings_ini</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span><span class="n">nr_max_sensors</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span><span class="n">nr_max_columns</span><span class="o">=</span><span class="mi">12</span><span class="p">):</span>
-
+    <span class="k">def</span><span class="w"> </span><span class="nf">read_settings_ini</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">nr_max_sensors</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">nr_max_columns</span><span class="o">=</span><span class="mi">12</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Read the settings ini file</span>
-
-<span class="sd">        We assume a plate format, so wells 1 to nr_max_sensors correspond to the first column,</span>
-<span class="sd">        wells 9 to 16 correspond to the second column, etc.</span>
-
-<span class="sd">        Example format:</span>
-
+<span class="sd">        Read the settings initialization file.</span>
+<span class="sd">        </span>
+<span class="sd">        Parses the Setting.ini file that contains information about the experiment settings,</span>
+<span class="sd">        including sensor configurations, sample concentrations, and plate layout.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        file : str</span>
+<span class="sd">            Path to the Setting.ini file.</span>
+<span class="sd">        nr_max_sensors : int, optional</span>
+<span class="sd">            Maximum number of sensors per column, default is 8.</span>
+<span class="sd">        nr_max_columns : int, optional</span>
+<span class="sd">            Maximum number of columns in the plate, default is 12.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Updates several instance attributes:</span>
+<span class="sd">            - sensor_names: List of sensor names</span>
+<span class="sd">            - ligand_conc_df: DataFrame with ligand concentration information</span>
+<span class="sd">            </span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Example format for Setting.ini:</span>
+<span class="sd">        </span>
 <span class="sd">            [BasicInformation]</span>
-<span class="sd">            PreExperiment=&quot;{&quot;AssayDescription&quot;:&quot;&quot;,&quot;AssayUser&quot;:&quot;Marianna&quot;,&quot;CreationTime&quot;:&quot;03-31-2025 14:01:50&quot;,&quot;ModificationTime&quot;:&quot;03-31-2025 14:44:10&quot;,&quot;StartExperimentTime&quot;:&quot;03-31-2025 14:44:10&quot;,&quot;EndExperimentTime&quot;:&quot;03-31-2025 15:55:27&quot;,&quot;AnotherSavePath&quot;:&quot;&quot;,&quot;AssayType&quot;:2,&quot;PreAssayShakerASpeed&quot;:400,&quot;PreAssayShakerBSpeed&quot;:400,&quot;PreAssayTime&quot;:600,&quot;GapTime&quot;:100,&quot;AssayShakerATemperature&quot;:30,&quot;AssayShakerBTemperature&quot;:30,&quot;MachineRealType&quot;:&quot;Prime&quot;,&quot;idleShakerATemperature&quot;:30,&quot;idleShakerBTemperature&quot;:30,&quot;PlateAType&quot;:0,&quot;bPlateAFlat&quot;:false,&quot;bRegeneration&quot;:true,&quot;bRegenerationStart&quot;:true,&quot;RegenerationNum&quot;:99999,&quot;RegenerationMode&quot;:0,&quot;ShakerASpeedDeviation&quot;:10,&quot;ShakerBSpeedDeviation&quot;:10,&quot;ShakerATempDeviation&quot;:2,&quot;ShakerBTempDeviation&quot;:2,&quot;SpectrometerTempDeviation&quot;:1,&quot;ParentName&quot;:&quot;K Result&quot;,&quot;ResultName&quot;:&quot;4x ab vs egfr 03-31-2025 14-44-10&quot;,&quot;SoftWareVersion&quot;:null,&quot;SeriesNo&quot;:&quot;GA00092&quot;,&quot;ErrorChannelList&quot;:[0,0,0,0,0,0,0,0],&quot;ErrorPreAssayList&quot;:[0,0,0,0,0,0,0,0],&quot;ErrorSampleList&quot;:[],&quot;ErrorRegenerationList&quot;:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],&quot;AnalysisSettingList&quot;:[],&quot;ReportSettingList&quot;:[],&quot;PlateColumns&quot;:[12,12],&quot;threshold&quot;:Infinity,&quot;bsingle&quot;:false,&quot;bThresh&quot;:false,&quot;strFileID&quot;:null}&quot;</span>
+<span class="sd">            PreExperiment=&quot;{&quot;AssayDescription&quot;:&quot;&quot;,&quot;AssayUser&quot;:&quot;Marianna&quot;,&quot;CreationTime&quot;:&quot;03-31-2025 14:01:50&quot;,...}&quot;</span>
 <span class="sd">            ExperimentType=Kinetics</span>
 <span class="sd">            SaveTime=03/31/2025 15:55:27</span>
 <span class="sd">            Frequency=10Hz</span>
@@ -490,16 +569,7 @@
 <span class="sd">            [SampleKinetics]</span>
 <span class="sd">            Well1=4,-1,-1,-1,,</span>
 <span class="sd">            Well2=4,-1,-1,-1,,</span>
-<span class="sd">            Well3=4,-1,-1,-1,,</span>
-<span class="sd">            Well4=4,-1,-1,-1,,</span>
-<span class="sd">            Well5=4,-1,-1,-1,,</span>
-<span class="sd">            Well6=4,-1,-1,-1,,</span>
-<span class="sd">            Well7=4,-1,-1,-1,,</span>
-<span class="sd">            Well8=4,-1,-1,-1,,</span>
-<span class="sd">            Well9=5,30,150,200,,Cetuximab</span>
-<span class="sd">            Well10=5,30,150,200,,Cetuximab</span>
-<span class="sd">            Well11=5,30,150,200,,Cetuximab</span>
-
+<span class="sd">            ...</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -646,6 +716,37 @@
 <div class="viewcode-block" id="GatorExperiment.read_sensor_data">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.gator.GatorExperiment.read_sensor_data">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">read_sensor_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read the sensor data from CSV files.</span>
+<span class="sd">        </span>
+<span class="sd">        Parses the Gator sensor data CSV files containing time series data for each sensor channel.</span>
+<span class="sd">        The method organizes the data according to experimental steps and sensors.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        files : list</span>
+<span class="sd">            List of file paths that may include sensor data CSV files.</span>
+<span class="sd">        names : list, optional</span>
+<span class="sd">            List of file names corresponding to the file paths in `files`.</span>
+<span class="sd">            If None, the file names will be extracted from the file paths.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Updates several instance attributes:</span>
+<span class="sd">            - xs: List of time arrays for each sensor</span>
+<span class="sd">            - ys: List of signal arrays for each sensor</span>
+<span class="sd">            - df_steps: DataFrame with filtered step information containing only steps with data</span>
+<span class="sd">            - no_steps: Number of steps with data</span>
+<span class="sd">            - traces_loaded: Boolean indicating if traces were successfully loaded</span>
+<span class="sd">            </span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The sensor data files are expected to be in CSV format with the following characteristics:</span>
+<span class="sd">        - File names contain &#39;Channel&#39; and have a &#39;.csv&#39; extension</span>
+<span class="sd">        - The first column contains signal values</span>
+<span class="sd">        - The second column contains time values</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">fns</span>   <span class="o">=</span> <span class="p">[</span><span class="n">fn</span> <span class="k">for</span> <span class="n">fn</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">names</span><span class="p">)</span> <span class="k">if</span> <span class="s1">&#39;.csv&#39;</span> <span class="ow">in</span> <span class="n">name</span> <span class="ow">and</span> <span class="s1">&#39;Channel&#39;</span> <span class="ow">in</span> <span class="n">name</span><span class="p">]</span>
         <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span> <span class="k">if</span> <span class="s1">&#39;.csv&#39;</span> <span class="ow">in</span> <span class="n">name</span> <span class="ow">and</span> <span class="s1">&#39;Channel&#39;</span> <span class="ow">in</span> <span class="n">name</span><span class="p">]</span>

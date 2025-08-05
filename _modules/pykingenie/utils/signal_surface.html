@@ -139,27 +139,6 @@
   </a>
 </li>
 
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
-    pykingenie.utils package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.html">
-    pykingenie package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
-    pykingenie.utils package
-  </a>
-</li>
-
   </ul>
 </nav></div>
       
@@ -257,27 +236,6 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../pykingenie.html">
     pykingenie package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
-    pykingenie.utils package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.html">
-    pykingenie package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
-    pykingenie.utils package
   </a>
 </li>
 
@@ -410,23 +368,29 @@
 
 <div class="viewcode-block" id="steady_state_one_site">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.steady_state_one_site">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">steady_state_one_site</span><span class="p">(</span><span class="n">C</span><span class="p">,</span><span class="n">Rmax</span><span class="p">,</span><span class="n">Kd</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">steady_state_one_site</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">Rmax</span><span class="p">,</span> <span class="n">Kd</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate the steady state signal for a given concentration of ligand</span>
-<span class="sd">    If the concentration is zero, the signal is zero</span>
-<span class="sd">    If the concentration is infinite, the signal is Rmax</span>
-<span class="sd">    The units of Kd must match the units of C (ligand concentration)</span>
-<span class="sd">    Rmax depends on the amount of loaded receptor</span>
+<span class="sd">    Calculate the steady state signal for a given concentration of ligand.</span>
+<span class="sd">    </span>
+<span class="sd">    If the concentration is zero, the signal is zero.</span>
+<span class="sd">    If the concentration is infinite, the signal is Rmax.</span>
+<span class="sd">    The units of Kd must match the units of C (ligand concentration).</span>
+<span class="sd">    Rmax depends on the amount of loaded receptor.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        C (np.ndarray): Concentration of the analyte</span>
-<span class="sd">        Rmax (float): Maximum response of the analyte</span>
-<span class="sd">        Kd (float): Equilibrium dissociation constant</span>
-<span class="sd">    Returns:</span>
-<span class="sd">        signal (np.ndarray): Steady state signal, according to the given parameters</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    C : np.ndarray</span>
+<span class="sd">        Concentration of the analyte.</span>
+<span class="sd">    Rmax : float</span>
+<span class="sd">        Maximum response of the analyte.</span>
+<span class="sd">    Kd : float</span>
+<span class="sd">        Equilibrium dissociation constant.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Steady state signal, according to the given parameters.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">C</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">C</span><span class="p">)</span>
     <span class="n">Rmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Rmax</span><span class="p">)</span>
     <span class="n">signal</span> <span class="o">=</span> <span class="n">Rmax</span><span class="o">*</span><span class="n">C</span><span class="o">/</span><span class="p">(</span><span class="n">Kd</span> <span class="o">+</span> <span class="n">C</span><span class="p">)</span>
@@ -435,24 +399,32 @@
 
 <div class="viewcode-block" id="one_site_association_analytical">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.one_site_association_analytical">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">one_site_association_analytical</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">s0</span><span class="p">,</span><span class="n">s_max</span><span class="p">,</span><span class="n">k_off</span><span class="p">,</span><span class="n">Kd</span><span class="p">,</span><span class="n">A</span><span class="p">,</span><span class="n">t0</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">one_site_association_analytical</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">s0</span><span class="p">,</span> <span class="n">s_max</span><span class="p">,</span> <span class="n">k_off</span><span class="p">,</span> <span class="n">Kd</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Analytical solution for the one site association model</span>
+<span class="sd">    Analytical solution for the one site association model.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        t (np.ndarray): Time variable</span>
-<span class="sd">        s0 (float):     Initial signal</span>
-<span class="sd">        s_max (float):  Maximum signal</span>
-<span class="sd">        k_off (float):  Dissociation rate constant</span>
-<span class="sd">        Kd (float):     Equilibrium dissociation constant</span>
-<span class="sd">        A (float): Concentration of the analyte</span>
-<span class="sd">        t0 (float):     Initial time offset</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    t : np.ndarray</span>
+<span class="sd">        Time variable.</span>
+<span class="sd">    s0 : float</span>
+<span class="sd">        Initial signal.</span>
+<span class="sd">    s_max : float</span>
+<span class="sd">        Maximum signal.</span>
+<span class="sd">    k_off : float</span>
+<span class="sd">        Dissociation rate constant.</span>
+<span class="sd">    Kd : float</span>
+<span class="sd">        Equilibrium dissociation constant.</span>
+<span class="sd">    A : float</span>
+<span class="sd">        Concentration of the analyte.</span>
+<span class="sd">    t0 : float, optional</span>
+<span class="sd">        Initial time offset, default is 0.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        s_t (np.ndarray): Signal over time</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Signal over time.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">t</span> <span class="o">=</span> <span class="n">t</span> <span class="o">-</span> <span class="n">t0</span>
     <span class="c1"># Precompute constants</span>
     <span class="n">rate</span> <span class="o">=</span> <span class="n">k_off</span> <span class="o">*</span> <span class="p">(</span><span class="n">A</span> <span class="o">+</span> <span class="n">Kd</span><span class="p">)</span> <span class="o">/</span> <span class="n">Kd</span>
@@ -466,21 +438,26 @@
 
 <div class="viewcode-block" id="one_site_dissociation_analytical">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.one_site_dissociation_analytical">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">one_site_dissociation_analytical</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">s0</span><span class="p">,</span><span class="n">k_off</span><span class="p">,</span><span class="n">t0</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">one_site_dissociation_analytical</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">s0</span><span class="p">,</span> <span class="n">k_off</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Analytical solution for the one site model - dissociation phase</span>
+<span class="sd">    Analytical solution for the one site model - dissociation phase.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        t (np.ndarray): Time variable</span>
-<span class="sd">        s0 (float):     Initial signal</span>
-<span class="sd">        k_off (float):  Dissociation rate constant</span>
-<span class="sd">        t0 (float):     Initial time offset</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    t : np.ndarray</span>
+<span class="sd">        Time variable.</span>
+<span class="sd">    s0 : float</span>
+<span class="sd">        Initial signal.</span>
+<span class="sd">    k_off : float</span>
+<span class="sd">        Dissociation rate constant.</span>
+<span class="sd">    t0 : float, optional</span>
+<span class="sd">        Initial time offset, default is 0.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        s_t (np.ndarray): Signal over time</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Signal over time.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">t</span>   <span class="o">=</span> <span class="n">t</span> <span class="o">+</span> <span class="n">t0</span>
     <span class="n">s_t</span> <span class="o">=</span> <span class="n">s0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">k_off</span><span class="o">*</span><span class="n">t</span><span class="p">)</span>
 
@@ -489,26 +466,28 @@
 
 <div class="viewcode-block" id="ode_one_site_mass_transport_association">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.ode_one_site_mass_transport_association">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">ode_one_site_mass_transport_association</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">params</span><span class="p">,</span><span class="n">analyte_conc</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">ode_one_site_mass_transport_association</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">analyte_conc</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    ODE for Mass Transport-limited binding</span>
-
+<span class="sd">    ODE for Mass Transport-limited binding.</span>
+<span class="sd">    </span>
 <span class="sd">    See https://www.cell.com/AJHG/fulltext/S0006-3495(07)70982-7</span>
 
-<span class="sd">    Args:</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    t : float</span>
+<span class="sd">        Time variable.</span>
+<span class="sd">    y : list</span>
+<span class="sd">        List of the state variables [s1,cs].</span>
+<span class="sd">    params : list</span>
+<span class="sd">        List of the parameters [K_d, k_off, k_tr, s_max].</span>
+<span class="sd">    analyte_conc : float</span>
+<span class="sd">        Concentration of the analyte.</span>
 
-<span class="sd">        t (float): Time variable.</span>
-<span class="sd">        y (list): List of the state variables [s1,cs]</span>
-<span class="sd">        params (list): List of the parameters [K_d, k_off, k_tr, s_max]</span>
-
-<span class="sd">    Returns:</span>
-
-<span class="sd">        ds1_dt (float): signal over time</span>
-<span class="sd">        dcs_dt (float): analyte surface concentration over time</span>
-
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        [ds1_dt, dcs_dt] representing the signal and analyte surface concentration derivatives.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">s1</span><span class="p">,</span> <span class="n">cs</span> <span class="o">=</span> <span class="n">y</span>
     <span class="n">K_d</span><span class="p">,</span> <span class="n">k_off</span><span class="p">,</span> <span class="n">k_tr</span><span class="p">,</span> <span class="n">s_max</span> <span class="o">=</span> <span class="n">params</span>
 
@@ -524,25 +503,26 @@
 
 <div class="viewcode-block" id="ode_one_site_mass_transport_dissociation">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.ode_one_site_mass_transport_dissociation">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">ode_one_site_mass_transport_dissociation</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">s1</span><span class="p">,</span><span class="n">params</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">ode_one_site_mass_transport_dissociation</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">s1</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    ODE for Mass Transport-limited binding</span>
-
+<span class="sd">    ODE for Mass Transport-limited binding - dissociation phase.</span>
+<span class="sd">    </span>
 <span class="sd">    See Equation 7 from https://pmc.ncbi.nlm.nih.gov/articles/PMC4134667/</span>
 
-<span class="sd">    Args:</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    t : float</span>
+<span class="sd">        Time variable.</span>
+<span class="sd">    s1 : float</span>
+<span class="sd">        The state variable representing the signal.</span>
+<span class="sd">    params : list</span>
+<span class="sd">        List of the parameters [K_d, k_off, k_tr, s_max].</span>
 
-<span class="sd">        t (float): Time variable.</span>
-<span class="sd">        y (list): List of the state variables [s1]</span>
-<span class="sd">        params (list): List of the parameters [K_d, k_off, k_tr, s_max]</span>
-
-<span class="sd">    Returns:</span>
-
-<span class="sd">        ds_dt (float): signal over time</span>
-
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float</span>
+<span class="sd">        The derivative of signal over time.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">K_d</span><span class="p">,</span> <span class="n">k_off</span><span class="p">,</span> <span class="n">k_tr</span><span class="p">,</span> <span class="n">s_max</span> <span class="o">=</span> <span class="n">params</span>
 
     <span class="n">k_on</span> <span class="o">=</span> <span class="n">k_off</span> <span class="o">/</span> <span class="n">K_d</span>
@@ -554,25 +534,36 @@
 
 <div class="viewcode-block" id="solve_ode_one_site_mass_transport_association">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.solve_ode_one_site_mass_transport_association">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">solve_ode_one_site_mass_transport_association</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">s1_0</span><span class="p">,</span><span class="n">cs_0</span><span class="p">,</span><span class="n">analyte_conc</span><span class="p">,</span><span class="n">K_d</span><span class="p">,</span><span class="n">k_off</span><span class="p">,</span><span class="n">k_tr</span><span class="p">,</span><span class="n">s_max</span><span class="p">,</span><span class="n">t0</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">solve_ode_one_site_mass_transport_association</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">s1_0</span><span class="p">,</span> <span class="n">cs_0</span><span class="p">,</span> <span class="n">analyte_conc</span><span class="p">,</span> <span class="n">K_d</span><span class="p">,</span> <span class="n">k_off</span><span class="p">,</span> <span class="n">k_tr</span><span class="p">,</span> <span class="n">s_max</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Solves the ODE for the one site mass transport model - association phase</span>
+<span class="sd">    Solves the ODE for the one site mass transport model - association phase.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        t (np.ndarray): Time variable</span>
-<span class="sd">        s1_0 (float):   Initial signal</span>
-<span class="sd">        cs_0 (float):   Initial analyte surface concentration</span>
-<span class="sd">        analyte_conc (float): Concentration of the analyte</span>
-<span class="sd">        K_d (float):    Equilibrium dissociation constant</span>
-<span class="sd">        k_off (float):  Dissociation rate constant</span>
-<span class="sd">        k_tr (float):   Mass transport rate constant</span>
-<span class="sd">        s_max (float): Maximum signal</span>
-<span class="sd">        t0 (float):     Initial time offset</span>
-<span class="sd">    Returns:</span>
-<span class="sd">        signal (np.ndarray): Signal overtime</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    t : np.ndarray</span>
+<span class="sd">        Time variable.</span>
+<span class="sd">    s1_0 : float</span>
+<span class="sd">        Initial signal.</span>
+<span class="sd">    cs_0 : float</span>
+<span class="sd">        Initial analyte surface concentration.</span>
+<span class="sd">    analyte_conc : float</span>
+<span class="sd">        Concentration of the analyte.</span>
+<span class="sd">    K_d : float</span>
+<span class="sd">        Equilibrium dissociation constant.</span>
+<span class="sd">    k_off : float</span>
+<span class="sd">        Dissociation rate constant.</span>
+<span class="sd">    k_tr : float</span>
+<span class="sd">        Mass transport rate constant.</span>
+<span class="sd">    s_max : float</span>
+<span class="sd">        Maximum signal.</span>
+<span class="sd">    t0 : float, optional</span>
+<span class="sd">        Initial time offset, default is 0.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Signal over time.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">t</span> <span class="o">=</span> <span class="n">t</span> <span class="o">+</span> <span class="n">t0</span>
 
     <span class="n">out</span> <span class="o">=</span> <span class="n">solve_ivp</span><span class="p">(</span><span class="n">ode_one_site_mass_transport_association</span><span class="p">,</span><span class="n">t_span</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">t</span><span class="p">)],</span>
@@ -584,23 +575,32 @@
 
 <div class="viewcode-block" id="solve_ode_one_site_mass_transport_dissociation">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.solve_ode_one_site_mass_transport_dissociation">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">solve_ode_one_site_mass_transport_dissociation</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">s1_0</span><span class="p">,</span><span class="n">K_d</span><span class="p">,</span><span class="n">k_off</span><span class="p">,</span><span class="n">k_tr</span><span class="p">,</span><span class="n">s_max</span><span class="p">,</span><span class="n">t0</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">solve_ode_one_site_mass_transport_dissociation</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">s1_0</span><span class="p">,</span> <span class="n">K_d</span><span class="p">,</span> <span class="n">k_off</span><span class="p">,</span> <span class="n">k_tr</span><span class="p">,</span> <span class="n">s_max</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Solves the ODE for the one site mass transport model - dissociation phase</span>
+<span class="sd">    Solves the ODE for the one site mass transport model - dissociation phase.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        t (np.ndarray): Time variable</span>
-<span class="sd">        s1_0 (float):   Initial signal</span>
-<span class="sd">        K_d (float):    Equilibrium dissociation constant</span>
-<span class="sd">        k_off (float):  Dissociation rate constant</span>
-<span class="sd">        k_tr (float):   Mass transport rate constant</span>
-<span class="sd">        s_max (float): Maximum signal</span>
-<span class="sd">        t0 (float):     Initial time offset</span>
-<span class="sd">    Returns:</span>
-<span class="sd">        signal (np.ndarray): Signal overtime</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    t : np.ndarray</span>
+<span class="sd">        Time variable.</span>
+<span class="sd">    s1_0 : float</span>
+<span class="sd">        Initial signal.</span>
+<span class="sd">    K_d : float</span>
+<span class="sd">        Equilibrium dissociation constant.</span>
+<span class="sd">    k_off : float</span>
+<span class="sd">        Dissociation rate constant.</span>
+<span class="sd">    k_tr : float</span>
+<span class="sd">        Mass transport rate constant.</span>
+<span class="sd">    s_max : float</span>
+<span class="sd">        Maximum signal.</span>
+<span class="sd">    t0 : float, optional</span>
+<span class="sd">        Initial time offset, default is 0.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Signal over time.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">t</span> <span class="o">=</span> <span class="n">t</span> <span class="o">+</span> <span class="n">t0</span>
 
     <span class="n">out</span> <span class="o">=</span> <span class="n">solve_ivp</span><span class="p">(</span><span class="n">ode_one_site_mass_transport_dissociation</span><span class="p">,</span><span class="n">t_span</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">t</span><span class="p">)],</span>
@@ -612,31 +612,36 @@
 
 <div class="viewcode-block" id="differential_matrix_association_induced_fit">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.differential_matrix_association_induced_fit">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">differential_matrix_association_induced_fit</span><span class="p">(</span><span class="n">koff</span><span class="p">,</span><span class="n">kon</span><span class="p">,</span><span class="n">kc</span><span class="p">,</span><span class="n">krev</span><span class="p">,</span><span class="n">a</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">differential_matrix_association_induced_fit</span><span class="p">(</span><span class="n">koff</span><span class="p">,</span> <span class="n">kon</span><span class="p">,</span> <span class="n">kc</span><span class="p">,</span> <span class="n">krev</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Association step</span>
-<span class="sd">    set of differential equations for</span>
-<span class="sd">    -dS/dt and dS1/dt</span>
-
+<span class="sd">    Association step set of differential equations for the induced fit model.</span>
+<span class="sd">    </span>
+<span class="sd">    Differential equations for -dS/dt and dS1/dt where:</span>
 <span class="sd">    S    = R([E2S] + [E1S]) ; Total signal</span>
 <span class="sd">    S1   = R[E2S]           ; Signal produced by E2S</span>
 <span class="sd">    Smax = R([Et])          ; Maximum signal</span>
 
-<span class="sd">    Note: E is here the molecule attached to the surface, S is the subtrate</span>
+<span class="sd">    Note: E is here the molecule attached to the surface, S is the substrate.</span>
 <span class="sd">    The signal produced by E2S and E1S is the same.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        koff (float): rate constant for E2S -&gt; E2 + S</span>
-<span class="sd">        kon (float): rate constant for E2 + S -&gt; E2S</span>
-<span class="sd">        kc (float): rate constant for E1 -&gt; E2</span>
-<span class="sd">        krev (float): rate constant for E2 -&gt; E1</span>
-<span class="sd">        a (float): concentration of the analyte (molecule being flown)</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    koff : float</span>
+<span class="sd">        Rate constant for E2S -&gt; E2 + S.</span>
+<span class="sd">    kon : float</span>
+<span class="sd">        Rate constant for E2 + S -&gt; E2S.</span>
+<span class="sd">    kc : float</span>
+<span class="sd">        Rate constant for E1 -&gt; E2.</span>
+<span class="sd">    krev : float</span>
+<span class="sd">        Rate constant for E2 -&gt; E1.</span>
+<span class="sd">    a : float</span>
+<span class="sd">        Concentration of the analyte (molecule being flown).</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">         matrix (np.ndarray): differential matrix</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Differential matrix.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">row1</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="n">koff</span> <span class="o">-</span> <span class="n">kon</span> <span class="o">*</span> <span class="n">a</span><span class="p">,</span> <span class="o">-</span><span class="n">koff</span><span class="p">]</span>
     <span class="n">row2</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="n">kc</span><span class="p">,</span> <span class="o">-</span><span class="n">kc</span> <span class="o">-</span> <span class="n">krev</span><span class="p">]</span>
 
@@ -647,27 +652,34 @@
 
 <div class="viewcode-block" id="differential_matrix_association_conformational_selection">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.differential_matrix_association_conformational_selection">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">differential_matrix_association_conformational_selection</span><span class="p">(</span><span class="n">koff</span><span class="p">,</span><span class="n">kon</span><span class="p">,</span><span class="n">kc</span><span class="p">,</span><span class="n">krev</span><span class="p">,</span><span class="n">a</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">differential_matrix_association_conformational_selection</span><span class="p">(</span><span class="n">koff</span><span class="p">,</span> <span class="n">kon</span><span class="p">,</span> <span class="n">kc</span><span class="p">,</span> <span class="n">krev</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Conformational selection model</span>
+<span class="sd">    Conformational selection model for the association step.</span>
+<span class="sd">    </span>
 <span class="sd">    E1     &lt;-&gt; E2</span>
 <span class="sd">    E2 + S &lt;-&gt; E2S</span>
+<span class="sd">    </span>
+<span class="sd">    Set of differential equations for (d[E1]*R)/dt and d[E2S]*R/dt.</span>
+<span class="sd">    The signal is only given by E2S.</span>
 
-<span class="sd">    Association step</span>
-<span class="sd">    set of differential equations for</span>
-<span class="sd">    (d[E1]*R)/dt and d[E2S]*R/dt. The signal is only given by E2S</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        koff (float): rate constant for E2S -&gt; E2 + S</span>
-<span class="sd">        kon (float): rate constant for E2 + S -&gt; E2S</span>
-<span class="sd">        kc (float): rate constant for E1 -&gt; E2</span>
-<span class="sd">        krev (float): rate constant for E2 -&gt; E1</span>
-<span class="sd">        a (float): concentration of the analyte (molecule being flown)</span>
-<span class="sd">    Returns:</span>
-<span class="sd">        matrix (np.ndarray): differential matrix</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    koff : float</span>
+<span class="sd">        Rate constant for E2S -&gt; E2 + S.</span>
+<span class="sd">    kon : float</span>
+<span class="sd">        Rate constant for E2 + S -&gt; E2S.</span>
+<span class="sd">    kc : float</span>
+<span class="sd">        Rate constant for E1 -&gt; E2.</span>
+<span class="sd">    krev : float</span>
+<span class="sd">        Rate constant for E2 -&gt; E1.</span>
+<span class="sd">    a : float</span>
+<span class="sd">        Concentration of the analyte (molecule being flown).</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Differential matrix.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">row1</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="n">kc</span> <span class="o">-</span> <span class="n">krev</span><span class="p">,</span> <span class="o">-</span><span class="n">krev</span><span class="p">]</span>
     <span class="n">row2</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="n">kon</span><span class="o">*</span><span class="n">a</span><span class="p">,</span><span class="o">-</span><span class="n">kon</span><span class="o">*</span><span class="n">a</span> <span class="o">-</span> <span class="n">koff</span><span class="p">]</span>
 
@@ -678,22 +690,26 @@
 
 <div class="viewcode-block" id="differential_matrix_dissociation_induced_fit">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.differential_matrix_dissociation_induced_fit">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">differential_matrix_dissociation_induced_fit</span><span class="p">(</span><span class="n">koff</span><span class="p">,</span><span class="n">kc</span><span class="p">,</span><span class="n">krev</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">differential_matrix_dissociation_induced_fit</span><span class="p">(</span><span class="n">koff</span><span class="p">,</span> <span class="n">kc</span><span class="p">,</span> <span class="n">krev</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Dissociation step</span>
-<span class="sd">    set of differential equations for</span>
-<span class="sd">    -ds/dt and ds1/dt</span>
+<span class="sd">    Dissociation step set of differential equations for the induced fit model.</span>
+<span class="sd">    </span>
+<span class="sd">    Differential equations for -ds/dt and ds1/dt.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        koff (float): rate constant for E2S -&gt; E2 + S</span>
-<span class="sd">        kc (float): rate constant for E1 -&gt; E2</span>
-<span class="sd">        krev (float): rate constant for E2 -&gt; E1</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    koff : float</span>
+<span class="sd">        Rate constant for E2S -&gt; E2 + S.</span>
+<span class="sd">    kc : float</span>
+<span class="sd">        Rate constant for E1 -&gt; E2.</span>
+<span class="sd">    krev : float</span>
+<span class="sd">        Rate constant for E2 -&gt; E1.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        matrix (np.ndarray): differential matrix</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Differential matrix.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">row1</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="n">koff</span><span class="p">,</span> <span class="o">-</span><span class="n">koff</span><span class="p">]</span>
     <span class="n">row2</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="n">kc</span><span class="p">,</span> <span class="o">-</span><span class="n">kc</span> <span class="o">-</span> <span class="n">krev</span><span class="p">]</span>
 
@@ -704,24 +720,27 @@
 
 <div class="viewcode-block" id="differential_matrix_dissociation_conformational_selection">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.differential_matrix_dissociation_conformational_selection">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">differential_matrix_dissociation_conformational_selection</span><span class="p">(</span><span class="n">koff</span><span class="p">,</span><span class="n">kc</span><span class="p">,</span><span class="n">krev</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">differential_matrix_dissociation_conformational_selection</span><span class="p">(</span><span class="n">koff</span><span class="p">,</span> <span class="n">kc</span><span class="p">,</span> <span class="n">krev</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Dissociation step</span>
-<span class="sd">    set of differential equations for</span>
-<span class="sd">    (d[E1]*R)/dt and d[E2S]*R/dt.</span>
+<span class="sd">    Dissociation step set of differential equations for the conformational selection model.</span>
+<span class="sd">    </span>
+<span class="sd">    Differential equations for (d[E1]*R)/dt and d[E2S]*R/dt.</span>
+<span class="sd">    The signal is only proportional to E2S.</span>
 
-<span class="sd">    The signal is only proportional to E2S</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    koff : float</span>
+<span class="sd">        Rate constant for E2S -&gt; E2 + S.</span>
+<span class="sd">    kc : float</span>
+<span class="sd">        Rate constant for E1 -&gt; E2.</span>
+<span class="sd">    krev : float</span>
+<span class="sd">        Rate constant for E2 -&gt; E1.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        koff (float): rate constant for E2S -&gt; E2 + S</span>
-<span class="sd">        kc (float): rate constant for E1 -&gt; E2</span>
-<span class="sd">        krev (float): rate constant for E2 -&gt; E1</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        matrix (np.ndarray): differential matrix</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Differential matrix.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">row1</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="n">kc</span> <span class="o">-</span><span class="n">krev</span><span class="p">,</span> <span class="o">-</span><span class="n">krev</span><span class="p">]</span>
     <span class="n">row2</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">koff</span><span class="p">]</span>
 
@@ -733,78 +752,106 @@
 <div class="viewcode-block" id="constant_vector_induced_fit">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.constant_vector_induced_fit">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">constant_vector_induced_fit</span><span class="p">(</span><span class="n">koff</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">kc</span><span class="p">):</span>
-
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate the constant vector for the induced fit model</span>
-<span class="sd">    Args:</span>
-<span class="sd">        koff (float): rate constant for E·S -&gt; E + S</span>
-<span class="sd">        a (float): concentration of the analyte (molecule being flown)</span>
-<span class="sd">        kc (float): rate constant for E·S -&gt; ES, induced fit step</span>
-<span class="sd">    Returns:</span>
-<span class="sd">        b_col (np.ndarray): constant vector</span>
+<span class="sd">    Calculate the constant vector for the induced fit model.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    koff : float</span>
+<span class="sd">        Rate constant for E·S -&gt; E + S.</span>
+<span class="sd">    a : float</span>
+<span class="sd">        Concentration of the analyte (molecule being flown).</span>
+<span class="sd">    kc : float</span>
+<span class="sd">        Rate constant for E·S -&gt; ES, induced fit step.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Constant vector.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="k">return</span> <span class="p">[</span><span class="n">koff</span> <span class="o">*</span> <span class="n">a</span><span class="p">,</span> <span class="n">kc</span> <span class="o">*</span> <span class="n">a</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="constant_vector_conformational_selection">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.constant_vector_conformational_selection">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">constant_vector_conformational_selection</span><span class="p">(</span><span class="n">kon</span><span class="p">,</span><span class="n">smax</span><span class="p">,</span><span class="n">krev</span><span class="p">,</span><span class="n">a</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">constant_vector_conformational_selection</span><span class="p">(</span><span class="n">kon</span><span class="p">,</span> <span class="n">smax</span><span class="p">,</span> <span class="n">krev</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate the constant vector for the conformational selection model</span>
-<span class="sd">    Args:</span>
-<span class="sd">        kon (float): rate constant for E2 + S -&gt; E2S</span>
-<span class="sd">        smax (float): signal proportional to the complex (E2S)</span>
-<span class="sd">        krev (float): rate constant for E2 -&gt; E1</span>
-<span class="sd">        a (float): concentration of the analyte (molecule being flown)</span>
-<span class="sd">    Returns:</span>
-<span class="sd">        b_col (np.ndarray): constant vector</span>
+<span class="sd">    Calculate the constant vector for the conformational selection model.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    kon : float</span>
+<span class="sd">        Rate constant for E2 + S -&gt; E2S.</span>
+<span class="sd">    smax : float</span>
+<span class="sd">        Signal proportional to the complex (E2S).</span>
+<span class="sd">    krev : float</span>
+<span class="sd">        Rate constant for E2 -&gt; E1.</span>
+<span class="sd">    a : float</span>
+<span class="sd">        Concentration of the analyte (molecule being flown).</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Constant vector.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">return</span>   <span class="p">[</span><span class="n">krev</span><span class="o">*</span><span class="n">smax</span><span class="p">,</span> <span class="n">kon</span><span class="o">*</span><span class="n">a</span><span class="o">*</span><span class="n">smax</span><span class="p">]</span></div>
-
+    <span class="k">return</span> <span class="p">[</span><span class="n">krev</span><span class="o">*</span><span class="n">smax</span><span class="p">,</span> <span class="n">kon</span><span class="o">*</span><span class="n">a</span><span class="o">*</span><span class="n">smax</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="solve_steady_state">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.solve_steady_state">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">solve_steady_state</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate the steady state solution of the system of equations</span>
-<span class="sd">    Args:</span>
-<span class="sd">        A (np.ndarray): differential matrix</span>
-<span class="sd">        b (np.ndarray): constant vector</span>
-<span class="sd">    Returns:</span>
-<span class="sd">        steady_state (np.ndarray): steady state solution</span>
+<span class="sd">    Calculate the steady state solution of the system of equations.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A : np.ndarray</span>
+<span class="sd">        Differential matrix.</span>
+<span class="sd">    b : np.ndarray</span>
+<span class="sd">        Constant vector.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Steady state solution.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="o">-</span><span class="n">solve</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="solve_induced_fit_association">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.solve_induced_fit_association">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">solve_induced_fit_association</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">a_conc</span><span class="p">,</span> <span class="n">kon</span><span class="p">,</span> <span class="n">koff</span><span class="p">,</span> <span class="n">kc</span><span class="p">,</span> <span class="n">krev</span><span class="p">,</span><span class="n">sP1L</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">sP2L</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">smax</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">solve_induced_fit_association</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">a_conc</span><span class="p">,</span> <span class="n">kon</span><span class="p">,</span> <span class="n">koff</span><span class="p">,</span> <span class="n">kc</span><span class="p">,</span> <span class="n">krev</span><span class="p">,</span> <span class="n">sP1L</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sP2L</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">smax</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Obtain the signal for the induced fit model (surface-based)</span>
+<span class="sd">    Obtain the signal for the induced fit model (surface-based).</span>
 
-<span class="sd">    We assume that the signal is given by the complex E·S and ES is the same</span>
-<span class="sd">    In other words, the complex before and after the conformational change produces the same signal</span>
+<span class="sd">    We assume that the signal is given by the complex E·S and ES is the same.</span>
+<span class="sd">    In other words, the complex before and after the conformational change produces the same signal.</span>
 
-<span class="sd">    Args:</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    time : np.ndarray</span>
+<span class="sd">        Time array.</span>
+<span class="sd">    a_conc : float</span>
+<span class="sd">        Concentration of the analyte (molecule being flown).</span>
+<span class="sd">    kon : float</span>
+<span class="sd">        Rate constant for E + S -&gt; E·S.</span>
+<span class="sd">    koff : float</span>
+<span class="sd">        Rate constant for E·S -&gt; E + S.</span>
+<span class="sd">    kc : float</span>
+<span class="sd">        Rate constant for E·S -&gt; ES.</span>
+<span class="sd">    krev : float</span>
+<span class="sd">        Rate constant for ES -&gt; E·S.</span>
+<span class="sd">    sP1L : float, optional</span>
+<span class="sd">        Initial concentration of E·S, default is 0.</span>
+<span class="sd">    sP2L : float, optional</span>
+<span class="sd">        Initial concentration of ES, default is 0.</span>
+<span class="sd">    smax : float, optional</span>
+<span class="sd">        Signal proportional to the complex (E·S or ES), default is 0.</span>
 
-<span class="sd">        t (float): time</span>
-<span class="sd">        a_conc (float): concentration of the analyte (molecule being flown)</span>
-<span class="sd">        kon (float): rate constant for E + S -&gt; E·S</span>
-<span class="sd">        koff (float): rate constant for E·S -&gt; E + S</span>
-<span class="sd">        kc (float): rate constant for E·S -&gt; ES</span>
-<span class="sd">        krev (float): rate constant for ES -&gt; E·S</span>
-<span class="sd">        t0 (float): initial time</span>
-<span class="sd">        smax (float): signal proportional to the complex (E·S or ES)</span>
-
-<span class="sd">    Returns:</span>
-
-<span class="sd">       signal (np.ndarray): signal over time</span>
-
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Signal over time.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">time</span> <span class="o">=</span> <span class="n">time</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="c1"># Start at zero</span>
 
@@ -834,9 +881,24 @@
 <div class="viewcode-block" id="solve_all_states_fast">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.solve_all_states_fast">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">solve_all_states_fast</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">initial_conditions</span><span class="p">,</span> <span class="n">steady_state_value</span><span class="p">):</span>
-
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Solve the system of differential equations for all time points using matrix exponentiation.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    time : np.ndarray</span>
+<span class="sd">        Array of time points to solve the system for.</span>
+<span class="sd">    A : np.ndarray</span>
+<span class="sd">        Differential matrix of the system.</span>
+<span class="sd">    initial_conditions : np.ndarray</span>
+<span class="sd">        Initial conditions for the system.</span>
+<span class="sd">    steady_state_value : np.ndarray</span>
+<span class="sd">        Steady state solution of the system.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Array of shape (len(time), len(initial_conditions)) containing the state of the system at each time point.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">v</span> <span class="o">=</span> <span class="n">initial_conditions</span> <span class="o">-</span> <span class="n">steady_state_value</span>
@@ -860,29 +922,37 @@
 
 <div class="viewcode-block" id="solve_conformational_selection_association">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.solve_conformational_selection_association">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">solve_conformational_selection_association</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">a_conc</span><span class="p">,</span> <span class="n">kon</span><span class="p">,</span> <span class="n">koff</span><span class="p">,</span> <span class="n">kc</span><span class="p">,</span> <span class="n">krev</span><span class="p">,</span><span class="n">smax</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">sP1</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">sP2L</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">solve_conformational_selection_association</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">a_conc</span><span class="p">,</span> <span class="n">kon</span><span class="p">,</span> <span class="n">koff</span><span class="p">,</span> <span class="n">kc</span><span class="p">,</span> <span class="n">krev</span><span class="p">,</span> <span class="n">smax</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sP1</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sP2L</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Obtain the signal for the conformational selection model (surface-based)</span>
+<span class="sd">    Obtain the signal for the conformational selection model (surface-based).</span>
 
-<span class="sd">    We assume that the signal is given by the complex E2S only</span>
+<span class="sd">    We assume that the signal is given by the complex E2S only.</span>
 
-<span class="sd">    Args:</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    time : np.ndarray</span>
+<span class="sd">        Time array.</span>
+<span class="sd">    a_conc : float</span>
+<span class="sd">        Concentration of the analyte (molecule being flown).</span>
+<span class="sd">    kon : float</span>
+<span class="sd">        Rate constant for E2 + S -&gt; E2S.</span>
+<span class="sd">    koff : float</span>
+<span class="sd">        Rate constant for E2S -&gt; E2 + S.</span>
+<span class="sd">    kc : float</span>
+<span class="sd">        Rate constant for E1 -&gt; E2.</span>
+<span class="sd">    krev : float</span>
+<span class="sd">        Rate constant for E2 -&gt; E1.</span>
+<span class="sd">    smax : float, optional</span>
+<span class="sd">        Maximum signal that the complex (E2S) can produce, default is 0.</span>
+<span class="sd">    sP1 : float, optional</span>
+<span class="sd">        Initial concentration of E1, default is 0.</span>
+<span class="sd">    sP2L : float, optional</span>
+<span class="sd">        Initial concentration of E2S, default is 0.</span>
 
-<span class="sd">        time (float): time</span>
-<span class="sd">        a_conc (float): concentration of the analyte (molecule being flown)</span>
-<span class="sd">        kon (float): rate constant for E2 + S -&gt; E2S</span>
-<span class="sd">        koff (float): rate constant for E2S -&gt; E2 + S</span>
-<span class="sd">        kc (float): rate constant for E1 -&gt; E2</span>
-<span class="sd">        krev (float): rate constant for E2 -&gt; E1</span>
-<span class="sd">        smax (float): maximum signal that the complex (E2S)can produce</span>
-<span class="sd">        sP1 (float): signal proportional to the protein in state E1</span>
-<span class="sd">        sP2L (float): signal proportional to the protein in state E2S</span>
-
-<span class="sd">    Returns:</span>
-
-<span class="sd">       signal (np.ndarray): signal over time</span>
-
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Signal over time, with columns for the signal, sP1, and sP2.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">time</span> <span class="o">=</span> <span class="n">time</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="c1"># Start at zero</span>
@@ -908,29 +978,34 @@
 
 <div class="viewcode-block" id="solve_induced_fit_dissociation">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.solve_induced_fit_dissociation">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">solve_induced_fit_dissociation</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">koff</span><span class="p">,</span> <span class="n">kc</span><span class="p">,</span> <span class="n">krev</span><span class="p">,</span><span class="n">s0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">sP2L</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">smax</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">solve_induced_fit_dissociation</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">koff</span><span class="p">,</span> <span class="n">kc</span><span class="p">,</span> <span class="n">krev</span><span class="p">,</span> <span class="n">s0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sP2L</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">smax</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Obtain the dissociation signal for the induced fit model (surface-based)</span>
+<span class="sd">    Obtain the dissociation signal for the induced fit model (surface-based).</span>
 
-<span class="sd">    We assume that the signal given by the complex E·S and ES is the same</span>
-<span class="sd">    In other words, the complex before and after the conformational change produces the same signal</span>
+<span class="sd">    We assume that the signal given by the complex E·S and ES is the same.</span>
+<span class="sd">    In other words, the complex before and after the conformational change produces the same signal.</span>
 
-<span class="sd">    Args:</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    time : np.ndarray</span>
+<span class="sd">        Time array.</span>
+<span class="sd">    koff : float</span>
+<span class="sd">        Rate constant for E·S -&gt; E + S.</span>
+<span class="sd">    kc : float</span>
+<span class="sd">        Rate constant for E·S -&gt; ES.</span>
+<span class="sd">    krev : float</span>
+<span class="sd">        Rate constant for ES -&gt; E·S.</span>
+<span class="sd">    s0 : float, optional</span>
+<span class="sd">        Initial signal, default is 0.</span>
+<span class="sd">    sP2L : float, optional</span>
+<span class="sd">        Initial concentration of ES, default is 0.</span>
+<span class="sd">    smax : float, optional</span>
+<span class="sd">        Signal proportional to the complex (E·S or ES), default is 0.</span>
 
-<span class="sd">        t (float): time</span>
-<span class="sd">        koff (float): rate constant for E·S -&gt; E + S</span>
-<span class="sd">        kc (float): rate constant for E·S -&gt; ES</span>
-<span class="sd">        krev (float): rate constant for ES -&gt; E·S</span>
-<span class="sd">        t0 (float): initial time</span>
-<span class="sd">        s0 (float): initial signal</span>
-<span class="sd">        sP2L (float): signal proportional to the complex ES (NOT the sum of E·S and ES)</span>
-<span class="sd">        smax (float): signal proportional to the complex (E·S or ES)</span>
-
-<span class="sd">    Returns:</span>
-
-<span class="sd">       signal (np.ndarray): signal over time</span>
-
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Signal over time, with columns for total signal, signal produced by E·S, and signal produced by ES.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">time</span> <span class="o">=</span> <span class="n">time</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="c1"># Start at zero</span>
 
@@ -955,25 +1030,33 @@
 
 <div class="viewcode-block" id="solve_conformational_selection_dissociation">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.solve_conformational_selection_dissociation">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">solve_conformational_selection_dissociation</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">koff</span><span class="p">,</span> <span class="n">kc</span><span class="p">,</span> <span class="n">krev</span><span class="p">,</span><span class="n">smax</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">sP1</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">sP2L</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">solve_conformational_selection_dissociation</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">koff</span><span class="p">,</span> <span class="n">kc</span><span class="p">,</span> <span class="n">krev</span><span class="p">,</span> <span class="n">smax</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sP1</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sP2L</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Obtain the signal for the conformational selection model (surface-based)</span>
+<span class="sd">    Obtain the signal for the conformational selection model (surface-based) during dissociation.</span>
 
-<span class="sd">    We assume that the signal is given by the complex E2S only</span>
+<span class="sd">    We assume that the signal is given by the complex E2S only.</span>
 
-<span class="sd">    Args:</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    time : np.ndarray</span>
+<span class="sd">        Time array.</span>
+<span class="sd">    koff : float</span>
+<span class="sd">        Rate constant for E2S -&gt; E2 + S.</span>
+<span class="sd">    kc : float</span>
+<span class="sd">        Rate constant for E1 -&gt; E2.</span>
+<span class="sd">    krev : float</span>
+<span class="sd">        Rate constant for E2 -&gt; E1.</span>
+<span class="sd">    smax : float, optional</span>
+<span class="sd">        Signal proportional to the complex (E2S), default is 0.</span>
+<span class="sd">    sP1 : float, optional</span>
+<span class="sd">        Initial concentration of E1, default is 0.</span>
+<span class="sd">    sP2L : float, optional</span>
+<span class="sd">        Initial concentration of E2S, default is 0.</span>
 
-<span class="sd">        time (float): time</span>
-<span class="sd">        koff (float): rate constant for E2S -&gt; E2 + S</span>
-<span class="sd">        kc (float): rate constant for E1 -&gt; E2</span>
-<span class="sd">        krev (float): rate constant for E2 -&gt; E1</span>
-<span class="sd">        smax (float): signal proportional to the complex (E2S)</span>
-
-<span class="sd">    Returns:</span>
-
-<span class="sd">       signal (np.ndarray): signal over time</span>
-
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Array with columns for signal (produced by E2S), sP1 (E1 concentration), and sP2 (E2 concentration).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">time</span> <span class="o">=</span> <span class="n">time</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="c1"># Start at zero</span>
@@ -1000,8 +1083,7 @@
 
 <div class="viewcode-block" id="ode_mixture_analyte_association">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.ode_mixture_analyte_association">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">ode_mixture_analyte_association</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">Ris</span><span class="p">,</span><span class="n">C_TOT</span><span class="p">,</span><span class="n">Fis</span><span class="p">,</span><span class="n">Ris_max</span><span class="p">,</span><span class="n">koffs</span><span class="p">,</span><span class="n">Kds</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">ode_mixture_analyte_association</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Ris</span><span class="p">,</span> <span class="n">C_TOT</span><span class="p">,</span> <span class="n">Fis</span><span class="p">,</span> <span class="n">Ris_max</span><span class="p">,</span> <span class="n">koffs</span><span class="p">,</span> <span class="n">Kds</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    We assume a Langmuir 1:1 interaction between each analyte (Ai) and the ligand (L):</span>
 
@@ -1014,19 +1096,27 @@
 <span class="sd">    The parameters to fit are the factor weights (Fis), the maximum response of each analyte (Ris_max),</span>
 <span class="sd">    the dissociation rate constants (koffs), and the equilibrium dissociation constants (Kds)</span>
 
-<span class="sd">    Args:</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    t : np.ndarray</span>
+<span class="sd">        Time variable.</span>
+<span class="sd">    Ris : list</span>
+<span class="sd">        Response of each analyte.</span>
+<span class="sd">    C_TOT : float</span>
+<span class="sd">        Total concentration of the analyte mixture.</span>
+<span class="sd">    Fis : np.ndarray</span>
+<span class="sd">        Factor weights.</span>
+<span class="sd">    Ris_max : np.ndarray</span>
+<span class="sd">        Maximum response of each analyte.</span>
+<span class="sd">    koffs : np.ndarray</span>
+<span class="sd">        Dissociation rate constants.</span>
+<span class="sd">    Kds : np.ndarray</span>
+<span class="sd">        Equilibrium dissociation constants.</span>
 
-<span class="sd">        t (np.ndarray):         Time variable</span>
-<span class="sd">        Ris (list):             Response of each analyte</span>
-<span class="sd">        C_TOT (float):          Total concentration of the analyte mixture</span>
-<span class="sd">        Fi (np.ndarray):        Factor weights</span>
-<span class="sd">        Ris_max (np.ndarray):   Maximum response of each analyte</span>
-<span class="sd">        koffs (np.ndarray):     Dissociation rate constants</span>
-<span class="sd">        Kds (np.ndarray):       Equilibrium dissociation constants</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        dRis (np.ndarray):     Rate of change of the response of each analyte</span>
-
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Rate of change of the response of each analyte.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">kons</span> <span class="o">=</span> <span class="n">koffs</span> <span class="o">/</span> <span class="n">Kds</span>
@@ -1040,36 +1130,46 @@
 
 <div class="viewcode-block" id="solve_ode_mixture_analyte_association">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.solve_ode_mixture_analyte_association">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">solve_ode_mixture_analyte_association</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">Ris0</span><span class="p">,</span><span class="n">C_TOT</span><span class="p">,</span><span class="n">Fis</span><span class="p">,</span><span class="n">Ris_max</span><span class="p">,</span><span class="n">koffs</span><span class="p">,</span><span class="n">Kds</span><span class="p">,</span><span class="n">t0</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">solve_ode_mixture_analyte_association</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Ris0</span><span class="p">,</span> <span class="n">C_TOT</span><span class="p">,</span> <span class="n">Fis</span><span class="p">,</span> <span class="n">Ris_max</span><span class="p">,</span> <span class="n">koffs</span><span class="p">,</span> <span class="n">Kds</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Solves the ODE for the mixture analyte model - association phase</span>
-<span class="sd">    Args:</span>
-<span class="sd">        t (np.ndarray): Time variable</span>
-<span class="sd">        Ris0 (list):    Initial response of each analyte</span>
-<span class="sd">        C_TOT (float):  Total concentration of the analyte mixture</span>
-<span class="sd">        Fis (np.ndarray): Factor weights</span>
-<span class="sd">        Ris_max (np.ndarray): Maximum response of each analyte</span>
-<span class="sd">        koffs (np.ndarray): Dissociation rate constants</span>
-<span class="sd">        Kds (np.ndarray): Equilibrium dissociation constants</span>
-<span class="sd">        t0 (float):     Initial time offset</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        out.y (np.ndarray): Response of EACH ANALYTE over time</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    t : np.ndarray</span>
+<span class="sd">        Time variable.</span>
+<span class="sd">    Ris0 : list</span>
+<span class="sd">        Initial response of each analyte.</span>
+<span class="sd">    C_TOT : float</span>
+<span class="sd">        Total concentration of the analyte mixture.</span>
+<span class="sd">    Fis : np.ndarray</span>
+<span class="sd">        Factor weights.</span>
+<span class="sd">    Ris_max : np.ndarray</span>
+<span class="sd">        Maximum response of each analyte.</span>
+<span class="sd">    koffs : np.ndarray</span>
+<span class="sd">        Dissociation rate constants.</span>
+<span class="sd">    Kds : np.ndarray</span>
+<span class="sd">        Equilibrium dissociation constants.</span>
+<span class="sd">    t0 : float, optional</span>
+<span class="sd">        Initial time offset, default is 0.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Response of EACH ANALYTE over time.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">t</span> <span class="o">=</span> <span class="n">t</span> <span class="o">+</span> <span class="n">t0</span>
 
-    <span class="n">out</span> <span class="o">=</span> <span class="n">solve_ivp</span><span class="p">(</span><span class="n">ode_mixture_analyte_association</span><span class="p">,</span><span class="n">t_span</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">t</span><span class="p">)],</span>
-                    <span class="n">t_eval</span><span class="o">=</span><span class="n">t</span><span class="p">,</span><span class="n">y0</span><span class="o">=</span><span class="n">Ris0</span><span class="p">,</span><span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">C_TOT</span><span class="p">,</span><span class="n">Fis</span><span class="p">,</span><span class="n">Ris_max</span><span class="p">,</span><span class="n">koffs</span><span class="p">,</span><span class="n">Kds</span><span class="p">),</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;LSODA&quot;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">solve_ivp</span><span class="p">(</span><span class="n">ode_mixture_analyte_association</span><span class="p">,</span> <span class="n">t_span</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">t</span><span class="p">)],</span>
+                    <span class="n">t_eval</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">y0</span><span class="o">=</span><span class="n">Ris0</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">C_TOT</span><span class="p">,</span> <span class="n">Fis</span><span class="p">,</span> <span class="n">Ris_max</span><span class="p">,</span> <span class="n">koffs</span><span class="p">,</span> <span class="n">Kds</span><span class="p">),</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;LSODA&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">y</span></div>
 
 
 <div class="viewcode-block" id="ode_mixture_analyte_dissociation">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.ode_mixture_analyte_dissociation">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">ode_mixture_analyte_dissociation</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">Ris</span><span class="p">,</span><span class="n">koffs</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">ode_mixture_analyte_dissociation</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Ris</span><span class="p">,</span> <span class="n">koffs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    We assume a Langmuir 1:1 interaction between each analyte (Ai) and the ligand (L):</span>
 
@@ -1081,14 +1181,19 @@
 
 <span class="sd">    The parameters to fit are the dissociation rate constants (koffs)</span>
 
-<span class="sd">    Args:</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    t : np.ndarray</span>
+<span class="sd">        Time variable.</span>
+<span class="sd">    Ris : list</span>
+<span class="sd">        Response of each analyte.</span>
+<span class="sd">    koffs : np.ndarray</span>
+<span class="sd">        Dissociation rate constants.</span>
 
-<span class="sd">        t (np.ndarray):         Time variable</span>
-<span class="sd">        Ris (list):             Response of each analyte</span>
-<span class="sd">        koffs (np.ndarray):     Dissociation rate constants</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        dRis_dt (np.ndarray):     Rate of change of the response of each analyte</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Rate of change of the response of each analyte.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dRis_dt</span> <span class="o">=</span> <span class="o">-</span> <span class="n">koffs</span> <span class="o">*</span> <span class="n">Ris</span>
@@ -1098,24 +1203,31 @@
 
 <div class="viewcode-block" id="solve_ode_mixture_analyte_dissociation">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.solve_ode_mixture_analyte_dissociation">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">solve_ode_mixture_analyte_dissociation</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">Ris0</span><span class="p">,</span><span class="n">koffs</span><span class="p">,</span><span class="n">t0</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">solve_ode_mixture_analyte_dissociation</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Ris0</span><span class="p">,</span> <span class="n">koffs</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Solves the ODE for the mixture analyte model - dissociation phase</span>
-<span class="sd">    Args:</span>
-<span class="sd">        t (np.ndarray): Time variable</span>
-<span class="sd">        Ris0 (list):    Initial response of each analyte</span>
-<span class="sd">        koffs (np.ndarray): Dissociation rate constants</span>
-<span class="sd">        t0 (float):     Initial time offset</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        out.y (np.ndarray): Response of EACH ANALYTE over time</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    t : np.ndarray</span>
+<span class="sd">        Time variable.</span>
+<span class="sd">    Ris0 : list</span>
+<span class="sd">        Initial response of each analyte.</span>
+<span class="sd">    koffs : np.ndarray</span>
+<span class="sd">        Dissociation rate constants.</span>
+<span class="sd">    t0 : float, optional</span>
+<span class="sd">        Initial time offset, default is 0.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Response of EACH ANALYTE over time.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">t</span> <span class="o">=</span> <span class="n">t</span> <span class="o">+</span> <span class="n">t0</span>
 
-    <span class="n">out</span> <span class="o">=</span> <span class="n">solve_ivp</span><span class="p">(</span><span class="n">ode_mixture_analyte_dissociation</span><span class="p">,</span><span class="n">t_span</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">t</span><span class="p">)],</span>
-                    <span class="n">t_eval</span><span class="o">=</span><span class="n">t</span><span class="p">,</span><span class="n">y0</span><span class="o">=</span><span class="n">Ris0</span><span class="p">,</span><span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">koffs</span><span class="p">,),</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;LSODA&quot;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">solve_ivp</span><span class="p">(</span><span class="n">ode_mixture_analyte_dissociation</span><span class="p">,</span> <span class="n">t_span</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">t</span><span class="p">)],</span>
+                    <span class="n">t_eval</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">y0</span><span class="o">=</span><span class="n">Ris0</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">koffs</span><span class="p">,),</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;LSODA&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">y</span></div>
 

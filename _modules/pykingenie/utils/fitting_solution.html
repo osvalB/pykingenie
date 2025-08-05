@@ -139,27 +139,6 @@
   </a>
 </li>
 
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
-    pykingenie.utils package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.html">
-    pykingenie package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
-    pykingenie.utils package
-  </a>
-</li>
-
   </ul>
 </nav></div>
       
@@ -257,27 +236,6 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../pykingenie.html">
     pykingenie package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
-    pykingenie.utils package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.html">
-    pykingenie package
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../pykingenie.utils.html">
-    pykingenie.utils package
   </a>
 </li>
 
@@ -399,35 +357,61 @@
         <span class="n">initial_parameters</span><span class="p">,</span>
         <span class="n">low_bounds</span><span class="p">,</span>
         <span class="n">high_bounds</span><span class="p">,</span>
-        <span class="n">fit_signal_E</span>    <span class="o">=</span>   <span class="kc">False</span><span class="p">,</span>
-        <span class="n">fit_signal_S</span>    <span class="o">=</span>   <span class="kc">False</span><span class="p">,</span>
-        <span class="n">fit_signal_ES</span>   <span class="o">=</span>   <span class="kc">True</span><span class="p">,</span>
-        <span class="n">fixed_t0</span>        <span class="o">=</span>   <span class="kc">True</span><span class="p">,</span>
-        <span class="n">fixed_Kd</span>        <span class="o">=</span>   <span class="kc">False</span><span class="p">,</span>
-        <span class="n">Kd_value</span>        <span class="o">=</span>   <span class="kc">None</span><span class="p">,</span>
-        <span class="n">fixed_koff</span>      <span class="o">=</span>   <span class="kc">False</span><span class="p">,</span>
-        <span class="n">koff_value</span>      <span class="o">=</span>   <span class="kc">None</span><span class="p">):</span>
-
+        <span class="n">fit_signal_E</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">fit_signal_S</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">fit_signal_ES</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">fixed_t0</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">fixed_Kd</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">Kd_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">fixed_koff</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">koff_value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Global fit to association and dissociation traces - one-to-one binding model</span>
-<span class="sd">    Args:</span>
-<span class="sd">        signal_lst (list):          list of signals. We assume initial values as follows: E = E_tot, S = S_tot, ES = 0</span>
-<span class="sd">        time_lst (list):            list of time points for the association signals</span>
-<span class="sd">        ligand_conc_lst (list):     list of ligand concentrations, one per element in signal_lst</span>
-<span class="sd">        protein_conc_lst (list):    list of protein concentrations, one per element in signal_lst</span>
-<span class="sd">        initial_parameters (list):  initial parameters for the fit</span>
-<span class="sd">        low_bounds (list):          lower bounds for the fit parameters</span>
-<span class="sd">        high_bounds (list):         upper bounds for the fit parameters</span>
-<span class="sd">        fit_signal_E (bool):        if True, fit the signal of the free protein</span>
-<span class="sd">        fit_signal_S (bool):        if True, fit the signal of the free ligand</span>
-<span class="sd">        fit_signal_ES (bool):       if True, fit the signal of the complex</span>
-<span class="sd">        fixed_t0 (bool):            if True, the initial time point is zero</span>
-<span class="sd">        fixed_Kd (bool):            if True, the equilibrium dissociation constant is fixed</span>
-<span class="sd">        Kd_value (float):           value of the equilibrium dissociation constant if fixed_Kd is True</span>
-<span class="sd">        fixed_koff (bool):          if True, the dissociation rate constant is fixed</span>
-<span class="sd">        koff_value (float):         value of the dissociation rate constant if fixed_koff is True</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    Global fit to association and dissociation traces - one-to-one binding model.</span>
 
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    signal_lst : list</span>
+<span class="sd">        List of signals. We assume initial values as follows: E = E_tot, S = S_tot, ES = 0.</span>
+<span class="sd">    time_lst : list</span>
+<span class="sd">        List of time points for the association signals.</span>
+<span class="sd">    ligand_conc_lst : list</span>
+<span class="sd">        List of ligand concentrations, one per element in signal_lst.</span>
+<span class="sd">    protein_conc_lst : list</span>
+<span class="sd">        List of protein concentrations, one per element in signal_lst.</span>
+<span class="sd">    initial_parameters : list</span>
+<span class="sd">        Initial parameters for the fit.</span>
+<span class="sd">    low_bounds : list</span>
+<span class="sd">        Lower bounds for the fit parameters.</span>
+<span class="sd">    high_bounds : list</span>
+<span class="sd">        Upper bounds for the fit parameters.</span>
+<span class="sd">    fit_signal_E : bool, optional</span>
+<span class="sd">        If True, fit the signal of the free protein, default is False.</span>
+<span class="sd">    fit_signal_S : bool, optional</span>
+<span class="sd">        If True, fit the signal of the free ligand, default is False.</span>
+<span class="sd">    fit_signal_ES : bool, optional</span>
+<span class="sd">        If True, fit the signal of the complex, default is True.</span>
+<span class="sd">    fixed_t0 : bool, optional</span>
+<span class="sd">        If True, the initial time point is zero, default is True.</span>
+<span class="sd">    fixed_Kd : bool, optional</span>
+<span class="sd">        If True, the equilibrium dissociation constant is fixed, default is False.</span>
+<span class="sd">    Kd_value : float, optional</span>
+<span class="sd">        Value of the equilibrium dissociation constant if fixed_Kd is True.</span>
+<span class="sd">    fixed_koff : bool, optional</span>
+<span class="sd">        If True, the dissociation rate constant is fixed, default is False.</span>
+<span class="sd">    koff_value : float, optional</span>
+<span class="sd">        Value of the dissociation rate constant if fixed_koff is True.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        Fitted parameters.</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Covariance matrix of the fitted parameters.</span>
+<span class="sd">    list</span>
+<span class="sd">        Fitted values for each signal, same dimensions as signal_lst.</span>
+<span class="sd">    list</span>
+<span class="sd">        Names of the fitted parameters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Flatten signals once</span>
     <span class="n">all_signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">signal_lst</span><span class="p">)</span>
     <span class="c1"># Preprocess time</span>
@@ -502,64 +486,96 @@
         <span class="n">initial_parameters</span><span class="p">,</span>
         <span class="n">low_bounds</span><span class="p">,</span>
         <span class="n">high_bounds</span><span class="p">,</span>
-        <span class="n">fit_signal_E</span>    <span class="o">=</span>   <span class="kc">False</span><span class="p">,</span>
-        <span class="n">fit_signal_S</span>    <span class="o">=</span>   <span class="kc">False</span><span class="p">,</span>
-        <span class="n">fit_signal_ES</span>   <span class="o">=</span>   <span class="kc">True</span><span class="p">,</span>
-        <span class="n">ESint_equals_ES</span> <span class="o">=</span>   <span class="kc">True</span><span class="p">,</span>
-        <span class="n">fixed_t0</span>        <span class="o">=</span>   <span class="kc">True</span><span class="p">,</span>
-        <span class="n">fixed_kon</span>       <span class="o">=</span>   <span class="kc">False</span><span class="p">,</span>
-        <span class="n">kon_value</span>       <span class="o">=</span>   <span class="kc">None</span><span class="p">,</span>
-        <span class="n">fixed_koff</span>      <span class="o">=</span>   <span class="kc">False</span><span class="p">,</span>
-        <span class="n">koff_value</span>      <span class="o">=</span>   <span class="kc">None</span><span class="p">,</span>
-        <span class="n">fixed_kc</span>        <span class="o">=</span>   <span class="kc">False</span><span class="p">,</span>
-        <span class="n">kc_value</span>        <span class="o">=</span>   <span class="kc">None</span><span class="p">,</span>
-        <span class="n">fixed_krev</span>      <span class="o">=</span>   <span class="kc">False</span><span class="p">,</span>
-        <span class="n">krev_value</span>      <span class="o">=</span>   <span class="kc">None</span><span class="p">,</span>
-        <span class="n">max_nfev</span>        <span class="o">=</span>   <span class="kc">None</span>
+        <span class="n">fit_signal_E</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">fit_signal_S</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">fit_signal_ES</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">ESint_equals_ES</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">fixed_t0</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">fixed_kon</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">kon_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">fixed_koff</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">koff_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">fixed_kc</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">kc_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">fixed_krev</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">krev_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">max_nfev</span><span class="o">=</span><span class="kc">None</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Global fit to association and dissociation traces - one-to-one binding model with induced fit</span>
+<span class="sd">    Global fit to association and dissociation traces - one-to-one binding model with induced fit.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        signal_lst:          list of signals. We assume initial values as follows: E = E_tot, S = S_tot, ES = 0, ESint = 0</span>
-<span class="sd">        time_lst:            list of time points for the association signals</span>
-<span class="sd">        ligand_conc_lst:     list of ligand concentrations, one per element in signal_lst</span>
-<span class="sd">        protein_conc_lst:    list of protein concentrations, one per element in signal_lst</span>
-<span class="sd">        initial_parameters:  initial parameters for the fit</span>
-<span class="sd">        low_bounds:          lower bounds for the fit parameters</span>
-<span class="sd">        high_bounds:         upper bounds for the fit parameters</span>
-<span class="sd">        fit_signal_E:        if True, fit the signal of the free protein</span>
-<span class="sd">        fit_signal_S:        if True, fit the signal of the free ligand</span>
-<span class="sd">        fit_signal_ES:       if True, fit the signal of the complex</span>
-<span class="sd">        ESint_equals_ES:     if True, the signal of the intermediate complex is equal to the signal of the trapped complex</span>
-<span class="sd">        fixed_t0:            if True, the initial time point is zero</span>
-<span class="sd">        fixed_kon:           if True, the association rate constant is fixed</span>
-<span class="sd">        kon_value:           value of the association rate constant if fixed_kon is True</span>
-<span class="sd">        fixed_koff:          if True, the dissociation rate constant is fixed</span>
-<span class="sd">        koff_value:          value of the dissociation rate constant if fixed_koff is True</span>
-<span class="sd">        fixed_kc:            if True, the induced fit rate constant is fixed</span>
-<span class="sd">        kc_value:            value of the induced fit rate constant if fixed_kc is True</span>
-<span class="sd">        fixed_krev:          if True, the reverse induced fit rate constant is fixed</span>
-<span class="sd">        krev_value:          value of the reverse induced fit rate constant if fixed_krev is True</span>
-<span class="sd">        max_nfev:            maximum number of function evaluations for the fit</span>
-
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    signal_lst : list</span>
+<span class="sd">        List of signals. We assume initial values as follows: E = E_tot, S = S_tot, ES = 0, ESint = 0.</span>
+<span class="sd">    time_lst : list</span>
+<span class="sd">        List of time points for the association signals.</span>
+<span class="sd">    ligand_conc_lst : list</span>
+<span class="sd">        List of ligand concentrations, one per element in signal_lst.</span>
+<span class="sd">    protein_conc_lst : list</span>
+<span class="sd">        List of protein concentrations, one per element in signal_lst.</span>
+<span class="sd">    initial_parameters : list</span>
+<span class="sd">        Initial parameters for the fit.</span>
+<span class="sd">    low_bounds : list</span>
+<span class="sd">        Lower bounds for the fit parameters.</span>
+<span class="sd">    high_bounds : list</span>
+<span class="sd">        Upper bounds for the fit parameters.</span>
+<span class="sd">    fit_signal_E : bool, optional</span>
+<span class="sd">        If True, fit the signal of the free protein, default is False.</span>
+<span class="sd">    fit_signal_S : bool, optional</span>
+<span class="sd">        If True, fit the signal of the free ligand, default is False.</span>
+<span class="sd">    fit_signal_ES : bool, optional</span>
+<span class="sd">        If True, fit the signal of the complex, default is True.</span>
+<span class="sd">    ESint_equals_ES : bool, optional</span>
+<span class="sd">        If True, the signal of the intermediate complex is equal to the signal of the trapped complex, default is True.</span>
+<span class="sd">    fixed_t0 : bool, optional</span>
+<span class="sd">        If True, the initial time point is zero, default is True.</span>
+<span class="sd">    fixed_kon : bool, optional</span>
+<span class="sd">        If True, the association rate constant is fixed, default is False.</span>
+<span class="sd">    kon_value : float, optional</span>
+<span class="sd">        Value of the association rate constant if fixed_kon is True.</span>
+<span class="sd">    fixed_koff : bool, optional</span>
+<span class="sd">        If True, the dissociation rate constant is fixed, default is False.</span>
+<span class="sd">    koff_value : float, optional</span>
+<span class="sd">        Value of the dissociation rate constant if fixed_koff is True.</span>
+<span class="sd">    fixed_kc : bool, optional</span>
+<span class="sd">        If True, the induced fit rate constant is fixed, default is False.</span>
+<span class="sd">    kc_value : float, optional</span>
+<span class="sd">        Value of the induced fit rate constant if fixed_kc is True.</span>
+<span class="sd">    fixed_krev : bool, optional</span>
+<span class="sd">        If True, the reverse induced fit rate constant is fixed, default is False.</span>
+<span class="sd">    krev_value : float, optional</span>
+<span class="sd">        Value of the reverse induced fit rate constant if fixed_krev is True.</span>
+<span class="sd">    max_nfev : int, optional</span>
+<span class="sd">        Maximum number of function evaluations for the fit.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        Fitted parameters.</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Covariance matrix of the fitted parameters.</span>
+<span class="sd">    list</span>
+<span class="sd">        Fitted values for each signal, same dimensions as signal_lst.</span>
+<span class="sd">    list</span>
+<span class="sd">        Names of the fitted parameters.</span>
+<span class="sd">        </span>
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
 <span class="sd">    The initial_parameters are given in the following order:</span>
-<span class="sd">        signal_E     if fit_signal_E                            (signal of the free rotein)</span>
-<span class="sd">        signal_S     if fit_signal_S                            (signal of the free ligand)</span>
-<span class="sd">        signal_ES    if fit_signal_ES                           (signal of the trapped complex)</span>
-<span class="sd">        signal_ESint if fit_signal_ES and not ESint_equals_ES   (signal of the intermediate complex)</span>
-<span class="sd">                                                                if ESint_equals_ES is True, then the trapped complex signal is used for both ES and ESint</span>
-<span class="sd">        k_on         if not fixed_kon                           (association rate constant)</span>
-<span class="sd">        k_off        if not fixed_koff                          (dissociation rate constant)</span>
-<span class="sd">        k_c          if not fixed_kc                            (induced fit rate constant)</span>
-<span class="sd">        k_rev        if not fixed_krev                          (reverse induced fit rate constant)</span>
-
-<span class="sd">        t0_1         if not fixed_t0                             (initial time point for the first  signal array, default is 0)</span>
-<span class="sd">        t0_2         if not fixed_t0                             (initial time point for the second signal array, default is 0)</span>
-<span class="sd">        ...</span>
-
+<span class="sd">        </span>
+<span class="sd">    - signal_E     if fit_signal_E                            (signal of the free protein)</span>
+<span class="sd">    - signal_S     if fit_signal_S                            (signal of the free ligand)</span>
+<span class="sd">    - signal_ES    if fit_signal_ES                           (signal of the trapped complex)</span>
+<span class="sd">    - signal_ESint if fit_signal_ES and not ESint_equals_ES   (signal of the intermediate complex)</span>
+<span class="sd">      if ESint_equals_ES is True, then the trapped complex signal is used for both ES and ESint</span>
+<span class="sd">    - k_on         if not fixed_kon                           (association rate constant)</span>
+<span class="sd">    - k_off        if not fixed_koff                          (dissociation rate constant)</span>
+<span class="sd">    - k_c          if not fixed_kc                            (induced fit rate constant)</span>
+<span class="sd">    - k_rev        if not fixed_krev                          (reverse induced fit rate constant)</span>
+<span class="sd">    - t0_1         if not fixed_t0                            (initial time point for the first signal array, default is 0)</span>
+<span class="sd">    - t0_2         if not fixed_t0                            (initial time point for the second signal array, default is 0)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="c1"># Flatten signals once</span>
     <span class="n">all_signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">signal_lst</span><span class="p">)</span>
 
@@ -666,34 +682,53 @@
         <span class="n">time_lst</span><span class="p">,</span>
         <span class="n">ligand_conc_lst</span><span class="p">,</span>
         <span class="n">protein_conc_lst</span><span class="p">,</span>
-        <span class="n">fit_signal_E</span>    <span class="o">=</span>   <span class="kc">False</span><span class="p">,</span>
-        <span class="n">fit_signal_S</span>    <span class="o">=</span>   <span class="kc">False</span><span class="p">,</span>
-        <span class="n">fit_signal_ES</span>   <span class="o">=</span>   <span class="kc">True</span><span class="p">,</span>
-        <span class="n">ESint_equals_ES</span> <span class="o">=</span>   <span class="kc">True</span><span class="p">,</span>
-        <span class="n">fixed_t0</span>        <span class="o">=</span>   <span class="kc">True</span><span class="p">,</span>
-        <span class="n">np_linspace_low</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span>
-        <span class="n">np_linspace_high</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
-        <span class="n">np_linspace_num</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="n">fit_signal_E</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">fit_signal_S</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">fit_signal_ES</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">ESint_equals_ES</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">fixed_t0</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">np_linspace_low</span><span class="o">=-</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">np_linspace_high</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">np_linspace_num</span><span class="o">=</span><span class="mi">5</span>
         <span class="p">):</span>
-
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Heuristic algorithm to find initial parameters for the global fit to association and dissociation traces - one-to-one binding model with induced fit</span>
-<span class="sd">    We explore a range of fixed kc and krev values, and fit kon and koff.</span>
+<span class="sd">    Find initial parameters for the global fit to association and dissociation traces - one-to-one binding model with induced fit.</span>
+<span class="sd">    </span>
+<span class="sd">    Heuristic algorithm to explore a range of fixed kc and krev values, and fit kon and koff.</span>
 <span class="sd">    This function is used to find the initial parameters for the fit_induced_fit_solution function.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        signal_lst (list):          list of signals. We assume initial values as follows: E = E_tot, S = S_tot, ES = 0, ESint = 0</span>
-<span class="sd">        time_lst   (list):          list of time points for the association signals</span>
-<span class="sd">        ligand_conc_lst (list):     list of ligand concentrations, one per element in signal_lst</span>
-<span class="sd">        protein_conc_lst (list):    list of protein concentrations, one per element in signal_lst</span>
-<span class="sd">        fit_signal_E (bool):        if True, fit the signal of the free protein</span>
-<span class="sd">        fit_signal_S (bool):        if True, fit the signal of the free ligand</span>
-<span class="sd">        fit_signal_ES (bool):       if True, fit the signal of the complex</span>
-<span class="sd">        ESint_equals_ES (bool):     if True, the signal of the intermediate complex is equal to the signal of the trapped complex</span>
-<span class="sd">        fixed_t0 (bool):            if True, the initial time point is zero</span>
-
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    signal_lst : list</span>
+<span class="sd">        List of signals. We assume initial values as follows: E = E_tot, S = S_tot, ES = 0, ESint = 0.</span>
+<span class="sd">    time_lst : list</span>
+<span class="sd">        List of time points for the association signals.</span>
+<span class="sd">    ligand_conc_lst : list</span>
+<span class="sd">        List of ligand concentrations, one per element in signal_lst.</span>
+<span class="sd">    protein_conc_lst : list</span>
+<span class="sd">        List of protein concentrations, one per element in signal_lst.</span>
+<span class="sd">    fit_signal_E : bool, optional</span>
+<span class="sd">        If True, fit the signal of the free protein, default is False.</span>
+<span class="sd">    fit_signal_S : bool, optional</span>
+<span class="sd">        If True, fit the signal of the free ligand, default is False.</span>
+<span class="sd">    fit_signal_ES : bool, optional</span>
+<span class="sd">        If True, fit the signal of the complex, default is True.</span>
+<span class="sd">    ESint_equals_ES : bool, optional</span>
+<span class="sd">        If True, the signal of the intermediate complex is equal to the signal of the trapped complex, default is True.</span>
+<span class="sd">    fixed_t0 : bool, optional</span>
+<span class="sd">        If True, the initial time point is zero, default is True.</span>
+<span class="sd">    np_linspace_low : float, optional</span>
+<span class="sd">        Lower bound for the logarithmic space to sample kc and krev, default is -2.</span>
+<span class="sd">    np_linspace_high : float, optional</span>
+<span class="sd">        Upper bound for the logarithmic space to sample kc and krev, default is 2.</span>
+<span class="sd">    np_linspace_num : int, optional</span>
+<span class="sd">        Number of points to sample in the logarithmic space, default is 5.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Best initial parameters found by the heuristic algorithm.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">kc_seq</span>   <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">np_linspace_low</span><span class="p">,</span> <span class="n">np_linspace_high</span><span class="p">,</span> <span class="n">np_linspace_num</span><span class="p">))</span>
     <span class="n">krev_seq</span> <span class="o">=</span> <span class="n">kc_seq</span>
 
@@ -724,11 +759,11 @@
                                                                          <span class="n">high_bounds</span><span class="p">,</span>
                                                                          <span class="n">fixed_kc</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">kc_value</span><span class="o">=</span><span class="n">kc</span><span class="p">,</span>
                                                                          <span class="n">fixed_krev</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">krev_value</span><span class="o">=</span><span class="n">krev</span><span class="p">,</span>
-                                                                         <span class="n">fit_signal_E</span> <span class="o">=</span> <span class="n">fit_signal_E</span><span class="p">,</span>
-                                                                         <span class="n">fit_signal_S</span> <span class="o">=</span> <span class="n">fit_signal_S</span><span class="p">,</span>
-                                                                         <span class="n">fit_signal_ES</span> <span class="o">=</span> <span class="n">fit_signal_ES</span><span class="p">,</span>
-                                                                         <span class="n">ESint_equals_ES</span> <span class="o">=</span> <span class="n">ESint_equals_ES</span><span class="p">,</span>
-                                                                         <span class="n">fixed_t0</span> <span class="o">=</span> <span class="n">fixed_t0</span><span class="p">)</span>
+                                                                         <span class="n">fit_signal_E</span><span class="o">=</span><span class="n">fit_signal_E</span><span class="p">,</span>
+                                                                         <span class="n">fit_signal_S</span><span class="o">=</span><span class="n">fit_signal_S</span><span class="p">,</span>
+                                                                         <span class="n">fit_signal_ES</span><span class="o">=</span><span class="n">fit_signal_ES</span><span class="p">,</span>
+                                                                         <span class="n">ESint_equals_ES</span><span class="o">=</span><span class="n">ESint_equals_ES</span><span class="p">,</span>
+                                                                         <span class="n">fixed_t0</span><span class="o">=</span><span class="n">fixed_t0</span><span class="p">)</span>
 
         <span class="c1"># We fit k_on and k_off, using fixed kc and krev</span>
         <span class="n">rss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">signal_lst</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">fitted_values</span><span class="p">))</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
