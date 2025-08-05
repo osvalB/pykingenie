@@ -1,0 +1,853 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>PyKinGenie Documentation &#8212; PyKinGenie 0.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=01f34227"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'index';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="pykingenie" href="modules.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="#">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">PyKinGenie 0.1.0 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="modules.html">
+    pykingenie
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="pykingenie.utils.html">
+    pykingenie.utils package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="pykingenie.utils.html">
+    pykingenie.utils package
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/osvalB/pykingenie" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="modules.html">
+    pykingenie
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="pykingenie.utils.html">
+    pykingenie.utils package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="pykingenie.html">
+    pykingenie package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="pykingenie.utils.html">
+    pykingenie.utils package
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/osvalB/pykingenie" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none"></div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="pykingenie-documentation">
+<h1>PyKinGenie Documentation<a class="headerlink" href="#pykingenie-documentation" title="Link to this heading">#</a></h1>
+<p>Welcome to PyKinGenie, a Python package for analyzing kinetics data.</p>
+<div class="toctree-wrapper compound">
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">pykingenie</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.html">pykingenie package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pykingenie.html">pykingenie package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.html#module-pykingenie.fitter">pykingenie.fitter module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.html#module-pykingenie.fitter_solution">pykingenie.fitter_solution module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.html#module-pykingenie.gator">pykingenie.gator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.html#module-pykingenie.kingenie_solution">pykingenie.kingenie_solution module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.html#module-pykingenie.kingenie_surface">pykingenie.kingenie_surface module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.html#module-pykingenie.main">pykingenie.main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.html#module-pykingenie.octet">pykingenie.octet module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.html#module-pykingenie.solution_exp">pykingenie.solution_exp module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.html#module-pykingenie.surface_exp">pykingenie.surface_exp module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pykingenie.utils.html">pykingenie.utils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.fitting_general">pykingenie.utils.fitting_general module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.fitting_solution">pykingenie.utils.fitting_solution module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.fitting_surface">pykingenie.utils.fitting_surface module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.math">pykingenie.utils.math module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.palettes">pykingenie.utils.palettes module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.plotting">pykingenie.utils.plotting module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.processing">pykingenie.utils.processing module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.signal_solution">pykingenie.utils.signal_solution module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.signal_surface">pykingenie.utils.signal_surface module</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h1>
+<p>Install PyPhotoMol using pip:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>pyphotomol
+</pre></div>
+</div>
+<p>Or for development:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/osvalB/pyPhotoMol.git
+<span class="nb">cd</span><span class="w"> </span>pyPhotoMol
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev]&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="quick-start">
+<h1>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading">#</a></h1>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyphotomol.main</span><span class="w"> </span><span class="kn">import</span> <span class="n">PyPhotoMol</span>
+
+<span class="c1"># Create instance and import data</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">PyPhotoMol</span><span class="p">()</span>
+<span class="n">model</span><span class="o">.</span><span class="n">import_file</span><span class="p">(</span><span class="s1">&#39;data.h5&#39;</span><span class="p">)</span>
+
+<span class="c1"># Analyze data</span>
+<span class="n">model</span><span class="o">.</span><span class="n">count_binding_events</span><span class="p">()</span>
+<span class="n">model</span><span class="o">.</span><span class="n">create_histogram</span><span class="p">(</span><span class="n">use_masses</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">],</span> <span class="n">bin_width</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">guess_peaks</span><span class="p">(</span><span class="n">min_height</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">min_distance</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="c1"># View operation history</span>
+<span class="n">model</span><span class="o">.</span><span class="n">print_logbook_summary</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="features">
+<h1>Features<a class="headerlink" href="#features" title="Link to this heading">#</a></h1>
+<ul class="simple">
+<li><p><strong>Data Import</strong>: Import HDF5 and CSV mass photometry data files</p></li>
+<li><p><strong>Histogram Analysis</strong>: Create and analyze histograms of mass and contrast distributions</p></li>
+<li><p><strong>Peak Detection</strong>: Automated peak finding in histograms</p></li>
+<li><p><strong>Mass-Contrast Conversion</strong>: Convert between mass and contrast with calibration parameters</p></li>
+<li><p><strong>Gaussian Fitting</strong>: Fit single and multiple truncated Gaussian functions to histogram data</p></li>
+<li><p><strong>Comprehensive Logging</strong>: Track all operations with detailed logbooks</p></li>
+</ul>
+</section>
+<section id="api-reference">
+<h1>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading">#</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="pykingenie.html">pykingenie package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html">pykingenie.utils package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.utils.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.fitting_general">pykingenie.utils.fitting_general module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.fitting_solution">pykingenie.utils.fitting_solution module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.fitting_surface">pykingenie.utils.fitting_surface module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.math">pykingenie.utils.math module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.palettes">pykingenie.utils.palettes module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.plotting">pykingenie.utils.plotting module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.processing">pykingenie.utils.processing module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.signal_solution">pykingenie.utils.signal_solution module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.signal_surface">pykingenie.utils.signal_surface module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.html#module-pykingenie.fitter">pykingenie.fitter module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.html#pykingenie.fitter.KineticsFitter"><code class="docutils literal notranslate"><span class="pre">KineticsFitter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.fitter.KineticsFitter.names"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.fitter.KineticsFitter.assoc"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.assoc</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.fitter.KineticsFitter.disso"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.disso</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.fitter.KineticsFitter.smax_id"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.smax_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.fitter.KineticsFitter.__init__"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.fitter.KineticsFitter.get_steady_state"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.get_steady_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.fitter.KineticsFitter.clear_fittings"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.clear_fittings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.fitter.KineticsFitter.create_fitting_bounds_table"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.create_fitting_bounds_table()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.fitter.KineticsFitter.fit_steady_state"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_steady_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.fitter.KineticsFitter.get_k_off_initial_guess"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.get_k_off_initial_guess()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.fitter.KineticsFitter.fit_one_site_association"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_one_site_association()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.fitter.KineticsFitter.fit_one_site_dissociation"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_one_site_dissociation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.fitter.KineticsFitter.fit_single_exponentials"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_single_exponentials()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.fitter.KineticsFitter.fit_one_site_assoc_and_disso"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_one_site_assoc_and_disso()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.fitter.KineticsFitter.calculate_ci95"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.calculate_ci95()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.fitter.KineticsFitter.fit_one_site_if_assoc_and_disso"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_one_site_if_assoc_and_disso()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.html#module-pykingenie.fitter_solution">pykingenie.fitter_solution module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.html#pykingenie.fitter_solution.KineticsFitterSolution"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.fitter_solution.KineticsFitterSolution.__init__"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.fitter_solution.KineticsFitterSolution.get_steady_state"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.get_steady_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.fitter_solution.KineticsFitterSolution.clear_fittings"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.clear_fittings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.fitter_solution.KineticsFitterSolution.fit_single_exponentials"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.fit_single_exponentials()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.fitter_solution.KineticsFitterSolution.group_k_obs_by_protein_concentration"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.group_k_obs_by_protein_concentration()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.fitter_solution.KineticsFitterSolution.fit_double_exponentials"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.fit_double_exponentials()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.fitter_solution.KineticsFitterSolution.group_double_exponential_k_obs_by_protein_concentration"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.group_double_exponential_k_obs_by_protein_concentration()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.fitter_solution.KineticsFitterSolution.fit_one_binding_site"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.fit_one_binding_site()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.fitter_solution.KineticsFitterSolution.find_initial_params_if"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.find_initial_params_if()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.fitter_solution.KineticsFitterSolution.fit_induced_fit"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.fit_induced_fit()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.html#module-pykingenie.gator">pykingenie.gator module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.html#pykingenie.gator.GatorExperiment"><code class="docutils literal notranslate"><span class="pre">GatorExperiment</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.gator.GatorExperiment.__init__"><code class="docutils literal notranslate"><span class="pre">GatorExperiment.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.gator.GatorExperiment.read_all_gator_data"><code class="docutils literal notranslate"><span class="pre">GatorExperiment.read_all_gator_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.gator.GatorExperiment.read_experiment_ini"><code class="docutils literal notranslate"><span class="pre">GatorExperiment.read_experiment_ini()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.gator.GatorExperiment.read_settings_ini"><code class="docutils literal notranslate"><span class="pre">GatorExperiment.read_settings_ini()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.gator.GatorExperiment.read_sensor_data"><code class="docutils literal notranslate"><span class="pre">GatorExperiment.read_sensor_data()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.html#module-pykingenie.kingenie_solution">pykingenie.kingenie_solution module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.html#pykingenie.kingenie_solution.KinGenieCsvSolution"><code class="docutils literal notranslate"><span class="pre">KinGenieCsvSolution</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.kingenie_solution.KinGenieCsvSolution.name"><code class="docutils literal notranslate"><span class="pre">KinGenieCsvSolution.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.kingenie_solution.KinGenieCsvSolution.xs"><code class="docutils literal notranslate"><span class="pre">KinGenieCsvSolution.xs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.kingenie_solution.KinGenieCsvSolution.ys"><code class="docutils literal notranslate"><span class="pre">KinGenieCsvSolution.ys</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.kingenie_solution.KinGenieCsvSolution.no_sensors"><code class="docutils literal notranslate"><span class="pre">KinGenieCsvSolution.no_sensors</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.kingenie_solution.KinGenieCsvSolution.sensor_names"><code class="docutils literal notranslate"><span class="pre">KinGenieCsvSolution.sensor_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.kingenie_solution.KinGenieCsvSolution.sensor_names_unique"><code class="docutils literal notranslate"><span class="pre">KinGenieCsvSolution.sensor_names_unique</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.kingenie_solution.KinGenieCsvSolution.ligand_conc_df"><code class="docutils literal notranslate"><span class="pre">KinGenieCsvSolution.ligand_conc_df</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.kingenie_solution.KinGenieCsvSolution.__init__"><code class="docutils literal notranslate"><span class="pre">KinGenieCsvSolution.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.kingenie_solution.KinGenieCsvSolution.read_csv"><code class="docutils literal notranslate"><span class="pre">KinGenieCsvSolution.read_csv()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.html#module-pykingenie.kingenie_surface">pykingenie.kingenie_surface module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.html#pykingenie.kingenie_surface.KinGenieCsv"><code class="docutils literal notranslate"><span class="pre">KinGenieCsv</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.kingenie_surface.KinGenieCsv.__init__"><code class="docutils literal notranslate"><span class="pre">KinGenieCsv.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.kingenie_surface.KinGenieCsv.read_csv"><code class="docutils literal notranslate"><span class="pre">KinGenieCsv.read_csv()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.html#module-pykingenie.main">pykingenie.main module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.html#pykingenie.main.KineticsAnalyzer"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.main.KineticsAnalyzer.__init__"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.main.KineticsAnalyzer.delete_experiment"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.delete_experiment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.main.KineticsAnalyzer.add_experiment"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.add_experiment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.main.KineticsAnalyzer.init_fittings"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.init_fittings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.main.KineticsAnalyzer.add_fitting"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.add_fitting()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.main.KineticsAnalyzer.get_experiment_properties"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.get_experiment_properties()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.main.KineticsAnalyzer.merge_ligand_conc_df"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.merge_ligand_conc_df()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.main.KineticsAnalyzer.merge_conc_df_solution"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.merge_conc_df_solution()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.main.KineticsAnalyzer.generate_fittings"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.generate_fittings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.main.KineticsAnalyzer.generate_fittings_solution"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.generate_fittings_solution()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.main.KineticsAnalyzer.submit_steady_state_fitting"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.submit_steady_state_fitting()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.main.KineticsAnalyzer.submit_fitting_solution"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.submit_fitting_solution()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.main.KineticsAnalyzer.submit_kinetics_fitting"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.submit_kinetics_fitting()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.main.KineticsAnalyzer.calculate_asymmetric_error"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.calculate_asymmetric_error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.main.KineticsAnalyzer.get_fitting_results"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.get_fitting_results()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.main.KineticsAnalyzer.get_legends_table"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.get_legends_table()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.html#module-pykingenie.octet">pykingenie.octet module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.html#pykingenie.octet.OctetExperiment"><code class="docutils literal notranslate"><span class="pre">OctetExperiment</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.octet.OctetExperiment.name"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.octet.OctetExperiment.fns"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.fns</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.octet.OctetExperiment.xs"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.xs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.octet.OctetExperiment.ys"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.ys</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.octet.OctetExperiment.exp_info"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.exp_info</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.octet.OctetExperiment.step_info"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.step_info</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.octet.OctetExperiment.no_steps"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.no_steps</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.octet.OctetExperiment.no_sensors"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.no_sensors</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.octet.OctetExperiment.sample_column"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.sample_column</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.octet.OctetExperiment.sample_row"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.sample_row</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.octet.OctetExperiment.sample_type"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.sample_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.octet.OctetExperiment.sample_id"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.sample_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.octet.OctetExperiment.sensor_names_unique"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.sensor_names_unique</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.octet.OctetExperiment.sensor_names"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.sensor_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.octet.OctetExperiment.df_steps"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.df_steps</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.octet.OctetExperiment.ligand_conc_df"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.ligand_conc_df</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.octet.OctetExperiment.ligand_conc_df.head"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.ligand_conc_df.head</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.octet.OctetExperiment.traces_loaded"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.traces_loaded</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.octet.OctetExperiment.sample_plate_loaded"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.sample_plate_loaded</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.octet.OctetExperiment.sample_conc"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.sample_conc</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.octet.OctetExperiment.sample_conc_labeled"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.sample_conc_labeled</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.octet.OctetExperiment.steps_performed"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.steps_performed</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.octet.OctetExperiment.steps_performed.head"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.steps_performed.head</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.octet.OctetExperiment.__init__"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.octet.OctetExperiment.read_sensor_data"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.read_sensor_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.octet.OctetExperiment.generate_ligand_conc_df"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.generate_ligand_conc_df()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.octet.OctetExperiment.merge_consecutive_steps"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.merge_consecutive_steps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.octet.OctetExperiment.merge_consecutive_steps_by_name"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.merge_consecutive_steps_by_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.octet.OctetExperiment.read_sample_plate_info"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.read_sample_plate_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.octet.OctetExperiment.convert_to_numbers"><code class="docutils literal notranslate"><span class="pre">OctetExperiment.convert_to_numbers()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.html#module-pykingenie.solution_exp">pykingenie.solution_exp module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.html#pykingenie.solution_exp.SolutionBasedExp"><code class="docutils literal notranslate"><span class="pre">SolutionBasedExp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.solution_exp.SolutionBasedExp.__init__"><code class="docutils literal notranslate"><span class="pre">SolutionBasedExp.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.solution_exp.SolutionBasedExp.create_unique_traces_names"><code class="docutils literal notranslate"><span class="pre">SolutionBasedExp.create_unique_traces_names()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.solution_exp.SolutionBasedExp.get_trace_xy"><code class="docutils literal notranslate"><span class="pre">SolutionBasedExp.get_trace_xy()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.html#module-pykingenie.surface_exp">pykingenie.surface_exp module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.html#pykingenie.surface_exp.SurfaceBasedExperiment"><code class="docutils literal notranslate"><span class="pre">SurfaceBasedExperiment</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.surface_exp.SurfaceBasedExperiment.__init__"><code class="docutils literal notranslate"><span class="pre">SurfaceBasedExperiment.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.surface_exp.SurfaceBasedExperiment.create_unique_sensor_names"><code class="docutils literal notranslate"><span class="pre">SurfaceBasedExperiment.create_unique_sensor_names()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.surface_exp.SurfaceBasedExperiment.check_sensor_name"><code class="docutils literal notranslate"><span class="pre">SurfaceBasedExperiment.check_sensor_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.surface_exp.SurfaceBasedExperiment.subtraction_one_to_one"><code class="docutils literal notranslate"><span class="pre">SurfaceBasedExperiment.subtraction_one_to_one()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.surface_exp.SurfaceBasedExperiment.subtraction"><code class="docutils literal notranslate"><span class="pre">SurfaceBasedExperiment.subtraction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.surface_exp.SurfaceBasedExperiment.average"><code class="docutils literal notranslate"><span class="pre">SurfaceBasedExperiment.average()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.surface_exp.SurfaceBasedExperiment.align_association"><code class="docutils literal notranslate"><span class="pre">SurfaceBasedExperiment.align_association()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.surface_exp.SurfaceBasedExperiment.align_dissociation"><code class="docutils literal notranslate"><span class="pre">SurfaceBasedExperiment.align_dissociation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.surface_exp.SurfaceBasedExperiment.discard_steps"><code class="docutils literal notranslate"><span class="pre">SurfaceBasedExperiment.discard_steps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pykingenie.html#pykingenie.surface_exp.SurfaceBasedExperiment.get_step_xy"><code class="docutils literal notranslate"><span class="pre">SurfaceBasedExperiment.get_step_xy()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pykingenie.utils.html">pykingenie.utils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.fitting_general">pykingenie.utils.fitting_general module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_general.fit_single_exponential"><code class="docutils literal notranslate"><span class="pre">fit_single_exponential()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_general.fit_double_exponential"><code class="docutils literal notranslate"><span class="pre">fit_double_exponential()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_general.re_fit"><code class="docutils literal notranslate"><span class="pre">re_fit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_general.re_fit_2"><code class="docutils literal notranslate"><span class="pre">re_fit_2()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.fitting_solution">pykingenie.utils.fitting_solution module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_solution.fit_one_site_solution"><code class="docutils literal notranslate"><span class="pre">fit_one_site_solution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_solution.fit_induced_fit_solution"><code class="docutils literal notranslate"><span class="pre">fit_induced_fit_solution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_solution.find_initial_parameters_induced_fit_solution"><code class="docutils literal notranslate"><span class="pre">find_initial_parameters_induced_fit_solution()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.fitting_surface">pykingenie.utils.fitting_surface module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.guess_initial_signal"><code class="docutils literal notranslate"><span class="pre">guess_initial_signal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.fit_steady_state_one_site"><code class="docutils literal notranslate"><span class="pre">fit_steady_state_one_site()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.steady_state_one_site_asymmetric_ci95"><code class="docutils literal notranslate"><span class="pre">steady_state_one_site_asymmetric_ci95()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.fit_one_site_association"><code class="docutils literal notranslate"><span class="pre">fit_one_site_association()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.fit_one_site_dissociation"><code class="docutils literal notranslate"><span class="pre">fit_one_site_dissociation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.fit_one_site_assoc_and_disso"><code class="docutils literal notranslate"><span class="pre">fit_one_site_assoc_and_disso()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.fit_induced_fit_sites_assoc_and_disso"><code class="docutils literal notranslate"><span class="pre">fit_induced_fit_sites_assoc_and_disso()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.fit_one_site_assoc_and_disso_ktr"><code class="docutils literal notranslate"><span class="pre">fit_one_site_assoc_and_disso_ktr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.one_site_assoc_and_disso_asymmetric_ci95"><code class="docutils literal notranslate"><span class="pre">one_site_assoc_and_disso_asymmetric_ci95()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.one_site_assoc_and_disso_asymmetric_ci95_koff"><code class="docutils literal notranslate"><span class="pre">one_site_assoc_and_disso_asymmetric_ci95_koff()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.get_smax_upper_bound_factor"><code class="docutils literal notranslate"><span class="pre">get_smax_upper_bound_factor()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.math">pykingenie.utils.math module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.math.single_exponential"><code class="docutils literal notranslate"><span class="pre">single_exponential()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.math.double_exponential"><code class="docutils literal notranslate"><span class="pre">double_exponential()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.math.median_filter"><code class="docutils literal notranslate"><span class="pre">median_filter()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.math.rss_p"><code class="docutils literal notranslate"><span class="pre">rss_p()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.math.get_rss"><code class="docutils literal notranslate"><span class="pre">get_rss()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.math.get_desired_rss"><code class="docutils literal notranslate"><span class="pre">get_desired_rss()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.palettes">pykingenie.utils.palettes module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.plotting">pykingenie.utils.plotting module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.plotting.config_fig"><code class="docutils literal notranslate"><span class="pre">config_fig()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.plotting.plot_plate_info"><code class="docutils literal notranslate"><span class="pre">plot_plate_info()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.plotting.plot_traces"><code class="docutils literal notranslate"><span class="pre">plot_traces()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.plotting.plot_traces_all"><code class="docutils literal notranslate"><span class="pre">plot_traces_all()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.plotting.plot_steady_state"><code class="docutils literal notranslate"><span class="pre">plot_steady_state()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.plotting.plot_association_dissociation"><code class="docutils literal notranslate"><span class="pre">plot_association_dissociation()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.processing">pykingenie.utils.processing module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.processing.guess_experiment_name"><code class="docutils literal notranslate"><span class="pre">guess_experiment_name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.processing.etree_to_dict"><code class="docutils literal notranslate"><span class="pre">etree_to_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.processing.combine_dicts"><code class="docutils literal notranslate"><span class="pre">combine_dicts()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.processing.guess_experiment_type"><code class="docutils literal notranslate"><span class="pre">guess_experiment_type()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.processing.detect_time_list_continuos"><code class="docutils literal notranslate"><span class="pre">detect_time_list_continuos()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.processing.find_loading_column"><code class="docutils literal notranslate"><span class="pre">find_loading_column()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.processing.concat_signal_lst"><code class="docutils literal notranslate"><span class="pre">concat_signal_lst()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.processing.expand_parameter_list"><code class="docutils literal notranslate"><span class="pre">expand_parameter_list()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.processing.combine_sequences"><code class="docutils literal notranslate"><span class="pre">combine_sequences()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.processing.get_palette"><code class="docutils literal notranslate"><span class="pre">get_palette()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.processing.get_plotting_df"><code class="docutils literal notranslate"><span class="pre">get_plotting_df()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.processing.subset_data"><code class="docutils literal notranslate"><span class="pre">subset_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.processing.sample_type_to_letter"><code class="docutils literal notranslate"><span class="pre">sample_type_to_letter()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.processing.get_colors_from_numeric_values"><code class="docutils literal notranslate"><span class="pre">get_colors_from_numeric_values()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.processing.if_string_to_list"><code class="docutils literal notranslate"><span class="pre">if_string_to_list()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.processing.find_index_of_previous_step_type"><code class="docutils literal notranslate"><span class="pre">find_index_of_previous_step_type()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.signal_solution">pykingenie.utils.signal_solution module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_solution.ode_one_site_insolution"><code class="docutils literal notranslate"><span class="pre">ode_one_site_insolution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_solution.solve_ode_one_site_insolution"><code class="docutils literal notranslate"><span class="pre">solve_ode_one_site_insolution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_solution.signal_ode_one_site_insolution"><code class="docutils literal notranslate"><span class="pre">signal_ode_one_site_insolution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_solution.ode_induced_fit_insolution"><code class="docutils literal notranslate"><span class="pre">ode_induced_fit_insolution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_solution.solve_ode_induced_fit_insolution"><code class="docutils literal notranslate"><span class="pre">solve_ode_induced_fit_insolution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_solution.signal_ode_induced_fit_insolution"><code class="docutils literal notranslate"><span class="pre">signal_ode_induced_fit_insolution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_solution.ode_conformational_selection_insolution"><code class="docutils literal notranslate"><span class="pre">ode_conformational_selection_insolution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_solution.solve_ode_conformational_selection_insolution"><code class="docutils literal notranslate"><span class="pre">solve_ode_conformational_selection_insolution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_solution.signal_ode_conformational_selection_insolution"><code class="docutils literal notranslate"><span class="pre">signal_ode_conformational_selection_insolution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_solution.get_initial_concentration_conformational_selection"><code class="docutils literal notranslate"><span class="pre">get_initial_concentration_conformational_selection()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_solution.get_kobs_induced_fit"><code class="docutils literal notranslate"><span class="pre">get_kobs_induced_fit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_solution.get_kobs_conformational_selection"><code class="docutils literal notranslate"><span class="pre">get_kobs_conformational_selection()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.signal_surface">pykingenie.utils.signal_surface module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.steady_state_one_site"><code class="docutils literal notranslate"><span class="pre">steady_state_one_site()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.one_site_association_analytical"><code class="docutils literal notranslate"><span class="pre">one_site_association_analytical()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.one_site_dissociation_analytical"><code class="docutils literal notranslate"><span class="pre">one_site_dissociation_analytical()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.ode_one_site_mass_transport_association"><code class="docutils literal notranslate"><span class="pre">ode_one_site_mass_transport_association()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.ode_one_site_mass_transport_dissociation"><code class="docutils literal notranslate"><span class="pre">ode_one_site_mass_transport_dissociation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.solve_ode_one_site_mass_transport_association"><code class="docutils literal notranslate"><span class="pre">solve_ode_one_site_mass_transport_association()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.solve_ode_one_site_mass_transport_dissociation"><code class="docutils literal notranslate"><span class="pre">solve_ode_one_site_mass_transport_dissociation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.differential_matrix_association_induced_fit"><code class="docutils literal notranslate"><span class="pre">differential_matrix_association_induced_fit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.differential_matrix_association_conformational_selection"><code class="docutils literal notranslate"><span class="pre">differential_matrix_association_conformational_selection()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.differential_matrix_dissociation_induced_fit"><code class="docutils literal notranslate"><span class="pre">differential_matrix_dissociation_induced_fit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.differential_matrix_dissociation_conformational_selection"><code class="docutils literal notranslate"><span class="pre">differential_matrix_dissociation_conformational_selection()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.constant_vector_induced_fit"><code class="docutils literal notranslate"><span class="pre">constant_vector_induced_fit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.constant_vector_conformational_selection"><code class="docutils literal notranslate"><span class="pre">constant_vector_conformational_selection()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.solve_steady_state"><code class="docutils literal notranslate"><span class="pre">solve_steady_state()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.solve_all_states_fast"><code class="docutils literal notranslate"><span class="pre">solve_all_states_fast()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.solve_induced_fit_association"><code class="docutils literal notranslate"><span class="pre">solve_induced_fit_association()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.solve_conformational_selection_association"><code class="docutils literal notranslate"><span class="pre">solve_conformational_selection_association()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.solve_induced_fit_dissociation"><code class="docutils literal notranslate"><span class="pre">solve_induced_fit_dissociation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.solve_conformational_selection_dissociation"><code class="docutils literal notranslate"><span class="pre">solve_conformational_selection_dissociation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.ode_mixture_analyte_association"><code class="docutils literal notranslate"><span class="pre">ode_mixture_analyte_association()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.solve_ode_mixture_analyte_association"><code class="docutils literal notranslate"><span class="pre">solve_ode_mixture_analyte_association()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.ode_mixture_analyte_dissociation"><code class="docutils literal notranslate"><span class="pre">ode_mixture_analyte_dissociation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.signal_surface.solve_ode_mixture_analyte_dissociation"><code class="docutils literal notranslate"><span class="pre">solve_ode_mixture_analyte_dissociation()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading">#</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="right-next"
+       href="modules.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">pykingenie</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">PyKinGenie Documentation</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#quick-start">Quick Start</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#features">Features</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#api-reference">API Reference</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, osvalB.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
