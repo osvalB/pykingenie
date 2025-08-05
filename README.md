@@ -1,5 +1,6 @@
 [![Tests](https://github.com/osvalB/pykingenie/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/osvalB/pykingenie/actions/workflows/ci-cd.yml)
 [![codecov](https://codecov.io/gh/osvalB/pykingenie/graph/badge.svg)](https://codecov.io/gh/osvalB/pykingenie)
+[![Docs](https://img.shields.io/badge/docs-online-blue)](https://osvalb.github.io/pykingenie)
 
 Welcome to **pyKingenie**!, a python package for analysing binding kinetics data 
 
