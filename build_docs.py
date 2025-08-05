@@ -20,9 +20,7 @@ def setup_docs():
     if not docs_dir.exists():
         print(f"Error: Could not create docs directory at {docs_dir.absolute()}")
         sys.exit(1)
-
-    import time
-    time.sleep(1)   
+        
     # Change to docs directory
     os.chdir(docs_dir)
 
@@ -98,36 +96,34 @@ numpydoc_show_class_members = False
 PyKinGenie Documentation
 ========================
 
-Welcome to PyKinGenie, a Python package for analyzing binding kinetics data with simple models.
+Welcome to PyKinGenie, a Python package for analyzing mass photometry data.
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+   installation
+   quickstart
+   api
+   examples
    modules
 
 Installation
 ============
 
-Install PyKinGenie using uv:
-
-.. code-block:: bash
-
-   uv install pykingenie
-
-Or using pip:
+Install PyKinGenie using pip:
 
 .. code-block:: bash
 
    pip install pykingenie
 
-For development:
+Or for development:
 
 .. code-block:: bash
 
    git clone https://github.com/osvalB/pykingenie
    cd pykingenie
-   uv pip install -e ".[dev]"
+   pip install -e ".[dev]"
 
 
 API Reference
@@ -159,20 +155,8 @@ def build_docs():
 
     if not docs_dir.exists():
         docs_dir = setup_docs()
-        print('Creating a new docs folder')
 
     os.chdir(docs_dir)
-
-    # Clean the build directory to ensure a fresh build
-    build_dir = Path("_build")
-    if build_dir.exists():
-        import shutil
-        print("Cleaning previous build...")
-        shutil.rmtree(build_dir)
-    
-    # Recreate the build directory
-    html_dir = build_dir / "html"
-    html_dir.mkdir(parents=True, exist_ok=True)
 
     print("Generating API documentation...")
     subprocess.run([
@@ -185,7 +169,7 @@ def build_docs():
         sys.executable, "-m", "sphinx", "-b", "html", ".", "_build/html"
     ])
 
-    html_path = Path("_build") / "html" / "index.html"
+    html_path = docs_dir / "_build" / "html" / "index.html"
     print(f"✅ Documentation built successfully!")
     print(f"📖 Open: {html_path.absolute()}")
 
