@@ -1,0 +1,104 @@
+name: Build Documentation
+
+# This workflow handles all documentation-related tasks:
+# 1. Building the documentation using Sphinx
+# 2. Uploading the documentation as an artifact
+# 3. Deploying the documentation to GitHub Pages 
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'docs/**'
+      - 'src/**'
+      - 'README.md'
+      - 'build_docs.py'
+      - '.github/workflows/build-docs.yml'
+      - 'pyproject.toml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'docs/**'
+      - 'src/**'
+      - 'README.md'
+      - 'build_docs.py'
+      - '.github/workflows/build-docs.yml'
+      - 'pyproject.toml'
+  workflow_dispatch:  # Allow manual triggering
+
+env:
+  UV_CACHE_DIR: ${{ github.workspace }}/.cache/uv
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v4
+      with:
+        version: "latest"
+
+    - name: Set up Python 3.13
+      run: uv python install 3.13
+
+    - name: Cache uv packages
+      uses: actions/cache@v4
+      with:
+        path: ${{ env.UV_CACHE_DIR }}
+        key: ${{ runner.os }}-uv-3.13-${{ hashFiles('**/pyproject.toml') }}
+        restore-keys: |
+          ${{ runner.os }}-uv-3.13-
+          ${{ runner.os }}-uv-
+
+    - name: Build documentation
+      run: |
+        uv sync --extra docs
+        python build_docs.py
+
+    - name: Debug documentation path
+      run: |
+        echo "Current directory: $(pwd)"
+        echo "Checking docs/_build/html directory:"
+        ls -la docs/_build/html 2>/dev/null || echo "Directory not found"
+        echo "Searching for _build directories:"
+        find . -name "_build" -type d | xargs -I{} sh -c 'echo "Content of {}:"; ls -la {} 2>/dev/null'
+        echo "Content of docs directory:"
+        ls -la docs/ 2>/dev/null || echo "Directory not found"
+        
+    - name: Upload documentation artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: documentation
+        path: docs/_build/html/
+        retention-days: 7
+        if-no-files-found: error # Fail the workflow if no files are found
+        overwrite: true
+
+  deploy-docs:
+    if: github.ref == 'refs/heads/main'
+    needs: build-docs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download documentation artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: documentation
+          path: docs-out
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs-out
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          full_commit_message: 'docs: update documentation site [skip ci]'
+          cname: '' # Set this if you have a custom domain

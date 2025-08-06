@@ -16,3 +16,4 @@ test11.py
 coverage.xml
 htmlcov
 view_docs.sh
+.venv
