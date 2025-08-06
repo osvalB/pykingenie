@@ -6,7 +6,9 @@
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>Search - PyKinGenie 0.1.0 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Quickstart &#8212; PyKinGenie 0.1.0 documentation</title>
   
   
   
@@ -44,12 +46,11 @@
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>
     <script src="_static/design-tabs.js?v=f930bc37"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'search';</script>
-  <script src="_static/searchtools.js"></script>
-  <script src="_static/language_data.js"></script>
-  <script src="searchindex.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'quickstart';</script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="#" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="pykingenie" href="modules.html" />
+    <link rel="prev" title="Installation" href="installation.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -71,7 +72,7 @@
   <dialog id="pst-search-dialog">
     
 <form class="bd-search d-flex align-items-center"
-      action="#"
+      action="search.html"
       method="get">
   <i class="fa-solid fa-magnifying-glass"></i>
   <input type="search"
@@ -135,8 +136,8 @@
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="quickstart.html">
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
     Quickstart
   </a>
 </li>
@@ -207,6 +208,10 @@
   
 
   
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
 </div>
 
     </header>
@@ -217,10 +222,8 @@
       
       
       
-        
-      
       <dialog id="pst-primary-sidebar-modal"></dialog>
-      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -242,8 +245,8 @@
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="quickstart.html">
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
     Quickstart
   </a>
 </li>
@@ -293,6 +296,15 @@
     
   </div>
   
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"></div>
+</nav></div>
+    </div>
+  
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
       <div class="sidebar-primary-item">
@@ -313,45 +325,93 @@
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article d-print-none"></div>
-              
-              
-  <div class="bd-search-container">
-    <h1>Search</h1>
-    <noscript>
-      <div class="admonition error">
-        <p class="admonition-title">Error</p>
-        <p>Please activate JavaScript to enable the search functionality.</p>
-      </div>
-    </noscript>
-    
-<form class="bd-search d-flex align-items-center"
-      action="#"
-      method="get">
-  <i class="fa-solid fa-magnifying-glass"></i>
-  <input type="search"
-         class="form-control"
-         name="q"
-         placeholder="Search the docs ..."
-         aria-label="Search the docs ..."
-         autocomplete="off"
-         autocorrect="off"
-         autocapitalize="off"
-         spellcheck="false"/>
-  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form>
-    <div id="search-results"></div>
-  </div>
-  <script>
-    // Activate the search field on page load
-    let searchInput = document.querySelector("form.bd-search input");
-    if (searchInput) {
-        searchInput.focus();
-        searchInput.select();
-        console.log("[PST]: Set focus on search field.");
-    }
-  </script>
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
 
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Quickstart</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="quickstart">
+<h1>Quickstart<a class="headerlink" href="#quickstart" title="Link to this heading">#</a></h1>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pykingenie</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">bli</span> <span class="o">=</span> <span class="n">OctetExperiment</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">)</span>
+<span class="c1"># Replace with your own folder containing .frd files !!! The .frd files can be exported from the Octet software</span>
+<span class="n">folder</span> <span class="o">=</span> <span class="s1">&#39;/home/os/spc_shiny_servers/kineticsApp/appFiles/KinGenie/www/test_bli_folder/&#39;</span>
+<span class="n">files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span>
+<span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">folder</span> <span class="o">+</span> <span class="n">file</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">]</span>
+
+<span class="n">files</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+<span class="n">bli</span><span class="o">.</span><span class="n">read_sensor_data</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+
+<span class="n">bli</span><span class="o">.</span><span class="n">align_association</span><span class="p">(</span><span class="n">bli</span><span class="o">.</span><span class="n">sensor_names</span><span class="p">)</span>
+<span class="n">bli</span><span class="o">.</span><span class="n">align_dissociation</span><span class="p">(</span><span class="n">bli</span><span class="o">.</span><span class="n">sensor_names</span><span class="p">)</span>
+
+<span class="c1"># We use the sensor #8 as the reference sensor for baseline correction. Remember than python indexing starts at 0.</span>
+<span class="n">bli</span><span class="o">.</span><span class="n">subtraction</span><span class="p">(</span><span class="n">bli</span><span class="o">.</span><span class="n">sensor_names</span><span class="p">[:</span><span class="mi">7</span><span class="p">],</span> <span class="n">bli</span><span class="o">.</span><span class="n">sensor_names</span><span class="p">[</span><span class="mi">7</span><span class="p">])</span>
+
+<span class="n">pyKinetics</span> <span class="o">=</span> <span class="n">KineticsAnalyzer</span><span class="p">()</span>
+<span class="n">pyKinetics</span><span class="o">.</span><span class="n">add_experiment</span><span class="p">(</span><span class="n">bli</span><span class="p">,</span> <span class="s1">&#39;test&#39;</span><span class="p">)</span>
+
+<span class="n">labels</span> <span class="o">=</span> <span class="n">pyKinetics</span><span class="o">.</span><span class="n">get_experiment_properties</span><span class="p">(</span><span class="s1">&#39;sensor_names&#39;</span><span class="p">)</span>
+<span class="n">ids</span>    <span class="o">=</span> <span class="n">pyKinetics</span><span class="o">.</span><span class="n">get_experiment_properties</span><span class="p">(</span><span class="s1">&#39;sensor_names_unique&#39;</span><span class="p">)</span>
+
+<span class="c1"># Flatten the lists</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">labels</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>
+<span class="n">ids</span>    <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">ids</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">get_plotting_df</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+
+<span class="n">figure</span> <span class="o">=</span> <span class="n">plot_traces_all</span><span class="p">(</span><span class="n">pyKinetics</span><span class="p">,</span><span class="n">df</span><span class="p">)</span>
+<span class="n">figure</span><span class="o">.</span><span class="n">write_image</span><span class="p">(</span><span class="s1">&#39;test_bli_traces.png&#39;</span><span class="p">)</span>
+
+<span class="n">pyKinetics</span><span class="o">.</span><span class="n">merge_ligand_conc_df</span><span class="p">()</span>
+<span class="n">pyKinetics</span><span class="o">.</span><span class="n">init_fittings</span><span class="p">()</span>
+
+<span class="n">pyKinetics</span><span class="o">.</span><span class="n">generate_fittings</span><span class="p">(</span><span class="n">pyKinetics</span><span class="o">.</span><span class="n">combined_ligand_conc_df</span><span class="p">)</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot_association_dissociation</span><span class="p">(</span><span class="n">pyKinetics</span><span class="p">,</span><span class="n">split_by_smax_id</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">write_image</span><span class="p">(</span><span class="s1">&#39;test_bli.png&#39;</span><span class="p">)</span>
+
+<span class="n">pyKinetics</span><span class="o">.</span><span class="n">submit_steady_state_fitting</span><span class="p">()</span>
+<span class="n">pyKinetics</span><span class="o">.</span><span class="n">submit_kinetics_fitting</span><span class="p">()</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot_association_dissociation</span><span class="p">(</span><span class="n">pyKinetics</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">write_image</span><span class="p">(</span><span class="s1">&#39;test_bli_fitted.png&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+
+
+                </article>
+              
               
               
               
@@ -359,12 +419,45 @@
                 <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="installation.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Installation</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="modules.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">pykingenie</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
 </div>
                 </footer>
               
             </div>
             
             
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/quickstart.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
               
             
           </div>
