@@ -1,6 +1,6 @@
 [project]
 name = "pykingenie"
-version = "0.1"
+version = "0.1.97"
 readme = "README.md"
 license = {text = "MIT"}
 authors = [
@@ -79,3 +79,9 @@ exclude_lines = [
 [tool.sphinx]
 source-dir = "docs"
 build-dir = "docs/_build"
+
+[dependency-groups]
+dev = [
+    "pip>=25.2",
+    "twine>=6.1.0",
+]

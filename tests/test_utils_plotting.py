@@ -1,5 +1,6 @@
 import pytest
-import os 
+import os
+import numpy as np
 
 from pykingenie.main import KineticsAnalyzer
 from pykingenie.octet import OctetExperiment

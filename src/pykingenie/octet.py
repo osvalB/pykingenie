@@ -2,8 +2,11 @@ import re
 import base64
 import xml.etree.ElementTree as elementTree
 
+import numpy as np
+import pandas as pd
+
 from .utils.processing import etree_to_dict, combine_dicts
-from .surface_exp      import *
+from .surface_exp      import SurfaceBasedExperiment
 
 factor_conc_to_micro = {'nM':1e-3, 'µM':1, 'mM':1e3, 'M':1e6, 'mg/ml':1e3, 'µg/ml':1}
 

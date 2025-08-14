@@ -1,4 +1,6 @@
 from .main              import KineticsAnalyzer
+from .fitter_solution   import KineticsFitterSolution
+from .fitter_surface    import KineticsFitter
 from .octet             import OctetExperiment
 from .gator             import GatorExperiment
 from .kingenie_solution import KinGenieCsvSolution

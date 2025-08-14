@@ -1,11 +1,21 @@
 import numpy as np
+import pandas as pd
 
-from .utils.fitting_general import fit_many_double_exponential
-from .utils.math            import *
-from .utils.fitting_general import *
-from .utils.fitting_solution import *
+from .utils.fitting_general import (
+    fit_many_double_exponential,
+    fit_single_exponential,
+    re_fit
+)
 
-class KineticsFitterSolution:
+from .utils.fitting_solution import (
+    fit_one_site_solution,
+    fit_induced_fit_solution,
+    find_initial_parameters_induced_fit_solution
+)
+
+from .fitter import KineticsFitterGeneral
+
+class KineticsFitterSolution(KineticsFitterGeneral):
     """
     A class used to fit solution-based kinetics data with shared thermodynamic parameters.
     
@@ -63,6 +73,9 @@ class KineticsFitterSolution:
         time_assoc : list
             List of time points for the association signals.
         """
+
+        super().__init__()
+
         self.name  = name
         self.assoc_lst = assoc
 
@@ -70,13 +83,6 @@ class KineticsFitterSolution:
         self.prot_conc    = protein_conc
 
         self.time_assoc_lst = time_assoc
-        self.signal_ss        = None
-        self.signal_ss_fit    = None
-        self.signal_assoc_fit = None
-
-        # Create empty dataframes for the fitted parameters
-        self.fit_params_kinetics = None
-        self.fit_params_ss       = None
 
     def get_steady_state(self):
         """
@@ -119,22 +125,6 @@ class KineticsFitterSolution:
         self.unq_prot_conc         = unq_prot_conc
         self.signal_ss_per_protein = signal_ss_per_protein
         self.lig_conc_per_protein  = ligand_conc_per_protein
-
-        return None
-
-    def clear_fittings(self):
-        """
-        Clear all fitting results.
-        
-        Resets the fitted signal arrays and parameter dataframes to None.
-        
-        Returns
-        -------
-        None
-        """
-        self.signal_assoc_fit    = None
-        self.fit_params_kinetics = None
-        self.fit_params_ss       = None
 
         return None
 
@@ -294,13 +284,25 @@ class KineticsFitterSolution:
 
         return None
 
-    def fit_one_binding_site(self):
+    def fit_one_binding_site(self,fit_signal_E=False, fit_signal_S=False,
+                             fit_signal_ES=True,fixed_t0=True):
         """
         Fit the association signals assuming one binding site.
         
         This is a simplified model that assumes a single binding site for the ligand 
         on the protein. The model fits global parameters to all curves simultaneously.
-        
+
+        Parameters
+        ----------
+        fit_signal_E : bool, optional
+            If True, fit the signal of the free protein E, default is False.
+        fit_signal_S : bool, optional
+            If True, fit the signal of the free ligand S, default is False.
+        fit_signal_ES : bool, optional
+            If True, fit the signal of the complex ES, default is True.
+        fixed_t0 : bool, optional
+            If True, fix the t0 parameter to 0, default is True.
+
         Returns
         -------
         None
@@ -313,7 +315,7 @@ class KineticsFitterSolution:
         low_bounds         = [0,np.min(self.lig_conc)/1e2,1e-2]
         high_bounds        = [np.inf,np.max(self.lig_conc)*1e2,np.inf]
 
-        global_fit_params, cov, fitted_values, parameter_names = fit_one_site_solution(
+        fit_params, cov, fitted_values, parameter_names = fit_one_site_solution(
             signal_lst=self.assoc_lst,
             time_lst=self.time_assoc_lst,
             ligand_conc_lst=self.lig_conc,
@@ -321,17 +323,45 @@ class KineticsFitterSolution:
             initial_parameters=initial_parameters,
             low_bounds=low_bounds,
             high_bounds=high_bounds,
-            fit_signal_E=False,
-            fit_signal_S=False,
-            fit_signal_ES=True,
-            fixed_t0=True,
+            fit_signal_E=fit_signal_E,
+            fit_signal_S=fit_signal_S,
+            fit_signal_ES=fit_signal_ES,
+            fixed_t0=fixed_t0,
             fixed_Kd=False,
             Kd_value=None,
             fixed_koff=False,
             koff_value=None
         )
 
-        self.signal_assoc_fit = fitted_values
+        kwargs = {
+            'signal_lst': self.assoc_lst,
+            'time_lst': self.time_assoc_lst,
+            'ligand_conc_lst': self.lig_conc,
+            'protein_conc_lst': self.prot_conc,
+            'fit_signal_E': fit_signal_E,
+            'fit_signal_S': fit_signal_S,
+            'fit_signal_ES': fit_signal_ES,
+            'fixed_t0': fixed_t0
+        }
+
+        # Re-fit the parameters if they are close to the constraints
+        fit_params, cov, fit_vals, low_bounds, high_bounds = re_fit(
+            fit=fit_params,
+            cov=cov,
+            fit_vals=fitted_values,
+            fit_fx=fit_one_site_solution,
+            low_bounds=low_bounds,
+            high_bounds=high_bounds,
+            times = 2,
+            **kwargs
+        )
+
+        self.params = fit_params
+        self.low_bounds  = low_bounds
+        self.high_bounds = high_bounds
+        self.create_fitting_bounds_table()
+
+        self.signal_assoc_fit = fit_vals
 
         # Create a DataFrame with the fitted parameters and assign it to fit_params_kinetics
 
@@ -341,7 +371,7 @@ class KineticsFitterSolution:
         })
 
         for i, param in enumerate(parameter_names):
-            self.fit_params_kinetics[param] = global_fit_params[i]
+            self.fit_params_kinetics[param] = fit_params[i]
 
         return None
 
@@ -403,8 +433,10 @@ class KineticsFitterSolution:
                         fixed_t0=True
                         ):
         """
-        Fit the association signals assuming induced fit mechanism.
-        
+        Fit the association signals assuming an induced-fit mechanism.
+
+        A + B <-> AB_intermediate <-> AB_trapped
+
         This model accounts for conformational changes in the protein upon ligand binding.
         The method first calls find_initial_params_if to get good starting values, then
         performs the actual fitting with those values.
@@ -449,6 +481,36 @@ class KineticsFitterSolution:
             ESint_equals_ES=ESint_equals_ES,
             fixed_t0=fixed_t0
         )
+
+        kwargs = {
+            'signal_lst': self.assoc_lst,
+            'time_lst': self.time_assoc_lst,
+            'ligand_conc_lst': self.lig_conc,
+            'protein_conc_lst': self.prot_conc,
+            'fit_signal_E': fit_signal_E,
+            'fit_signal_S': fit_signal_S,
+            'fit_signal_ES': fit_signal_ES,
+            'ESint_equals_ES': ESint_equals_ES,
+            'fixed_t0': fixed_t0
+        }
+
+        # Re-fit the parameters if they are close to the constraints
+        global_fit_params, cov, fitted_values, low_bounds, high_bounds = re_fit(
+            fit=global_fit_params,
+            cov=cov,
+            fit_vals=fitted_values,
+            fit_fx=fit_induced_fit_solution,
+            low_bounds=low_bounds,
+            high_bounds=high_bounds,
+            times=2,
+            **kwargs
+        )
+
+        self.params = global_fit_params
+        self.low_bounds  = low_bounds
+        self.high_bounds = high_bounds
+
+        self.create_fitting_bounds_table()
 
         self.signal_assoc_fit = fitted_values
 

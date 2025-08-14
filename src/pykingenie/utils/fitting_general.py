@@ -2,7 +2,11 @@ import itertools
 import numpy as np
 import pandas as pd
 from scipy.optimize import curve_fit
-from ..utils.math import *
+
+from ..utils.math import (
+    single_exponential,
+    double_exponential
+)
 
 __all__ = ['fit_single_exponential', 'fit_double_exponential','re_fit','re_fit_2']
 
@@ -209,6 +213,7 @@ def fit_many_double_exponential(signal_lst, time_lst, min_log_k=-4, max_log_k=4,
     and None for fitted values. The function assumes that the input signals and time arrays 
     are of the same length.
     """
+
     k_obs_1 = [np.nan for _ in range(len(signal_lst))]
     k_obs_2 = [np.nan for _ in range(len(signal_lst))]
     y_pred =  [None   for _ in range(len(signal_lst))]
@@ -344,11 +349,17 @@ def re_fit(fit, cov, fit_vals, fit_fx, low_bounds, high_bounds, times, **kwargs)
 
         if c1 or c2:
 
-            fit, cov, fit_vals = fit_fx(
+           # Some fitting functions return 3 elements: fit, cov, fit_vals, while others return those 3 and the parameter names
+            result = fit_fx(
                 initial_parameters=fit,
                 low_bounds=low_bounds,
                 high_bounds=high_bounds,
                 **kwargs)
+
+            if len(result) == 4:
+                fit, cov, fit_vals, param_names = result
+            else:
+                fit, cov, fit_vals = result
 
     return fit, cov, fit_vals, low_bounds, high_bounds
 

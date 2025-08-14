@@ -4,7 +4,12 @@ import itertools
 
 from scipy.optimize import curve_fit
 
-from ..utils.signal_solution  import *
+from ..utils.signal_solution import (
+    signal_ode_one_site_insolution,
+    signal_ode_induced_fit_insolution
+)
+
+from ..utils.fitting_general import re_fit
 
 __all__ = [
     'fit_one_site_solution',

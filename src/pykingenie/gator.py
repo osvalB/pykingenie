@@ -1,7 +1,10 @@
-from .surface_exp      import *
+from .surface_exp      import SurfaceBasedExperiment
 import os
 import json
 import zipfile
+
+import numpy as np
+import pandas as pd
 
 from .utils.processing import find_loading_column
 

@@ -1,6 +1,7 @@
 import pandas as pd
+import numpy as np
 
-from .fitter          import KineticsFitter
+from .fitter_surface  import KineticsFitter
 from .fitter_solution import KineticsFitterSolution
 
 from .utils.processing import get_plotting_df
@@ -74,6 +75,7 @@ class KineticsAnalyzer:
         """
         self.fittings       = {}
         self.fittings_names = []
+
         return None
 
     def add_fitting(self, fitting, fitting_name):
@@ -418,6 +420,9 @@ class KineticsAnalyzer:
             prot_conc_vec = []
 
             ids = df.index[df['SampleID'] == unq].tolist()
+
+            # Choose only the ones that have Select == True
+            ids = [i for i in ids if df.loc[i, 'Select']]
 
             if len(ids) == 0:
                 continue
