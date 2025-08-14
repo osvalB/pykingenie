@@ -353,7 +353,14 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.graph_objs</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">go</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">plotly.subplots</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_subplots</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.processing</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.processing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">subset_data</span><span class="p">,</span>
+    <span class="n">sample_type_to_letter</span><span class="p">,</span>
+    <span class="n">combine_sequences</span><span class="p">,</span>
+    <span class="n">get_colors_from_numeric_values</span>
+<span class="p">)</span>
+
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.math</span><span class="w">       </span><span class="kn">import</span> <span class="n">median_filter</span>
 
 <span class="n">PLOT_TICKS_LENGTH_CST</span> <span class="o">=</span> <span class="mi">8</span>

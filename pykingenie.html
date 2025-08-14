@@ -496,248 +496,118 @@
 <section id="module-pykingenie.fitter">
 <span id="pykingenie-fitter-module"></span><h2>pykingenie.fitter module<a class="headerlink" href="#module-pykingenie.fitter" title="Link to this heading">#</a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pykingenie.fitter.</span></span><span class="sig-name descname"><span class="pre">KineticsFitter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_assoc_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">association_signal_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lig_conc_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_diss_lst</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dissociation_signal_lst</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smax_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_lst</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_single_cycle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter.html#KineticsFitter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter.KineticsFitter" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitterGeneral">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pykingenie.fitter.</span></span><span class="sig-name descname"><span class="pre">KineticsFitterGeneral</span></span><a class="reference internal" href="_modules/pykingenie/fitter.html#KineticsFitterGeneral"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter.KineticsFitterGeneral" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>A class used to fit kinetics data with shared thermodynamic parameters.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>time_assoc_lst</strong> (<em>list</em>) – List of time points for the association signals, one per replicate.</p></li>
-<li><p><strong>association_signal_lst</strong> (<em>list</em>) – List of association signals, one per replicate.</p></li>
-<li><p><strong>lig_conc_lst</strong> (<em>list</em>) – List of ligand concentrations, one per replicate.</p></li>
-<li><p><strong>time_diss_lst</strong> (<em>list</em><em>, </em><em>optional</em>) – List of time points for the dissociation signals, one per replicate.</p></li>
-<li><p><strong>dissociation_signal_lst</strong> (<em>list</em><em>, </em><em>optional</em>) – List of dissociation signals, one per replicate.</p></li>
-<li><p><strong>smax_id</strong> (<em>list</em><em>, </em><em>optional</em>) – List containing the Smax IDs (maximum amplitude identifiers).</p></li>
-<li><p><strong>name_lst</strong> (<em>list</em><em>, </em><em>optional</em>) – List of experiment names.</p></li>
-<li><p><strong>is_single_cycle</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether the experiment is a single cycle kinetics experiment.</p></li>
-</ul>
-</dd>
-</dl>
+<p>A class used to handle kinetics data both for solution-based and surface-based experiments.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitterGeneral.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter.html#KineticsFitterGeneral.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter.KineticsFitterGeneral.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialize the KineticsFitterGeneral instance.</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.names">
-<span class="sig-name descname"><span class="pre">names</span></span><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.names" title="Link to this definition">#</a></dt>
-<dd><p>List of experiment names.</p>
+<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitterGeneral.signal_ss_fit">
+<span class="sig-name descname"><span class="pre">signal_ss_fit</span></span><a class="headerlink" href="#pykingenie.fitter.KineticsFitterGeneral.signal_ss_fit" title="Link to this definition">#</a></dt>
+<dd><p>Fitted steady state signals.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
+<dd class="field-odd"><p>list of numpy.ndarray or None</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.assoc_lst">
-<span class="sig-name descname"><span class="pre">assoc_lst</span></span><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.assoc_lst" title="Link to this definition">#</a></dt>
-<dd><p>List of association signals, one per replicate.
-Each signal is a numpy matrix of size n*m where n is the number of time points and m
-is the number of ligand concentrations.</p>
+<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitterGeneral.signal_assoc_fit">
+<span class="sig-name descname"><span class="pre">signal_assoc_fit</span></span><a class="headerlink" href="#pykingenie.fitter.KineticsFitterGeneral.signal_assoc_fit" title="Link to this definition">#</a></dt>
+<dd><p>Fitted association kinetics signals.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
+<dd class="field-odd"><p>list of numpy.ndarray or None</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.disso_lst">
-<span class="sig-name descname"><span class="pre">disso_lst</span></span><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.disso_lst" title="Link to this definition">#</a></dt>
-<dd><p>List of dissociation signals, one per replicate.
-Each signal is a numpy matrix of size n*m where n is the number of time points and m
-is the number of ligand concentrations (different from zero).</p>
+<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitterGeneral.signal_disso_fit">
+<span class="sig-name descname"><span class="pre">signal_disso_fit</span></span><a class="headerlink" href="#pykingenie.fitter.KineticsFitterGeneral.signal_disso_fit" title="Link to this definition">#</a></dt>
+<dd><p>Fitted dissociation kinetics signals.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
+<dd class="field-odd"><p>list of numpy.ndarray or None</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.lig_conc_lst">
-<span class="sig-name descname"><span class="pre">lig_conc_lst</span></span><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.lig_conc_lst" title="Link to this definition">#</a></dt>
-<dd><p>List of ligand concentrations, one per replicate.</p>
+<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitterGeneral.fit_params_kinetics">
+<span class="sig-name descname"><span class="pre">fit_params_kinetics</span></span><a class="headerlink" href="#pykingenie.fitter.KineticsFitterGeneral.fit_params_kinetics" title="Link to this definition">#</a></dt>
+<dd><p>Fitted parameters for the association / dissociation kinetics.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
+<dd class="field-odd"><p>pandas.DataFrame or None</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.time_assoc_lst">
-<span class="sig-name descname"><span class="pre">time_assoc_lst</span></span><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.time_assoc_lst" title="Link to this definition">#</a></dt>
-<dd><p>List of time points for the association signals, one per replicate.</p>
+<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitterGeneral.fit_params_ss">
+<span class="sig-name descname"><span class="pre">fit_params_ss</span></span><a class="headerlink" href="#pykingenie.fitter.KineticsFitterGeneral.fit_params_ss" title="Link to this definition">#</a></dt>
+<dd><p>Fitted parameters for the steady state.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
+<dd class="field-odd"><p>pandas.DataFrame or None</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.time_disso_lst">
-<span class="sig-name descname"><span class="pre">time_disso_lst</span></span><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.time_disso_lst" title="Link to this definition">#</a></dt>
-<dd><p>List of time points for the dissociation signals, one per replicate.</p>
+<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitterGeneral.fitted_params_boundaries">
+<span class="sig-name descname"><span class="pre">fitted_params_boundaries</span></span><a class="headerlink" href="#pykingenie.fitter.KineticsFitterGeneral.fitted_params_boundaries" title="Link to this definition">#</a></dt>
+<dd><p>DataFrame with fitting boundaries and fitted parameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
+<dd class="field-odd"><p>pandas.DataFrame or None</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.is_single_cycle">
-<span class="sig-name descname"><span class="pre">is_single_cycle</span></span><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.is_single_cycle" title="Link to this definition">#</a></dt>
-<dd><p>Whether the experiment is a single cycle kinetics experiment.</p>
+<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitterGeneral.params">
+<span class="sig-name descname"><span class="pre">params</span></span><a class="headerlink" href="#pykingenie.fitter.KineticsFitterGeneral.params" title="Link to this definition">#</a></dt>
+<dd><p>Parameters used for fitting.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
+<dd class="field-odd"><p>numpy.ndarray or None</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.signal_ss">
-<span class="sig-name descname"><span class="pre">signal_ss</span></span><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.signal_ss" title="Link to this definition">#</a></dt>
-<dd><p>List of steady state signals, one per replicate.</p>
+<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitterGeneral.low_bounds">
+<span class="sig-name descname"><span class="pre">low_bounds</span></span><a class="headerlink" href="#pykingenie.fitter.KineticsFitterGeneral.low_bounds" title="Link to this definition">#</a></dt>
+<dd><p>Lower bounds for fitting parameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
+<dd class="field-odd"><p>numpy.ndarray or None</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.signal_ss_fit">
-<span class="sig-name descname"><span class="pre">signal_ss_fit</span></span><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.signal_ss_fit" title="Link to this definition">#</a></dt>
-<dd><p>List of steady state fitted signals, one per replicate.</p>
+<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitterGeneral.high_bounds">
+<span class="sig-name descname"><span class="pre">high_bounds</span></span><a class="headerlink" href="#pykingenie.fitter.KineticsFitterGeneral.high_bounds" title="Link to this definition">#</a></dt>
+<dd><p>Upper bounds for fitting parameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
+<dd class="field-odd"><p>numpy.ndarray or None</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.signal_assoc_fit">
-<span class="sig-name descname"><span class="pre">signal_assoc_fit</span></span><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.signal_assoc_fit" title="Link to this definition">#</a></dt>
-<dd><p>List of association kinetics fitted signals, one per replicate.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.signal_disso_fit">
-<span class="sig-name descname"><span class="pre">signal_disso_fit</span></span><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.signal_disso_fit" title="Link to this definition">#</a></dt>
-<dd><p>List of dissociation kinetics fitted signals, one per replicate.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.lig_conc_lst_per_id">
-<span class="sig-name descname"><span class="pre">lig_conc_lst_per_id</span></span><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.lig_conc_lst_per_id" title="Link to this definition">#</a></dt>
-<dd><p>Ligand concentrations per Smax ID.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.smax_guesses_unq">
-<span class="sig-name descname"><span class="pre">smax_guesses_unq</span></span><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.smax_guesses_unq" title="Link to this definition">#</a></dt>
-<dd><p>Smax guesses per association signal.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.smax_guesses_shared">
-<span class="sig-name descname"><span class="pre">smax_guesses_shared</span></span><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.smax_guesses_shared" title="Link to this definition">#</a></dt>
-<dd><p>Smax guesses per Smax ID.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.fit_params_kinetics">
-<span class="sig-name descname"><span class="pre">fit_params_kinetics</span></span><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.fit_params_kinetics" title="Link to this definition">#</a></dt>
-<dd><p>DataFrame with the fitted parameters for the association/dissociation kinetics.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>pd.DataFrame</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.fit_params_ss">
-<span class="sig-name descname"><span class="pre">fit_params_ss</span></span><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.fit_params_ss" title="Link to this definition">#</a></dt>
-<dd><p>DataFrame with the values of the fitted parameters - steady state.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>pd.DataFrame</p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_assoc_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">association_signal_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lig_conc_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_diss_lst</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dissociation_signal_lst</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smax_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_lst</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_single_cycle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter.html#KineticsFitter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.__init__" title="Link to this definition">#</a></dt>
-<dd><p>Initialize the KineticsFitter class.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>time_assoc_lst</strong> (<em>list</em>) – List of time points for the association signals, one per replicate.</p></li>
-<li><p><strong>association_signal_lst</strong> (<em>list</em>) – List of association signals, one per replicate.</p></li>
-<li><p><strong>lig_conc_lst</strong> (<em>list</em>) – List of ligand concentrations, one per replicate.</p></li>
-<li><p><strong>time_diss_lst</strong> (<em>list</em><em>, </em><em>optional</em>) – List of time points for the dissociation signals, one per replicate.</p></li>
-<li><p><strong>dissociation_signal_lst</strong> (<em>list</em><em>, </em><em>optional</em>) – List of dissociation signals, one per replicate.</p></li>
-<li><p><strong>smax_id</strong> (<em>list</em><em>, </em><em>optional</em>) – List containing the Smax IDs (maximum amplitude identifiers).</p></li>
-<li><p><strong>name_lst</strong> (<em>list</em><em>, </em><em>optional</em>) – List of experiment names.</p></li>
-<li><p><strong>is_single_cycle</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether the experiment is a single cycle kinetics experiment, default is False.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.get_steady_state">
-<span class="sig-name descname"><span class="pre">get_steady_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter.html#KineticsFitter.get_steady_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.get_steady_state" title="Link to this definition">#</a></dt>
-<dd><p>Calculate the steady state signal and group it by Smax ID.</p>
-<p>This function calculates the steady state signal for each association curve
-and groups the signals by Smax ID. It also calculates the Smax guesses
-for each association signal.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Updates the following instance attributes:
-- signal_ss: List of steady state signals grouped by Smax ID
-- lig_conc_lst_per_id: List of ligand concentrations grouped by Smax ID
-- smax_guesses_unq: Smax guesses for each association signal
-- smax_guesses_shared: Smax guesses for each Smax ID</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.clear_fittings">
-<span class="sig-name descname"><span class="pre">clear_fittings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter.html#KineticsFitter.clear_fittings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.clear_fittings" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitterGeneral.clear_fittings">
+<span class="sig-name descname"><span class="pre">clear_fittings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter.html#KineticsFitterGeneral.clear_fittings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter.KineticsFitterGeneral.clear_fittings" title="Link to this definition">#</a></dt>
 <dd><p>Clear all fitting results.</p>
 <p>Resets all fitted signal arrays and parameter dataframes to None.</p>
 <dl class="field-list simple">
@@ -748,8 +618,8 @@ for each association signal.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.create_fitting_bounds_table">
-<span class="sig-name descname"><span class="pre">create_fitting_bounds_table</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter.html#KineticsFitter.create_fitting_bounds_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.create_fitting_bounds_table" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitterGeneral.create_fitting_bounds_table">
+<span class="sig-name descname"><span class="pre">create_fitting_bounds_table</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter.html#KineticsFitterGeneral.create_fitting_bounds_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter.KineticsFitterGeneral.create_fitting_bounds_table" title="Link to this definition">#</a></dt>
 <dd><p>Create a dataframe with the fitting bounds and the fitted parameters.</p>
 <p>Uses the class attributes params, low_bounds and high_bounds to create
 a DataFrame with fitting boundaries.</p>
@@ -763,179 +633,6 @@ a DataFrame with fitting boundaries.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.fit_steady_state">
-<span class="sig-name descname"><span class="pre">fit_steady_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter.html#KineticsFitter.fit_steady_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.fit_steady_state" title="Link to this definition">#</a></dt>
-<dd><p>Fit the steady state signal using the one-site binding model.</p>
-<p>This function fits the steady state signal to a one-site binding model
-to estimate the equilibrium dissociation constant (Kd) and maximum signal (Smax).
-It also calculates the 95% confidence intervals for the Kd.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Updates the following instance attributes:
-- params: The fitted parameters [Kd, Smax1, Smax2, …]
-- signal_ss_fit: The fitted steady state signals
-- fit_params_ss: DataFrame with the fitted parameters
-- Kd_ss: The equilibrium dissociation constant
-- Smax_upper_bound_factor: Factor to determine the upper bound for Smax</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.get_k_off_initial_guess">
-<span class="sig-name descname"><span class="pre">get_k_off_initial_guess</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter.html#KineticsFitter.get_k_off_initial_guess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.get_k_off_initial_guess" title="Link to this definition">#</a></dt>
-<dd><p>Get initial guess and bounds for k_off parameter.</p>
-<p>This method determines initial values and fitting bounds for Kd and k_off.
-If dissociation data is available, it fits the dissociation curves to get
-a better estimate of k_off.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A tuple containing:
-- p0: Initial parameter guesses [Kd, k_off]
-- low_bounds: Lower bounds for the parameters
-- high_bounds: Upper bounds for the parameters</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>tuple</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ValueError</strong> – If Kd_ss is not set and fit_steady_state has not been run</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.fit_one_site_association">
-<span class="sig-name descname"><span class="pre">fit_one_site_association</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shared_smax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter.html#KineticsFitter.fit_one_site_association"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.fit_one_site_association" title="Link to this definition">#</a></dt>
-<dd><p>Fit the association curves using the one-site binding model.</p>
-<p>This function fits the association curves to a one-site binding model
-to estimate the equilibrium dissociation constant (Kd), dissociation
-rate constant (k_off), and maximum signal (Smax).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>shared_smax</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to share Smax across curves with the same Smax ID, default is True.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Updates the following instance attributes:
-- params: The fitted parameters [Kd, k_off, Smax1, Smax2, …]
-- signal_assoc_fit: The fitted association signals
-- Kd: The equilibrium dissociation constant
-- k_off: The dissociation rate constant
-- Smax: The maximum signal values</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.fit_one_site_dissociation">
-<span class="sig-name descname"><span class="pre">fit_one_site_dissociation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter.html#KineticsFitter.fit_one_site_dissociation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.fit_one_site_dissociation" title="Link to this definition">#</a></dt>
-<dd><p>Fit the dissociation curves using the one-site binding model.</p>
-<p>This function fits the dissociation curves to a one-site binding model
-to estimate the dissociation rate constant (k_off) and the initial signal (S0).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>time_limit</strong> (<em>float</em><em>, </em><em>optional</em>) – Time limit for fitting (in seconds). If &gt; 0, only fit data up to this time,
-default is 0 (fit all data).</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Updates the following instance attributes:
-- params: The fitted parameters [k_off, S0_1, S0_2, …]
-- signal_disso_fit: The fitted dissociation signals
-- k_off: The dissociation rate constant
-- fit_params_kinetics: DataFrame with the fitted parameters
-- fit_params_kinetics_error: DataFrame with the relative errors</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.fit_single_exponentials">
-<span class="sig-name descname"><span class="pre">fit_single_exponentials</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter.html#KineticsFitter.fit_single_exponentials"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.fit_single_exponentials" title="Link to this definition">#</a></dt>
-<dd><p>Fit single exponentials to the association signals.</p>
-<p>This method fits each association curve with a single exponential function
-and extracts the observed rate constants (k_obs).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Updates the k_obs attribute with a list of observed rate constants
-for each association curve.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.fit_one_site_assoc_and_disso">
-<span class="sig-name descname"><span class="pre">fit_one_site_assoc_and_disso</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shared_smax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_ktr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter.html#KineticsFitter.fit_one_site_assoc_and_disso"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.fit_one_site_assoc_and_disso" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.calculate_ci95">
-<span class="sig-name descname"><span class="pre">calculate_ci95</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shared_smax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_ktr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter.html#KineticsFitter.calculate_ci95"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.calculate_ci95" title="Link to this definition">#</a></dt>
-<dd><p>Calculate 95% confidence intervals for the fitted parameters.</p>
-<p>This method computes asymmetrical 95% confidence intervals for the
-equilibrium dissociation constant (Kd) and the dissociation rate constant (k_off).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>shared_smax</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether Smax was shared across curves with the same Smax ID, default is True.</p></li>
-<li><p><strong>fixed_t0</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether the time offset (t0) was fixed to zero, default is True.</p></li>
-<li><p><strong>fit_ktr</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether mass transport rate constants were included in the model, default is False.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Updates the fit_params_kinetics_ci95 attribute with a DataFrame containing
-the 95% confidence intervals for Kd and k_off.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>This method will create an empty DataFrame if the confidence interval calculation fails.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pykingenie.fitter.KineticsFitter.fit_one_site_if_assoc_and_disso">
-<span class="sig-name descname"><span class="pre">fit_one_site_if_assoc_and_disso</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shared_smax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter.html#KineticsFitter.fit_one_site_if_assoc_and_disso"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter.KineticsFitter.fit_one_site_if_assoc_and_disso" title="Link to this definition">#</a></dt>
-<dd><p>Fit the association and dissociation signals using the induced fit model.</p>
-<p>This method first fits a simple one-site model to get initial parameter estimates,
-then explores different values of the conformational change rate constants (kc and krev)
-to find good initial guesses for the induced fit model. Finally, it fits the full
-induced fit model with these initial guesses.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>shared_smax</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to share Smax across curves with the same Smax ID, default is True.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Updates the following instance attributes:
-- params: The fitted parameters [k_on, k_off, k_c, k_rev, Smax1, Smax2, …]
-- signal_assoc_fit: The fitted association signals
-- signal_disso_fit: The fitted dissociation signals
-- k_on: The association rate constant
-- k_off: The dissociation rate constant
-- k_c: The forward conformational change rate constant
-- k_rev: The reverse conformational change rate constant
-- Smax: The maximum signal values
-- fit_params_kinetics: DataFrame with the fitted parameters</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 </section>
@@ -944,7 +641,7 @@ induced fit model with these initial guesses.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pykingenie.fitter_solution.KineticsFitterSolution">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pykingenie.fitter_solution.</span></span><span class="sig-name descname"><span class="pre">KineticsFitterSolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assoc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lig_conc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protein_conc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_assoc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_solution.html#KineticsFitterSolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_solution.KineticsFitterSolution" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#pykingenie.fitter.KineticsFitterGeneral" title="pykingenie.fitter.KineticsFitterGeneral"><code class="xref py py-class docutils literal notranslate"><span class="pre">KineticsFitterGeneral</span></code></a></p>
 <p>A class used to fit solution-based kinetics data with shared thermodynamic parameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1104,18 +801,6 @@ of each association signal. The signals are grouped by protein concentration.</p
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pykingenie.fitter_solution.KineticsFitterSolution.clear_fittings">
-<span class="sig-name descname"><span class="pre">clear_fittings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_solution.html#KineticsFitterSolution.clear_fittings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_solution.KineticsFitterSolution.clear_fittings" title="Link to this definition">#</a></dt>
-<dd><p>Clear all fitting results.</p>
-<p>Resets the fitted signal arrays and parameter dataframes to None.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="pykingenie.fitter_solution.KineticsFitterSolution.fit_single_exponentials">
 <span class="sig-name descname"><span class="pre">fit_single_exponentials</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_solution.html#KineticsFitterSolution.fit_single_exponentials"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_solution.KineticsFitterSolution.fit_single_exponentials" title="Link to this definition">#</a></dt>
 <dd><p>Fit single exponentials to the association signals in the solution kinetics experiment.</p>
@@ -1201,18 +886,26 @@ when using double exponential fits.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pykingenie.fitter_solution.KineticsFitterSolution.fit_one_binding_site">
-<span class="sig-name descname"><span class="pre">fit_one_binding_site</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_solution.html#KineticsFitterSolution.fit_one_binding_site"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_solution.KineticsFitterSolution.fit_one_binding_site" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">fit_one_binding_site</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fit_signal_E</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_signal_S</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_signal_ES</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_solution.html#KineticsFitterSolution.fit_one_binding_site"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_solution.KineticsFitterSolution.fit_one_binding_site" title="Link to this definition">#</a></dt>
 <dd><p>Fit the association signals assuming one binding site.</p>
 <p>This is a simplified model that assumes a single binding site for the ligand
 on the protein. The model fits global parameters to all curves simultaneously.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Updates the following instance attributes:
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fit_signal_E</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, fit the signal of the free protein E, default is False.</p></li>
+<li><p><strong>fit_signal_S</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, fit the signal of the free ligand S, default is False.</p></li>
+<li><p><strong>fit_signal_ES</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, fit the signal of the complex ES, default is True.</p></li>
+<li><p><strong>fixed_t0</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, fix the t0 parameter to 0, default is True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Updates the following instance attributes:
 - signal_assoc_fit: List of fitted association signals
 - fit_params_kinetics: DataFrame with the fitted parameters</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1246,7 +939,8 @@ to the signal of the complex ES, default is True.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="pykingenie.fitter_solution.KineticsFitterSolution.fit_induced_fit">
 <span class="sig-name descname"><span class="pre">fit_induced_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fit_signal_E</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_signal_S</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_signal_ES</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ESint_equals_ES</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_solution.html#KineticsFitterSolution.fit_induced_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_solution.KineticsFitterSolution.fit_induced_fit" title="Link to this definition">#</a></dt>
-<dd><p>Fit the association signals assuming induced fit mechanism.</p>
+<dd><p>Fit the association signals assuming an induced-fit mechanism.</p>
+<p>A + B &lt;-&gt; AB_intermediate &lt;-&gt; AB_trapped</p>
 <p>This model accounts for conformational changes in the protein upon ligand binding.
 The method first calls find_initial_params_if to get good starting values, then
 performs the actual fitting with those values.</p>
@@ -1263,6 +957,424 @@ performs the actual fitting with those values.</p>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Updates the following instance attributes:
 - signal_assoc_fit: List of fitted association signals
+- fit_params_kinetics: DataFrame with the fitted parameters</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-pykingenie.fitter_surface">
+<span id="pykingenie-fitter-surface-module"></span><h2>pykingenie.fitter_surface module<a class="headerlink" href="#module-pykingenie.fitter_surface" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pykingenie.fitter_surface.</span></span><span class="sig-name descname"><span class="pre">KineticsFitter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_assoc_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">association_signal_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lig_conc_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_diss_lst</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dissociation_signal_lst</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smax_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_lst</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_single_cycle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_surface.html#KineticsFitter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pykingenie.fitter.KineticsFitterGeneral" title="pykingenie.fitter.KineticsFitterGeneral"><code class="xref py py-class docutils literal notranslate"><span class="pre">KineticsFitterGeneral</span></code></a></p>
+<p>A class used to fit kinetics data with shared thermodynamic parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>time_assoc_lst</strong> (<em>list</em>) – List of time points for the association signals, one per replicate.</p></li>
+<li><p><strong>association_signal_lst</strong> (<em>list</em>) – List of association signals, one per replicate.</p></li>
+<li><p><strong>lig_conc_lst</strong> (<em>list</em>) – List of ligand concentrations, one per replicate.</p></li>
+<li><p><strong>time_diss_lst</strong> (<em>list</em><em>, </em><em>optional</em>) – List of time points for the dissociation signals, one per replicate.</p></li>
+<li><p><strong>dissociation_signal_lst</strong> (<em>list</em><em>, </em><em>optional</em>) – List of dissociation signals, one per replicate.</p></li>
+<li><p><strong>smax_id</strong> (<em>list</em><em>, </em><em>optional</em>) – List containing the Smax IDs (maximum amplitude identifiers).</p></li>
+<li><p><strong>name_lst</strong> (<em>list</em><em>, </em><em>optional</em>) – List of experiment names.</p></li>
+<li><p><strong>is_single_cycle</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether the experiment is a single cycle kinetics experiment.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter.names">
+<span class="sig-name descname"><span class="pre">names</span></span><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter.names" title="Link to this definition">#</a></dt>
+<dd><p>List of experiment names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter.assoc_lst">
+<span class="sig-name descname"><span class="pre">assoc_lst</span></span><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter.assoc_lst" title="Link to this definition">#</a></dt>
+<dd><p>List of association signals, one per replicate.
+Each signal is a numpy matrix of size n*m where n is the number of time points and m
+is the number of ligand concentrations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter.disso_lst">
+<span class="sig-name descname"><span class="pre">disso_lst</span></span><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter.disso_lst" title="Link to this definition">#</a></dt>
+<dd><p>List of dissociation signals, one per replicate.
+Each signal is a numpy matrix of size n*m where n is the number of time points and m
+is the number of ligand concentrations (different from zero).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter.lig_conc_lst">
+<span class="sig-name descname"><span class="pre">lig_conc_lst</span></span><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter.lig_conc_lst" title="Link to this definition">#</a></dt>
+<dd><p>List of ligand concentrations, one per replicate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter.time_assoc_lst">
+<span class="sig-name descname"><span class="pre">time_assoc_lst</span></span><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter.time_assoc_lst" title="Link to this definition">#</a></dt>
+<dd><p>List of time points for the association signals, one per replicate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter.time_disso_lst">
+<span class="sig-name descname"><span class="pre">time_disso_lst</span></span><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter.time_disso_lst" title="Link to this definition">#</a></dt>
+<dd><p>List of time points for the dissociation signals, one per replicate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter.is_single_cycle">
+<span class="sig-name descname"><span class="pre">is_single_cycle</span></span><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter.is_single_cycle" title="Link to this definition">#</a></dt>
+<dd><p>Whether the experiment is a single cycle kinetics experiment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter.signal_ss">
+<span class="sig-name descname"><span class="pre">signal_ss</span></span><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter.signal_ss" title="Link to this definition">#</a></dt>
+<dd><p>List of steady state signals, one per replicate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter.signal_ss_fit">
+<span class="sig-name descname"><span class="pre">signal_ss_fit</span></span><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter.signal_ss_fit" title="Link to this definition">#</a></dt>
+<dd><p>List of steady state fitted signals, one per replicate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter.signal_assoc_fit">
+<span class="sig-name descname"><span class="pre">signal_assoc_fit</span></span><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter.signal_assoc_fit" title="Link to this definition">#</a></dt>
+<dd><p>List of association kinetics fitted signals, one per replicate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter.signal_disso_fit">
+<span class="sig-name descname"><span class="pre">signal_disso_fit</span></span><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter.signal_disso_fit" title="Link to this definition">#</a></dt>
+<dd><p>List of dissociation kinetics fitted signals, one per replicate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter.lig_conc_lst_per_id">
+<span class="sig-name descname"><span class="pre">lig_conc_lst_per_id</span></span><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter.lig_conc_lst_per_id" title="Link to this definition">#</a></dt>
+<dd><p>Ligand concentrations per Smax ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter.smax_guesses_unq">
+<span class="sig-name descname"><span class="pre">smax_guesses_unq</span></span><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter.smax_guesses_unq" title="Link to this definition">#</a></dt>
+<dd><p>Smax guesses per association signal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter.smax_guesses_shared">
+<span class="sig-name descname"><span class="pre">smax_guesses_shared</span></span><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter.smax_guesses_shared" title="Link to this definition">#</a></dt>
+<dd><p>Smax guesses per Smax ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter.fit_params_kinetics">
+<span class="sig-name descname"><span class="pre">fit_params_kinetics</span></span><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter.fit_params_kinetics" title="Link to this definition">#</a></dt>
+<dd><p>DataFrame with the fitted parameters for the association/dissociation kinetics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter.fit_params_ss">
+<span class="sig-name descname"><span class="pre">fit_params_ss</span></span><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter.fit_params_ss" title="Link to this definition">#</a></dt>
+<dd><p>DataFrame with the values of the fitted parameters - steady state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_assoc_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">association_signal_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lig_conc_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_diss_lst</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dissociation_signal_lst</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smax_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_lst</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_single_cycle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_surface.html#KineticsFitter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialize the KineticsFitter class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>time_assoc_lst</strong> (<em>list</em>) – List of time points for the association signals, one per replicate.</p></li>
+<li><p><strong>association_signal_lst</strong> (<em>list</em>) – List of association signals, one per replicate.</p></li>
+<li><p><strong>lig_conc_lst</strong> (<em>list</em>) – List of ligand concentrations, one per replicate.</p></li>
+<li><p><strong>time_diss_lst</strong> (<em>list</em><em>, </em><em>optional</em>) – List of time points for the dissociation signals, one per replicate.</p></li>
+<li><p><strong>dissociation_signal_lst</strong> (<em>list</em><em>, </em><em>optional</em>) – List of dissociation signals, one per replicate.</p></li>
+<li><p><strong>smax_id</strong> (<em>list</em><em>, </em><em>optional</em>) – List containing the Smax IDs (maximum amplitude identifiers).</p></li>
+<li><p><strong>name_lst</strong> (<em>list</em><em>, </em><em>optional</em>) – List of experiment names.</p></li>
+<li><p><strong>is_single_cycle</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether the experiment is a single cycle kinetics experiment, default is False.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter.get_steady_state">
+<span class="sig-name descname"><span class="pre">get_steady_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_surface.html#KineticsFitter.get_steady_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter.get_steady_state" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the steady state signal and group it by Smax ID.</p>
+<p>This function calculates the steady state signal for each association curve
+and groups the signals by Smax ID. It also calculates the Smax guesses
+for each association signal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Updates the following instance attributes:
+- signal_ss: List of steady state signals grouped by Smax ID
+- lig_conc_lst_per_id: List of ligand concentrations grouped by Smax ID
+- smax_guesses_unq: Smax guesses for each association signal
+- smax_guesses_shared: Smax guesses for each Smax ID</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter.fit_steady_state">
+<span class="sig-name descname"><span class="pre">fit_steady_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_surface.html#KineticsFitter.fit_steady_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter.fit_steady_state" title="Link to this definition">#</a></dt>
+<dd><p>Fit the steady state signal using the one-site binding model.</p>
+<p>This function fits the steady state signal to a one-site binding model
+to estimate the equilibrium dissociation constant (Kd) and maximum signal (Smax).
+It also calculates the 95% confidence intervals for the Kd.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Updates the following instance attributes:
+- params: The fitted parameters [Kd, Smax1, Smax2, …]
+- signal_ss_fit: The fitted steady state signals
+- fit_params_ss: DataFrame with the fitted parameters
+- Kd_ss: The equilibrium dissociation constant
+- Smax_upper_bound_factor: Factor to determine the upper bound for Smax</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter.get_k_off_initial_guess">
+<span class="sig-name descname"><span class="pre">get_k_off_initial_guess</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_surface.html#KineticsFitter.get_k_off_initial_guess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter.get_k_off_initial_guess" title="Link to this definition">#</a></dt>
+<dd><p>Get initial guess and bounds for k_off parameter.</p>
+<p>This method determines initial values and fitting bounds for Kd and k_off.
+If dissociation data is available, it fits the dissociation curves to get
+a better estimate of k_off.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A tuple containing:
+- p0: Initial parameter guesses [Kd, k_off]
+- low_bounds: Lower bounds for the parameters
+- high_bounds: Upper bounds for the parameters</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If Kd_ss is not set and fit_steady_state has not been run</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter.fit_one_site_association">
+<span class="sig-name descname"><span class="pre">fit_one_site_association</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shared_smax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_surface.html#KineticsFitter.fit_one_site_association"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter.fit_one_site_association" title="Link to this definition">#</a></dt>
+<dd><p>Fit the association curves using the one-site binding model.</p>
+<p>This function fits the association curves to a one-site binding model
+to estimate the equilibrium dissociation constant (Kd), dissociation
+rate constant (k_off), and maximum signal (Smax).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>shared_smax</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to share Smax across curves with the same Smax ID, default is True.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Updates the following instance attributes:
+- params: The fitted parameters [Kd, k_off, Smax1, Smax2, …]
+- signal_assoc_fit: The fitted association signals
+- Kd: The equilibrium dissociation constant
+- k_off: The dissociation rate constant
+- Smax: The maximum signal values</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter.fit_one_site_dissociation">
+<span class="sig-name descname"><span class="pre">fit_one_site_dissociation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_surface.html#KineticsFitter.fit_one_site_dissociation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter.fit_one_site_dissociation" title="Link to this definition">#</a></dt>
+<dd><p>Fit the dissociation curves using the one-site binding model.</p>
+<p>This function fits the dissociation curves to a one-site binding model
+to estimate the dissociation rate constant (k_off) and the initial signal (S0).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>time_limit</strong> (<em>float</em><em>, </em><em>optional</em>) – Time limit for fitting (in seconds). If &gt; 0, only fit data up to this time,
+default is 0 (fit all data).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Updates the following instance attributes:
+- params: The fitted parameters [k_off, S0_1, S0_2, …]
+- signal_disso_fit: The fitted dissociation signals
+- k_off: The dissociation rate constant
+- fit_params_kinetics: DataFrame with the fitted parameters
+- fit_params_kinetics_error: DataFrame with the relative errors</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter.fit_single_exponentials">
+<span class="sig-name descname"><span class="pre">fit_single_exponentials</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_surface.html#KineticsFitter.fit_single_exponentials"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter.fit_single_exponentials" title="Link to this definition">#</a></dt>
+<dd><p>Fit single exponentials to the association signals.</p>
+<p>This method fits each association curve with a single exponential function
+and extracts the observed rate constants (k_obs).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Updates the k_obs attribute with a list of observed rate constants
+for each association curve.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter.fit_one_site_assoc_and_disso">
+<span class="sig-name descname"><span class="pre">fit_one_site_assoc_and_disso</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shared_smax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_ktr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_surface.html#KineticsFitter.fit_one_site_assoc_and_disso"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter.fit_one_site_assoc_and_disso" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter.calculate_ci95">
+<span class="sig-name descname"><span class="pre">calculate_ci95</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shared_smax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_ktr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_surface.html#KineticsFitter.calculate_ci95"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter.calculate_ci95" title="Link to this definition">#</a></dt>
+<dd><p>Calculate 95% confidence intervals for the fitted parameters.</p>
+<p>This method computes asymmetrical 95% confidence intervals for the
+equilibrium dissociation constant (Kd) and the dissociation rate constant (k_off).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>shared_smax</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether Smax was shared across curves with the same Smax ID, default is True.</p></li>
+<li><p><strong>fixed_t0</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether the time offset (t0) was fixed to zero, default is True.</p></li>
+<li><p><strong>fit_ktr</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether mass transport rate constants were included in the model, default is False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Updates the fit_params_kinetics_ci95 attribute with a DataFrame containing
+the 95% confidence intervals for Kd and k_off.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This method will create an empty DataFrame if the confidence interval calculation fails.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter.fit_one_site_if_assoc_and_disso">
+<span class="sig-name descname"><span class="pre">fit_one_site_if_assoc_and_disso</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shared_smax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_surface.html#KineticsFitter.fit_one_site_if_assoc_and_disso"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter.fit_one_site_if_assoc_and_disso" title="Link to this definition">#</a></dt>
+<dd><p>Fit the association and dissociation signals using the induced fit model.</p>
+<p>This method first fits a simple one-site model to get initial parameter estimates,
+then explores different values of the conformational change rate constants (kc and krev)
+to find good initial guesses for the induced fit model. Finally, it fits the full
+induced fit model with these initial guesses.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>shared_smax</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to share Smax across curves with the same Smax ID, default is True.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Updates the following instance attributes:
+- params: The fitted parameters [k_on, k_off, k_c, k_rev, Smax1, Smax2, …]
+- signal_assoc_fit: The fitted association signals
+- signal_disso_fit: The fitted dissociation signals
+- k_on: The association rate constant
+- k_off: The dissociation rate constant
+- k_c: The forward conformational change rate constant
+- k_rev: The reverse conformational change rate constant
+- Smax: The maximum signal values
 - fit_params_kinetics: DataFrame with the fitted parameters</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -3186,35 +3298,21 @@ For dissociation steps, time continues from the association step.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#subpackages">Subpackages</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submodules">Submodules</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-pykingenie.fitter">pykingenie.fitter module</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter"><code class="docutils literal notranslate"><span class="pre">KineticsFitter</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.names"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.names</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.assoc_lst"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.assoc_lst</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.disso_lst"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.disso_lst</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.lig_conc_lst"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.lig_conc_lst</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.time_assoc_lst"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.time_assoc_lst</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.time_disso_lst"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.time_disso_lst</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.is_single_cycle"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.is_single_cycle</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.signal_ss"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.signal_ss</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.signal_ss_fit"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.signal_ss_fit</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.signal_assoc_fit"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.signal_assoc_fit</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.signal_disso_fit"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.signal_disso_fit</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.lig_conc_lst_per_id"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.lig_conc_lst_per_id</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.smax_guesses_unq"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.smax_guesses_unq</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.smax_guesses_shared"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.smax_guesses_shared</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.fit_params_kinetics"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_params_kinetics</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.fit_params_ss"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_params_ss</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.__init__"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.__init__()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.get_steady_state"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.get_steady_state()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.clear_fittings"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.clear_fittings()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.create_fitting_bounds_table"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.create_fitting_bounds_table()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.fit_steady_state"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_steady_state()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.get_k_off_initial_guess"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.get_k_off_initial_guess()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.fit_one_site_association"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_one_site_association()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.fit_one_site_dissociation"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_one_site_dissociation()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.fit_single_exponentials"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_single_exponentials()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.fit_one_site_assoc_and_disso"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_one_site_assoc_and_disso()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.calculate_ci95"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.calculate_ci95()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitter.fit_one_site_if_assoc_and_disso"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_one_site_if_assoc_and_disso()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitterGeneral"><code class="docutils literal notranslate"><span class="pre">KineticsFitterGeneral</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitterGeneral.__init__"><code class="docutils literal notranslate"><span class="pre">KineticsFitterGeneral.__init__()</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitterGeneral.signal_ss_fit"><code class="docutils literal notranslate"><span class="pre">KineticsFitterGeneral.signal_ss_fit</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitterGeneral.signal_assoc_fit"><code class="docutils literal notranslate"><span class="pre">KineticsFitterGeneral.signal_assoc_fit</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitterGeneral.signal_disso_fit"><code class="docutils literal notranslate"><span class="pre">KineticsFitterGeneral.signal_disso_fit</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitterGeneral.fit_params_kinetics"><code class="docutils literal notranslate"><span class="pre">KineticsFitterGeneral.fit_params_kinetics</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitterGeneral.fit_params_ss"><code class="docutils literal notranslate"><span class="pre">KineticsFitterGeneral.fit_params_ss</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitterGeneral.fitted_params_boundaries"><code class="docutils literal notranslate"><span class="pre">KineticsFitterGeneral.fitted_params_boundaries</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitterGeneral.params"><code class="docutils literal notranslate"><span class="pre">KineticsFitterGeneral.params</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitterGeneral.low_bounds"><code class="docutils literal notranslate"><span class="pre">KineticsFitterGeneral.low_bounds</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitterGeneral.high_bounds"><code class="docutils literal notranslate"><span class="pre">KineticsFitterGeneral.high_bounds</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitterGeneral.clear_fittings"><code class="docutils literal notranslate"><span class="pre">KineticsFitterGeneral.clear_fittings()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter.KineticsFitterGeneral.create_fitting_bounds_table"><code class="docutils literal notranslate"><span class="pre">KineticsFitterGeneral.create_fitting_bounds_table()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -3233,7 +3331,6 @@ For dissociation steps, time continues from the association step.</p>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_solution.KineticsFitterSolution.fit_params_ss"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.fit_params_ss</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_solution.KineticsFitterSolution.__init__"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.__init__()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_solution.KineticsFitterSolution.get_steady_state"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.get_steady_state()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_solution.KineticsFitterSolution.clear_fittings"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.clear_fittings()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_solution.KineticsFitterSolution.fit_single_exponentials"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.fit_single_exponentials()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_solution.KineticsFitterSolution.group_k_obs_by_protein_concentration"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.group_k_obs_by_protein_concentration()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_solution.KineticsFitterSolution.fit_double_exponentials"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.fit_double_exponentials()</span></code></a></li>
@@ -3241,6 +3338,38 @@ For dissociation steps, time continues from the association step.</p>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_solution.KineticsFitterSolution.fit_one_binding_site"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.fit_one_binding_site()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_solution.KineticsFitterSolution.find_initial_params_if"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.find_initial_params_if()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_solution.KineticsFitterSolution.fit_induced_fit"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.fit_induced_fit()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-pykingenie.fitter_surface">pykingenie.fitter_surface module</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter"><code class="docutils literal notranslate"><span class="pre">KineticsFitter</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.names"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.names</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.assoc_lst"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.assoc_lst</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.disso_lst"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.disso_lst</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.lig_conc_lst"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.lig_conc_lst</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.time_assoc_lst"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.time_assoc_lst</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.time_disso_lst"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.time_disso_lst</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.is_single_cycle"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.is_single_cycle</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.signal_ss"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.signal_ss</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.signal_ss_fit"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.signal_ss_fit</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.signal_assoc_fit"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.signal_assoc_fit</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.signal_disso_fit"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.signal_disso_fit</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.lig_conc_lst_per_id"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.lig_conc_lst_per_id</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.smax_guesses_unq"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.smax_guesses_unq</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.smax_guesses_shared"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.smax_guesses_shared</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.fit_params_kinetics"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_params_kinetics</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.fit_params_ss"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_params_ss</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.__init__"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.__init__()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.get_steady_state"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.get_steady_state()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.fit_steady_state"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_steady_state()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.get_k_off_initial_guess"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.get_k_off_initial_guess()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.fit_one_site_association"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_one_site_association()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.fit_one_site_dissociation"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_one_site_dissociation()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.fit_single_exponentials"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_single_exponentials()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.fit_one_site_assoc_and_disso"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_one_site_assoc_and_disso()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.calculate_ci95"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.calculate_ci95()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.fit_one_site_if_assoc_and_disso"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_one_site_if_assoc_and_disso()</span></code></a></li>
 </ul>
 </li>
 </ul>

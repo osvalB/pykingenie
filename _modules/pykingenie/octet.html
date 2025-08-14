@@ -351,8 +351,11 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">base64</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">xml.etree.ElementTree</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">elementTree</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">.utils.processing</span><span class="w"> </span><span class="kn">import</span> <span class="n">etree_to_dict</span><span class="p">,</span> <span class="n">combine_dicts</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.surface_exp</span><span class="w">      </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.surface_exp</span><span class="w">      </span><span class="kn">import</span> <span class="n">SurfaceBasedExperiment</span>
 
 <span class="n">factor_conc_to_micro</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;nM&#39;</span><span class="p">:</span><span class="mf">1e-3</span><span class="p">,</span> <span class="s1">&#39;µM&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;mM&#39;</span><span class="p">:</span><span class="mf">1e3</span><span class="p">,</span> <span class="s1">&#39;M&#39;</span><span class="p">:</span><span class="mf">1e6</span><span class="p">,</span> <span class="s1">&#39;mg/ml&#39;</span><span class="p">:</span><span class="mf">1e3</span><span class="p">,</span> <span class="s1">&#39;µg/ml&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">}</span>
 

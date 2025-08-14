@@ -1,0 +1,1354 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pykingenie.fitter_surface &#8212; PyKinGenie 0.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/pykingenie/fitter_surface';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">PyKinGenie 0.1.0 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../modules.html">
+    pykingenie
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/osvalB/pykingenie" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../modules.html">
+    pykingenie
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/osvalB/pykingenie" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">pykingenie.fitter_surface</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for pykingenie.fitter_surface</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.utils.fitting_surface</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">guess_initial_signal</span><span class="p">,</span>
+    <span class="n">fit_steady_state_one_site</span><span class="p">,</span>
+    <span class="n">steady_state_one_site_asymmetric_ci95</span><span class="p">,</span>
+    <span class="n">fit_one_site_association</span><span class="p">,</span>
+    <span class="n">fit_one_site_dissociation</span><span class="p">,</span>
+    <span class="n">fit_one_site_assoc_and_disso</span><span class="p">,</span>
+    <span class="n">fit_induced_fit_sites_assoc_and_disso</span><span class="p">,</span>
+    <span class="n">fit_one_site_assoc_and_disso_ktr</span><span class="p">,</span>
+    <span class="n">one_site_assoc_and_disso_asymmetric_ci95</span><span class="p">,</span>
+    <span class="n">one_site_assoc_and_disso_asymmetric_ci95_koff</span><span class="p">,</span>
+    <span class="n">get_smax_upper_bound_factor</span>
+<span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.utils.fitting_general</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">fit_single_exponential</span><span class="p">,</span>
+    <span class="n">re_fit</span><span class="p">,</span>
+    <span class="n">re_fit_2</span>
+<span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.utils.processing</span><span class="w">      </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">subset_data</span><span class="p">,</span>
+    <span class="n">concat_signal_lst</span><span class="p">,</span>
+    <span class="n">expand_parameter_list</span>
+<span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.utils.math</span><span class="w"> </span><span class="kn">import</span>  <span class="n">get_desired_rss</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.fitter</span><span class="w"> </span><span class="kn">import</span> <span class="n">KineticsFitterGeneral</span>
+
+<div class="viewcode-block" id="KineticsFitter">
+<a class="viewcode-back" href="../../pykingenie.html#pykingenie.fitter_surface.KineticsFitter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">KineticsFitter</span><span class="p">(</span><span class="n">KineticsFitterGeneral</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class used to fit kinetics data with shared thermodynamic parameters.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    time_assoc_lst : list</span>
+<span class="sd">        List of time points for the association signals, one per replicate.</span>
+<span class="sd">    association_signal_lst : list</span>
+<span class="sd">        List of association signals, one per replicate.</span>
+<span class="sd">    lig_conc_lst : list</span>
+<span class="sd">        List of ligand concentrations, one per replicate.</span>
+<span class="sd">    time_diss_lst : list, optional</span>
+<span class="sd">        List of time points for the dissociation signals, one per replicate.</span>
+<span class="sd">    dissociation_signal_lst : list, optional</span>
+<span class="sd">        List of dissociation signals, one per replicate.</span>
+<span class="sd">    smax_id : list, optional</span>
+<span class="sd">        List containing the Smax IDs (maximum amplitude identifiers).</span>
+<span class="sd">    name_lst : list, optional</span>
+<span class="sd">        List of experiment names.</span>
+<span class="sd">    is_single_cycle : bool, optional</span>
+<span class="sd">        Whether the experiment is a single cycle kinetics experiment.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    names : list</span>
+<span class="sd">        List of experiment names.</span>
+<span class="sd">    assoc_lst : list</span>
+<span class="sd">        List of association signals, one per replicate.</span>
+<span class="sd">        Each signal is a numpy matrix of size n*m where n is the number of time points and m</span>
+<span class="sd">        is the number of ligand concentrations.</span>
+<span class="sd">    disso_lst : list</span>
+<span class="sd">        List of dissociation signals, one per replicate.</span>
+<span class="sd">        Each signal is a numpy matrix of size n*m where n is the number of time points and m</span>
+<span class="sd">        is the number of ligand concentrations (different from zero).</span>
+<span class="sd">    lig_conc_lst : list</span>
+<span class="sd">        List of ligand concentrations, one per replicate.</span>
+<span class="sd">    time_assoc_lst : list</span>
+<span class="sd">        List of time points for the association signals, one per replicate.</span>
+<span class="sd">    time_disso_lst : list</span>
+<span class="sd">        List of time points for the dissociation signals, one per replicate.</span>
+<span class="sd">    is_single_cycle : bool</span>
+<span class="sd">        Whether the experiment is a single cycle kinetics experiment.</span>
+<span class="sd">    signal_ss : list</span>
+<span class="sd">        List of steady state signals, one per replicate.</span>
+<span class="sd">    signal_ss_fit : list</span>
+<span class="sd">        List of steady state fitted signals, one per replicate.</span>
+<span class="sd">    signal_assoc_fit : list</span>
+<span class="sd">        List of association kinetics fitted signals, one per replicate.</span>
+<span class="sd">    signal_disso_fit : list</span>
+<span class="sd">        List of dissociation kinetics fitted signals, one per replicate.</span>
+<span class="sd">    lig_conc_lst_per_id : list</span>
+<span class="sd">        Ligand concentrations per Smax ID.</span>
+<span class="sd">    smax_guesses_unq : list</span>
+<span class="sd">        Smax guesses per association signal.</span>
+<span class="sd">    smax_guesses_shared : list</span>
+<span class="sd">        Smax guesses per Smax ID.</span>
+<span class="sd">    fit_params_kinetics : pd.DataFrame</span>
+<span class="sd">        DataFrame with the fitted parameters for the association/dissociation kinetics.</span>
+<span class="sd">    fit_params_ss : pd.DataFrame</span>
+<span class="sd">        DataFrame with the values of the fitted parameters - steady state.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="KineticsFitter.__init__">
+<a class="viewcode-back" href="../../pykingenie.html#pykingenie.fitter_surface.KineticsFitter.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">time_assoc_lst</span><span class="p">,</span><span class="n">association_signal_lst</span><span class="p">,</span><span class="n">lig_conc_lst</span><span class="p">,</span>
+                 <span class="n">time_diss_lst</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">dissociation_signal_lst</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">smax_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">name_lst</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">is_single_cycle</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the KineticsFitter class.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        time_assoc_lst : list</span>
+<span class="sd">            List of time points for the association signals, one per replicate.</span>
+<span class="sd">        association_signal_lst : list</span>
+<span class="sd">            List of association signals, one per replicate.</span>
+<span class="sd">        lig_conc_lst : list</span>
+<span class="sd">            List of ligand concentrations, one per replicate.</span>
+<span class="sd">        time_diss_lst : list, optional</span>
+<span class="sd">            List of time points for the dissociation signals, one per replicate.</span>
+<span class="sd">        dissociation_signal_lst : list, optional</span>
+<span class="sd">            List of dissociation signals, one per replicate.</span>
+<span class="sd">        smax_id : list, optional</span>
+<span class="sd">            List containing the Smax IDs (maximum amplitude identifiers).</span>
+<span class="sd">        name_lst : list, optional</span>
+<span class="sd">            List of experiment names.</span>
+<span class="sd">        is_single_cycle : bool, optional</span>
+<span class="sd">            Whether the experiment is a single cycle kinetics experiment, default is False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">names</span>            <span class="o">=</span> <span class="n">name_lst</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span>        <span class="o">=</span> <span class="n">association_signal_lst</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">disso_lst</span>        <span class="o">=</span> <span class="n">dissociation_signal_lst</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lig_conc_lst</span>     <span class="o">=</span> <span class="n">lig_conc_lst</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_assoc_lst</span>   <span class="o">=</span> <span class="n">time_assoc_lst</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_disso_lst</span>   <span class="o">=</span> <span class="n">time_diss_lst</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_single_cycle</span>  <span class="o">=</span> <span class="n">is_single_cycle</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">lig_conc_lst_per_id</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Ligand concentrations per Smax ID</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">smax_guesses_unq</span>    <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Smax guesses per association signal</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">smax_guesses_shared</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Smax guesses per Smax ID</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Kd_ss</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># If smax_id is None, set it to a list of zeros</span>
+        <span class="k">if</span> <span class="n">smax_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">smax_id</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">association_signal_lst</span><span class="p">))]</span>
+
+        <span class="c1"># We need to rearrange smax_id to start at 0, then 1, then 2, etc.</span>
+        <span class="n">smax_id_unq</span><span class="p">,</span> <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">smax_id</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">smax_id_unq</span> <span class="o">=</span> <span class="n">smax_id_unq</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">idx</span><span class="p">)]</span>
+
+        <span class="n">smax_id_new</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">unq</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">smax_id_unq</span><span class="p">):</span>
+            <span class="n">smax_id_new</span> <span class="o">+=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">smax_id</span> <span class="o">==</span> <span class="n">unq</span><span class="p">)[</span><span class="mi">0</span><span class="p">]))]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">smax_id</span> <span class="o">=</span> <span class="n">smax_id_new</span></div>
+
+
+<div class="viewcode-block" id="KineticsFitter.get_steady_state">
+<a class="viewcode-back" href="../../pykingenie.html#pykingenie.fitter_surface.KineticsFitter.get_steady_state">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_steady_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the steady state signal and group it by Smax ID.</span>
+<span class="sd">        </span>
+<span class="sd">        This function calculates the steady state signal for each association curve</span>
+<span class="sd">        and groups the signals by Smax ID. It also calculates the Smax guesses</span>
+<span class="sd">        for each association signal.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Updates the following instance attributes:</span>
+<span class="sd">            - signal_ss: List of steady state signals grouped by Smax ID</span>
+<span class="sd">            - lig_conc_lst_per_id: List of ligand concentrations grouped by Smax ID</span>
+<span class="sd">            - smax_guesses_unq: Smax guesses for each association signal</span>
+<span class="sd">            - smax_guesses_shared: Smax guesses for each Smax ID</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">signals_steady_state</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">assoc</span><span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">:])</span> <span class="k">for</span> <span class="n">assoc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="p">]</span>
+
+        <span class="c1"># Create a new list, that will contain one element per Smax ID</span>
+        <span class="c1"># each element will be a list of steady-state signals</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">signal_ss</span>            <span class="o">=</span> <span class="p">[]</span> <span class="c1"># convert to list of lists, one list per unique smax id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lig_conc_lst_per_id</span>  <span class="o">=</span> <span class="p">[]</span> <span class="c1"># convert to list of lists, one list per unique smax id</span>
+
+        <span class="c1"># Obtain the smax guesses, the maximum signal</span>
+        <span class="n">smax_guesses_unq</span>    <span class="o">=</span> <span class="p">[]</span> <span class="c1"># One element per association signal</span>
+        <span class="n">smax_guesses_shared</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># One element per Smax ID</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">smax_id</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">smax_id</span><span class="p">)):</span>
+
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">smax_id</span> <span class="o">==</span> <span class="n">smax_id</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">signal_ss</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">signals_steady_state</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">idx</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lig_conc_lst_per_id</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">lig_conc_lst</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">idx</span><span class="p">])</span>
+
+            <span class="n">smax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signal_ss</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">smax_guesses_unq</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">smax</span><span class="o">*</span><span class="mf">1.5</span><span class="p">)</span>
+            <span class="n">smax_guesses_shared</span> <span class="o">+=</span> <span class="p">[</span><span class="n">smax</span><span class="o">*</span><span class="mf">1.5</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">idx</span><span class="p">))]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">smax_guesses_unq</span>    <span class="o">=</span> <span class="n">smax_guesses_unq</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">smax_guesses_shared</span> <span class="o">=</span> <span class="n">smax_guesses_shared</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="KineticsFitter.fit_steady_state">
+<a class="viewcode-back" href="../../pykingenie.html#pykingenie.fitter_surface.KineticsFitter.fit_steady_state">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit_steady_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fit the steady state signal using the one-site binding model.</span>
+<span class="sd">        </span>
+<span class="sd">        This function fits the steady state signal to a one-site binding model</span>
+<span class="sd">        to estimate the equilibrium dissociation constant (Kd) and maximum signal (Smax).</span>
+<span class="sd">        It also calculates the 95% confidence intervals for the Kd.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Updates the following instance attributes:</span>
+<span class="sd">            - params: The fitted parameters [Kd, Smax1, Smax2, ...]</span>
+<span class="sd">            - signal_ss_fit: The fitted steady state signals</span>
+<span class="sd">            - fit_params_ss: DataFrame with the fitted parameters</span>
+<span class="sd">            - Kd_ss: The equilibrium dissociation constant</span>
+<span class="sd">            - Smax_upper_bound_factor: Factor to determine the upper bound for Smax</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear_fittings</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">signal_ss</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_steady_state</span><span class="p">()</span>
+
+        <span class="n">Kd_init</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lig_conc_lst_per_id</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">p0</span>      <span class="o">=</span> <span class="p">[</span><span class="n">Kd_init</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span> <span class="k">for</span> <span class="n">signal</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">signal_ss</span><span class="p">]</span>
+
+        <span class="n">kd_min</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lig_conc_lst_per_id</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mf">1e3</span>
+        <span class="n">kd_max</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lig_conc_lst_per_id</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="mf">1e3</span>
+
+        <span class="c1"># Find the upper bound for the Kd</span>
+        <span class="n">upper_bound</span> <span class="o">=</span> <span class="mf">1e3</span> <span class="k">if</span> <span class="n">Kd_init</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="k">else</span> <span class="mf">1e2</span>
+
+        <span class="n">low_bounds</span>  <span class="o">=</span> <span class="p">[</span><span class="n">kd_min</span><span class="p">]</span>  <span class="o">+</span> <span class="p">[</span><span class="n">x</span><span class="o">*</span><span class="mf">0.5</span>          <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">p0</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span>
+        <span class="n">high_bounds</span> <span class="o">=</span> <span class="p">[</span><span class="n">kd_max</span><span class="p">]</span>  <span class="o">+</span> <span class="p">[</span><span class="n">x</span><span class="o">*</span><span class="n">upper_bound</span>  <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">p0</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span>
+
+        <span class="c1"># testing - set upper bound for smax to smax</span>
+        <span class="n">high_bounds</span> <span class="o">=</span> <span class="p">[</span><span class="n">kd_max</span><span class="p">]</span>  <span class="o">+</span> <span class="p">[</span><span class="n">x</span><span class="o">*</span><span class="mi">1</span>  <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">p0</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span>
+
+        <span class="n">fit</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">fit_vals</span> <span class="o">=</span> <span class="n">fit_steady_state_one_site</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signal_ss</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">lig_conc_lst_per_id</span><span class="p">,</span>
+            <span class="n">p0</span><span class="p">,</span><span class="n">low_bounds</span><span class="p">,</span><span class="n">high_bounds</span><span class="p">)</span>
+
+        <span class="c1"># Prepare the arguments for re-fitting fit_steady_state_one_site</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;signal_lst&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">signal_ss</span><span class="p">,</span>
+            <span class="s2">&quot;ligand_lst&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">lig_conc_lst_per_id</span>
+        <span class="p">}</span>
+
+        <span class="n">fit</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">fit_vals</span><span class="p">,</span> <span class="n">low_bounds</span><span class="p">,</span> <span class="n">high_bounds</span> <span class="o">=</span> <span class="n">re_fit</span><span class="p">(</span>
+            <span class="n">fit</span><span class="o">=</span><span class="n">fit</span><span class="p">,</span>
+            <span class="n">cov</span><span class="o">=</span><span class="n">cov</span><span class="p">,</span>
+            <span class="n">fit_vals</span><span class="o">=</span><span class="n">fit_vals</span><span class="p">,</span>
+            <span class="n">fit_fx</span><span class="o">=</span><span class="n">fit_steady_state_one_site</span><span class="p">,</span>
+            <span class="n">low_bounds</span><span class="o">=</span><span class="n">low_bounds</span><span class="p">,</span>
+            <span class="n">high_bounds</span><span class="o">=</span> <span class="n">high_bounds</span><span class="p">,</span>
+            <span class="n">times</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Kd_ss</span>   <span class="o">=</span> <span class="n">fit</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">Smax</span>         <span class="o">=</span> <span class="n">fit</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span>      <span class="o">=</span> <span class="n">fit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p0</span>          <span class="o">=</span> <span class="n">p0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">low_bounds</span>  <span class="o">=</span> <span class="n">low_bounds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">high_bounds</span> <span class="o">=</span> <span class="n">high_bounds</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">signal_ss_fit</span> <span class="o">=</span> <span class="n">fit_vals</span>
+
+        <span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span> <span class="k">for</span> <span class="n">signal</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">signal_ss</span><span class="p">])</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">p0</span><span class="p">)</span>
+
+        <span class="n">rss_desired</span> <span class="o">=</span> <span class="n">get_desired_rss</span><span class="p">(</span><span class="n">concat_signal_lst</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signal_ss</span><span class="p">),</span> <span class="n">concat_signal_lst</span><span class="p">(</span><span class="n">fit_vals</span><span class="p">),</span> <span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+
+        <span class="n">minKd</span><span class="p">,</span> <span class="n">maxKd</span> <span class="o">=</span> <span class="n">steady_state_one_site_asymmetric_ci95</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Kd_ss</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">signal_ss</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lig_conc_lst_per_id</span><span class="p">,</span> <span class="n">p0</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+            <span class="n">low_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">high_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">rss_desired</span><span class="p">)</span>
+
+        <span class="c1"># Create a dataframe with the fitted parameters</span>
+        <span class="n">df_fit</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Kd [µM]&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kd_ss</span><span class="p">,</span>
+                               <span class="s1">&#39;Kd_min95&#39;</span><span class="p">:</span> <span class="n">minKd</span><span class="p">,</span>
+                               <span class="s1">&#39;Kd_max95&#39;</span><span class="p">:</span> <span class="n">maxKd</span><span class="p">,</span>
+                               <span class="s1">&#39;Smax&#39;</span><span class="p">:</span> <span class="n">Smax</span><span class="p">,</span>
+                               <span class="s1">&#39;Name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">names</span><span class="p">})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_params_ss</span> <span class="o">=</span> <span class="n">df_fit</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Smax_upper_bound_factor</span> <span class="o">=</span> <span class="n">get_smax_upper_bound_factor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Kd_ss</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_params_ss</span> <span class="o">=</span> <span class="n">df_fit</span>
+
+        <span class="c1"># Fit the steady state signal</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="KineticsFitter.get_k_off_initial_guess">
+<a class="viewcode-back" href="../../pykingenie.html#pykingenie.fitter_surface.KineticsFitter.get_k_off_initial_guess">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_k_off_initial_guess</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get initial guess and bounds for k_off parameter.</span>
+<span class="sd">        </span>
+<span class="sd">        This method determines initial values and fitting bounds for Kd and k_off.</span>
+<span class="sd">        If dissociation data is available, it fits the dissociation curves to get</span>
+<span class="sd">        a better estimate of k_off.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple</span>
+<span class="sd">            A tuple containing:</span>
+<span class="sd">            - p0: Initial parameter guesses [Kd, k_off]</span>
+<span class="sd">            - low_bounds: Lower bounds for the parameters</span>
+<span class="sd">            - high_bounds: Upper bounds for the parameters</span>
+<span class="sd">            </span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If Kd_ss is not set and fit_steady_state has not been run</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Initial guess for Kd_ss for single_cycle_kinetics</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_single_cycle</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Kd_ss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lig_conc_lst</span><span class="p">)</span>
+
+        <span class="c1"># Requires that Kd_ss is set</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kd_ss</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Kd_ss is not set. Please run fit_steady_state() first.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># We check if we have dissociation curves and fit them to get a better estimate of k_off</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">disso_lst</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_disso_lst</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">fit_one_site_dissociation</span><span class="p">()</span>
+            <span class="n">p0</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Kd_ss</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_off</span><span class="p">]</span>
+            <span class="n">low_bounds</span>  <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Kd_ss</span><span class="o">/</span><span class="mf">7e2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_off</span><span class="o">/</span><span class="mf">7e2</span><span class="p">]</span>
+            <span class="n">high_bounds</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Kd_ss</span><span class="o">*</span><span class="mf">7e2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_off</span><span class="o">*</span><span class="mf">7e2</span><span class="p">]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">clear_fittings</span><span class="p">()</span>
+
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="n">p0</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Kd_ss</span><span class="p">,</span><span class="mf">0.01</span><span class="p">]</span>
+
+            <span class="n">low_bounds</span>  <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Kd_ss</span><span class="o">/</span><span class="mf">7e2</span><span class="p">,</span><span class="mf">1e-7</span><span class="p">]</span>
+            <span class="n">high_bounds</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Kd_ss</span><span class="o">*</span><span class="mf">7e2</span><span class="p">,</span><span class="mi">10</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">p0</span><span class="p">,</span> <span class="n">low_bounds</span><span class="p">,</span> <span class="n">high_bounds</span></div>
+
+
+<div class="viewcode-block" id="KineticsFitter.fit_one_site_association">
+<a class="viewcode-back" href="../../pykingenie.html#pykingenie.fitter_surface.KineticsFitter.fit_one_site_association">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit_one_site_association</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shared_smax</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fit the association curves using the one-site binding model.</span>
+<span class="sd">        </span>
+<span class="sd">        This function fits the association curves to a one-site binding model</span>
+<span class="sd">        to estimate the equilibrium dissociation constant (Kd), dissociation</span>
+<span class="sd">        rate constant (k_off), and maximum signal (Smax).</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        shared_smax : bool, optional</span>
+<span class="sd">            Whether to share Smax across curves with the same Smax ID, default is True.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Updates the following instance attributes:</span>
+<span class="sd">            - params: The fitted parameters [Kd, k_off, Smax1, Smax2, ...]</span>
+<span class="sd">            - signal_assoc_fit: The fitted association signals</span>
+<span class="sd">            - Kd: The equilibrium dissociation constant</span>
+<span class="sd">            - k_off: The dissociation rate constant</span>
+<span class="sd">            - Smax: The maximum signal values</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear_fittings</span><span class="p">()</span>
+
+        <span class="n">p0</span><span class="p">,</span> <span class="n">low_bounds</span><span class="p">,</span> <span class="n">high_bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_k_off_initial_guess</span><span class="p">()</span>
+
+        <span class="n">smax_guesses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">smax_guesses_unq</span> <span class="k">if</span> <span class="n">shared_smax</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">smax_guesses_shared</span>
+
+        <span class="n">p0</span> <span class="o">+=</span> <span class="n">smax_guesses</span>
+
+        <span class="n">low_bounds</span>  <span class="o">+=</span> <span class="p">[</span><span class="n">x</span><span class="o">/</span><span class="mi">15</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">p0</span><span class="p">[</span><span class="mi">2</span><span class="p">:]]</span>
+        <span class="n">high_bounds</span> <span class="o">+=</span> <span class="p">[</span><span class="n">x</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">Smax_upper_bound_factor</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">p0</span><span class="p">[</span><span class="mi">2</span><span class="p">:]]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">p0</span>           <span class="o">=</span> <span class="n">p0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">low_bounds</span>  <span class="o">=</span> <span class="n">low_bounds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">high_bounds</span> <span class="o">=</span> <span class="n">high_bounds</span>
+
+        <span class="n">fit</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">fit_vals</span> <span class="o">=</span> <span class="n">fit_one_site_association</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">time_assoc_lst</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">lig_conc_lst</span><span class="p">,</span>
+            <span class="n">p0</span><span class="p">,</span><span class="n">low_bounds</span><span class="p">,</span><span class="n">high_bounds</span><span class="p">,</span><span class="n">smax_idx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">smax_id</span><span class="p">,</span><span class="n">shared_smax</span><span class="o">=</span><span class="n">shared_smax</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">fit</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">signal_assoc_fit</span> <span class="o">=</span> <span class="n">fit_vals</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Kd</span>   <span class="o">=</span> <span class="n">fit</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">k_off</span> <span class="o">=</span> <span class="n">fit</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Smax</span> <span class="o">=</span> <span class="n">fit</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+
+        <span class="c1"># Create a dataframe with the fitted parameters</span>
+        <span class="n">df_fit</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Kd [µM]&#39;</span><span class="p">:</span>   <span class="bp">self</span><span class="o">.</span><span class="n">Kd</span><span class="p">,</span>
+                               <span class="s1">&#39;k_off [1/s]&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_off</span><span class="p">,</span>
+                               <span class="s1">&#39;Smax&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">Smax</span><span class="p">})</span>
+
+        <span class="n">error</span>     <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">cov</span><span class="p">))</span>
+        <span class="n">rel_error</span> <span class="o">=</span> <span class="n">error</span><span class="o">/</span><span class="n">fit</span> <span class="o">*</span> <span class="mi">100</span>
+
+        <span class="n">df_error</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Kd [µM]&#39;</span><span class="p">:</span>   <span class="n">rel_error</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                 <span class="s1">&#39;k_off&#39;</span><span class="p">:</span> <span class="n">rel_error</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                 <span class="s1">&#39;Smax&#39;</span><span class="p">:</span> <span class="n">rel_error</span><span class="p">[</span><span class="mi">2</span><span class="p">:]})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_params_kinetics</span>       <span class="o">=</span> <span class="n">df_fit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_params_kinetics_error</span> <span class="o">=</span> <span class="n">df_error</span>
+
+        <span class="k">return</span>  <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="KineticsFitter.fit_one_site_dissociation">
+<a class="viewcode-back" href="../../pykingenie.html#pykingenie.fitter_surface.KineticsFitter.fit_one_site_dissociation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit_one_site_dissociation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time_limit</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fit the dissociation curves using the one-site binding model.</span>
+<span class="sd">        </span>
+<span class="sd">        This function fits the dissociation curves to a one-site binding model</span>
+<span class="sd">        to estimate the dissociation rate constant (k_off) and the initial signal (S0).</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        time_limit : float, optional</span>
+<span class="sd">            Time limit for fitting (in seconds). If &gt; 0, only fit data up to this time, </span>
+<span class="sd">            default is 0 (fit all data).</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Updates the following instance attributes:</span>
+<span class="sd">            - params: The fitted parameters [k_off, S0_1, S0_2, ...]</span>
+<span class="sd">            - signal_disso_fit: The fitted dissociation signals</span>
+<span class="sd">            - k_off: The dissociation rate constant</span>
+<span class="sd">            - fit_params_kinetics: DataFrame with the fitted parameters</span>
+<span class="sd">            - fit_params_kinetics_error: DataFrame with the relative errors</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear_fittings</span><span class="p">()</span>
+
+        <span class="n">disso_lst</span>     <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">disso_lst</span>
+        <span class="n">time_disso_lst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_disso_lst</span>
+
+        <span class="c1"># Fit only some data. If time_limit = 0, fit all data</span>
+        <span class="k">if</span> <span class="n">time_limit</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+
+            <span class="n">disso_lst</span>      <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="n">t</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">+</span><span class="n">time_limit</span><span class="p">)]</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span><span class="n">t</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">disso_lst</span><span class="p">,</span><span class="n">time_disso_lst</span><span class="p">)]</span>
+            <span class="n">time_disso_lst</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="p">[</span><span class="n">t</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">+</span><span class="n">time_limit</span><span class="p">)]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">time_disso_lst</span><span class="p">]</span>
+
+        <span class="n">p0</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span> <span class="k">for</span> <span class="n">signal</span> <span class="ow">in</span> <span class="n">disso_lst</span><span class="p">]</span>
+
+        <span class="n">low_bounds</span>  <span class="o">=</span> <span class="p">[</span><span class="mf">1e-7</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">x</span><span class="o">/</span><span class="mi">5</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">p0</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span>
+        <span class="n">high_bounds</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">]</span>   <span class="o">+</span> <span class="p">[</span><span class="n">x</span><span class="o">*</span><span class="mi">5</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">p0</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">p0</span>           <span class="o">=</span> <span class="n">p0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">low_bounds</span>  <span class="o">=</span> <span class="n">low_bounds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">high_bounds</span> <span class="o">=</span> <span class="n">high_bounds</span>
+
+        <span class="n">fit</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">fit_vals</span> <span class="o">=</span> <span class="n">fit_one_site_dissociation</span><span class="p">(</span><span class="n">disso_lst</span><span class="p">,</span><span class="n">time_disso_lst</span><span class="p">,</span>
+                                                       <span class="n">p0</span><span class="p">,</span><span class="n">low_bounds</span><span class="p">,</span><span class="n">high_bounds</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">signal_disso_fit</span> <span class="o">=</span> <span class="n">fit_vals</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">k_off</span> <span class="o">=</span> <span class="n">fit</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># generate dataframe with the fitted parameters</span>
+        <span class="n">df_fit</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;k_off&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_off</span><span class="p">,</span>
+                               <span class="s1">&#39;S0&#39;</span><span class="p">:</span> <span class="n">fit</span><span class="p">[</span><span class="mi">1</span><span class="p">:]})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_params_kinetics</span> <span class="o">=</span> <span class="n">df_fit</span>
+
+        <span class="c1"># Add the fitted errors to the dataframe</span>
+        <span class="n">error</span>     <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">cov</span><span class="p">))</span>
+        <span class="n">rel_error</span> <span class="o">=</span> <span class="n">error</span><span class="o">/</span><span class="n">fit</span> <span class="o">*</span> <span class="mi">100</span>
+
+        <span class="n">df_error</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;k_off [1/s]&#39;</span><span class="p">:</span> <span class="n">rel_error</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                 <span class="s1">&#39;S0&#39;</span><span class="p">:</span>          <span class="n">rel_error</span><span class="p">[</span><span class="mi">1</span><span class="p">:]})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_params_kinetics_error</span> <span class="o">=</span> <span class="n">df_error</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">fit</span>
+
+        <span class="k">return</span>  <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="KineticsFitter.fit_single_exponentials">
+<a class="viewcode-back" href="../../pykingenie.html#pykingenie.fitter_surface.KineticsFitter.fit_single_exponentials">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit_single_exponentials</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fit single exponentials to the association signals.</span>
+<span class="sd">        </span>
+<span class="sd">        This method fits each association curve with a single exponential function</span>
+<span class="sd">        and extracts the observed rate constants (k_obs).</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Updates the k_obs attribute with a list of observed rate constants</span>
+<span class="sd">            for each association curve.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Fit one exponential to each signal</span>
+
+        <span class="c1"># Initialize a list to store the k_obs values - filld with NaNs</span>
+        <span class="n">k_obs</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="p">))]</span>
+
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">y</span><span class="p">,</span><span class="n">t</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">time_assoc_lst</span><span class="p">):</span>
+
+            <span class="n">fit_params</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">fit_single_exponential</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">t</span><span class="p">)</span>
+
+            <span class="c1"># Append the k_obs value to the list</span>
+            <span class="n">k_obs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">fit_params</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">k_obs</span> <span class="o">=</span> <span class="n">k_obs</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="KineticsFitter.fit_one_site_assoc_and_disso">
+<a class="viewcode-back" href="../../pykingenie.html#pykingenie.fitter_surface.KineticsFitter.fit_one_site_assoc_and_disso">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit_one_site_assoc_and_disso</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">shared_smax</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">fixed_t0</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">fit_ktr</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear_fittings</span><span class="p">()</span>
+
+        <span class="n">p0</span><span class="p">,</span> <span class="n">low_bounds</span><span class="p">,</span> <span class="n">high_bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_k_off_initial_guess</span><span class="p">()</span>
+
+        <span class="c1"># Extend the lower bound for Kd_ss</span>
+        <span class="n">low_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">Kd_ss</span><span class="o">/</span><span class="mf">1e3</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">lig_conc_lst</span><span class="p">)</span>  <span class="c1"># Kd lower bound</span>
+
+        <span class="n">smax_guesses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">smax_guesses_unq</span> <span class="k">if</span> <span class="n">shared_smax</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">smax_guesses_shared</span>
+
+        <span class="n">p0</span> <span class="o">+=</span> <span class="n">smax_guesses</span>
+
+        <span class="n">low_bounds</span>  <span class="o">+=</span> <span class="p">[</span><span class="n">x</span><span class="o">/</span><span class="mi">4</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">p0</span><span class="p">[</span><span class="mi">2</span><span class="p">:]]</span>
+        <span class="n">high_bounds</span> <span class="o">+=</span> <span class="p">[</span><span class="n">x</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">Smax_upper_bound_factor</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">p0</span><span class="p">[</span><span class="mi">2</span><span class="p">:]]</span>
+
+        <span class="n">smax_param_start</span> <span class="o">=</span> <span class="mi">2</span>
+
+        <span class="k">if</span> <span class="n">fit_ktr</span><span class="p">:</span>
+
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">smax_guesses_unq</span><span class="p">):</span>
+                <span class="n">p0</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">1e-4</span><span class="p">)</span>
+                <span class="n">low_bounds</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">1e-7</span><span class="p">)</span>
+                <span class="n">high_bounds</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">smax_param_start</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fixed_t0</span><span class="p">:</span>
+
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">_</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">smax_guesses_unq</span><span class="p">):</span>
+                <span class="n">p0</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">low_bounds</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="o">-</span><span class="mf">0.01</span><span class="p">)</span>
+                <span class="n">high_bounds</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mf">0.1</span><span class="p">)</span>
+                <span class="n">smax_param_start</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">fit_ktr</span><span class="p">:</span>
+
+            <span class="n">fit</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">fit_vals_assoc</span><span class="p">,</span> <span class="n">fit_vals_disso</span> <span class="o">=</span> <span class="n">fit_one_site_assoc_and_disso_ktr</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">time_assoc_lst</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">lig_conc_lst</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">disso_lst</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">time_disso_lst</span><span class="p">,</span>
+                <span class="n">p0</span><span class="p">,</span><span class="n">low_bounds</span><span class="p">,</span><span class="n">high_bounds</span><span class="p">,</span>
+                <span class="n">smax_idx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">smax_id</span><span class="p">,</span>
+                <span class="n">shared_smax</span><span class="o">=</span><span class="n">shared_smax</span><span class="p">,</span>
+                <span class="n">fixed_t0</span><span class="o">=</span><span class="n">fixed_t0</span>
+            <span class="p">)</span>
+
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;assoc_signal_lst&#39;</span> <span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="p">,</span>
+                <span class="s1">&#39;assoc_time_lst&#39;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_assoc_lst</span><span class="p">,</span>
+                <span class="s1">&#39;analyte_conc_lst&#39;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">lig_conc_lst</span><span class="p">,</span>
+                <span class="s1">&#39;disso_signal_lst&#39;</span> <span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">disso_lst</span><span class="p">,</span>
+                <span class="s1">&#39;disso_time_lst&#39;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_disso_lst</span><span class="p">,</span>
+                <span class="s1">&#39;shared_smax&#39;</span> <span class="p">:</span> <span class="n">shared_smax</span><span class="p">,</span>
+                <span class="s1">&#39;smax_idx&#39;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">smax_id</span><span class="p">,</span>
+                <span class="s1">&#39;fixed_t0&#39;</span> <span class="p">:</span> <span class="n">fixed_t0</span>
+            <span class="p">}</span>
+
+            <span class="n">fit</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">fit_vals_assoc</span><span class="p">,</span> <span class="n">fit_vals_disso</span><span class="p">,</span><span class="n">low_bounds</span><span class="p">,</span> <span class="n">high_bounds</span> <span class="o">=</span> <span class="n">re_fit_2</span><span class="p">(</span>
+                <span class="n">fit</span><span class="o">=</span><span class="n">fit</span><span class="p">,</span>
+                <span class="n">cov</span><span class="o">=</span><span class="n">cov</span><span class="p">,</span>
+                <span class="n">fit_vals_a</span><span class="o">=</span><span class="n">fit_vals_assoc</span><span class="p">,</span>
+                <span class="n">fit_vals_b</span><span class="o">=</span><span class="n">fit_vals_disso</span><span class="p">,</span>
+                <span class="n">fit_fx</span><span class="o">=</span><span class="n">fit_one_site_assoc_and_disso_ktr</span><span class="p">,</span>
+                <span class="n">low_bounds</span><span class="o">=</span><span class="n">low_bounds</span><span class="p">,</span>
+                <span class="n">high_bounds</span><span class="o">=</span><span class="n">high_bounds</span><span class="p">,</span>
+                <span class="n">times</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span>
+            <span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="n">fit</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">fit_vals_assoc</span><span class="p">,</span> <span class="n">fit_vals_disso</span> <span class="o">=</span> <span class="n">fit_one_site_assoc_and_disso</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">time_assoc_lst</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">lig_conc_lst</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">disso_lst</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">time_disso_lst</span><span class="p">,</span>
+                <span class="n">p0</span><span class="p">,</span><span class="n">low_bounds</span><span class="p">,</span><span class="n">high_bounds</span><span class="p">,</span>
+                <span class="n">smax_idx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">smax_id</span><span class="p">,</span>
+                <span class="n">shared_smax</span><span class="o">=</span><span class="n">shared_smax</span><span class="p">,</span>
+                <span class="n">fixed_t0</span><span class="o">=</span><span class="n">fixed_t0</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">signal_assoc_fit</span> <span class="o">=</span> <span class="n">fit_vals_assoc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">signal_disso_fit</span> <span class="o">=</span> <span class="n">fit_vals_disso</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Kd</span>   <span class="o">=</span> <span class="n">fit</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">k_off</span> <span class="o">=</span> <span class="n">fit</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Smax</span> <span class="o">=</span> <span class="n">fit</span><span class="p">[</span><span class="n">smax_param_start</span><span class="p">:]</span>
+
+        <span class="c1"># Create a dataframe with the fitted parameters</span>
+        <span class="n">df_fit</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Kd [µM]&#39;</span><span class="p">:</span>     <span class="bp">self</span><span class="o">.</span><span class="n">Kd</span><span class="p">,</span>
+                               <span class="s1">&#39;k_off [1/s]&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_off</span><span class="p">,</span>
+                               <span class="s1">&#39;Smax&#39;</span><span class="p">:</span>        <span class="bp">self</span><span class="o">.</span><span class="n">Smax</span><span class="p">})</span>
+
+        <span class="c1"># Include the Kon, derived from the Kd and Koff</span>
+        <span class="n">df_fit</span><span class="p">[</span><span class="s1">&#39;(Derived) k_on [1/µM/s]&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_fit</span><span class="p">[</span><span class="s1">&#39;k_off [1/s]&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">df_fit</span><span class="p">[</span><span class="s1">&#39;Kd [µM]&#39;</span><span class="p">]</span>
+
+        <span class="n">error</span>     <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">cov</span><span class="p">))</span>
+        <span class="n">rel_error</span> <span class="o">=</span> <span class="n">error</span><span class="o">/</span><span class="n">fit</span> <span class="o">*</span> <span class="mi">100</span>
+
+        <span class="n">df_error</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Kd [µM]&#39;</span><span class="p">:</span>   <span class="n">rel_error</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                 <span class="s1">&#39;k_off [1/s]&#39;</span><span class="p">:</span> <span class="n">rel_error</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                 <span class="s1">&#39;Smax&#39;</span><span class="p">:</span> <span class="n">rel_error</span><span class="p">[</span><span class="n">smax_param_start</span><span class="p">:]})</span>
+
+        <span class="c1"># Add the t0 parameter</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fixed_t0</span><span class="p">:</span>
+
+            <span class="n">t0</span>       <span class="o">=</span> <span class="n">fit</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">3</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">smax_id</span><span class="p">))]</span>
+            <span class="n">t0_error</span> <span class="o">=</span> <span class="n">rel_error</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">3</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">smax_id</span><span class="p">))]</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">shared_smax</span><span class="p">:</span>
+
+                <span class="n">t0_all</span>       <span class="o">=</span> <span class="n">expand_parameter_list</span><span class="p">(</span><span class="n">t0</span><span class="p">,</span>       <span class="bp">self</span><span class="o">.</span><span class="n">smax_id</span><span class="p">)</span>
+                <span class="n">t0_error_all</span> <span class="o">=</span> <span class="n">expand_parameter_list</span><span class="p">(</span><span class="n">t0_error</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">smax_id</span><span class="p">)</span>
+
+                <span class="n">df_fit</span><span class="p">[</span><span class="s1">&#39;t0&#39;</span><span class="p">]</span>   <span class="o">=</span> <span class="n">t0_all</span>
+                <span class="n">df_error</span><span class="p">[</span><span class="s1">&#39;t0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t0_error_all</span>
+
+            <span class="k">else</span><span class="p">:</span>
+
+                <span class="n">df_fit</span><span class="p">[</span><span class="s1">&#39;t0&#39;</span><span class="p">]</span>   <span class="o">=</span> <span class="n">t0</span>
+                <span class="n">df_error</span><span class="p">[</span><span class="s1">&#39;t0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t0_error</span>
+
+        <span class="k">if</span> <span class="n">fit_ktr</span><span class="p">:</span>
+
+            <span class="n">n_ktr</span>      <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">smax_id</span><span class="p">))</span>
+            <span class="n">idx_start</span>  <span class="o">=</span> <span class="mi">2</span><span class="o">+</span><span class="p">(</span><span class="ow">not</span> <span class="n">fixed_t0</span><span class="p">)</span><span class="o">*</span><span class="n">n_ktr</span>
+            <span class="n">ktrs</span>       <span class="o">=</span> <span class="n">fit</span><span class="p">[</span><span class="n">idx_start</span><span class="p">:</span><span class="n">smax_param_start</span><span class="p">]</span>
+            <span class="n">ktrs_error</span> <span class="o">=</span> <span class="n">rel_error</span><span class="p">[</span><span class="n">idx_start</span><span class="p">:</span><span class="n">smax_param_start</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">shared_smax</span><span class="p">:</span>
+
+                <span class="n">ktr_all</span>       <span class="o">=</span> <span class="n">expand_parameter_list</span><span class="p">(</span><span class="n">ktrs</span><span class="p">,</span>       <span class="bp">self</span><span class="o">.</span><span class="n">smax_id</span><span class="p">)</span>
+                <span class="n">ktr_error_all</span> <span class="o">=</span> <span class="n">expand_parameter_list</span><span class="p">(</span><span class="n">ktrs_error</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">smax_id</span><span class="p">)</span>
+
+                <span class="n">df_fit</span><span class="p">[</span><span class="s1">&#39;Ktr&#39;</span><span class="p">]</span>   <span class="o">=</span> <span class="n">ktr_all</span>
+                <span class="n">df_error</span><span class="p">[</span><span class="s1">&#39;Ktr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ktr_error_all</span>
+
+            <span class="k">else</span><span class="p">:</span>
+
+                <span class="n">df_fit</span><span class="p">[</span><span class="s1">&#39;Ktr&#39;</span><span class="p">]</span>   <span class="o">=</span> <span class="n">ktrs</span>
+                <span class="n">df_error</span><span class="p">[</span><span class="s1">&#39;Ktr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ktrs_error</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_params_kinetics</span>       <span class="o">=</span> <span class="n">df_fit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_params_kinetics_error</span> <span class="o">=</span> <span class="n">df_error</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span>      <span class="o">=</span> <span class="n">fit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p0</span>          <span class="o">=</span> <span class="n">p0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">low_bounds</span>  <span class="o">=</span> <span class="n">low_bounds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">high_bounds</span> <span class="o">=</span> <span class="n">high_bounds</span>
+
+        <span class="k">return</span>  <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="KineticsFitter.calculate_ci95">
+<a class="viewcode-back" href="../../pykingenie.html#pykingenie.fitter_surface.KineticsFitter.calculate_ci95">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_ci95</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shared_smax</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fixed_t0</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fit_ktr</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate 95% confidence intervals for the fitted parameters.</span>
+<span class="sd">        </span>
+<span class="sd">        This method computes asymmetrical 95% confidence intervals for the</span>
+<span class="sd">        equilibrium dissociation constant (Kd) and the dissociation rate constant (k_off).</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        shared_smax : bool, optional</span>
+<span class="sd">            Whether Smax was shared across curves with the same Smax ID, default is True.</span>
+<span class="sd">        fixed_t0 : bool, optional</span>
+<span class="sd">            Whether the time offset (t0) was fixed to zero, default is True.</span>
+<span class="sd">        fit_ktr : bool, optional</span>
+<span class="sd">            Whether mass transport rate constants were included in the model, default is False.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Updates the fit_params_kinetics_ci95 attribute with a DataFrame containing</span>
+<span class="sd">            the 95% confidence intervals for Kd and k_off.</span>
+<span class="sd">            </span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method will create an empty DataFrame if the confidence interval calculation fails.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+
+        <span class="c1"># Compute asymmetrical 95% confidence intervals</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">fit_ktr</span><span class="p">:</span>
+
+                <span class="n">exp_signal_concat</span> <span class="o">=</span> <span class="n">concat_signal_lst</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">disso_lst</span><span class="p">)</span>
+                <span class="n">fit_signal_concat</span> <span class="o">=</span> <span class="n">concat_signal_lst</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signal_assoc_fit</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">signal_disso_fit</span><span class="p">)</span>
+                <span class="n">n</span>                 <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">exp_signal_concat</span><span class="p">)</span>
+                <span class="n">p</span>                 <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p0</span><span class="p">)</span>
+
+                <span class="n">rss_desired</span> <span class="o">=</span> <span class="n">get_desired_rss</span><span class="p">(</span><span class="n">exp_signal_concat</span><span class="p">,</span>
+                                              <span class="n">fit_signal_concat</span><span class="p">,</span>
+                                              <span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+
+                <span class="n">Kd_min</span><span class="p">,</span> <span class="n">Kd_max</span> <span class="o">=</span> <span class="n">one_site_assoc_and_disso_asymmetric_ci95</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">Kd</span><span class="p">,</span><span class="n">rss_desired</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">time_assoc_lst</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">lig_conc_lst</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">disso_lst</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">time_disso_lst</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">p0</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span><span class="bp">self</span><span class="o">.</span><span class="n">low_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span><span class="bp">self</span><span class="o">.</span><span class="n">high_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">smax_id</span><span class="p">,</span><span class="n">shared_smax</span><span class="o">=</span><span class="n">shared_smax</span><span class="p">,</span><span class="n">fixed_t0</span><span class="o">=</span><span class="n">fixed_t0</span><span class="p">)</span>
+
+                <span class="n">p0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p0</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">p0</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+                <span class="n">low_bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">low_bounds</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">low_bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+                <span class="n">high_bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">high_bounds</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">high_bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+
+                <span class="n">koff_min</span><span class="p">,</span> <span class="n">koff_max</span>  <span class="o">=</span> <span class="n">one_site_assoc_and_disso_asymmetric_ci95_koff</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">k_off</span><span class="p">,</span><span class="n">rss_desired</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">time_assoc_lst</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">lig_conc_lst</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">disso_lst</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">time_disso_lst</span><span class="p">,</span>
+                    <span class="n">p0</span><span class="p">,</span><span class="n">low_bounds</span><span class="p">,</span><span class="n">high_bounds</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">smax_id</span><span class="p">,</span><span class="n">shared_smax</span><span class="o">=</span><span class="n">shared_smax</span><span class="p">,</span><span class="n">fixed_t0</span><span class="o">=</span><span class="n">fixed_t0</span><span class="p">)</span>
+
+                <span class="c1"># Convert ci95_Kd and ci95_koff to a nice Table</span>
+                <span class="n">header</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Parameter&#39;</span><span class="p">,</span><span class="s1">&#39;95% CI lower&#39;</span><span class="p">,</span><span class="s1">&#39;95% CI upper&#39;</span><span class="p">]</span>
+                <span class="n">row1</span>   <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Kd [µM]&#39;</span><span class="p">,</span><span class="n">Kd_min</span><span class="p">,</span><span class="n">Kd_max</span><span class="p">]</span>
+                <span class="n">row2</span>   <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;k_off [1/s]&#39;</span><span class="p">,</span><span class="n">koff_min</span><span class="p">,</span><span class="n">koff_max</span><span class="p">]</span>
+
+                <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">row1</span><span class="p">,</span><span class="n">row2</span><span class="p">],</span><span class="n">columns</span><span class="o">=</span><span class="n">header</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">fit_params_kinetics_ci95</span> <span class="o">=</span> <span class="n">df</span>
+
+        <span class="k">except</span><span class="p">:</span>
+
+            <span class="c1"># Generate an empty dataframe if the procedure did not work</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fit_params_kinetics_ci95</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+
+        <span class="k">return</span>  <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="KineticsFitter.fit_one_site_if_assoc_and_disso">
+<a class="viewcode-back" href="../../pykingenie.html#pykingenie.fitter_surface.KineticsFitter.fit_one_site_if_assoc_and_disso">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit_one_site_if_assoc_and_disso</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shared_smax</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fit the association and dissociation signals using the induced fit model.</span>
+<span class="sd">        </span>
+<span class="sd">        This method first fits a simple one-site model to get initial parameter estimates,</span>
+<span class="sd">        then explores different values of the conformational change rate constants (kc and krev)</span>
+<span class="sd">        to find good initial guesses for the induced fit model. Finally, it fits the full</span>
+<span class="sd">        induced fit model with these initial guesses.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        shared_smax : bool, optional</span>
+<span class="sd">            Whether to share Smax across curves with the same Smax ID, default is True.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Updates the following instance attributes:</span>
+<span class="sd">            - params: The fitted parameters [k_on, k_off, k_c, k_rev, Smax1, Smax2, ...]</span>
+<span class="sd">            - signal_assoc_fit: The fitted association signals</span>
+<span class="sd">            - signal_disso_fit: The fitted dissociation signals</span>
+<span class="sd">            - k_on: The association rate constant</span>
+<span class="sd">            - k_off: The dissociation rate constant</span>
+<span class="sd">            - k_c: The forward conformational change rate constant</span>
+<span class="sd">            - k_rev: The reverse conformational change rate constant</span>
+<span class="sd">            - Smax: The maximum signal values</span>
+<span class="sd">            - fit_params_kinetics: DataFrame with the fitted parameters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Fit first a model without induced-fit</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_one_site_assoc_and_disso</span><span class="p">(</span><span class="n">shared_smax</span><span class="o">=</span><span class="n">shared_smax</span><span class="p">)</span>
+
+        <span class="c1"># Get the initial parameters from the single site fit</span>
+        <span class="n">p0</span>          <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p0</span>
+        <span class="n">low_bounds</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">low_bounds</span>
+        <span class="n">high_bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">high_bounds</span>
+
+        <span class="c1"># Find kon from Kd (1st fitted param) and koff (2nd fitted param)</span>
+        <span class="n">kon</span> <span class="o">=</span> <span class="n">p0</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">p0</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">p0</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>          <span class="o">=</span> <span class="n">kon</span>
+        <span class="n">low_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="o">=</span> <span class="n">kon</span> <span class="o">/</span> <span class="mf">1e3</span>
+        <span class="n">high_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">kon</span> <span class="o">*</span> <span class="mf">1e3</span>
+
+        <span class="c1"># We need to find good initial guesses for the kc and krev parameters</span>
+        <span class="n">kc_init</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+        <span class="n">k_rev_init</span> <span class="o">=</span> <span class="n">kc_init</span>
+
+        <span class="n">combinations</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">kc_init</span><span class="p">,</span> <span class="n">k_rev_init</span><span class="p">)))</span>
+        <span class="n">df_combinations</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">combinations</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;kc_init&#39;</span><span class="p">,</span> <span class="s1">&#39;kc_rev&#39;</span><span class="p">])</span>
+
+        <span class="c1"># We need kc &gt; krev/100 - otherwise there is no detectable induced fit</span>
+        <span class="n">df_combinations</span> <span class="o">=</span> <span class="n">df_combinations</span><span class="p">[</span><span class="n">df_combinations</span><span class="p">[</span><span class="s1">&#39;kc_init&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">df_combinations</span><span class="p">[</span><span class="s1">&#39;kc_rev&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">100</span><span class="p">]</span>
+
+        <span class="n">rss_init</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+        <span class="n">best_kc</span>     <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">best_krev</span>   <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">best_params</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># We create a subsample of the time points to speed up the fitting for the initial guess</span>
+        <span class="n">time_assoc_lst_subsampled</span> <span class="o">=</span> <span class="p">[</span><span class="n">subset_data</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_assoc_lst</span><span class="p">]</span>
+        <span class="n">time_disso_lst_subsampled</span> <span class="o">=</span> <span class="p">[</span><span class="n">subset_data</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_disso_lst</span><span class="p">]</span>
+        <span class="n">assoc_lst_subsampled</span>      <span class="o">=</span> <span class="p">[</span><span class="n">subset_data</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="p">]</span>
+        <span class="n">disso_lst_subsampled</span>      <span class="o">=</span> <span class="p">[</span><span class="n">subset_data</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">disso_lst</span><span class="p">]</span>
+
+        <span class="c1"># Loop through each combination of kc and krev</span>
+        <span class="c1"># Apply fit_induced_fit_sites_assoc_and_disso with fixed kon2 and koff2 (corresponding to kc and krev)</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df_combinations</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+
+            <span class="n">kc</span>     <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;kc_init&#39;</span><span class="p">]</span>
+            <span class="n">krev</span>   <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;kc_rev&#39;</span><span class="p">]</span>
+
+            <span class="k">try</span><span class="p">:</span>
+
+                <span class="n">params</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">fit_vals_assoc</span><span class="p">,</span> <span class="n">fit_vals_disso</span> <span class="o">=</span> <span class="n">fit_induced_fit_sites_assoc_and_disso</span><span class="p">(</span>
+                    <span class="n">assoc_lst_subsampled</span><span class="p">,</span><span class="n">time_assoc_lst_subsampled</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">lig_conc_lst</span><span class="p">,</span>
+                    <span class="n">disso_lst_subsampled</span><span class="p">,</span><span class="n">time_disso_lst_subsampled</span><span class="p">,</span>
+                    <span class="n">p0</span><span class="p">,</span><span class="n">low_bounds</span><span class="p">,</span><span class="n">high_bounds</span><span class="p">,</span>
+                    <span class="n">smax_idx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">smax_id</span><span class="p">,</span>
+                    <span class="n">shared_smax</span><span class="o">=</span><span class="n">shared_smax</span><span class="p">,</span>
+                    <span class="n">fixed_t0</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">fixed_kon2</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="c1"># k_on2 refers here to the forward rate constant of the induced fit</span>
+                    <span class="n">kon2_value</span><span class="o">=</span><span class="n">kc</span><span class="p">,</span>
+                    <span class="n">fixed_koff2</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="c1"># k_off2 refers here to the reverse rate constant of the induced fit</span>
+                    <span class="n">koff2_value</span><span class="o">=</span><span class="n">krev</span>
+                <span class="p">)</span>
+
+                <span class="c1"># Calculate the residuals for the signals - use the subsampled data</span>
+                <span class="n">rss_asso</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">y</span> <span class="o">-</span> <span class="n">fit_y</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span><span class="p">,</span> <span class="n">fit_y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">assoc_lst_subsampled</span><span class="p">,</span> <span class="n">fit_vals_assoc</span><span class="p">)])</span>
+                <span class="n">rss_disso</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">y</span> <span class="o">-</span> <span class="n">fit_y</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span><span class="p">,</span> <span class="n">fit_y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">disso_lst_subsampled</span><span class="p">,</span> <span class="n">fit_vals_disso</span><span class="p">)])</span>
+
+                <span class="n">rss</span> <span class="o">=</span> <span class="n">rss_asso</span> <span class="o">+</span> <span class="n">rss_disso</span>
+
+                <span class="k">if</span> <span class="n">rss</span> <span class="o">&lt;</span> <span class="n">rss_init</span><span class="p">:</span>
+
+                    <span class="n">rss_init</span> <span class="o">=</span> <span class="n">rss</span>
+                    <span class="n">best_kc</span>  <span class="o">=</span> <span class="n">kc</span>
+                    <span class="n">best_krev</span> <span class="o">=</span> <span class="n">krev</span>
+                    <span class="n">best_params</span> <span class="o">=</span> <span class="n">params</span>
+
+            <span class="k">except</span><span class="p">:</span>
+
+                <span class="c1"># If the fit fails, just continue to the next combination</span>
+                <span class="k">continue</span>
+
+        <span class="c1"># Insert the kc and krev parameters into the p0, low_bounds and high_bounds lists</span>
+
+        <span class="n">factor</span> <span class="o">=</span> <span class="mf">1e3</span>  <span class="c1"># Factor to scale the bounds for kc and krev</span>
+
+        <span class="n">p0</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">best_kc</span><span class="p">)</span>
+        <span class="n">low_bounds</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">best_kc</span><span class="o">/</span><span class="n">factor</span><span class="p">)</span>
+        <span class="n">high_bounds</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">best_kc</span><span class="o">*</span><span class="n">factor</span><span class="p">)</span>
+        <span class="n">p0</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">best_krev</span><span class="p">)</span>
+        <span class="n">low_bounds</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">best_krev</span><span class="o">/</span><span class="n">factor</span><span class="p">)</span>
+        <span class="n">high_bounds</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">best_krev</span><span class="o">*</span><span class="n">factor</span><span class="p">)</span>
+
+        <span class="c1"># Replace the kon and koff with the best parameters</span>
+        <span class="n">p0</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="o">=</span> <span class="n">best_params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># kon</span>
+        <span class="n">p0</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="o">=</span> <span class="n">best_params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># koff</span>
+
+        <span class="n">low_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="o">=</span> <span class="n">best_params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">factor</span>  <span class="c1"># kon</span>
+        <span class="n">high_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">best_params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">factor</span>
+
+        <span class="n">low_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="o">=</span> <span class="n">best_params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">factor</span>  <span class="c1"># koff</span>
+        <span class="n">high_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">best_params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">factor</span>
+
+        <span class="n">fit</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">fit_vals_assoc</span><span class="p">,</span> <span class="n">fit_vals_disso</span> <span class="o">=</span> <span class="n">fit_induced_fit_sites_assoc_and_disso</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">time_assoc_lst</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">lig_conc_lst</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">disso_lst</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">time_disso_lst</span><span class="p">,</span>
+            <span class="n">p0</span><span class="p">,</span><span class="n">low_bounds</span><span class="p">,</span><span class="n">high_bounds</span><span class="p">,</span>
+            <span class="n">smax_idx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">smax_id</span><span class="p">,</span>
+            <span class="n">shared_smax</span><span class="o">=</span><span class="n">shared_smax</span><span class="p">,</span>
+            <span class="n">fixed_t0</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">signal_assoc_fit</span> <span class="o">=</span> <span class="n">fit_vals_assoc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">signal_disso_fit</span> <span class="o">=</span> <span class="n">fit_vals_disso</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">k_on</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_off</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_rev</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">Smax</span> <span class="o">=</span> <span class="n">fit</span>
+
+        <span class="c1"># Create a dataframe with the fitted parameters</span>
+        <span class="n">df_fit</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;k_on [1/(s*µM)]&#39;</span><span class="p">:</span>  <span class="bp">self</span><span class="o">.</span><span class="n">k_on</span><span class="p">,</span>
+                               <span class="s1">&#39;k_off [1/s]&#39;</span><span class="p">:</span>      <span class="bp">self</span><span class="o">.</span><span class="n">k_off</span><span class="p">,</span>
+                               <span class="s1">&#39;k_c [1/s]&#39;</span><span class="p">:</span>        <span class="bp">self</span><span class="o">.</span><span class="n">k_c</span><span class="p">,</span>
+                               <span class="s1">&#39;k_rev [1/s]&#39;</span><span class="p">:</span>      <span class="bp">self</span><span class="o">.</span><span class="n">k_rev</span><span class="p">,</span>
+                               <span class="s1">&#39;Smax&#39;</span><span class="p">:</span>             <span class="bp">self</span><span class="o">.</span><span class="n">Smax</span><span class="p">})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_params_kinetics</span> <span class="o">=</span> <span class="n">df_fit</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span>      <span class="o">=</span> <span class="n">fit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p0</span>          <span class="o">=</span> <span class="n">p0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">low_bounds</span>  <span class="o">=</span> <span class="n">low_bounds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">high_bounds</span> <span class="o">=</span> <span class="n">high_bounds</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+</div>
+
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, osvalB.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

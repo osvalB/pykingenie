@@ -347,10 +347,13 @@
                 <article class="bd-article">
                   
   <h1>Source code for pykingenie.gator</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">.surface_exp</span><span class="w">      </span><span class="kn">import</span> <span class="o">*</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">.surface_exp</span><span class="w">      </span><span class="kn">import</span> <span class="n">SurfaceBasedExperiment</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">zipfile</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.utils.processing</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_loading_column</span>
 
