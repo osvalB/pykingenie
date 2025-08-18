@@ -437,6 +437,27 @@
         <span class="k">return</span> <span class="kc">None</span></div>
 
 
+<div class="viewcode-block" id="SolutionBasedExp.cut_off_time">
+<a class="viewcode-back" href="../../pykingenie.html#pykingenie.solution_exp.SolutionBasedExp.cut_off_time">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cut_off_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">time</span><span class="p">):</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove all data before a specified time.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        time : float</span>
+<span class="sd">            The time to cut off the data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xs</span><span class="p">)):</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">ys</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ys</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">xs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">time</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">xs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">xs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">time</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
 <div class="viewcode-block" id="SolutionBasedExp.get_trace_xy">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.solution_exp.SolutionBasedExp.get_trace_xy">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_trace_xy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace_name</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">):</span>

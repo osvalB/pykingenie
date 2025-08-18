@@ -594,6 +594,7 @@
 <span class="sd">            - signal_assoc_fit: List of fitted association signals</span>
 <span class="sd">            - fit_params_kinetics: DataFrame with the fitted parameters</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear_fittings</span><span class="p">()</span>
 
         <span class="n">k_obs_1</span><span class="p">,</span> <span class="n">k_obs_2</span><span class="p">,</span> <span class="n">y_pred</span> <span class="o">=</span> <span class="n">fit_many_double_exponential</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">time_assoc_lst</span><span class="p">,</span><span class="n">min_log_k</span><span class="p">,</span> <span class="n">max_log_k</span><span class="p">,</span> <span class="n">log_k_points</span><span class="p">)</span>
 
@@ -655,8 +656,11 @@
 
 <div class="viewcode-block" id="KineticsFitterSolution.fit_one_binding_site">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.fitter_solution.KineticsFitterSolution.fit_one_binding_site">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">fit_one_binding_site</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">fit_signal_E</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fit_signal_S</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                             <span class="n">fit_signal_ES</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">fixed_t0</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit_one_binding_site</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span><span class="n">fit_signal_E</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">fit_signal_S</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">fit_signal_ES</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">fixed_t0</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Fit the association signals assuming one binding site.</span>
 <span class="sd">        </span>
@@ -682,9 +686,58 @@
 <span class="sd">            - fit_params_kinetics: DataFrame with the fitted parameters</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">initial_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lig_conc</span><span class="p">),</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># Signal amplitude of the complex, Kd, and koff</span>
-        <span class="n">low_bounds</span>         <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lig_conc</span><span class="p">)</span><span class="o">/</span><span class="mf">1e2</span><span class="p">,</span><span class="mf">1e-2</span><span class="p">]</span>
-        <span class="n">high_bounds</span>        <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lig_conc</span><span class="p">)</span><span class="o">*</span><span class="mf">1e2</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">]</span>
+        <span class="c1"># Initial parameters are as follows:</span>
+        <span class="c1"># 1. Signal amplitude of the free protein</span>
+        <span class="c1"># 2. Signal amplitude of the free ligand</span>
+        <span class="c1"># 3. Signal amplitude of the complex</span>
+        <span class="c1"># 4. Kd of the complex</span>
+        <span class="c1"># 5. koff of the complex</span>
+        <span class="c1"># 6. t0 of the first trace</span>
+        <span class="c1"># 7. t0 of the second trace</span>
+        <span class="c1"># n. t0 of the last trace</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear_fittings</span><span class="p">()</span>
+
+        <span class="n">max_signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="p">)</span>
+        <span class="n">max_prot</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prot_conc</span><span class="p">)</span>
+        <span class="n">max_lig</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lig_conc</span><span class="p">)</span>
+
+        <span class="n">max_signal_P</span> <span class="o">=</span> <span class="n">max_signal</span> <span class="o">/</span> <span class="n">max_prot</span>
+        <span class="n">max_signal_L</span> <span class="o">=</span> <span class="n">max_signal</span> <span class="o">/</span> <span class="n">max_lig</span>
+
+        <span class="n">min_Kd</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lig_conc</span><span class="p">)</span><span class="o">/</span><span class="mf">1e2</span>
+        <span class="n">max_Kd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lig_conc</span><span class="p">)</span><span class="o">*</span><span class="mf">1e2</span>
+
+        <span class="n">initial_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="n">max_signal_P</span><span class="p">,</span><span class="n">max_signal_L</span><span class="p">,</span><span class="n">max_signal_P</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lig_conc</span><span class="p">),</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">low_bounds</span>  <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">min_Kd</span><span class="p">,</span><span class="mf">1e-4</span><span class="p">]</span>
+        <span class="n">high_bounds</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span><span class="n">max_Kd</span><span class="p">,</span><span class="mf">1e5</span><span class="p">]</span>
+
+        <span class="c1"># Remove the third parameter if we do not fit the signal of the complex</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fit_signal_ES</span><span class="p">:</span>
+            <span class="n">initial_parameters</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">low_bounds</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">high_bounds</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># Remove the second parameter if we do not fit the signal of the free ligand</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fit_signal_S</span><span class="p">:</span>
+            <span class="n">initial_parameters</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">low_bounds</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">high_bounds</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Remove the first parameter if we do not fit the signal of the free protein</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fit_signal_E</span><span class="p">:</span>
+            <span class="n">initial_parameters</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">low_bounds</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">high_bounds</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># If t0 is fitted, we need to include it in the initial parameters</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fixed_t0</span><span class="p">:</span>
+
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="p">)):</span>
+
+                <span class="n">initial_parameters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">low_bounds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">-</span><span class="mf">0.1</span><span class="p">)</span>
+                <span class="n">high_bounds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
 
         <span class="n">fit_params</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">fitted_values</span><span class="p">,</span> <span class="n">parameter_names</span> <span class="o">=</span> <span class="n">fit_one_site_solution</span><span class="p">(</span>
             <span class="n">signal_lst</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="p">,</span>
@@ -742,7 +795,18 @@
         <span class="p">})</span>
 
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">parameter_names</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fit_params_kinetics</span><span class="p">[</span><span class="n">param</span><span class="p">]</span> <span class="o">=</span> <span class="n">fit_params</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="s2">&quot;t0&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">param</span><span class="p">:</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">fit_params_kinetics</span><span class="p">[</span><span class="n">param</span><span class="p">]</span> <span class="o">=</span> <span class="n">fit_params</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="c1"># If we fit t0, we need to restructure the fit_params_kinetics DataFrame</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fixed_t0</span><span class="p">:</span>
+            <span class="n">n_t0</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="p">)</span>
+            <span class="n">t0_params</span> <span class="o">=</span> <span class="n">fit_params</span><span class="p">[</span><span class="o">-</span><span class="n">n_t0</span><span class="p">:]</span>
+
+            <span class="c1"># Include a column named t0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fit_params_kinetics</span><span class="p">[</span><span class="s1">&#39;t0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t0_params</span>
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
@@ -781,6 +845,8 @@
 <span class="sd">        None</span>
 <span class="sd">            Updates the params_guess attribute with the best initial parameters.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear_fittings</span><span class="p">()</span>
 
         <span class="c1"># Heuristically find the best initial parameters for the fit</span>
         <span class="c1"># We explore fixed values of kc and krev and fit kon and koff (and the signal of the complex)</span>
@@ -841,8 +907,15 @@
 
         <span class="c1"># fit using as initial parameters the best found parameters</span>
         <span class="n">initial_parameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params_guess</span> <span class="p">)</span>
-        <span class="n">low_bounds</span>  <span class="o">=</span> <span class="n">initial_parameters</span> <span class="o">/</span> <span class="mf">1e3</span>
-        <span class="n">high_bounds</span> <span class="o">=</span> <span class="n">initial_parameters</span> <span class="o">*</span> <span class="mf">1e3</span>
+        <span class="n">low_bounds</span>  <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">/</span> <span class="mf">1e3</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">x</span><span class="o">*</span><span class="mf">1e3</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">initial_parameters</span> <span class="p">]</span>
+        <span class="n">high_bounds</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">*</span> <span class="mf">1e3</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">x</span><span class="o">*</span><span class="mf">1e-3</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">initial_parameters</span> <span class="p">]</span>
+
+        <span class="c1"># Set the bounds for the t0 parameter - between -0.1 and 0.1</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fixed_t0</span><span class="p">:</span>
+            <span class="n">n_params</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">initial_parameters</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="p">)):</span>
+                <span class="n">low_bounds</span><span class="p">[</span><span class="n">n_params</span><span class="o">-</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.1</span>
+                <span class="n">high_bounds</span><span class="p">[</span><span class="n">n_params</span><span class="o">-</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
 
         <span class="n">global_fit_params</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">fitted_values</span><span class="p">,</span> <span class="n">parameter_names</span> <span class="o">=</span> <span class="n">fit_induced_fit_solution</span><span class="p">(</span>
             <span class="n">signal_lst</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="p">,</span>
@@ -883,7 +956,7 @@
             <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">global_fit_params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span>  <span class="o">=</span> <span class="n">global_fit_params</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">low_bounds</span>  <span class="o">=</span> <span class="n">low_bounds</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">high_bounds</span> <span class="o">=</span> <span class="n">high_bounds</span>
 
@@ -898,7 +971,14 @@
         <span class="p">})</span>
 
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">parameter_names</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fit_params_kinetics</span><span class="p">[</span><span class="n">param</span><span class="p">]</span> <span class="o">=</span> <span class="n">global_fit_params</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s2">&quot;t0&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">param</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fit_params_kinetics</span><span class="p">[</span><span class="n">param</span><span class="p">]</span> <span class="o">=</span> <span class="n">global_fit_params</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="c1"># Include the t0 column in the dataframe if we fitted t0</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fixed_t0</span><span class="p">:</span>
+            <span class="n">n_t0</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="p">)</span>
+            <span class="n">t0_params</span> <span class="o">=</span> <span class="n">global_fit_params</span><span class="p">[</span><span class="o">-</span><span class="n">n_t0</span><span class="p">:]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fit_params_kinetics</span><span class="p">[</span><span class="s1">&#39;t0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t0_params</span>
 
         <span class="k">return</span> <span class="kc">None</span></div>
 </div>
