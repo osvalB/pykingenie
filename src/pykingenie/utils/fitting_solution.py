@@ -102,10 +102,7 @@ def fit_one_site_solution(
 
         signal_E  = 0 if not fit_signal_E  else args[idx]; idx += fit_signal_E
         signal_S  = 0 if not fit_signal_S  else args[idx]; idx += fit_signal_S
-
-        if fit_signal_ES:
-            signal_ES = args[idx]
-            idx += 1
+        signal_ES = 0 if not fit_signal_ES else args[idx]; idx += fit_signal_ES
 
         Kd     = Kd_value     if fixed_Kd    else args[idx]; idx += not fixed_Kd
         k_off  = koff_value   if fixed_koff  else args[idx]; idx += not fixed_koff
@@ -117,6 +114,7 @@ def fit_one_site_solution(
         for i, t in enumerate(time_lst):
 
             t0 = 0 if fixed_t0 else args[idx + i]
+
             lig_conc  = ligand_conc_lst[i]
             prot_conc = protein_conc_lst[i]
             signal = signal_ode_one_site_insolution(t,k_off,Kd,prot_conc,lig_conc,t0=t0,signal_a=signal_E,signal_b=signal_S,signal_complex=signal_ES)
@@ -276,11 +274,8 @@ def fit_induced_fit_solution(
         if fit_signal_ES:
             signal_ES = args[idx]
             idx += 1
-            if ESint_equals_ES:
-                signal_ESint = signal_ES
-            else:
-                signal_ESint = args[idx]
-                idx += 1
+
+            signal_ESint = signal_ES if ESint_equals_ES else args[idx]; idx += not ESint_equals_ES
 
         k_on    = kon_value     if fixed_kon    else args[idx]; idx += not fixed_kon
         k_off   = koff_value    if fixed_koff   else args[idx]; idx += not fixed_koff
@@ -353,6 +348,7 @@ def find_initial_parameters_induced_fit_solution(
         np_linspace_high=2,
         np_linspace_num=5
         ):
+
     """
     Find initial parameters for the global fit to association and dissociation traces - one-to-one binding model with induced fit.
     
@@ -406,9 +402,60 @@ def find_initial_parameters_induced_fit_solution(
     rss_init    = np.inf
     best_params = None
 
-    initial_parameters = [1, 1, 1]
-    low_bounds         = [0, 1e-2, 1e-2]
-    high_bounds        = [1e5, 1e3, 1e3]
+    # Initial parameters are as follows:
+    # 1. Signal amplitude of the free protein - removed if not fit_signal_E
+    # 2. Signal amplitude of the free ligand - removed if not fit_signal_S
+    # 3. Signal amplitude of the complex - removed if not fit_signal_ES
+    # 4. Signal amplitude of the intermediate complex - only included if fit_signal_ES and not ESint_equals_ES
+    # 5. Association rate constant
+    # 6. Dissociation rate constant
+    # 7. Induced fit forward rate constant - not included in the next loop with fixed_kc and fixed_krev
+    # 8. Induced fit reverse rate constant - not included in the next loop with fixed_kc and fixed_krev
+    # 9. t0 of the first curve
+    # ... t0 of the last curve
+
+    max_signal = np.max(signal_lst)
+    max_prot   = np.max(protein_conc_lst)
+    max_lig    = np.max(ligand_conc_lst)
+
+    max_signal_P = max_signal / max_prot
+    max_signal_L = max_signal / max_lig
+
+    initial_parameters = []
+    low_bounds = []
+    high_bounds = []
+
+    if fit_signal_E:
+        initial_parameters.append(max_signal_P)
+        low_bounds.append(0)
+        high_bounds.append(np.inf)
+
+    if fit_signal_S:
+        initial_parameters.append(max_signal_L)
+        low_bounds.append(0)
+        high_bounds.append(np.inf)
+
+    if fit_signal_ES:
+        initial_parameters.append(max_signal_P)
+        low_bounds.append(0)
+        high_bounds.append(np.inf)
+
+        if not ESint_equals_ES:
+            initial_parameters.append(max_signal_P)
+            low_bounds.append(0)
+            high_bounds.append(np.inf)
+
+    # Append kon and koff
+    initial_parameters += [1, 1]
+    low_bounds         += [1e-4, 1e-4]
+    high_bounds        += [1e4, 1e4]
+
+    # Include the t0 parameter
+    if not fixed_t0:
+        n_t0 = len(time_lst)
+        initial_parameters += [0] * n_t0
+        low_bounds         += [-0.1] * n_t0
+        high_bounds        += [0.1] * n_t0
 
     for index, row in df_combinations.iterrows():
 
@@ -432,7 +479,13 @@ def find_initial_parameters_induced_fit_solution(
 
         if rss < rss_init:
             rss_init = rss
-            best_params = np.concatenate((global_fit_params, [kc, krev]))
+
+            # We need to include kc and krev before the t0 parameter
+            if fixed_t0:
+                best_params = np.concatenate((global_fit_params, [kc, krev]))
+            else:
+                best_params = np.concatenate((global_fit_params[:-n_t0], [kc, krev],global_fit_params[-n_t0:]))
+
             initial_parameters = global_fit_params.tolist() 
 
     return best_params

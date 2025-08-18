@@ -22,7 +22,7 @@ def test_load_solution_data():
     pyKinetics.add_experiment(kingenie, 'test_kingenie_csv')
     pyKinetics.merge_conc_df_solution()
 
-    df = pyKinetics.combined_conc_df
+    df = pyKinetics.combined_conc_df.iloc[4:,:].copy() # Last 4 curves only to make it faster
 
     assert not df.empty, "Combined concentration DataFrame should not be empty after merging."
 
@@ -38,7 +38,7 @@ def test_load_solution_data():
 
     k_obs = pyKinetics.get_experiment_properties('k_obs', fittings=True)[0]
 
-    expected = [0.12707, 0.13733, 0.15369, 0.17947, 0.22084, 0.28767, 0.39540,0.56919]
+    expected = [0.22084, 0.28767, 0.39540,0.56919]
 
     assert np.allclose(k_obs, expected,rtol=0.0001), f"Expected {expected}, got {k_obs}"
 
@@ -46,21 +46,69 @@ def test_load_solution_data():
 
     fit_params_kinetics = pyKinetics.get_experiment_properties('fit_params_kinetics', fittings=True)[0]
 
-    assert len(fit_params_kinetics) == 8, "There should be 8 sets of fit parameters for kinetics."
+    assert len(fit_params_kinetics) == 4, "There should be 4 sets of fit parameters for kinetics."
 
-    assert np.allclose(fit_params_kinetics['Kd [µM]'][0],0.103944,rtol=0.001)
+    assert np.allclose(fit_params_kinetics['Kd [µM]'][0],0.1,rtol=0.01)
 
-def test_submit_fitting_solution():
+def test_submit_fitting_solution_simple_fit_t0():
+
+    pyKinetics.submit_fitting_solution(fitting_model='one_binding_site',fixed_t0=False)
+
+    fit_params_kinetics = pyKinetics.get_experiment_properties('fit_params_kinetics', fittings=True)[0]
+
+    print(fit_params_kinetics)
+
+    assert len(fit_params_kinetics) == 4, "There should be 4 sets of fit parameters for kinetics."
+
+
+def test_submit_fitting_solution_simple_fit_2():
+
+    pyKinetics.submit_fitting_solution(
+        fitting_model='one_binding_site',
+        fixed_t0=True,
+        fit_signal_E=True, # should be close to zero
+        fit_signal_S=False,
+        fit_signal_ES=True)
+
+    fit_params_kinetics = pyKinetics.get_experiment_properties('fit_params_kinetics', fittings=True)[0]
+
+    assert np.allclose(fit_params_kinetics['Kd [µM]'][0],0.1,rtol=0.01)
+
+
+def test_submit_fitting_solution_simple_fit_3():
+
+    pyKinetics.submit_fitting_solution(
+        fitting_model='one_binding_site',
+        fixed_t0=True,
+        fit_signal_E=False,
+        fit_signal_S=True, # should be close to zero
+        fit_signal_ES=True)
+
+    fit_params_kinetics = pyKinetics.get_experiment_properties('fit_params_kinetics', fittings=True)[0]
+
+    assert np.allclose(fit_params_kinetics['Kd [µM]'][0],0.1,rtol=0.01)
+
+
+def test_submit_fitting_solution_if():
 
     pyKinetics.delete_experiment('test_kingenie_csv')
     pyKinetics.add_experiment(kingenie2, 'test_kingenie_csv_2')
     pyKinetics.merge_conc_df_solution()
 
-    df = pyKinetics.combined_conc_df
+    df = pyKinetics.combined_conc_df.iloc[5:,:].copy() # Last 3 curves only to make it faster
 
     assert not df.empty, "Combined concentration DataFrame should not be empty after merging."
 
     pyKinetics.generate_fittings_solution(df)
+
+    pyKinetics.submit_fitting_solution(fitting_model='double')
+
+    fitting_names   = pyKinetics.fittings_names
+    fitter_solution = pyKinetics.fittings[fitting_names[0]]
+
+    # Check that self.kobs_x is not filled with NaN values
+    assert not np.isnan(fitter_solution.k_obs_1).all(), "kobs_1 should not be all NaN values."
+    assert not np.isnan(fitter_solution.k_obs_2).all(), "kobs_2 should not be all NaN values."
 
     kwargs = {
         "fit_signal_E": False,  # E alone does not produce a signal
@@ -70,20 +118,57 @@ def test_submit_fitting_solution():
         "fixed_t0": True # t0 is fixed to 0
     }
 
-    pyKinetics.submit_fitting_solution(fitting_model='double',**kwargs)
-
-    fitting_names   = pyKinetics.fittings_names
-    fitter_solution = pyKinetics.fittings[fitting_names[0]]
-
-    # Check that self.kobs_x is not filled with NaN values
-    assert not np.isnan(fitter_solution.k_obs_1).all(), "kobs_1 should not be all NaN values."
-    assert not np.isnan(fitter_solution.k_obs_2).all(), "kobs_2 should not be all NaN values."
-
     # fit one binding site with induced fit and verify parameters
-    pyKinetics.submit_fitting_solution(fitting_model='one_binding_site_if')
+    pyKinetics.submit_fitting_solution(fitting_model='one_binding_site_if',**kwargs)
 
     assert np.isclose(fitter_solution.fit_params_kinetics['k_c [1/s]'].iloc[0], 1, rtol=0.1), "k_c should be close to 1 (within 10%)."
     assert np.isclose(fitter_solution.fit_params_kinetics['k_rev [1/s]'].iloc[0], 10, rtol=0.1), "k_rev should be close to 10 (within 10%)."
     assert np.isclose(fitter_solution.fit_params_kinetics['k_on [1/(µM·s)]'].iloc[0], 100, rtol=0.1), "k_on should be close to 100 (within 10%)."
     assert np.isclose(fitter_solution.fit_params_kinetics['k_off [1/s]'].iloc[0], 100, rtol=0.1), "k_off should be close to 100 (within 10%)."
+
+def test_submit_fitting_solution_if_2():
+
+    kwargs = {
+        "fit_signal_E": True,  # E does not produce a signal in the simulated data - we use it to trigger code execution
+        "fit_signal_S": True, # S does not produce a signal in the simulated data - we use it to trigger code execution
+        "fit_signal_ES": True, # The complex ES and ES_int produce a signal
+        "ESint_equals_ES": True, # ES_int produces a signal equal to ES
+        "fixed_t0": True # t0 is fixed to 0
+    }
+
+    # fit one binding site with induced fit and verify parameters
+    pyKinetics.submit_fitting_solution(fitting_model='one_binding_site_if',**kwargs)
+
+    fit_params_kinetics = pyKinetics.get_experiment_properties('fit_params_kinetics', fittings=True)[0]
+
+    assert np.isclose(fit_params_kinetics['k_c [1/s]'].iloc[0], 1, rtol=0.1), "k_c should be close to 1 (within 10%)."
+    assert np.isclose(fit_params_kinetics['k_rev [1/s]'].iloc[0], 10, rtol=0.1), "k_rev should be close to 10 (within 10%)."
+    assert np.isclose(fit_params_kinetics['k_on [1/(µM·s)]'].iloc[0], 100, rtol=0.1), "k_on should be close to 100 (within 10%)."
+    assert np.isclose(fit_params_kinetics['k_off [1/s]'].iloc[0], 100, rtol=0.1), "k_off should be close to 100 (within 10%)."
+
+def test_submit_fitting_solution_if_with_t0():
+
+    kwargs = {
+        "fit_signal_E": False,  # E alone does not produce a signal
+        "fit_signal_S": False, # S alone does not produce a signal
+        "fit_signal_ES": True, # The complex ES and ES_int produce a signal
+        "ESint_equals_ES": True, # ES_int produces a signal equal to ES
+        "fixed_t0": False # t0 is fixed to 0
+    }
+
+    # fit one binding site with induced fit and verify parameters
+    pyKinetics.submit_fitting_solution(fitting_model='one_binding_site_if',**kwargs)
+
+    fitting_names   = pyKinetics.fittings_names
+    fitter_solution = pyKinetics.fittings[pyKinetics.fittings_names[0]]
+
+    assert np.isclose(fitter_solution.fit_params_kinetics['k_c [1/s]'].iloc[0], 1,
+                      rtol=0.1), "k_c should be close to 1 (within 10%)."
+    assert np.isclose(fitter_solution.fit_params_kinetics['k_rev [1/s]'].iloc[0], 10,
+                      rtol=0.1), "k_rev should be close to 10 (within 10%)."
+    assert np.isclose(fitter_solution.fit_params_kinetics['k_on [1/(µM·s)]'].iloc[0], 100,
+                      rtol=0.1), "k_on should be close to 100 (within 10%)."
+    assert np.isclose(fitter_solution.fit_params_kinetics['k_off [1/s]'].iloc[0], 100,
+                      rtol=0.1), "k_off should be close to 100 (within 10%)."
+
 

@@ -229,6 +229,7 @@ class KineticsFitterSolution(KineticsFitterGeneral):
             - signal_assoc_fit: List of fitted association signals
             - fit_params_kinetics: DataFrame with the fitted parameters
         """
+        self.clear_fittings()
 
         k_obs_1, k_obs_2, y_pred = fit_many_double_exponential(self.assoc_lst,self.time_assoc_lst,min_log_k, max_log_k, log_k_points)
 
@@ -284,8 +285,11 @@ class KineticsFitterSolution(KineticsFitterGeneral):
 
         return None
 
-    def fit_one_binding_site(self,fit_signal_E=False, fit_signal_S=False,
-                             fit_signal_ES=True,fixed_t0=True):
+    def fit_one_binding_site(
+            self,fit_signal_E=False,
+            fit_signal_S=False,
+            fit_signal_ES=True,
+            fixed_t0=True):
         """
         Fit the association signals assuming one binding site.
         
@@ -311,9 +315,58 @@ class KineticsFitterSolution(KineticsFitterGeneral):
             - fit_params_kinetics: DataFrame with the fitted parameters
         """
 
-        initial_parameters = [1,np.mean(self.lig_conc),1] # Signal amplitude of the complex, Kd, and koff
-        low_bounds         = [0,np.min(self.lig_conc)/1e2,1e-2]
-        high_bounds        = [np.inf,np.max(self.lig_conc)*1e2,np.inf]
+        # Initial parameters are as follows:
+        # 1. Signal amplitude of the free protein
+        # 2. Signal amplitude of the free ligand
+        # 3. Signal amplitude of the complex
+        # 4. Kd of the complex
+        # 5. koff of the complex
+        # 6. t0 of the first trace
+        # 7. t0 of the second trace
+        # n. t0 of the last trace
+
+        self.clear_fittings()
+
+        max_signal = np.max(self.assoc_lst)
+        max_prot   = np.max(self.prot_conc)
+        max_lig    = np.max(self.lig_conc)
+
+        max_signal_P = max_signal / max_prot
+        max_signal_L = max_signal / max_lig
+
+        min_Kd =  np.min(self.lig_conc)/1e2
+        max_Kd = np.max(self.lig_conc)*1e2
+
+        initial_parameters = [max_signal_P,max_signal_L,max_signal_P,np.mean(self.lig_conc),1]
+        low_bounds  = [0,0,0,min_Kd,1e-4]
+        high_bounds = [np.inf,np.inf,np.inf,max_Kd,1e5]
+
+        # Remove the third parameter if we do not fit the signal of the complex
+        if not fit_signal_ES:
+            initial_parameters.pop(2)
+            low_bounds.pop(2)
+            high_bounds.pop(2)
+
+        # Remove the second parameter if we do not fit the signal of the free ligand
+        if not fit_signal_S:
+            initial_parameters.pop(1)
+            low_bounds.pop(1)
+            high_bounds.pop(1)
+
+        # Remove the first parameter if we do not fit the signal of the free protein
+        if not fit_signal_E:
+            initial_parameters.pop(0)
+            low_bounds.pop(0)
+            high_bounds.pop(0)
+
+        # If t0 is fitted, we need to include it in the initial parameters
+        if not fixed_t0:
+
+            for _ in range(len(self.assoc_lst)):
+
+                initial_parameters.append(0)
+                low_bounds.append(-0.1)
+                high_bounds.append(0.1)
 
         fit_params, cov, fitted_values, parameter_names = fit_one_site_solution(
             signal_lst=self.assoc_lst,
@@ -371,7 +424,18 @@ class KineticsFitterSolution(KineticsFitterGeneral):
         })
 
         for i, param in enumerate(parameter_names):
-            self.fit_params_kinetics[param] = fit_params[i]
+
+            if "t0" not in param:
+
+                self.fit_params_kinetics[param] = fit_params[i]
+
+        # If we fit t0, we need to restructure the fit_params_kinetics DataFrame
+        if not fixed_t0:
+            n_t0 = len(self.assoc_lst)
+            t0_params = fit_params[-n_t0:]
+
+            # Include a column named t0
+            self.fit_params_kinetics['t0'] = t0_params
 
         return None
 
@@ -407,6 +471,8 @@ class KineticsFitterSolution(KineticsFitterGeneral):
         None
             Updates the params_guess attribute with the best initial parameters.
         """
+
+        self.clear_fittings()
 
         # Heuristically find the best initial parameters for the fit
         # We explore fixed values of kc and krev and fit kon and koff (and the signal of the complex)
@@ -464,8 +530,15 @@ class KineticsFitterSolution(KineticsFitterGeneral):
 
         # fit using as initial parameters the best found parameters
         initial_parameters = np.array(self.params_guess )
-        low_bounds  = initial_parameters / 1e3
-        high_bounds = initial_parameters * 1e3
+        low_bounds  = [x / 1e3 if x > 0 else x*1e3 for x in initial_parameters ]
+        high_bounds = [x * 1e3 if x > 0 else x*1e-3 for x in initial_parameters ]
+
+        # Set the bounds for the t0 parameter - between -0.1 and 0.1
+        if not fixed_t0:
+            n_params = len(initial_parameters)
+            for i in range(len(self.assoc_lst)):
+                low_bounds[n_params-i-1] = -0.1
+                high_bounds[n_params-i-1] = 0.1
 
         global_fit_params, cov, fitted_values, parameter_names = fit_induced_fit_solution(
             signal_lst=self.assoc_lst,
@@ -506,7 +579,7 @@ class KineticsFitterSolution(KineticsFitterGeneral):
             **kwargs
         )
 
-        self.params = global_fit_params
+        self.params  = global_fit_params
         self.low_bounds  = low_bounds
         self.high_bounds = high_bounds
 
@@ -521,7 +594,14 @@ class KineticsFitterSolution(KineticsFitterGeneral):
         })
 
         for i, param in enumerate(parameter_names):
-            self.fit_params_kinetics[param] = global_fit_params[i]
+            if "t0" not in param:
+                self.fit_params_kinetics[param] = global_fit_params[i]
+
+        # Include the t0 column in the dataframe if we fitted t0
+        if not fixed_t0:
+            n_t0 = len(self.assoc_lst)
+            t0_params = global_fit_params[-n_t0:]
+            self.fit_params_kinetics['t0'] = t0_params
 
         return None
 

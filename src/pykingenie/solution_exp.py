@@ -80,6 +80,24 @@ class SolutionBasedExp:
 
         return None
 
+    def cut_off_time(self,time):
+
+        """
+        Remove all data before a specified time.
+
+        Parameters
+        ----------
+        time : float
+            The time to cut off the data.
+        """
+
+        for i in range(len(self.xs)):
+
+            self.ys[i] = self.ys[i][self.xs[i] <= time]
+            self.xs[i] = self.xs[i][self.xs[i] <= time]
+
+        return None
+
     def get_trace_xy(self, trace_name, type='y'):
         """
         Return the x or y values of a specific trace.

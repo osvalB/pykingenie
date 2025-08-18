@@ -330,7 +330,8 @@ def re_fit(fit, cov, fit_vals, fit_fx, low_bounds, high_bounds, times, **kwargs)
 
     for _ in range(times):
 
-        difference_to_upper = np.abs( (high_bounds - fit) / high_bounds )
+        # upper bounds may contain np.inf, which will cause a division error
+        difference_to_upper = np.abs(np.array([(a-b)/a if a != np.inf else np.inf for a, b in zip(high_bounds, fit)]))
         difference_to_lower = np.abs( (fit - low_bounds) / fit )
 
         c1 = any(difference_to_upper < 0.02)
@@ -413,7 +414,7 @@ def re_fit_2(fit, cov, fit_vals_a, fit_vals_b, fit_fx, low_bounds, high_bounds, 
 
     for _ in range(times):
 
-        difference_to_upper = np.abs( (high_bounds - fit) / high_bounds)
+        difference_to_upper = np.abs(np.array([(a-b)/a if a != np.inf else np.inf for a, b in zip(high_bounds, fit)]))
         difference_to_lower = np.abs( (fit - low_bounds) / fit)
 
         c1 = any(difference_to_upper < 0.02)
