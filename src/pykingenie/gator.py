@@ -48,11 +48,13 @@ class GatorExperiment(SurfaceBasedExperiment):
             Updates instance attributes with the loaded experiment data.
         """
 
-        # Check if files is a zipfile and extract it
-        if files.endswith('.zip'):
-            with zipfile.ZipFile(files, 'r') as zip_ref:
-                zip_ref.extractall(os.path.dirname(files))
-            files = [os.path.join(os.path.dirname(files), file) for file in zip_ref.namelist()]
+        # Check if files is a string
+        if isinstance(files, str):
+            # Check if files is a zipfile and extract it
+            if files.endswith('.zip'):
+                with zipfile.ZipFile(files, 'r') as zip_ref:
+                    zip_ref.extractall(os.path.dirname(files))
+                files = [os.path.join(os.path.dirname(files), file) for file in zip_ref.namelist()]
 
         self.traces_loaded = False
 
