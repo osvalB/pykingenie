@@ -502,7 +502,11 @@
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">unq</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">smax_id_unq</span><span class="p">):</span>
             <span class="n">smax_id_new</span> <span class="o">+=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">smax_id</span> <span class="o">==</span> <span class="n">unq</span><span class="p">)[</span><span class="mi">0</span><span class="p">]))]</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">smax_id</span> <span class="o">=</span> <span class="n">smax_id_new</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">smax_id</span> <span class="o">=</span> <span class="n">smax_id_new</span>
+
+        <span class="n">signal_assoc_fit</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">signal_disso_fit</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">signal_ss_fit</span>    <span class="o">=</span> <span class="kc">None</span></div>
 
 
 <div class="viewcode-block" id="KineticsFitter.get_steady_state">
