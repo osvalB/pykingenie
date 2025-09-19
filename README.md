@@ -11,7 +11,7 @@ This project is under development, and breaking changes may occur at any moment!
 - Import Octet files (.frd)
 - Import Gator files (Assay_#_Channel#.csv, Setting.ini and ExperimentStep.ini)
 - Import custom CSV files 
-- Processs the traces (alignment, baseline correction)
+- Process the traces (alignment, baseline correction)
 - Calculate binding kinetics (*k*<sub>on</sub>, *k*<sub>off</sub>, *K*<sub>D</sub>)
 - Global fitting of multiple traces
 - One-to-one, one-to-one with mass transport limitation, and one-to-one with induced fit models
