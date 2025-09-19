@@ -151,9 +151,9 @@ class KineticsFitter(KineticsFitterGeneral):
 
         self.smax_id = smax_id_new
 
-        signal_assoc_fit = None
-        signal_disso_fit = None
-        signal_ss_fit    = None
+        self.signal_assoc_fit = None
+        self.signal_disso_fit = None
+        self.signal_ss_fit    = None
 
     def get_steady_state(self):
 
