@@ -432,6 +432,25 @@
 
         <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
 
+        <span class="c1"># Validate the input file</span>
+        <span class="c1"># Check we have at least 2 columns, time versus signal</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The CSV file must have at least 2 columns.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># If we only have two columns, assume that the third is the protein concentration</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Protein_concentration_micromolar&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># If we have only 3 columns, assume that the third is the protein concentration, and the ligand concentration is 0</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Ligand_concentration_micromolar&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Assume the first 4 columns are Time, Signal, Protein_concentration_micromolar, Ligand_concentration_micromolar</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+
+        <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">,</span> <span class="s1">&#39;Signal&#39;</span><span class="p">,</span> <span class="s1">&#39;Protein_concentration_micromolar&#39;</span><span class="p">,</span> <span class="s1">&#39;Ligand_concentration_micromolar&#39;</span><span class="p">]</span>
+
         <span class="c1"># Find the ligand concentrations</span>
         <span class="n">ligand_conc</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Ligand_concentration_micromolar&#39;</span><span class="p">]</span>
 
