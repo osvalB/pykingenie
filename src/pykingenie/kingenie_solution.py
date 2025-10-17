@@ -76,6 +76,25 @@ class KinGenieCsvSolution(SolutionBasedExp):
 
         df = pd.read_csv(file)
 
+        # Validate the input file
+        # Check we have at least 2 columns, time versus signal
+
+        if len(df.columns) < 2:
+            raise ValueError("The CSV file must have at least 2 columns.")
+
+        # If we only have two columns, assume that the third is the protein concentration
+        if len(df.columns) == 2:
+            df['Protein_concentration_micromolar'] = 0
+
+        # If we have only 3 columns, assume that the third is the protein concentration, and the ligand concentration is 0
+        if len(df.columns) == 3:
+            df['Ligand_concentration_micromolar'] = 0
+
+        # Assume the first 4 columns are Time, Signal, Protein_concentration_micromolar, Ligand_concentration_micromolar
+        df = df.iloc[:, 0:4]
+
+        df.columns = ['Time', 'Signal', 'Protein_concentration_micromolar', 'Ligand_concentration_micromolar']
+
         # Find the ligand concentrations
         ligand_conc = df['Ligand_concentration_micromolar']
 
