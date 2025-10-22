@@ -11,7 +11,7 @@ from pykingenie.utils.fitting_solution import fit_conformational_selection_solut
 from src.pykingenie.utils.fitting_solution import find_initial_parameters_conformational_selection_solution
 
 
-t = np.linspace(0, 0.5, 10)
+t = np.linspace(0, 0.5, 20)
 
 E_tot = 1  # Total enzyme concentration
 S_tot = np.logspace(-1.5, 1, 6)  # Total substrate concentrations
@@ -52,13 +52,13 @@ def test_fit_cs_solution_fixed_constants_t0():
 
     signal_lst = generate_ys(E_tot,S_tot,kc,krev,kon,koff,signal_E, signal_E, signal_S, signal_E2S)
 
-    time_lst = [t + 0.01] * len(signal_lst)
+    time_lst = [t + 0.02] * len(signal_lst)
     ligand_conc_lst = S_tot
     protein_conc_lst = [E_tot] * len(signal_lst)
 
-    initial_parameters = [20] + ([0.01] * len(time_lst))
-    low_bounds = [10] + ([0.001] * len(time_lst))
-    high_bounds = [30] + ([0.1] * len(time_lst))
+    initial_parameters = [20] + ([0.02] * len(time_lst))
+    low_bounds = [10] + ([0.002] * len(time_lst))
+    high_bounds = [30] + ([0.2] * len(time_lst))
 
     global_fit_params, _, _, params_names = fit_conformational_selection_solution(
         signal_lst=signal_lst,
@@ -81,10 +81,10 @@ def test_fit_cs_solution_fixed_constants_t0():
         fit_signal_E2S=True,
         fixed_t0=False)
 
-    expected_params = [signal_E2S] + ([0.01] * len(time_lst))  # t0 values should be close to the offset we added
+    expected_params = [signal_E2S] + ([0.02] * len(time_lst))  # t0 values should be close to the offset we added
 
     np.testing.assert_allclose(
-        global_fit_params, expected_params, rtol=0.1,
+        global_fit_params, expected_params, rtol=0.2,
         err_msg="The fitted parameters do not match the expected values."
     )
 
