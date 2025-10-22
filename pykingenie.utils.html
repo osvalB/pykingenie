@@ -589,6 +589,62 @@ if ESint_equals_ES is True, then the trapped complex signal is used for both ES 
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="pykingenie.utils.fitting_solution.fit_conformational_selection_solution">
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.fitting_solution.</span></span><span class="sig-name descname"><span class="pre">fit_conformational_selection_solution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ligand_conc_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protein_conc_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">low_bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">high_bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_signal_E</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">E1_equals_E2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_signal_S</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_signal_E2S</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_kon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kon_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_koff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">koff_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_kc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kc_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_krev</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">krev_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_nfev</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/fitting_solution.html#fit_conformational_selection_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.fitting_solution.fit_conformational_selection_solution" title="Link to this definition">#</a></dt>
+<dd><p>Global fit to association and dissociation traces - one-to-one binding model with conformational selection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>signal_lst</strong> (<em>list</em>) – List of signals. We assume initial values as follows: E = E_tot, S = S_tot, ES = 0, ESint = 0.</p></li>
+<li><p><strong>time_lst</strong> (<em>list</em>) – List of time points for the association signals.</p></li>
+<li><p><strong>ligand_conc_lst</strong> (<em>list</em>) – List of ligand concentrations, one per element in signal_lst.</p></li>
+<li><p><strong>protein_conc_lst</strong> (<em>list</em>) – List of protein concentrations, one per element in signal_lst.</p></li>
+<li><p><strong>initial_parameters</strong> (<em>list</em>) – Initial parameters for the fit.</p></li>
+<li><p><strong>low_bounds</strong> (<em>list</em>) – Lower bounds for the fit parameters.</p></li>
+<li><p><strong>high_bounds</strong> (<em>list</em>) – Upper bounds for the fit parameters.</p></li>
+<li><p><strong>fit_signal_E</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, fit the signal of the free protein, default is False.</p></li>
+<li><p><strong>E1_equals_E2</strong> (<em>bool</em><em>, </em><em>optional</em>) – If true the signal in protein state 1 is equal to the signal in protein state 2, default is True.</p></li>
+<li><p><strong>fit_signal_S</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, fit the signal of the free ligand, default is False</p></li>
+<li><p><strong>fit_signal_E2S</strong> (<em>bool</em><em>, </em><em>optional</em>) – If true fit the signal of the complex, default is True.</p></li>
+<li><p><strong>fixed_t0</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the initial time point is zero, default is True.</p></li>
+<li><p><strong>fixed_kon</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the association rate constant is fixed, default is False.</p></li>
+<li><p><strong>kon_value</strong> (<em>float</em><em>, </em><em>optional</em>) – Value of the association rate constant if fixed_kon is True.</p></li>
+<li><p><strong>fixed_koff</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the dissociation rate constant is fixed, default is False.</p></li>
+<li><p><strong>koff_value</strong> (<em>float</em><em>, </em><em>optional</em>) – Value of the dissociation rate constant if fixed_koff is True.</p></li>
+<li><p><strong>fixed_kc</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the induced fit rate constant is fixed, default is False.</p></li>
+<li><p><strong>kc_value</strong> (<em>float</em><em>, </em><em>optional</em>) – Value of the induced fit rate constant if fixed_kc is True.</p></li>
+<li><p><strong>fixed_krev</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the reverse induced fit rate constant is fixed, default is False.</p></li>
+<li><p><strong>krev_value</strong> (<em>float</em><em>, </em><em>optional</em>) – Value of the reverse induced fit rate constant if fixed_krev is True.</p></li>
+<li><p><strong>max_nfev</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of function evaluations for the fit.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>list</em> – Fitted parameters.</p></li>
+<li><p><em>np.ndarray</em> – Covariance matrix of the fitted parameters.</p></li>
+<li><p><em>list</em> – Fitted values for each signal, same dimensions as signal_lst.</p></li>
+<li><p><em>list</em> – Names of the fitted parameters.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The initial_parameters are given in the following order:</p>
+<ul class="simple">
+<li><p>signal_E1    if fit_signal_E                           (signal of the free protein state 1)</p></li>
+<li><p>signal_E2    if fit_signal_E and E1_equals_E2          (signal of the free protein state 2)</p></li>
+<li><p>signal_S     if fit_signal_S                         (signal of the free ligand)</p></li>
+<li><p>signal_E2S    if fit_signal_E2S                           (signal of the complex)</p></li>
+<li><p>k_on         if not fixed_kon                           (association rate constant)</p></li>
+<li><p>k_off        if not fixed_koff                          (dissociation rate constant)</p></li>
+<li><p>k_c          if not fixed_kc                            (conformational rate constant)</p></li>
+<li><p>k_rev        if not fixed_krev                          (reverse conformational rate constant)</p></li>
+<li><p>t0_1         if not fixed_t0                            (initial time point for the first signal array, default is 0)</p></li>
+<li><p>t0_2         if not fixed_t0                            (initial time point for the second signal array, default is 0)</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="pykingenie.utils.fitting_solution.find_initial_parameters_induced_fit_solution">
 <span class="sig-prename descclassname"><span class="pre">pykingenie.utils.fitting_solution.</span></span><span class="sig-name descname"><span class="pre">find_initial_parameters_induced_fit_solution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ligand_conc_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protein_conc_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_signal_E</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_signal_S</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_signal_ES</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ESint_equals_ES</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">np_linspace_low</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">np_linspace_high</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">np_linspace_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/fitting_solution.html#find_initial_parameters_induced_fit_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.fitting_solution.find_initial_parameters_induced_fit_solution" title="Link to this definition">#</a></dt>
 <dd><p>Find initial parameters for the global fit to association and dissociation traces - one-to-one binding model with induced fit.</p>
@@ -598,6 +654,39 @@ This function is used to find the initial parameters for the fit_induced_fit_sol
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>signal_lst</strong> (<em>list</em>) – List of signals. We assume initial values as follows: E = E_tot, S = S_tot, ES = 0, ESint = 0.</p></li>
+<li><p><strong>time_lst</strong> (<em>list</em>) – List of time points for the association signals.</p></li>
+<li><p><strong>ligand_conc_lst</strong> (<em>list</em>) – List of ligand concentrations, one per element in signal_lst.</p></li>
+<li><p><strong>protein_conc_lst</strong> (<em>list</em>) – List of protein concentrations, one per element in signal_lst.</p></li>
+<li><p><strong>fit_signal_E</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, fit the signal of the free protein, default is False.</p></li>
+<li><p><strong>fit_signal_S</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, fit the signal of the free ligand, default is False.</p></li>
+<li><p><strong>fit_signal_ES</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, fit the signal of the complex, default is True.</p></li>
+<li><p><strong>ESint_equals_ES</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the signal of the intermediate complex is equal to the signal of the trapped complex, default is True.</p></li>
+<li><p><strong>fixed_t0</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the initial time point is zero, default is True.</p></li>
+<li><p><strong>np_linspace_low</strong> (<em>float</em><em>, </em><em>optional</em>) – Lower bound for the logarithmic space to sample kc and krev, default is -2.</p></li>
+<li><p><strong>np_linspace_high</strong> (<em>float</em><em>, </em><em>optional</em>) – Upper bound for the logarithmic space to sample kc and krev, default is 2.</p></li>
+<li><p><strong>np_linspace_num</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of points to sample in the logarithmic space, default is 5.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Best initial parameters found by the heuristic algorithm.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pykingenie.utils.fitting_solution.find_initial_parameters_conformational_selection_solution">
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.fitting_solution.</span></span><span class="sig-name descname"><span class="pre">find_initial_parameters_conformational_selection_solution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ligand_conc_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protein_conc_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_signal_E</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">E1_equals_E2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_signal_S</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_signal_E2S</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">np_linspace_low</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">np_linspace_high</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">np_linspace_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/fitting_solution.html#find_initial_parameters_conformational_selection_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.fitting_solution.find_initial_parameters_conformational_selection_solution" title="Link to this definition">#</a></dt>
+<dd><p>Find initial parameters for the global fit to association and dissociation traces
+one-to-one binding model with conformational selection.</p>
+<p>Heuristic algorithm to explore a range of fixed kc and krev values, and fit kon and koff.
+This function is used to find the initial parameters for the fit_conformational_selection_solution function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>signal_lst</strong> (<em>list</em>) – List of signals</p></li>
 <li><p><strong>time_lst</strong> (<em>list</em>) – List of time points for the association signals.</p></li>
 <li><p><strong>ligand_conc_lst</strong> (<em>list</em>) – List of ligand concentrations, one per element in signal_lst.</p></li>
 <li><p><strong>protein_conc_lst</strong> (<em>list</em>) – List of protein concentrations, one per element in signal_lst.</p></li>
@@ -1778,61 +1867,31 @@ or None if no matching step is found.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pykingenie.utils.signal_solution.ode_conformational_selection_insolution">
-<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_solution.</span></span><span class="sig-name descname"><span class="pre">ode_conformational_selection_insolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_minus1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_minus2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_solution.html#ode_conformational_selection_insolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_solution.ode_conformational_selection_insolution" title="Link to this definition">#</a></dt>
-<dd><p>ODE for the conformational selection model.</p>
-<dl class="simple">
-<dt>Species:</dt><dd><p>E1: Free enzyme in state 1
-E2: Free enzyme in state 2
-S: Free substrate
-E2S: Complex</p>
-</dd>
-<dt>ODE for the conformational selection model:</dt><dd><p>E1     &lt;-&gt; E2  (conformational change)
-E2 + S &lt;-&gt; E2S (binding)</p>
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_solution.</span></span><span class="sig-name descname"><span class="pre">ode_conformational_selection_insolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_minus1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_minus2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">E_tot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S_tot</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_solution.html#ode_conformational_selection_insolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_solution.ode_conformational_selection_insolution" title="Link to this definition">#</a></dt>
+<dd><dl class="simple">
+<dt>Reduced ODEs for conformational selection using conservation:</dt><dd><p>E_tot = E1 + E2 + E2S
+S_tot = S + E2S</p>
 </dd>
 </dl>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>t</strong> (<em>float</em>) – Time.</p></li>
-<li><p><strong>y</strong> (<em>list</em>) – Concentrations of E1, E2, S, and E2S.</p></li>
-<li><p><strong>k1</strong> (<em>float</em>) – Rate constant for E1 -&gt; E2.</p></li>
-<li><p><strong>k_minus1</strong> (<em>float</em>) – Rate constant for E2 -&gt; E1.</p></li>
-<li><p><strong>k2</strong> (<em>float</em>) – Rate constant for E2 + S -&gt; E2S.</p></li>
-<li><p><strong>k_minus2</strong> (<em>float</em>) – Rate constant for E2S -&gt; E2 + S.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>[dE1, dE2, dS, dE2S] - Rate of change for concentrations of E1, E2, S, E2S.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<dl>
-<dt>Example values taken from Fabian Paul, Thomas R. Weikl, 2016:</dt><dd><p>k+ = 100 / (μM*s)  k+ equals k2       in our notation
-k− = 1 / s         k- equals k_minus2 in our notation
-ke = 10 / s        ke equals k1       in our notation
-kr = 100 / s       kr equals k_minus1 in our notation</p>
-<p>Protein concentration = 0.5 μM
-Ligand concentration  = 1.8 μM</p>
-</dd>
-</dl>
+<p>State vector y: [E2, E2S]</p>
+<p>Returns: [dE2_dt, dE2S_dt]</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pykingenie.utils.signal_solution.solve_ode_conformational_selection_insolution">
-<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_solution.</span></span><span class="sig-name descname"><span class="pre">solve_ode_conformational_selection_insolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_minus1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_minus2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_solution.html#solve_ode_conformational_selection_insolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_solution.solve_ode_conformational_selection_insolution" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_solution.</span></span><span class="sig-name descname"><span class="pre">solve_ode_conformational_selection_insolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_minus1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_minus2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">E_tot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S_tot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_solution.html#solve_ode_conformational_selection_insolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_solution.solve_ode_conformational_selection_insolution" title="Link to this definition">#</a></dt>
 <dd><p>Solve ODE for the conformational selection model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> (<em>np.ndarray</em>) – Time points to calculate the complex concentration.</p></li>
-<li><p><strong>y</strong> (<em>list</em>) – Initial concentrations of E1, E2, S, and E2S.</p></li>
+<li><p><strong>y</strong> (<em>list</em>) – Initial concentrations of E2 and E2S.</p></li>
 <li><p><strong>k1</strong> (<em>float</em>) – Rate constant for E1 -&gt; E2.</p></li>
 <li><p><strong>k_minus1</strong> (<em>float</em>) – Rate constant for E2 -&gt; E1.</p></li>
 <li><p><strong>k2</strong> (<em>float</em>) – Rate constant for E2 + S -&gt; E2S.</p></li>
 <li><p><strong>k_minus2</strong> (<em>float</em>) – Rate constant for E2S -&gt; E2 + S.</p></li>
+<li><p><strong>E_tot</strong> (<em>float</em>) – total protein concentration</p></li>
+<li><p><strong>S_tot</strong> (<em>float</em>) – total substrate concentration</p></li>
 <li><p><strong>t0</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial time, default is 0.</p></li>
 </ul>
 </dd>
@@ -1847,17 +1906,19 @@ Ligand concentration  = 1.8 μM</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pykingenie.utils.signal_solution.signal_ode_conformational_selection_insolution">
-<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_solution.</span></span><span class="sig-name descname"><span class="pre">signal_ode_conformational_selection_insolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_minus1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_minus2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_E1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_E2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_S</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_E2S</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_solution.html#signal_ode_conformational_selection_insolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_solution.signal_ode_conformational_selection_insolution" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_solution.</span></span><span class="sig-name descname"><span class="pre">signal_ode_conformational_selection_insolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_minus1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_minus2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">E_tot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S_tot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_E1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_E2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_S</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_E2S</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_solution.html#signal_ode_conformational_selection_insolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_solution.signal_ode_conformational_selection_insolution" title="Link to this definition">#</a></dt>
 <dd><p>Solve the ODE for the conformational selection model and compute the signal.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> (<em>np.ndarray</em>) – Time.</p></li>
-<li><p><strong>y</strong> (<em>list</em>) – Concentrations of E1, E2, S, and E2S.</p></li>
+<li><p><strong>y</strong> (<em>list</em>) – Concentrations of E2 and E2S.</p></li>
 <li><p><strong>k1</strong> (<em>float</em>) – Rate constant for E1 -&gt; E2 (aka kc).</p></li>
 <li><p><strong>k_minus1</strong> (<em>float</em>) – Rate constant for E2 -&gt; E1 (aka krev).</p></li>
 <li><p><strong>k2</strong> (<em>float</em>) – Rate constant for E2 + S -&gt; E2S (aka kon).</p></li>
 <li><p><strong>k_minus2</strong> (<em>float</em>) – Rate constant for E2S -&gt; E2 + S (aka koff).</p></li>
+<li><p><strong>E_tot</strong> (<em>float</em>) – total protein concentration</p></li>
+<li><p><strong>S_tot</strong> (<em>float</em>) – total substrate concentration</p></li>
 <li><p><strong>t0</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial time, default is 0.</p></li>
 <li><p><strong>signal_E1</strong> (<em>float</em><em>, </em><em>optional</em>) – Signal for E1, default is 0.</p></li>
 <li><p><strong>signal_E2</strong> (<em>float</em><em>, </em><em>optional</em>) – Signal for E2, default is 0.</p></li>
@@ -2569,7 +2630,9 @@ the dissociation rate constants (koffs), and the equilibrium dissociation consta
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-pykingenie.utils.fitting_solution">pykingenie.utils.fitting_solution module</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.fitting_solution.fit_one_site_solution"><code class="docutils literal notranslate"><span class="pre">fit_one_site_solution()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.fitting_solution.fit_induced_fit_solution"><code class="docutils literal notranslate"><span class="pre">fit_induced_fit_solution()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.fitting_solution.fit_conformational_selection_solution"><code class="docutils literal notranslate"><span class="pre">fit_conformational_selection_solution()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.fitting_solution.find_initial_parameters_induced_fit_solution"><code class="docutils literal notranslate"><span class="pre">find_initial_parameters_induced_fit_solution()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.fitting_solution.find_initial_parameters_conformational_selection_solution"><code class="docutils literal notranslate"><span class="pre">find_initial_parameters_conformational_selection_solution()</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-pykingenie.utils.fitting_surface">pykingenie.utils.fitting_surface module</a><ul class="visible nav section-nav flex-column">

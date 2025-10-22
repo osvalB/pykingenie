@@ -384,7 +384,9 @@
 <li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.fitting_solution">pykingenie.utils.fitting_solution module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_solution.fit_one_site_solution"><code class="docutils literal notranslate"><span class="pre">fit_one_site_solution()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_solution.fit_induced_fit_solution"><code class="docutils literal notranslate"><span class="pre">fit_induced_fit_solution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_solution.fit_conformational_selection_solution"><code class="docutils literal notranslate"><span class="pre">fit_conformational_selection_solution()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_solution.find_initial_parameters_induced_fit_solution"><code class="docutils literal notranslate"><span class="pre">find_initial_parameters_induced_fit_solution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_solution.find_initial_parameters_conformational_selection_solution"><code class="docutils literal notranslate"><span class="pre">find_initial_parameters_conformational_selection_solution()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.fitting_surface">pykingenie.utils.fitting_surface module</a><ul>
@@ -941,9 +943,7 @@ to the signal of the complex ES, default is True.</p></li>
 <span class="sig-name descname"><span class="pre">fit_induced_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fit_signal_E</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_signal_S</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_signal_ES</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ESint_equals_ES</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_solution.html#KineticsFitterSolution.fit_induced_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_solution.KineticsFitterSolution.fit_induced_fit" title="Link to this definition">#</a></dt>
 <dd><p>Fit the association signals assuming an induced-fit mechanism.</p>
 <p>A + B &lt;-&gt; AB_intermediate &lt;-&gt; AB_trapped</p>
-<p>This model accounts for conformational changes in the protein upon ligand binding.
-The method first calls find_initial_params_if to get good starting values, then
-performs the actual fitting with those values.</p>
+<p>This model accounts for conformational changes in the protein upon ligand binding.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -951,6 +951,61 @@ performs the actual fitting with those values.</p>
 <li><p><strong>fit_signal_S</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, fit the signal of the free ligand S, default is False.</p></li>
 <li><p><strong>fit_signal_ES</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, fit the signal of the complex ES, default is True.</p></li>
 <li><p><strong>ESint_equals_ES</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, assume that the signal of the intermediate ESint is equal to the signal of the complex ES, default is True.</p></li>
+<li><p><strong>fixed_t0</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, fix the t0 parameter to 0, default is True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Updates the following instance attributes:
+- signal_assoc_fit: List of fitted association signals
+- fit_params_kinetics: DataFrame with the fitted parameters</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter_solution.KineticsFitterSolution.find_initial_params_cs">
+<span class="sig-name descname"><span class="pre">find_initial_params_cs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fit_signal_E</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">E1_equals_E2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_signal_S</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_signal_E2S</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_solution.html#KineticsFitterSolution.find_initial_params_cs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_solution.KineticsFitterSolution.find_initial_params_cs" title="Link to this definition">#</a></dt>
+<dd><p>Find optimal initial parameters for the conformational selection model.</p>
+<p>Heuristically finds the best initial parameters for the fit by exploring
+fixed values of kc and krev and fitting kon and koff (and the signal of the complex).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fit_signal_E</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, fit the signal of the free protein E, default is False.</p></li>
+<li><p><strong>E1_equals_E2</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, assume that the signal of the two conformations of the free protein E1
+and E2 are equal, default is True.</p></li>
+<li><p><strong>fit_signal_S</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, fit the signal of the free ligand S, default is False.</p></li>
+<li><p><strong>fit_signal_E2S</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, fit the signal of the complex E2S, default is True.</p></li>
+<li><p><strong>fixed_t0</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, fix the t0 parameter to 0, default is True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Updates the params_guess attribute with the best initial parameters.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter_solution.KineticsFitterSolution.fit_conformational_selection">
+<span class="sig-name descname"><span class="pre">fit_conformational_selection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fit_signal_E</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">E1_equals_E2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_signal_S</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_signal_E2S</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_solution.html#KineticsFitterSolution.fit_conformational_selection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_solution.KineticsFitterSolution.fit_conformational_selection" title="Link to this definition">#</a></dt>
+<dd><p>Fit the association signals assuming an conformational selection mechanism.</p>
+<p>A_active &lt;-&gt; A_inactive</p>
+<p>A_active + B &lt;-&gt; AB</p>
+<p>This model accounts for conformational changes in the protein before ligand binding.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fit_signal_E</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, fit the signal of the free protein E, default is False.</p></li>
+<li><p><strong>E1_equals_E2</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, assume that the signal of the two conformations of the free protein E1
+and E2 are equal, default is True.</p></li>
+<li><p><strong>fit_signal_S</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, fit the signal of the free ligand S, default is False.</p></li>
+<li><p><strong>fit_signal_E2S</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, fit the signal of the complex E2S, default is True.</p></li>
 <li><p><strong>fixed_t0</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, fix the t0 parameter to 0, default is True.</p></li>
 </ul>
 </dd>
@@ -1986,6 +2041,12 @@ it should also include a Cycle column.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.main.KineticsAnalyzer.collapse_solution_experiments">
+<span class="sig-name descname"><span class="pre">collapse_solution_experiments</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/main.html#KineticsAnalyzer.collapse_solution_experiments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.main.KineticsAnalyzer.collapse_solution_experiments" title="Link to this definition">#</a></dt>
+<dd><p>Useful when many csv files are imported, and each is assigned to a different experiment.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pykingenie.main.KineticsAnalyzer.init_fittings">
 <span class="sig-name descname"><span class="pre">init_fittings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/main.html#KineticsAnalyzer.init_fittings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.main.KineticsAnalyzer.init_fittings" title="Link to this definition">#</a></dt>
 <dd><p>Initialize (reset) the fittings dictionary and names list.</p>
@@ -2114,7 +2175,9 @@ which can be used for filtering data in subsequent analyses.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>fitting_model</strong> (<em>str</em><em>, </em><em>optional</em>) – Model to fit. Options: ‘single’, ‘double’, ‘one_binding_site’, ‘one_binding_site_if’. Default is ‘single’.</p></li>
+<li><p><strong>fitting_model</strong> (<em>str</em><em>, </em><em>optional</em>) – Model to fit.
+Options: ‘single’, ‘double’, ‘one_binding_site’, ‘one_binding_site_if’, ‘one_binding_site_cs’
+Default is ‘single’.</p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – Additional keyword arguments for fitting methods.</p></li>
 </ul>
 </dd>
@@ -3349,6 +3412,8 @@ For dissociation steps, time continues from the association step.</p>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_solution.KineticsFitterSolution.fit_one_binding_site"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.fit_one_binding_site()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_solution.KineticsFitterSolution.find_initial_params_if"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.find_initial_params_if()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_solution.KineticsFitterSolution.fit_induced_fit"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.fit_induced_fit()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_solution.KineticsFitterSolution.find_initial_params_cs"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.find_initial_params_cs()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_solution.KineticsFitterSolution.fit_conformational_selection"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.fit_conformational_selection()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -3441,6 +3506,7 @@ For dissociation steps, time continues from the association step.</p>
 </li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.main.KineticsAnalyzer.delete_experiment"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.delete_experiment()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.main.KineticsAnalyzer.add_experiment"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.add_experiment()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.main.KineticsAnalyzer.collapse_solution_experiments"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.collapse_solution_experiments()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.main.KineticsAnalyzer.init_fittings"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.init_fittings()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.main.KineticsAnalyzer.add_fitting"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.add_fitting()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.main.KineticsAnalyzer.get_experiment_properties"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.get_experiment_properties()</span></code></a></li>

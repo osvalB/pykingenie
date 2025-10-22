@@ -419,6 +419,11 @@
             <span class="n">t</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">t</span> <span class="o">&lt;</span> <span class="n">time_limit</span><span class="p">]</span>
 
             <span class="n">a0</span><span class="p">,</span><span class="n">a1</span><span class="p">,</span><span class="n">kobs</span> <span class="o">=</span> <span class="n">fit_single_exponential</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">t</span><span class="p">)</span>
+
+            <span class="n">fit_params</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">fit_single_exponential</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">t</span><span class="p">)</span>
+
+            <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">kobs</span> <span class="o">=</span> <span class="n">fit_params</span>
+
             <span class="n">s0s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a0</span> <span class="o">+</span> <span class="n">a1</span><span class="p">)</span>
 
         <span class="k">except</span><span class="p">:</span>
@@ -451,8 +456,7 @@
     <span class="p">}</span>
     <span class="k">for</span> <span class="p">(</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">),</span> <span class="n">factor</span> <span class="ow">in</span> <span class="n">factor_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">low</span> <span class="o">&lt;=</span> <span class="n">Kd_ss</span> <span class="o">&lt;</span> <span class="n">high</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">factor</span>
-    <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># or raise an error if needed</span></div>
+            <span class="k">return</span> <span class="n">factor</span></div>
 
 
 <div class="viewcode-block" id="fit_steady_state_one_site">
@@ -741,9 +745,13 @@
 
         <span class="k">if</span> <span class="n">fit_s0</span><span class="p">:</span>
 
-            <span class="n">s0_all</span> <span class="o">=</span> <span class="n">args</span><span class="p">[(</span> <span class="mi">2</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">([</span><span class="n">fixed_koff</span><span class="p">,</span><span class="n">fixed_t0</span><span class="p">])</span> <span class="p">):]</span>
+            <span class="n">s0_vals</span> <span class="o">=</span> <span class="n">args</span><span class="p">[(</span> <span class="mi">2</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">([</span><span class="n">fixed_koff</span><span class="p">,</span><span class="n">fixed_t0</span><span class="p">])</span> <span class="p">):]</span>
 
-        <span class="n">signal</span>  <span class="o">=</span> <span class="p">[</span><span class="n">one_site_dissociation_analytical</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">s0</span><span class="p">,</span><span class="n">Koff</span><span class="p">,</span><span class="n">t0</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span><span class="p">,</span><span class="n">s0</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">time_lst</span><span class="p">,</span><span class="n">s0_all</span><span class="p">)]</span>
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="n">s0_vals</span> <span class="o">=</span> <span class="n">s0_all</span>
+
+        <span class="n">signal</span>  <span class="o">=</span> <span class="p">[</span><span class="n">one_site_dissociation_analytical</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">s0</span><span class="p">,</span><span class="n">Koff</span><span class="p">,</span><span class="n">t0</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span><span class="p">,</span><span class="n">s0</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">time_lst</span><span class="p">,</span><span class="n">s0_vals</span><span class="p">)]</span>
 
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 

@@ -425,21 +425,16 @@
     <span class="c1"># Loop through each k_obs value</span>
     <span class="k">for</span> <span class="n">k_obs</span> <span class="ow">in</span> <span class="n">possible_k</span><span class="p">:</span>
 
-        <span class="k">try</span><span class="p">:</span>
-            <span class="c1"># Fit the reduced model</span>
-            <span class="n">params</span><span class="p">,</span> <span class="n">cov</span> <span class="o">=</span> <span class="n">curve_fit</span><span class="p">(</span><span class="n">single_exponential_reduced</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p0</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">y</span><span class="p">)])</span>
+        <span class="c1"># Fit the reduced model</span>
+        <span class="n">params</span><span class="p">,</span> <span class="n">cov</span> <span class="o">=</span> <span class="n">curve_fit</span><span class="p">(</span><span class="n">single_exponential_reduced</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p0</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">y</span><span class="p">)])</span>
 
-            <span class="c1"># Calculate the residual sum of squares</span>
-            <span class="n">rss_temp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">y</span> <span class="o">-</span> <span class="n">single_exponential_reduced</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">))</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="c1"># Calculate the residual sum of squares</span>
+        <span class="n">rss_temp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">y</span> <span class="o">-</span> <span class="n">single_exponential_reduced</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">))</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">rss_temp</span> <span class="o">&lt;</span> <span class="n">rss</span><span class="p">:</span>
-                <span class="n">rss</span>         <span class="o">=</span> <span class="n">rss_temp</span>
-                <span class="n">best_params</span> <span class="o">=</span> <span class="n">params</span>
-                <span class="n">best_k_obs</span>  <span class="o">=</span> <span class="n">k_obs</span>
-
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="c1"># If fitting fails, continue to the next k_obs</span>
-            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">rss_temp</span> <span class="o">&lt;</span> <span class="n">rss</span><span class="p">:</span>
+            <span class="n">rss</span>         <span class="o">=</span> <span class="n">rss_temp</span>
+            <span class="n">best_params</span> <span class="o">=</span> <span class="n">params</span>
+            <span class="n">best_k_obs</span>  <span class="o">=</span> <span class="n">k_obs</span>
 
     <span class="n">p0</span> <span class="o">=</span> <span class="p">[</span><span class="n">best_params</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">best_params</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">best_k_obs</span><span class="p">]</span>
 
