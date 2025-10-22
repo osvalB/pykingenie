@@ -10,7 +10,8 @@ from .utils.fitting_general import (
 from .utils.fitting_solution import (
     fit_one_site_solution,
     fit_induced_fit_solution,
-    find_initial_parameters_induced_fit_solution
+    find_initial_parameters_induced_fit_solution, find_initial_parameters_conformational_selection_solution,
+    fit_conformational_selection_solution
 )
 
 from .fitter import KineticsFitterGeneral
@@ -504,9 +505,7 @@ class KineticsFitterSolution(KineticsFitterGeneral):
         A + B <-> AB_intermediate <-> AB_trapped
 
         This model accounts for conformational changes in the protein upon ligand binding.
-        The method first calls find_initial_params_if to get good starting values, then
-        performs the actual fitting with those values.
-        
+
         Parameters
         ----------
         fit_signal_E : bool, optional
@@ -605,3 +604,172 @@ class KineticsFitterSolution(KineticsFitterGeneral):
 
         return None
 
+    def find_initial_params_cs(self,
+                               fit_signal_E=False,
+                               E1_equals_E2=True,
+                               fit_signal_S=False,
+                               fit_signal_E2S=True,
+                               fixed_t0=True
+                               ):
+        """
+        Find optimal initial parameters for the conformational selection model.
+
+        Heuristically finds the best initial parameters for the fit by exploring
+        fixed values of kc and krev and fitting kon and koff (and the signal of the complex).
+
+        Parameters
+        ----------
+        fit_signal_E : bool, optional
+            If True, fit the signal of the free protein E, default is False.
+        E1_equals_E2 : bool, optional
+            If True, assume that the signal of the two conformations of the free protein E1
+            and E2 are equal, default is True.
+        fit_signal_S : bool, optional
+            If True, fit the signal of the free ligand S, default is False.
+        fit_signal_E2S : bool, optional
+            If True, fit the signal of the complex E2S, default is True.
+        fixed_t0 : bool, optional
+            If True, fix the t0 parameter to 0, default is True.
+
+        Returns
+        -------
+        None
+            Updates the params_guess attribute with the best initial parameters.
+        """
+
+        self.clear_fittings()
+
+        # Heuristically find the best initial parameters for the fit
+        # We explore fixed values of kc and krev and fit kon and koff (and the signal of the complex)
+        params_guess = find_initial_parameters_conformational_selection_solution(
+            signal_lst=self.assoc_lst,
+            time_lst=self.time_assoc_lst,
+            ligand_conc_lst=self.lig_conc,
+            protein_conc_lst=self.prot_conc,
+            fit_signal_E=fit_signal_E,
+            E1_equals_E2=E1_equals_E2,
+            fit_signal_S=fit_signal_S,
+            fit_signal_E2S=fit_signal_E2S,
+            fixed_t0=fixed_t0)
+
+        self.params_guess = params_guess
+
+        print(f"Initial parameters found for the conformational selection model: {params_guess}")
+
+        return None
+
+    def fit_conformational_selection(
+            self,
+            fit_signal_E=False,
+            E1_equals_E2=True,
+            fit_signal_S=False,
+            fit_signal_E2S=True,
+            fixed_t0=True
+            ):
+        """
+        Fit the association signals assuming an conformational selection mechanism.
+
+        A_active <-> A_inactive
+
+        A_active + B <-> AB
+
+        This model accounts for conformational changes in the protein before ligand binding.
+
+        Parameters
+        ----------
+        fit_signal_E : bool, optional
+            If True, fit the signal of the free protein E, default is False.
+        E1_equals_E2 : bool, optional
+            If True, assume that the signal of the two conformations of the free protein E1
+            and E2 are equal, default is True.
+        fit_signal_S : bool, optional
+            If True, fit the signal of the free ligand S, default is False.
+        fit_signal_E2S : bool, optional
+            If True, fit the signal of the complex E2S, default is True.
+        fixed_t0 : bool, optional
+            If True, fix the t0 parameter to 0, default is True.
+
+        Returns
+        -------
+        None
+            Updates the following instance attributes:
+            - signal_assoc_fit: List of fitted association signals
+            - fit_params_kinetics: DataFrame with the fitted parameters
+        """
+
+        # fit using as initial parameters the best found parameters
+        initial_parameters = np.array(self.params_guess)
+        low_bounds = [x / 1e3 if x > 0 else x * 1e3 for x in initial_parameters]
+        high_bounds = [x * 1e3 if x > 0 else x * 1e-3 for x in initial_parameters]
+
+        # Set the bounds for the t0 parameter - between -0.1 and 0.1
+        if not fixed_t0:
+            n_params = len(initial_parameters)
+            for i in range(len(self.assoc_lst)):
+                low_bounds[n_params - i - 1] = -0.1
+                high_bounds[n_params - i - 1] = 0.1
+
+        global_fit_params, cov, fitted_values, parameter_names = fit_conformational_selection_solution(
+            signal_lst=self.assoc_lst,
+            time_lst=self.time_assoc_lst,
+            ligand_conc_lst=self.lig_conc,
+            protein_conc_lst=self.prot_conc,
+            initial_parameters=initial_parameters,
+            low_bounds=low_bounds,
+            high_bounds=high_bounds,
+            fit_signal_E=fit_signal_E,
+            E1_equals_E2=E1_equals_E2,
+            fit_signal_S=fit_signal_S,
+            fit_signal_E2S=fit_signal_E2S,
+            fixed_t0=fixed_t0
+        )
+
+        kwargs = {
+            'signal_lst': self.assoc_lst,
+            'time_lst': self.time_assoc_lst,
+            'ligand_conc_lst': self.lig_conc,
+            'protein_conc_lst': self.prot_conc,
+            'fit_signal_E': fit_signal_E,
+            'E1_equals_E2' : E1_equals_E2,
+            'fit_signal_S': fit_signal_S,
+            'fit_signal_E2S': fit_signal_E2S,
+            'fixed_t0': fixed_t0
+        }
+
+        # Re-fit the parameters if they are close to the constraints
+        global_fit_params, cov, fitted_values, low_bounds, high_bounds = re_fit(
+            fit=global_fit_params,
+            cov=cov,
+            fit_vals=fitted_values,
+            fit_fx=fit_conformational_selection_solution,
+            low_bounds=low_bounds,
+            high_bounds=high_bounds,
+            times=2,
+            **kwargs
+        )
+
+        self.params = global_fit_params
+        self.low_bounds = low_bounds
+        self.high_bounds = high_bounds
+
+        self.create_fitting_bounds_table()
+
+        self.signal_assoc_fit = fitted_values
+
+        # Create a DataFrame with the fitted parameters and assign it to fit_params_kinetics
+        self.fit_params_kinetics = pd.DataFrame({
+            'Protein [µM]': self.prot_conc,
+            'Ligand [µM]': self.lig_conc,
+        })
+
+        for i, param in enumerate(parameter_names):
+            if "t0" not in param:
+                self.fit_params_kinetics[param] = global_fit_params[i]
+
+        # Include the t0 column in the dataframe if we fitted t0
+        if not fixed_t0:
+            n_t0 = len(self.assoc_lst)
+            t0_params = global_fit_params[-n_t0:]
+            self.fit_params_kinetics['t0'] = t0_params
+
+        return None

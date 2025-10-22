@@ -192,8 +192,9 @@ def solve_ode_induced_fit_insolution(t, y0, k1, k_minus1, k2, k_minus2, E_tot, S
     # Include the concentrations of E and S in the output
     E = E_tot - out.y[0] - out.y[1]  # E_S is out.y[0], ES is out.y[1]
     S = S_tot - out.y[0] - out.y[1]  # E_S is out.y[0], ES is out.y[1]
-    out.y = np.vstack((E, S, out.y[0], out.y[1]))  # Stack E, S, E_S, ES
-    return out.y
+    out = np.vstack((E, S, out.y[0], out.y[1]))  # Stack E, S, E_S, ES
+
+    return out
 
 def signal_ode_induced_fit_insolution(t, y, k1, k_minus1, k2, k_minus2, E_tot, S_tot,
                                       t0=0, signal_E=0, signal_S=0, signal_ES_int=0, signal_ES=0):
@@ -238,71 +239,38 @@ def signal_ode_induced_fit_insolution(t, y, k1, k_minus1, k2, k_minus2, E_tot, S
     signal = signal_E * species[0] + signal_S * species[1] + signal_ES_int * species[2] + signal_ES * species[3]
     return signal
 
-def ode_conformational_selection_insolution(t, y, k1, k_minus1, k2, k_minus2):
-    """
-    ODE for the conformational selection model.
-    
-    Species:
-        E1: Free enzyme in state 1
-        E2: Free enzyme in state 2
-        S: Free substrate
-        E2S: Complex
-    
-    ODE for the conformational selection model:
-        E1     <-> E2  (conformational change)
-        E2 + S <-> E2S (binding)
-    
-    Parameters
-    ----------
-    t : float
-        Time.
-    y : list
-        Concentrations of E1, E2, S, and E2S.
-    k1 : float
-        Rate constant for E1 -> E2.
-    k_minus1 : float
-        Rate constant for E2 -> E1.
-    k2 : float
-        Rate constant for E2 + S -> E2S.
-    k_minus2 : float
-        Rate constant for E2S -> E2 + S.
-        
-    Returns
-    -------
-    list
-        [dE1, dE2, dS, dE2S] - Rate of change for concentrations of E1, E2, S, E2S.
-        
-    Notes
-    -----
-    Example values taken from Fabian Paul, Thomas R. Weikl, 2016:
-        k+ = 100 / (μM*s)  k+ equals k2       in our notation
-        k− = 1 / s         k- equals k_minus2 in our notation
-        ke = 10 / s        ke equals k1       in our notation
-        kr = 100 / s       kr equals k_minus1 in our notation
-        
-        Protein concentration = 0.5 μM
-        Ligand concentration  = 1.8 μM
-    """
-    E1, E2, S, E2S = y
 
-    # Differential equations
-    dE1 = -k1 * E1 + k_minus1 * E2
-    dE2 =  k1 * E1 - k_minus1 * E2 - k2 * E2 * S + k_minus2 * E2S
-    dS  = -k2 * E2 * S + k_minus2 * E2S
+def ode_conformational_selection_insolution(t, y, k1, k_minus1, k2, k_minus2, E_tot, S_tot):
+
+    """
+    Reduced ODEs for conformational selection using conservation:
+      E_tot = E1 + E2 + E2S
+      S_tot = S + E2S
+
+    State vector y: [E2, E2S]
+
+    Returns: [dE2_dt, dE2S_dt]
+    """
+
+    E2, E2S = y
+    E1 = E_tot - E2 - E2S
+    S  = S_tot - E2S
+
+    dE2  = k1 * E1 - k_minus1 * E2 - k2 * E2 * S + k_minus2 * E2S
     dE2S = k2 * E2 * S - k_minus2 * E2S
 
-    return [dE1, dE2, dS, dE2S]
+    return [dE2, dE2S]
 
-def solve_ode_conformational_selection_insolution(t, y, k1, k_minus1, k2, k_minus2, t0=0):
+def solve_ode_conformational_selection_insolution(t, y, k1, k_minus1, k2, k_minus2, E_tot,S_tot,t0=0):
     """
     Solve ODE for the conformational selection model.
-    
+
     Parameters
     ----------
     t : np.ndarray
         Time points to calculate the complex concentration.
     y : list
-        Initial concentrations of E1, E2, S, and E2S.
+        Initial concentrations of E2 and E2S.
     k1 : float
         Rate constant for E1 -> E2.
     k_minus1 : float
@@ -311,9 +279,13 @@ def solve_ode_conformational_selection_insolution(t, y, k1, k_minus1, k2, k_minu
         Rate constant for E2 + S -> E2S.
     k_minus2 : float
         Rate constant for E2S -> E2 + S.
+    E_tot : float
+        total protein concentration
+    S_tot : float
+        total substrate concentration
     t0 : float, optional
         Initial time, default is 0.
-        
+
     Returns
     -------
     np.ndarray
@@ -321,12 +293,26 @@ def solve_ode_conformational_selection_insolution(t, y, k1, k_minus1, k2, k_minu
     """
     t = t + t0
 
-    out = solve_ivp(ode_conformational_selection_insolution,t_span=[np.min(t), np.max(t)],
-                    t_eval=t,y0=y,args=(k1, k_minus1, k2, k_minus2),method="LSODA")
+    out = solve_ivp(ode_conformational_selection_insolution,
+                    t_span=[np.min(t), np.max(t)],
+                    t_eval=t, y0=y, args=(k1, k_minus1, k2, k_minus2,E_tot,S_tot), method="LSODA")
 
-    return out.y
+    # out includes [dE2, dE2S], we need to add E1 and S
+    # E1 in the first column, S in the third column
 
-def signal_ode_conformational_selection_insolution(t, y, k1, k_minus1, k2, k_minus2, t0=0, signal_E1=0, signal_E2=0, signal_S=0, signal_E2S=0):
+    E1 = E_tot - out.y[0] - out.y[1]
+    S  = S_tot - out.y[1]
+
+    out = np.vstack((E1, out.y[0], S, out.y[1]))
+
+    return out
+
+def signal_ode_conformational_selection_insolution(
+        t, y,
+        k1, k_minus1,
+        k2, k_minus2,
+        E_tot, S_tot,
+        t0=0, signal_E1=0, signal_E2=0, signal_S=0, signal_E2S=0):
     """
     Solve the ODE for the conformational selection model and compute the signal.
     
@@ -335,7 +321,7 @@ def signal_ode_conformational_selection_insolution(t, y, k1, k_minus1, k2, k_min
     t : np.ndarray
         Time.
     y : list
-        Concentrations of E1, E2, S, and E2S.
+        Concentrations of E2 and E2S.
     k1 : float
         Rate constant for E1 -> E2 (aka kc).
     k_minus1 : float
@@ -344,6 +330,10 @@ def signal_ode_conformational_selection_insolution(t, y, k1, k_minus1, k2, k_min
         Rate constant for E2 + S -> E2S (aka kon).
     k_minus2 : float
         Rate constant for E2S -> E2 + S (aka koff).
+    E_tot : float
+        total protein concentration
+    S_tot : float
+        total substrate concentration
     t0 : float, optional
         Initial time, default is 0.
     signal_E1 : float, optional
@@ -360,7 +350,7 @@ def signal_ode_conformational_selection_insolution(t, y, k1, k_minus1, k2, k_min
     np.ndarray
         Signal over time.
     """
-    species = solve_ode_conformational_selection_insolution(t, y, k1, k_minus1, k2, k_minus2, t0)
+    species = solve_ode_conformational_selection_insolution(t, y, k1, k_minus1, k2, k_minus2, E_tot, S_tot, t0)
 
     signal = signal_E1 * species[0] + signal_E2 * species[1] + signal_S * species[2] + signal_E2S * species[3]
 

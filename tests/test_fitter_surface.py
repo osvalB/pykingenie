@@ -33,6 +33,13 @@ def create_fitter(file):
 
     fitter_surface = list(pyKinetics.fittings.values())[0]
 
+    # Subset the data to include less points for faster - testing
+
+    fitter_surface.assoc_lst = [x[::4] for x in fitter_surface.assoc_lst]
+    fitter_surface.disso_lst =  [x[::4] for x in fitter_surface.disso_lst]
+    fitter_surface.time_assoc_lst =  [x[::4] for x in fitter_surface.time_assoc_lst]
+    fitter_surface.time_disso_lst =  [x[::4] for x in fitter_surface.time_disso_lst]
+
     return fitter_surface
 
 ## End of obtaining a fitter instance

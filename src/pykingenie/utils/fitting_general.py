@@ -74,21 +74,16 @@ def fit_single_exponential(y, t, min_log_k=-5, max_log_k=5, log_k_points=50):
     # Loop through each k_obs value
     for k_obs in possible_k:
 
-        try:
-            # Fit the reduced model
-            params, cov = curve_fit(single_exponential_reduced, t, y, p0=[0, np.max(y)])
+        # Fit the reduced model
+        params, cov = curve_fit(single_exponential_reduced, t, y, p0=[0, np.max(y)])
 
-            # Calculate the residual sum of squares
-            rss_temp = np.sum((y - single_exponential_reduced(t, *params)) ** 2)
+        # Calculate the residual sum of squares
+        rss_temp = np.sum((y - single_exponential_reduced(t, *params)) ** 2)
 
-            if rss_temp < rss:
-                rss         = rss_temp
-                best_params = params
-                best_k_obs  = k_obs
-
-        except Exception as e:
-            # If fitting fails, continue to the next k_obs
-            continue
+        if rss_temp < rss:
+            rss         = rss_temp
+            best_params = params
+            best_k_obs  = k_obs
 
     p0 = [best_params[0], best_params[1], best_k_obs]
 

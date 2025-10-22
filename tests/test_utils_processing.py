@@ -23,6 +23,10 @@ def test_guess_experiment_name():
     name = guess_experiment_name(test_file)
     assert name == '5th interaction with antibodie reg and imd - wt mut and wtDTT', "The guessed experiment name should be '5th interaction with antibodie reg and imd - wt mut and wtDTT'"
 
+    test_file = './test_files/empty_file.frd'
+    name = guess_experiment_name(test_file)
+    assert name == 'Experiment'
+
 def test_guess_experiment_type():
 
     non_existing_file = 'sarasaa'

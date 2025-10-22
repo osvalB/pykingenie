@@ -70,13 +70,14 @@ def test_signal_ode_conformational_selection_insolution():
 
     E1, E2 = get_initial_concentration_conformational_selection(E_tot,k1,k_minus1)
 
-    y = [E1,E2,S_tot,0]# concentrations of E1, E2, S, and E2S
-
     t = np.linspace(0, 0.05, 10)
 
-    result = signal_ode_conformational_selection_insolution(t, y, k1, k_minus1, k2, 
-                                                            k_minus2,t0=0,signal_E1=0,signal_E2=0,signal_S=0,signal_E2S=1)
-    
+    y = [E2,0]
+
+    result = signal_ode_conformational_selection_insolution(
+        t, y, k1, k_minus1, k2,k_minus2,
+        E_tot, S_tot,
+        t0=0,signal_E1=0,signal_E2=0,signal_S=0,signal_E2S=1)
 
     expected = np.array([0.    , 0.0203, 0.0311, 0.0368, 0.0398, 0.0414, 0.0423, 0.0428,0.043 , 0.0431])
 

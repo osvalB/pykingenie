@@ -7,7 +7,7 @@ from pykingenie.octet import OctetExperiment
 folder = "./test_files/"
 frd_files = os.listdir(folder)
 
-frd_files = [os.path.join(folder, file) for file in frd_files if file.endswith('.frd')]
+frd_files = [os.path.join(folder, file) for file in frd_files if file.endswith('.frd') and file.startswith('230309')]
 fmf_file  = os.path.join(folder, '230309_ExpMethod.fmf')
 
 

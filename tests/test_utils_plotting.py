@@ -18,7 +18,7 @@ pyKinetics = KineticsAnalyzer()
 folder = "./test_files/"
 frd_files = os.listdir(folder)
 
-frd_files = [os.path.join(folder, file) for file in frd_files if file.endswith('.frd')]
+frd_files = [os.path.join(folder, file) for file in frd_files if file.endswith('.frd') and file.startswith('230309')]
 frd_files.sort()
 
 bli = OctetExperiment('test')

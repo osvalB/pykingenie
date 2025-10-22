@@ -6,6 +6,8 @@ from .fitter_solution import KineticsFitterSolution
 
 from .utils.processing import get_plotting_df
 
+from .solution_exp import SolutionBasedExp
+
 class KineticsAnalyzer:
 
     def __init__(self):
@@ -41,12 +43,17 @@ class KineticsAnalyzer:
         experiment_names : str or list of str
             Name(s) of the experiment(s) to delete.
         """
+
         if not isinstance(experiment_names, list):
             experiment_names = [experiment_names]
+
         for experiment_name in experiment_names:
+
             if experiment_name in self.experiment_names:
+
                 del self.experiments[experiment_name]
                 self.experiment_names.remove(experiment_name)
+
         return None
 
     def add_experiment(self, experiment, experiment_name):
@@ -63,6 +70,61 @@ class KineticsAnalyzer:
         self.delete_experiment(experiment_name)
         self.experiments[experiment_name] = experiment
         self.experiment_names.append(experiment_name)
+
+        return None
+
+    def collapse_solution_experiments(self):
+
+        """
+        Useful when many csv files are imported, and each is assigned to a different experiment.
+        """
+
+        names = self.experiment_names.copy() # We must force a copy
+
+        xs = self.get_experiment_properties('xs')
+        ys = self.get_experiment_properties('ys')
+
+        # Convert each xs, that is a
+
+        xs_all = [item for sub in xs for item in sub]
+        ys_all = [item for sub in ys for item in sub]
+
+        no_traces = np.sum(self.get_experiment_properties('no_traces'))
+
+        traces_names = self.get_experiment_properties('traces_names_unique')
+        tr_names_all = [item for sub in traces_names for item in sub]
+
+        traces_names_unique = tr_names_all
+
+        conc_dfs = self.get_experiment_properties('conc_df')
+
+        combined = pd.concat(conc_dfs, ignore_index=True,sort=False)
+
+        combined['Trace']      = tr_names_all
+
+        # Delete the experiment column
+        combined.drop(columns=['Experiment'], inplace=True)
+
+        # Set the sampleID column values to 'Sample 1'
+        combined['SampleID'] = 'Sample 1'
+
+        # Now create a new experiment with the combined data
+        solution_experiment = SolutionBasedExp('Experiment','kingenie_csv_solution')
+
+        solution_experiment.xs = xs_all
+        solution_experiment.ys = ys_all
+        solution_experiment.no_traces = no_traces
+        solution_experiment.traces_names = traces_names_unique
+        solution_experiment.traces_names_unique = traces_names_unique
+        solution_experiment.conc_df = combined
+        solution_experiment.traces_loaded = True
+
+        # Delete all previous data
+        self.delete_experiment(names)
+
+        # Add the new experiment
+        self.add_experiment(solution_experiment, 'Experiment')
+
         return None
 
     def init_fittings(self):
@@ -478,7 +540,9 @@ class KineticsAnalyzer:
         Parameters
         ----------
         fitting_model : str, optional
-            Model to fit. Options: 'single', 'double', 'one_binding_site', 'one_binding_site_if'. Default is 'single'.
+            Model to fit.
+            Options: 'single', 'double', 'one_binding_site', 'one_binding_site_if', 'one_binding_site_cs'
+            Default is 'single'.
         **kwargs : dict
             Additional keyword arguments for fitting methods.
 
@@ -486,7 +550,7 @@ class KineticsAnalyzer:
         -------
         None
         """
-        if fitting_model not in ['single', 'double', 'one_binding_site', 'one_binding_site_if']:
+        if fitting_model not in ['single', 'double', 'one_binding_site', 'one_binding_site_if','one_binding_site_cs']:
             raise ValueError("Unknown fitting model: " + fitting_model)
 
         for kf in self.fittings.values():
@@ -503,6 +567,10 @@ class KineticsAnalyzer:
             elif fitting_model == 'one_binding_site_if':
                 kf.find_initial_params_if(**kwargs)
                 kf.fit_induced_fit(**kwargs)
+
+            elif fitting_model == 'one_binding_site_cs':
+                kf.find_initial_params_cs(**kwargs)
+                kf.fit_conformational_selection(**kwargs)
 
         return None
 

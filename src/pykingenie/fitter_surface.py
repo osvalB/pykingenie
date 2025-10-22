@@ -155,6 +155,8 @@ class KineticsFitter(KineticsFitterGeneral):
         self.signal_disso_fit = None
         self.signal_ss_fit    = None
 
+        self.Smax_upper_bound_factor = 1e2  # Normal values for lower than micromolar affinity
+
     def get_steady_state(self):
 
         """

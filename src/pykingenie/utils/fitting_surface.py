@@ -68,6 +68,11 @@ def guess_initial_signal(assoc_time_lst, assoc_signal_lst, time_limit=30):
             t = t[t < time_limit]
 
             a0,a1,kobs = fit_single_exponential(y,t)
+
+            fit_params, _, _ = fit_single_exponential(y,t)
+
+            a0, a1, kobs = fit_params
+
             s0s.append(a0 + a1)
 
         except:
@@ -98,7 +103,6 @@ def get_smax_upper_bound_factor(Kd_ss):
     for (low, high), factor in factor_dict.items():
         if low <= Kd_ss < high:
             return factor
-    return None  # or raise an error if needed
 
 def fit_steady_state_one_site(signal_lst, ligand_lst, initial_parameters,
                               low_bounds, high_bounds, fixed_Kd=False, Kd_value=None):
@@ -375,9 +379,13 @@ def fit_one_site_dissociation(signal_lst, time_lst,
 
         if fit_s0:
 
-            s0_all = args[( 2 - sum([fixed_koff,fixed_t0]) ):]
+            s0_vals = args[( 2 - sum([fixed_koff,fixed_t0]) ):]
 
-        signal  = [one_site_dissociation_analytical(t,s0,Koff,t0) for t,s0 in zip(time_lst,s0_all)]
+        else:
+
+            s0_vals = s0_all
+
+        signal  = [one_site_dissociation_analytical(t,s0,Koff,t0) for t,s0 in zip(time_lst,s0_vals)]
 
         return np.concatenate(signal, axis=0)
 

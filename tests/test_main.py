@@ -11,7 +11,7 @@ pyKinetics = KineticsAnalyzer()
 folder = "./test_files/"
 frd_files = os.listdir(folder)
 
-frd_files = [os.path.join(folder, file) for file in frd_files if file.endswith('.frd')]
+frd_files = [os.path.join(folder, file) for file in frd_files if file.endswith('.frd') and file.startswith('230309')]
 frd_files.sort()
 
 bli = OctetExperiment('test')
@@ -69,6 +69,14 @@ def test_generate_fittings_a():
     df = pyKinetics.combined_ligand_conc_df.copy()
     df['Select'] = False
 
+    # generate fittings
+    pyKinetics.generate_fittings(df)
+
+    # generate fittings again with one less column
+    # Remove the 'Experiment' column to trigger code execution
+    df = df.drop(columns=["Experiment"], errors="ignore")
+
+    pyKinetics.init_fittings()
     pyKinetics.generate_fittings(df)
 
     # check that no fittings were generated

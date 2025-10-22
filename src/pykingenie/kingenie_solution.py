@@ -113,7 +113,7 @@ class KinGenieCsvSolution(SolutionBasedExp):
         self.no_traces = len(combined_concs_unq)
 
         # Use fake names
-        self.traces_names = ['sim. trace ' + str(i + 1) for i in range(self.no_traces)]
+        self.traces_names = ['trace ' + str(i + 1) for i in range(self.no_traces)]
 
         # Initiate self.xs and self.ys
         self.xs = []

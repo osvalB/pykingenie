@@ -25,6 +25,15 @@ test_file_4 = "./test_files/sim_solution_Kd-0.1_koff-0.01_E-20_S-0_ES-0.csv"
 kingenie4  = KinGenieCsvSolution('test_kingenie_csv_4')
 kingenie4.read_csv(test_file_4)
 
+test_file_5 = "./test_files/sim_solution_CS_kon-100_koff-1_kc-10_krev-100.csv"
+kingenie5  = KinGenieCsvSolution('test_kingenie_csv_5')
+kingenie5.read_csv(test_file_5)
+
+test_file_6 = "./test_files/sim_cs_kon-100_koff-1_kc-10_krev-100_fit_signal_E.csv"
+kingenie6  = KinGenieCsvSolution('test_kingenie_csv_6')
+kingenie6.read_csv(test_file_6)
+
+
 def test_load_solution_data():
 
     pyKinetics.add_experiment(kingenie, 'test_kingenie_csv')
@@ -34,6 +43,13 @@ def test_load_solution_data():
 
     assert not df.empty, "Combined concentration DataFrame should not be empty after merging."
 
+    # generate fittings
+    pyKinetics.generate_fittings_solution(df)
+
+    # Remove the 'Experiment' column to trigger code execution when generating fittings
+    df = df.drop(columns=["Experiment"], errors="ignore")
+
+    pyKinetics.init_fittings()
     pyKinetics.generate_fittings_solution(df)
 
     assert len(pyKinetics.fittings_names) > 0
@@ -64,8 +80,6 @@ def test_submit_fitting_solution_simple_fit_t0():
     pyKinetics.submit_fitting_solution(fitting_model='one_binding_site',fixed_t0=False)
 
     fit_params_kinetics = pyKinetics.get_experiment_properties('fit_params_kinetics', fittings=True)[0]
-
-    print(fit_params_kinetics)
 
     assert len(fit_params_kinetics) == 4, "There should be 4 sets of fit parameters for kinetics."
 
@@ -223,9 +237,9 @@ def test_submit_fitting_solution_simple_fit_E():
     pyKinetics.generate_fittings_solution(df)
 
     kwargs = {
-        "fit_signal_E": True,  # E alone does not produce a signal
+        "fit_signal_E": True,  # E alone does produce a signal
         "fit_signal_S": False, # S alone does not produce a signal
-        "fit_signal_ES": False, # The complex ES and ES_int produce a signal
+        "fit_signal_ES": False, # The complex ES and ES_int do not produce a signal
         "fixed_t0": True # t0 is fixed to 0
     }
 
@@ -236,3 +250,75 @@ def test_submit_fitting_solution_simple_fit_E():
 
     assert np.allclose(fit_params_kinetics['Kd [µM]'][0],0.1,rtol=0.01)
 
+def test_submit_fitting_solution_cs():
+
+    pyKinetics.delete_experiment('test_kingenie_csv_4')
+    pyKinetics.add_experiment(kingenie5, 'test_kingenie_csv_5')
+    pyKinetics.merge_conc_df_solution()
+
+    df = pyKinetics.combined_conc_df
+
+    pyKinetics.generate_fittings_solution(df)
+
+    kwargs = {
+        "fit_signal_E": False,  # E alone does not produce a signal
+        "E1_equals_E2": True, # E1 and E2 produce the same signal, in this case it does not matter because fit_signal_E is false
+        "fit_signal_S": False, # S alone does not produce a signal
+        "fit_signal_E2S": True, # The complex ES and ES_int produce a signal
+        "fixed_t0": True # t0 is fixed to 0
+    }
+
+    # fit one binding site with induced fit and verify parameters
+    pyKinetics.submit_fitting_solution(fitting_model='one_binding_site_cs',**kwargs)
+
+    fit_params_kinetics = pyKinetics.get_experiment_properties('fit_params_kinetics', fittings=True)[0]
+
+    assert np.allclose(fit_params_kinetics['k_off [1/s]'][0],1,rtol=0.1)
+
+    assert np.allclose(fit_params_kinetics['k_rev [1/s]'][0],100,rtol=0.1)
+
+def test_submit_fitting_solution_cs_with_t0():
+
+    kwargs = {
+        "fit_signal_E": False,  # E alone does not produce a signal
+        "E1_equals_E2": True, # E1 and E2 produce the same signal, in this case it does not matter because fit_signal_E is false
+        "fit_signal_S": False, # S alone does not produce a signal
+        "fit_signal_E2S": True, # The complex ES and ES_int produce a signal
+        "fixed_t0": False # t0 is fitted
+    }
+
+    # fit one binding site with induced fit and verify parameters
+    pyKinetics.submit_fitting_solution(fitting_model='one_binding_site_cs',**kwargs)
+
+    fit_params_kinetics = pyKinetics.get_experiment_properties('fit_params_kinetics', fittings=True)[0]
+
+    assert np.allclose(fit_params_kinetics['k_off [1/s]'][0],1,rtol=0.1)
+
+    assert np.allclose(fit_params_kinetics['k_rev [1/s]'][0],100,rtol=0.1)
+
+def test_submit_fitting_solution_cs_fit_signal_E():
+
+    pyKinetics.delete_experiment('test_kingenie_csv_5')
+    pyKinetics.add_experiment(kingenie6, 'test_kingenie_csv_6')
+    pyKinetics.merge_conc_df_solution()
+
+    df = pyKinetics.combined_conc_df
+
+    pyKinetics.generate_fittings_solution(df)
+
+    kwargs = {
+        "fit_signal_E": True,  # E alone does not produce a signal
+        "E1_equals_E2": True, # just to force code execution
+        "fit_signal_S": False, # S alone does not produce a signal
+        "fit_signal_E2S": False, # The complex ES and ES_int produce a signal
+        "fixed_t0": True # t0 is fixed to 0
+    }
+
+    # fit one binding site with induced fit and verify parameters
+    pyKinetics.submit_fitting_solution(fitting_model='one_binding_site_cs',**kwargs)
+
+    fit_params_kinetics = pyKinetics.get_experiment_properties('fit_params_kinetics', fittings=True)[0]
+
+    assert np.allclose(fit_params_kinetics['k_off [1/s]'][0],1,rtol=0.1)
+
+    assert np.allclose(fit_params_kinetics['k_rev [1/s]'][0],100,rtol=0.1)
