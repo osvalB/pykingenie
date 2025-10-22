@@ -73,7 +73,7 @@ class KineticsAnalyzer:
 
         return None
 
-    def collapse_solution_experiments(self):
+    def collapse_solution_experiments(self,new_name='Experiment'):
 
         """
         Useful when many csv files are imported, and each is assigned to a different experiment.
@@ -123,7 +123,7 @@ class KineticsAnalyzer:
         self.delete_experiment(names)
 
         # Add the new experiment
-        self.add_experiment(solution_experiment, 'Experiment')
+        self.add_experiment(solution_experiment, new_name)
 
         return None
 

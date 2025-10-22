@@ -93,7 +93,7 @@ def fit_single_exponential(y, t, min_log_k=-5, max_log_k=5, log_k_points=50):
 
     return fit_params, cov, fit_y
 
-def fit_double_exponential(y, t, min_log_k=-4, max_log_k=4, log_k_points=22):
+def fit_double_exponential(y, t, min_log_k=-4, max_log_k=4, log_k_points=24):
     """
     Fit a double exponential to a signal.
 
@@ -199,6 +199,10 @@ def fit_many_double_exponential(signal_lst, time_lst, min_log_k=-4, max_log_k=4,
         List of second slowest k_obs values for each signal.
     list
         List of fitted values for each signal.
+    list
+        List of the relative errors for the slowest k_obs values.
+    list
+        List of the relative errors for the second slowest k_obs values.
         
     Notes
     -----
@@ -213,6 +217,9 @@ def fit_many_double_exponential(signal_lst, time_lst, min_log_k=-4, max_log_k=4,
     k_obs_2 = [np.nan for _ in range(len(signal_lst))]
     y_pred =  [None   for _ in range(len(signal_lst))]
 
+    k_obs_1_err = [np.nan for _ in range(len(signal_lst))]
+    k_obs_2_err = [np.nan for _ in range(len(signal_lst))]
+
     i = 0
     for y, t in zip(signal_lst, time_lst):
 
@@ -221,12 +228,27 @@ def fit_many_double_exponential(signal_lst, time_lst, min_log_k=-4, max_log_k=4,
             params, cov, fitted_y = fit_double_exponential(y, t, min_log_k=min_log_k, max_log_k=max_log_k,
                                                            log_k_points=log_k_points)
 
-            slowest_k = np.min([params[2], params[4]])
-            second_k = np.max([params[2], params[4]])
+            errors = (np.sqrt(cov) / params) * 100
+
+            k_obs_both = [params[2], params[4]]
+            k_obs_both_err = [errors[2], errors[4]]
+
+            # Find the index of the slowest k_obs
+            min_idx = np.argmin(k_obs_both)
+            max_idx = 1 - min_idx
+
+            slowest_k = k_obs_both[min_idx]
+            second_k = k_obs_both[max_idx]
+
+            slowest_k_err = k_obs_both_err[min_idx]
+            second_k_err = k_obs_both_err[max_idx]
 
             k_obs_1[i] = slowest_k
             k_obs_2[i] = second_k
             y_pred[i] = fitted_y
+
+            k_obs_1_err[i] = slowest_k_err
+            k_obs_2_err[i] = second_k_err
 
         except:
 
@@ -234,7 +256,7 @@ def fit_many_double_exponential(signal_lst, time_lst, min_log_k=-4, max_log_k=4,
 
         i += 1
 
-    return k_obs_1, k_obs_2, y_pred
+    return k_obs_1, k_obs_2, y_pred, k_obs_1_err, k_obs_2_err
 
 def expand_high_bound(value, factor=10):
     """

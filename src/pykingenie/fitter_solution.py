@@ -232,11 +232,16 @@ class KineticsFitterSolution(KineticsFitterGeneral):
         """
         self.clear_fittings()
 
-        k_obs_1, k_obs_2, y_pred = fit_many_double_exponential(self.assoc_lst,self.time_assoc_lst,min_log_k, max_log_k, log_k_points)
+        double_exp_results = fit_many_double_exponential(self.assoc_lst,self.time_assoc_lst,min_log_k, max_log_k, log_k_points)
+
+        k_obs_1, k_obs_2, y_pred, k_obs_1_err, k_obs_2_err = double_exp_results
 
         self.k_obs_1 = k_obs_1
         self.k_obs_2 = k_obs_2
         self.signal_assoc_fit = y_pred
+
+        self.k_obs_1_err = k_obs_1_err
+        self.k_obs_2_err = k_obs_2_err
 
         self.group_double_exponential_k_obs_by_protein_concentration()
 
@@ -245,7 +250,9 @@ class KineticsFitterSolution(KineticsFitterGeneral):
             'Protein [µM]': self.prot_conc,
             'Ligand [µM]':  self.lig_conc,
             'k_obs_1 [1/s]': self.k_obs_1,
-            'k_obs_2 [1/s]': self.k_obs_2
+            'k_obs_1 relative error (%)': self.k_obs_1_err,
+            'k_obs_2 [1/s]': self.k_obs_2,
+            'k_obs_2 relative error (%)': self.k_obs_2_err
         })
 
         return None
