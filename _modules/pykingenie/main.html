@@ -435,7 +435,7 @@
 
 <div class="viewcode-block" id="KineticsAnalyzer.collapse_solution_experiments">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.main.KineticsAnalyzer.collapse_solution_experiments">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">collapse_solution_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">collapse_solution_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">new_name</span><span class="o">=</span><span class="s1">&#39;Experiment&#39;</span><span class="p">):</span>
 
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Useful when many csv files are imported, and each is assigned to a different experiment.</span>
@@ -485,7 +485,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">delete_experiment</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
 
         <span class="c1"># Add the new experiment</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_experiment</span><span class="p">(</span><span class="n">solution_experiment</span><span class="p">,</span> <span class="s1">&#39;Experiment&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_experiment</span><span class="p">(</span><span class="n">solution_experiment</span><span class="p">,</span> <span class="n">new_name</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="kc">None</span></div>
 

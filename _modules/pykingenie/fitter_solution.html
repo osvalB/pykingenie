@@ -597,11 +597,16 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">clear_fittings</span><span class="p">()</span>
 
-        <span class="n">k_obs_1</span><span class="p">,</span> <span class="n">k_obs_2</span><span class="p">,</span> <span class="n">y_pred</span> <span class="o">=</span> <span class="n">fit_many_double_exponential</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">time_assoc_lst</span><span class="p">,</span><span class="n">min_log_k</span><span class="p">,</span> <span class="n">max_log_k</span><span class="p">,</span> <span class="n">log_k_points</span><span class="p">)</span>
+        <span class="n">double_exp_results</span> <span class="o">=</span> <span class="n">fit_many_double_exponential</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">time_assoc_lst</span><span class="p">,</span><span class="n">min_log_k</span><span class="p">,</span> <span class="n">max_log_k</span><span class="p">,</span> <span class="n">log_k_points</span><span class="p">)</span>
+
+        <span class="n">k_obs_1</span><span class="p">,</span> <span class="n">k_obs_2</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">k_obs_1_err</span><span class="p">,</span> <span class="n">k_obs_2_err</span> <span class="o">=</span> <span class="n">double_exp_results</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">k_obs_1</span> <span class="o">=</span> <span class="n">k_obs_1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">k_obs_2</span> <span class="o">=</span> <span class="n">k_obs_2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">signal_assoc_fit</span> <span class="o">=</span> <span class="n">y_pred</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">k_obs_1_err</span> <span class="o">=</span> <span class="n">k_obs_1_err</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">k_obs_2_err</span> <span class="o">=</span> <span class="n">k_obs_2_err</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">group_double_exponential_k_obs_by_protein_concentration</span><span class="p">()</span>
 
@@ -610,7 +615,9 @@
             <span class="s1">&#39;Protein [µM]&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">prot_conc</span><span class="p">,</span>
             <span class="s1">&#39;Ligand [µM]&#39;</span><span class="p">:</span>  <span class="bp">self</span><span class="o">.</span><span class="n">lig_conc</span><span class="p">,</span>
             <span class="s1">&#39;k_obs_1 [1/s]&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_obs_1</span><span class="p">,</span>
-            <span class="s1">&#39;k_obs_2 [1/s]&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_obs_2</span>
+            <span class="s1">&#39;k_obs_1 relative error (%)&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_obs_1_err</span><span class="p">,</span>
+            <span class="s1">&#39;k_obs_2 [1/s]&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_obs_2</span><span class="p">,</span>
+            <span class="s1">&#39;k_obs_2 relative error (%)&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_obs_2_err</span>
         <span class="p">})</span>
 
         <span class="k">return</span> <span class="kc">None</span></div>
