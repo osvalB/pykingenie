@@ -792,6 +792,48 @@
         <span class="k">return</span> <span class="kc">None</span></div>
 
 
+<div class="viewcode-block" id="SurfaceBasedExperiment.subtraction_by_column">
+<a class="viewcode-back" href="../../pykingenie.html#pykingenie.surface_exp.SurfaceBasedExperiment.subtraction_by_column">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">subtraction_by_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">sensors_column_one</span><span class="p">,</span><span class="n">sensors_column_two</span><span class="p">,</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Subtract a whole column of sensors from another column of sensors.</span>
+<span class="sd">        Useful when a screening experiment has been done</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sensors_column_one : int</span>
+<span class="sd">            Column number of the sensors to subtract from.</span>
+<span class="sd">        sensors_column_two : int</span>
+<span class="sd">            Column number of the sensors to subtract.</span>
+<span class="sd">        inplace : bool, optional</span>
+<span class="sd">            If True, the subtraction is done in place, otherwise new sensors</span>
+<span class="sd">            are created, by default True.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A list of strings mentioning which sensors were subtracted from which.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Find all sensor names that contain the column number one </span>
+        <span class="n">sensors_one</span> <span class="o">=</span> <span class="p">[</span><span class="n">sensor_name</span> <span class="k">for</span> <span class="n">sensor_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sensor_names</span> <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">sensors_column_one</span><span class="p">)</span> <span class="ow">in</span> <span class="n">sensor_name</span><span class="p">]</span>
+
+        <span class="c1"># Sort them in alphabetical order</span>
+        <span class="n">sensors_one</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+        <span class="n">return_strings</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Apply subtraction for each sensor in column one with the corresponding sensor in column two</span>
+        <span class="k">for</span> <span class="n">sensor_name</span> <span class="ow">in</span> <span class="n">sensors_one</span><span class="p">:</span>
+
+            <span class="c1"># Create the corresponding sensor name in column two</span>
+            <span class="n">sensor_name_two</span> <span class="o">=</span> <span class="n">sensor_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">sensors_column_one</span><span class="p">),</span><span class="nb">str</span><span class="p">(</span><span class="n">sensors_column_two</span><span class="p">))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">subtraction_one_to_one</span><span class="p">(</span><span class="n">sensor_name</span><span class="p">,</span><span class="n">sensor_name_two</span><span class="p">,</span><span class="n">inplace</span><span class="o">=</span><span class="n">inplace</span><span class="p">)</span>
+
+            <span class="n">return_strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Subtracted </span><span class="si">{</span><span class="n">sensor_name_two</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">sensor_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">return_strings</span></div>
+
+
 <div class="viewcode-block" id="SurfaceBasedExperiment.align_dissociation">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.surface_exp.SurfaceBasedExperiment.align_dissociation">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">align_dissociation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sensor_names</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">new_names</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">npoints</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
