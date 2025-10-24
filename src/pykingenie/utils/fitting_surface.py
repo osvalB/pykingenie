@@ -6,14 +6,10 @@ from ..utils.signal_surface import (
     steady_state_one_site,
     one_site_association_analytical,
     one_site_dissociation_analytical,
-    ode_one_site_mass_transport_association,
-    ode_one_site_mass_transport_dissociation,
     solve_ode_one_site_mass_transport_association,
     solve_ode_one_site_mass_transport_dissociation,
     solve_induced_fit_association,
-    solve_induced_fit_dissociation,
-    solve_ode_mixture_analyte_association,
-    solve_ode_mixture_analyte_dissociation
+    solve_induced_fit_dissociation
 )
 
 from ..utils.math import get_rss

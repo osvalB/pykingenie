@@ -112,7 +112,76 @@ def test_read_sample_plate_info():
     # Check if sample_row is not None
     assert bli.sample_row is not None, "The sample_row should not be None after reading plate info."
 
+def test_subtract_experiment():
+    
+    # Create two instances of OctetExperiment
+    bli1 = OctetExperiment('test_octet_1')
+    bli2 = OctetExperiment('test_octet_2')
 
+    bli1.read_sensor_data(frd_files[:4])
+    bli2.read_sensor_data(frd_files[:4])
+
+    bli1.subtract_experiment(bli2)
+
+    assert len(bli1.ys) > 0, "The ys list should not be empty after subtraction."
+
+    # The ys should be zero because both experiments are identical
+    for step_data in bli1.ys:
+        for sensor_data in step_data:
+            assert all(sensor_data == 0), "The ys data should be zero after subtracting identical experiments."
+
+def test_subtract_experiment_not_in_place():
+    
+    # Create two instances of OctetExperiment
+    bli1 = OctetExperiment('test_octet_1')
+    bli2 = OctetExperiment('test_octet_2')
+
+    bli1.read_sensor_data(frd_files[:4])
+    bli2.read_sensor_data(frd_files[:4])
+
+    bli1.subtract_experiment(bli2, inplace=False)
+
+    assert len(bli1.ys) > 0, "The ys list should not be empty after subtraction."
+
+    # We should have 8 sensors now in bli1
+    assert len(bli1.sensor_names) == 8, "The number of sensors should be doubled after subtraction in non-inplace mode."
+
+    # The ys of the last four sensors should be zero because both experiments are identical
+    for step_data in bli1.ys[-4:]:
+        for sensor_data in step_data:
+            assert all(sensor_data == 0), "The ys data should be zero after subtracting identical experiments."
+
+    # The ys of the first four sensors should not be zero
+    for step_data in bli1.ys[:4]:
+        for sensor_data in step_data:
+            assert not all(sensor_data == 0), "The ys data should not be zero for the original sensors."
+
+
+def test_subtract_experiment_error_1():
+    
+    # Create two instances of OctetExperiment
+    bli1 = OctetExperiment('test_octet_1')
+    bli2 = OctetExperiment('test_octet_2')
+
+    bli1.read_sensor_data(frd_files[:4])
+    bli2.read_sensor_data(frd_files[:3])  # Different number of sensors to trigger error
+
+    with pytest.raises(RuntimeError, match="Experiments have different number of sensors"):
+        bli1.subtract_experiment(bli2)
+
+def test_subtract_experiment_error_2():
+    
+    # Create two instances of OctetExperiment
+    bli1 = OctetExperiment('test_octet_1')
+    bli2 = OctetExperiment('test_octet_2')
+
+    bli1.read_sensor_data(frd_files[:4])
+    bli2.read_sensor_data(frd_files[:4])  
+
+    bli2.xs[0][0] = bli2.xs[0][0] + 10  # Modify time data to trigger error
+
+    with pytest.raises(RuntimeError, match="Experiments have different time data"):
+        bli1.subtract_experiment(bli2)
 
 def test_convert_to_numbers():
 

@@ -70,7 +70,8 @@ def test_subtract_repeated_names():
 
 def test_align_association():
 
-    bli.align_association(sensor_names = sensor_names,inplace = True,new_names = False)
+    # Sensor names equal None means all sensors
+    bli.align_association(sensor_names = None,inplace = True,new_names = False)
 
     assert len(bli.sensor_names) == 8, "The sensor_names list should have 8 sensors after aligning association."
     assert bli.xs is not None, "The xs list should not be None after aligning association."
@@ -191,7 +192,6 @@ def test_subtraction_string_as_sensor_names():
     bli.subtraction(list_of_sensor_names=bli.sensor_names[0], reference_sensor=bli.sensor_names[-1], inplace=False)
 
     assert bli.xs is not None, "The xs list should not be None after subtraction."
-
 
 ## Now we test the KinGenieCsv 
 def test_align_single_cycle():

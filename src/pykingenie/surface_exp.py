@@ -294,7 +294,7 @@ class SurfaceBasedExperiment:
 
         return None
 
-    def align_association(self, sensor_names, inplace=True, new_names=False, npoints=10):
+    def align_association(self, sensor_names=None, inplace=True, new_names=False, npoints=10):
         """Align BLI traces based on the signal before the association step(s).
         
         Parameters
@@ -302,6 +302,7 @@ class SurfaceBasedExperiment:
         sensor_names : str or list
             Name of the sensor(s) to align. If a string is provided,
             it will be converted to a list.
+            If None, all sensors will be aligned.
         inplace : bool, optional
             If True, the alignment is done in place, otherwise new sensors
             are created, by default True.
@@ -328,7 +329,11 @@ class SurfaceBasedExperiment:
         The alignment is performed by subtracting the average signal of the
         last `npoints` points before each association step.
         """
-        sensor_names = if_string_to_list(sensor_names)
+        if sensor_names is None:
+            sensor_names = self.sensor_names
+        
+        else:
+            sensor_names = if_string_to_list(sensor_names)
 
         # Find the index of the association steps
         association_steps_indices = self.df_steps.index[self.df_steps['Type'] == 'ASSOC'].to_numpy()
@@ -417,6 +422,73 @@ class SurfaceBasedExperiment:
                 self.ligand_conc_df = pd.concat([self.ligand_conc_df,new_row])
 
         self.create_unique_sensor_names()
+
+        return None
+
+    def subtract_experiment(self, other_experiment, inplace=True):
+        
+        """Subtract another SurfaceBasedExperiment from this one on a sensor-by-sensor basis.
+        
+        Parameters
+        ----------
+        other_experiment : SurfaceBasedExperiment
+            The experiment to subtract from this one.
+        inplace : bool, optional
+            If True, the subtraction is done in place, otherwise new sensors
+            are created, by default True.
+        """
+
+        # Verify that both experiments have the same number of sensors
+        if len(self.sensor_names) != len(other_experiment.sensor_names):
+            raise RuntimeError("Experiments have different number of sensors")
+        
+        # Verify that both experiments x-data is the same
+        if not np.allclose(self.xs[0][0], other_experiment.xs[0][0],rtol=0.01):
+            raise RuntimeError("Experiments have different time data")
+
+        # Sort sensor names alphanumerically
+        self_sensor_names_sorted = sorted(self.sensor_names)
+        other_sensor_names_sorted = sorted(other_experiment.sensor_names)
+
+        for j,sensor_name1 in enumerate(self_sensor_names_sorted):
+
+            sensor_name2 = other_sensor_names_sorted[j]
+
+            new_sensor_name = sensor_name1 + ' - ' + sensor_name2
+
+            new_sensor_name = self.check_sensor_name(new_sensor_name)
+
+            sensor1 = self.sensor_names.index(sensor_name1)
+            sensor2 = other_experiment.sensor_names.index(sensor_name2)
+
+            # Subtract
+            if inplace:
+
+                for i in range(len(self.xs[sensor1])):
+                    self.ys[sensor1][i] -= other_experiment.ys[sensor2][i]
+                    self.sensor_names[sensor1] = new_sensor_name
+
+                self.ligand_conc_df['Sensor'] = self.ligand_conc_df['Sensor'].replace(sensor_name1,new_sensor_name)
+
+            else:
+                ys = []
+                for i in range(len(self.xs[sensor1])):
+                    ys.append(self.ys[sensor1][i] - other_experiment.ys[sensor2][i])
+
+                # Fill instance
+                self.xs.append(self.xs[sensor1])
+                self.ys.append(ys)
+                self.sensor_names.append(new_sensor_name)
+
+                # Add new sensor name to the ligand conc df
+                previous_row        = self.ligand_conc_df[self.ligand_conc_df['Sensor'] == sensor_name1]
+                new_row             = previous_row.copy()
+                new_row['Sensor']   = new_sensor_name
+                new_row['SampleID'] = new_row['SampleID'] + ' bl subtracted'
+
+                self.ligand_conc_df = pd.concat([self.ligand_conc_df,new_row])
+
+            self.create_unique_sensor_names()
 
         return None
 
