@@ -50,15 +50,15 @@ def test_fit_cs_solution_fixed_constants_t0():
     signal_S = 0
     signal_E2S = 20
 
-    signal_lst = generate_ys(E_tot,S_tot,kc,krev,kon,koff,signal_E, signal_E, signal_S, signal_E2S)
+    signal_lst = generate_ys(E_tot,S_tot[-3:],kc,krev,kon,koff,signal_E, signal_E, signal_S, signal_E2S)
 
-    time_lst = [t + 0.02] * len(signal_lst)
-    ligand_conc_lst = S_tot
+    time_lst = [t + 0.03] * len(signal_lst)
+    ligand_conc_lst = S_tot[-3:]
     protein_conc_lst = [E_tot] * len(signal_lst)
 
-    initial_parameters = [20] + ([0.02] * len(time_lst))
-    low_bounds = [10] + ([0.002] * len(time_lst))
-    high_bounds = [30] + ([0.2] * len(time_lst))
+    initial_parameters = [20] + ([0.03] * len(time_lst))
+    low_bounds = [10] + ([0.003] * len(time_lst))
+    high_bounds = [30] + ([0.3] * len(time_lst))
 
     global_fit_params, _, _, params_names = fit_conformational_selection_solution(
         signal_lst=signal_lst,
@@ -81,7 +81,7 @@ def test_fit_cs_solution_fixed_constants_t0():
         fit_signal_E2S=True,
         fixed_t0=False)
 
-    expected_params = [signal_E2S] + ([0.02] * len(time_lst))  # t0 values should be close to the offset we added
+    expected_params = [signal_E2S] + ([0.03] * len(time_lst))  # t0 values should be close to the offset we added
 
     np.testing.assert_allclose(
         global_fit_params, expected_params, rtol=0.2,

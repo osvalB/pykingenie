@@ -420,6 +420,45 @@ class SurfaceBasedExperiment:
 
         return None
 
+    def subtraction_by_column(self,sensors_column_one,sensors_column_two,inplace=True):
+        
+        """Subtract a whole column of sensors from another column of sensors.
+        Useful when a screening experiment has been done
+
+        Parameters
+        ----------
+        sensors_column_one : int
+            Column number of the sensors to subtract from.
+        sensors_column_two : int
+            Column number of the sensors to subtract.
+        inplace : bool, optional
+            If True, the subtraction is done in place, otherwise new sensors
+            are created, by default True.
+        Returns
+        -------
+        A list of strings mentioning which sensors were subtracted from which.
+        """
+
+        # Find all sensor names that contain the column number one 
+        sensors_one = [sensor_name for sensor_name in self.sensor_names if str(sensors_column_one) in sensor_name]
+
+        # Sort them in alphabetical order
+        sensors_one.sort()
+
+        return_strings = []
+
+        # Apply subtraction for each sensor in column one with the corresponding sensor in column two
+        for sensor_name in sensors_one:
+
+            # Create the corresponding sensor name in column two
+            sensor_name_two = sensor_name.replace(str(sensors_column_one),str(sensors_column_two))
+
+            self.subtraction_one_to_one(sensor_name,sensor_name_two,inplace=inplace)
+
+            return_strings.append(f"Subtracted {sensor_name_two} from {sensor_name}")
+
+        return return_strings
+
     def align_dissociation(self, sensor_names, inplace=True, new_names=False, npoints=10):
         """Align BLI traces based on the signal before the dissociation step(s).
         

@@ -40,7 +40,7 @@ def test_subtract_incompatible():
     
     # bli_temp has no traces loaded
     bli_temp = OctetExperiment('test_octet')
-    bli_temp.read_sensor_data(frd_files[:2])  # Load only A1, B1, and C1
+    bli_temp.read_sensor_data(frd_files[:2])  # Load only A1, B1
 
     bli_temp.xs[0] = bli_temp.xs[0][:5] # Reduce the number of steps for sensor A1
 
@@ -291,3 +291,18 @@ def test_get_step_xy_kingenie():
             type='y')
         
         # Check if y is a numpy array
+
+def test_subtraction_by_column():
+
+    bli_temp = OctetExperiment('test_octet')
+    bli_temp.read_sensor_data(frd_files[:2])  # Load only A1, B1
+
+    bli_temp.sensor_names = ['A1', 'A2'] # Rename sensors to allow subtraction by column
+
+    result = bli_temp.subtraction_by_column(1, 2)
+
+    assert result is not None, "The subtraction by column should return a result."
+
+    assert isinstance(result, list), "The result should be a list."
+
+    assert isinstance(result[0], str), "The first element of the result should be a string."

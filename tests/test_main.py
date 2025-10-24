@@ -201,3 +201,4 @@ def test_submit_kinetics_fitting():
     df = pyKinetics.fit_params_kinetics_all
     assert isinstance(df, pd.DataFrame), "Fitting results should be a dataframe."
     assert not df.empty, "Fitting results dataframe should not be empty."
+    

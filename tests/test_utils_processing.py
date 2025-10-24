@@ -14,7 +14,8 @@ from pykingenie.utils.processing import (
     get_colors_from_numeric_values,
     if_string_to_list,
     find_loading_column,
-    find_index_of_previous_step_type)
+    find_index_of_previous_step_type
+    )
 
 def test_guess_experiment_name():
     # Create a temporary file with known content

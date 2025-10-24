@@ -14,7 +14,7 @@ __all__ = [
     'detect_time_list_continuos', 'find_loading_column', 'concat_signal_lst',
     'expand_parameter_list', 'combine_sequences', 'get_palette', 'get_plotting_df',
     'subset_data', 'sample_type_to_letter', 'get_colors_from_numeric_values',
-    'if_string_to_list','find_index_of_previous_step_type']
+    'if_string_to_list','find_index_of_previous_step_type','number_is_in_word']
 
 def if_string_to_list(string_or_list):
     """
