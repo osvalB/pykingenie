@@ -3191,13 +3191,14 @@ are created, by default True.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pykingenie.surface_exp.SurfaceBasedExperiment.align_association">
-<span class="sig-name descname"><span class="pre">align_association</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sensor_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/surface_exp.html#SurfaceBasedExperiment.align_association"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.surface_exp.SurfaceBasedExperiment.align_association" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">align_association</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sensor_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/surface_exp.html#SurfaceBasedExperiment.align_association"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.surface_exp.SurfaceBasedExperiment.align_association" title="Link to this definition">#</a></dt>
 <dd><p>Align BLI traces based on the signal before the association step(s).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>sensor_names</strong> (<em>str</em><em> or </em><em>list</em>) – Name of the sensor(s) to align. If a string is provided,
-it will be converted to a list.</p></li>
+it will be converted to a list.
+If None, all sensors will be aligned.</p></li>
 <li><p><strong>inplace</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the alignment is done in place, otherwise new sensors
 are created, by default True.</p></li>
 <li><p><strong>new_names</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, new sensor names are generated, otherwise the original
@@ -3221,6 +3222,21 @@ by default 10.</p></li>
 - self.ligand_conc_df</p>
 <p>The alignment is performed by subtracting the average signal of the
 last <cite>npoints</cite> points before each association step.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.surface_exp.SurfaceBasedExperiment.subtract_experiment">
+<span class="sig-name descname"><span class="pre">subtract_experiment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other_experiment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/surface_exp.html#SurfaceBasedExperiment.subtract_experiment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.surface_exp.SurfaceBasedExperiment.subtract_experiment" title="Link to this definition">#</a></dt>
+<dd><p>Subtract another SurfaceBasedExperiment from this one on a sensor-by-sensor basis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>other_experiment</strong> (<a class="reference internal" href="#pykingenie.surface_exp.SurfaceBasedExperiment" title="pykingenie.surface_exp.SurfaceBasedExperiment"><em>SurfaceBasedExperiment</em></a>) – The experiment to subtract from this one.</p></li>
+<li><p><strong>inplace</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the subtraction is done in place, otherwise new sensors
+are created, by default True.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -3618,6 +3634,7 @@ For dissociation steps, time continues from the association step.</p>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.surface_exp.SurfaceBasedExperiment.subtraction"><code class="docutils literal notranslate"><span class="pre">SurfaceBasedExperiment.subtraction()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.surface_exp.SurfaceBasedExperiment.average"><code class="docutils literal notranslate"><span class="pre">SurfaceBasedExperiment.average()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.surface_exp.SurfaceBasedExperiment.align_association"><code class="docutils literal notranslate"><span class="pre">SurfaceBasedExperiment.align_association()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.surface_exp.SurfaceBasedExperiment.subtract_experiment"><code class="docutils literal notranslate"><span class="pre">SurfaceBasedExperiment.subtract_experiment()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.surface_exp.SurfaceBasedExperiment.subtraction_by_column"><code class="docutils literal notranslate"><span class="pre">SurfaceBasedExperiment.subtraction_by_column()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.surface_exp.SurfaceBasedExperiment.align_dissociation"><code class="docutils literal notranslate"><span class="pre">SurfaceBasedExperiment.align_dissociation()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.surface_exp.SurfaceBasedExperiment.discard_steps"><code class="docutils literal notranslate"><span class="pre">SurfaceBasedExperiment.discard_steps()</span></code></a></li>

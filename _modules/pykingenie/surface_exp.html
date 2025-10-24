@@ -665,7 +665,7 @@
 
 <div class="viewcode-block" id="SurfaceBasedExperiment.align_association">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.surface_exp.SurfaceBasedExperiment.align_association">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">align_association</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sensor_names</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">new_names</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">npoints</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">align_association</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sensor_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">new_names</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">npoints</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Align BLI traces based on the signal before the association step(s).</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
@@ -673,6 +673,7 @@
 <span class="sd">        sensor_names : str or list</span>
 <span class="sd">            Name of the sensor(s) to align. If a string is provided,</span>
 <span class="sd">            it will be converted to a list.</span>
+<span class="sd">            If None, all sensors will be aligned.</span>
 <span class="sd">        inplace : bool, optional</span>
 <span class="sd">            If True, the alignment is done in place, otherwise new sensors</span>
 <span class="sd">            are created, by default True.</span>
@@ -699,7 +700,11 @@
 <span class="sd">        The alignment is performed by subtracting the average signal of the</span>
 <span class="sd">        last `npoints` points before each association step.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">sensor_names</span> <span class="o">=</span> <span class="n">if_string_to_list</span><span class="p">(</span><span class="n">sensor_names</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sensor_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sensor_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sensor_names</span>
+        
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sensor_names</span> <span class="o">=</span> <span class="n">if_string_to_list</span><span class="p">(</span><span class="n">sensor_names</span><span class="p">)</span>
 
         <span class="c1"># Find the index of the association steps</span>
         <span class="n">association_steps_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_steps</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">df_steps</span><span class="p">[</span><span class="s1">&#39;Type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;ASSOC&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
@@ -788,6 +793,76 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">ligand_conc_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">ligand_conc_df</span><span class="p">,</span><span class="n">new_row</span><span class="p">])</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">create_unique_sensor_names</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="SurfaceBasedExperiment.subtract_experiment">
+<a class="viewcode-back" href="../../pykingenie.html#pykingenie.surface_exp.SurfaceBasedExperiment.subtract_experiment">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">subtract_experiment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_experiment</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Subtract another SurfaceBasedExperiment from this one on a sensor-by-sensor basis.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other_experiment : SurfaceBasedExperiment</span>
+<span class="sd">            The experiment to subtract from this one.</span>
+<span class="sd">        inplace : bool, optional</span>
+<span class="sd">            If True, the subtraction is done in place, otherwise new sensors</span>
+<span class="sd">            are created, by default True.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Verify that both experiments have the same number of sensors</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sensor_names</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">other_experiment</span><span class="o">.</span><span class="n">sensor_names</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Experiments have different number of sensors&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># Verify that both experiments x-data is the same</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">other_experiment</span><span class="o">.</span><span class="n">xs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span><span class="n">rtol</span><span class="o">=</span><span class="mf">0.01</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Experiments have different time data&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Sort sensor names alphanumerically</span>
+        <span class="n">self_sensor_names_sorted</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sensor_names</span><span class="p">)</span>
+        <span class="n">other_sensor_names_sorted</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">other_experiment</span><span class="o">.</span><span class="n">sensor_names</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span><span class="n">sensor_name1</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">self_sensor_names_sorted</span><span class="p">):</span>
+
+            <span class="n">sensor_name2</span> <span class="o">=</span> <span class="n">other_sensor_names_sorted</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+
+            <span class="n">new_sensor_name</span> <span class="o">=</span> <span class="n">sensor_name1</span> <span class="o">+</span> <span class="s1">&#39; - &#39;</span> <span class="o">+</span> <span class="n">sensor_name2</span>
+
+            <span class="n">new_sensor_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_sensor_name</span><span class="p">(</span><span class="n">new_sensor_name</span><span class="p">)</span>
+
+            <span class="n">sensor1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sensor_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">sensor_name1</span><span class="p">)</span>
+            <span class="n">sensor2</span> <span class="o">=</span> <span class="n">other_experiment</span><span class="o">.</span><span class="n">sensor_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">sensor_name2</span><span class="p">)</span>
+
+            <span class="c1"># Subtract</span>
+            <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xs</span><span class="p">[</span><span class="n">sensor1</span><span class="p">])):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">ys</span><span class="p">[</span><span class="n">sensor1</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">-=</span> <span class="n">other_experiment</span><span class="o">.</span><span class="n">ys</span><span class="p">[</span><span class="n">sensor2</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sensor_names</span><span class="p">[</span><span class="n">sensor1</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_sensor_name</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">ligand_conc_df</span><span class="p">[</span><span class="s1">&#39;Sensor&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ligand_conc_df</span><span class="p">[</span><span class="s1">&#39;Sensor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">sensor_name1</span><span class="p">,</span><span class="n">new_sensor_name</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ys</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xs</span><span class="p">[</span><span class="n">sensor1</span><span class="p">])):</span>
+                    <span class="n">ys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ys</span><span class="p">[</span><span class="n">sensor1</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">other_experiment</span><span class="o">.</span><span class="n">ys</span><span class="p">[</span><span class="n">sensor2</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+
+                <span class="c1"># Fill instance</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xs</span><span class="p">[</span><span class="n">sensor1</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ys</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sensor_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_sensor_name</span><span class="p">)</span>
+
+                <span class="c1"># Add new sensor name to the ligand conc df</span>
+                <span class="n">previous_row</span>        <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ligand_conc_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">ligand_conc_df</span><span class="p">[</span><span class="s1">&#39;Sensor&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">sensor_name1</span><span class="p">]</span>
+                <span class="n">new_row</span>             <span class="o">=</span> <span class="n">previous_row</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">new_row</span><span class="p">[</span><span class="s1">&#39;Sensor&#39;</span><span class="p">]</span>   <span class="o">=</span> <span class="n">new_sensor_name</span>
+                <span class="n">new_row</span><span class="p">[</span><span class="s1">&#39;SampleID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_row</span><span class="p">[</span><span class="s1">&#39;SampleID&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; bl subtracted&#39;</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">ligand_conc_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">ligand_conc_df</span><span class="p">,</span><span class="n">new_row</span><span class="p">])</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">create_unique_sensor_names</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
