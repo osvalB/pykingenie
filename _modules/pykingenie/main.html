@@ -780,6 +780,8 @@
             <span class="n">lig_conc_vec</span>   <span class="o">=</span> <span class="p">[</span><span class="n">lig_conc_vec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>   <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sorted_indices</span><span class="p">]</span>
             <span class="n">smax_id_vec</span>    <span class="o">=</span> <span class="p">[</span><span class="n">smax_id_vec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sorted_indices</span><span class="p">]</span>
 
+            <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">time_assoc_lst</span><span class="p">))</span>
+
             <span class="n">fit</span> <span class="o">=</span> <span class="n">KineticsFitter</span><span class="p">(</span>
                 <span class="n">time_assoc_lst</span><span class="o">=</span><span class="n">time_assoc_lst</span><span class="p">,</span>
                 <span class="n">association_signal_lst</span><span class="o">=</span><span class="n">assoc_lst</span><span class="p">,</span>
@@ -788,7 +790,7 @@
                 <span class="n">dissociation_signal_lst</span><span class="o">=</span><span class="n">diss_lst</span><span class="p">,</span>
                 <span class="n">smax_id</span><span class="o">=</span><span class="n">smax_id_vec</span><span class="p">,</span>
                 <span class="n">name_lst</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">unq</span><span class="si">}</span><span class="s2">_id_</span><span class="si">{</span><span class="n">smax</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">smax</span> <span class="ow">in</span> <span class="n">unq_smax_id</span><span class="p">],</span>
-                <span class="n">is_single_cycle</span><span class="o">=</span><span class="nb">any</span><span class="p">([</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">time_assoc_lst</span><span class="p">])</span>
+                <span class="n">is_single_cycle</span><span class="o">=</span><span class="nb">any</span><span class="p">([</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">time_assoc_lst</span><span class="p">])</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">time_assoc_lst</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
             <span class="p">)</span>
 
             <span class="n">fit</span><span class="o">.</span><span class="n">get_steady_state</span><span class="p">()</span>
