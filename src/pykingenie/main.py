@@ -400,6 +400,8 @@ class KineticsAnalyzer:
             lig_conc_vec   = [lig_conc_vec[i]   for i in sorted_indices]
             smax_id_vec    = [smax_id_vec[i]    for i in sorted_indices]
 
+            print(len(time_assoc_lst))
+
             fit = KineticsFitter(
                 time_assoc_lst=time_assoc_lst,
                 association_signal_lst=assoc_lst,
@@ -408,7 +410,7 @@ class KineticsAnalyzer:
                 dissociation_signal_lst=diss_lst,
                 smax_id=smax_id_vec,
                 name_lst=[f"{unq}_id_{smax}" for smax in unq_smax_id],
-                is_single_cycle=any([t[0] > 1 for t in time_assoc_lst])
+                is_single_cycle=any([t[0] > 1 for t in time_assoc_lst]) or len(time_assoc_lst) == 1
             )
 
             fit.get_steady_state()
