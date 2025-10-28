@@ -521,6 +521,23 @@
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">all_stepinfo</span><span class="p">)):</span>
             <span class="n">all_stepinfo</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">all_stepinfo</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="o">**</span><span class="n">more_info</span><span class="p">[</span><span class="n">i</span><span class="p">]}</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">no_sensors</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fns</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_sensors</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+
+            <span class="c1"># Perform a filter to verify that all steps of the different sensors have the same type and location</span>
+            <span class="n">reference_location</span> <span class="o">=</span> <span class="n">all_stepinfo</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;SampleLocation&#39;</span><span class="p">]</span>
+            <span class="n">reference_type</span>     <span class="o">=</span> <span class="n">all_stepinfo</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;StepType&#39;</span><span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">all_stepinfo</span><span class="p">)):</span>
+
+                <span class="n">condition1</span> <span class="o">=</span> <span class="n">all_stepinfo</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;SampleLocation&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">reference_location</span>
+                <span class="n">condition2</span> <span class="o">=</span> <span class="n">all_stepinfo</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;StepType&#39;</span><span class="p">]</span>     <span class="o">==</span> <span class="n">reference_type</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">condition1</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">condition2</span><span class="p">:</span>
+
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The steps of the different sensors do not have the same type and location. Please import in one experiment only sensors with the same metadata&quot;</span><span class="p">)</span>
+
         <span class="c1"># Fill instance</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">xs</span>   <span class="o">=</span> <span class="n">xs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ys</span>   <span class="o">=</span> <span class="n">ys</span>
@@ -575,8 +592,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">no_steps</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">step_info</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;ActualTime&#39;</span><span class="p">])</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">no_sensors</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fns</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">sensor_names</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">exp_info</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;SensorName&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">no_sensors</span><span class="p">)]</span>
 
