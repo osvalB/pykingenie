@@ -33,7 +33,7 @@ def test_import_no_frd_files():
 
 def test_different_metadata_value_err():
 
-    err_file = '/home/os/pykingenie/test_files/different_sensor_metadata.frd'
+    err_file = './test_files/different_sensor_metadata.frd'
     bli = OctetExperiment('test_octet')
 
     with pytest.raises(ValueError):
