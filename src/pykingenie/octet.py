@@ -165,6 +165,23 @@ class OctetExperiment(SurfaceBasedExperiment):
         for i in range(len(all_stepinfo)):
             all_stepinfo[i] = {**all_stepinfo[i], **more_info[i]}
 
+        self.no_sensors = len(self.fns)
+
+        if self.no_sensors > 1:
+
+            # Perform a filter to verify that all steps of the different sensors have the same type and location
+            reference_location = all_stepinfo[0]['SampleLocation']
+            reference_type     = all_stepinfo[0]['StepType']
+
+            for i in range(1,len(all_stepinfo)):
+
+                condition1 = all_stepinfo[i]['SampleLocation'] == reference_location
+                condition2 = all_stepinfo[i]['StepType']     == reference_type
+
+                if not condition1 or not condition2:
+
+                    raise ValueError("The steps of the different sensors do not have the same type and location. Please import in one experiment only sensors with the same metadata")
+
         # Fill instance
         self.xs   = xs
         self.ys   = ys
@@ -216,8 +233,6 @@ class OctetExperiment(SurfaceBasedExperiment):
         """
 
         self.no_steps = len(self.step_info[0]['ActualTime'])
-
-        self.no_sensors = len(self.fns)
 
         self.sensor_names = [self.exp_info[i]['SensorName'] for i in range(self.no_sensors)]
 

@@ -31,6 +31,14 @@ def test_import_no_frd_files():
 
     assert bli.xs is None, "The xs list should be still None when no .frd files are provided."
 
+def test_different_metadata_value_err():
+
+    err_file = '/home/os/pykingenie/test_files/different_sensor_metadata.frd'
+    bli = OctetExperiment('test_octet')
+
+    with pytest.raises(ValueError):
+        bli.read_sensor_data([err_file] + frd_files)
+
 def test_import_file_with_no_loading_data():
 
     # Create an instance of OctetExperiment
