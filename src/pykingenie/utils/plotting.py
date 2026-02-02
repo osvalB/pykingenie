@@ -4,7 +4,7 @@ import pandas as pd
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 
-from ..utils.processing import (
+from .processing import (
     subset_data,
     sample_type_to_letter,
     combine_sequences,
@@ -12,7 +12,7 @@ from ..utils.processing import (
 )
 
 
-from ..utils.math       import median_filter
+from .math  import median_filter
 
 PLOT_TICKS_LENGTH_CST = 8
 

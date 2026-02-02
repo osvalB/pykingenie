@@ -651,3 +651,136 @@ def test_fit_induced_fit_solution_fixed_constants_t0():
     expected_params_names = ["Signal of the complex"] + ['t0_' + str(i+1) for i in range(len(time_lst))]
 
     assert params_names == expected_params_names, "The parameter names do not match the expected names."
+
+def test_fit_induced_fit_solution_fixed_constants_scale_factor():
+
+    kon  = 100
+    koff = 100
+    kc   = 10
+    krev = 1
+
+    t = np.linspace(0, 0.25, 50)
+
+    E_tot = 1  # Total enzyme concentration
+    S_tot = np.logspace(-1.5, 1, 6)  # Total substrate concentrations
+
+    signal_E = 0
+    signal_S = 0
+    signal_ES_int = 5
+    signal_ES = 5
+
+    ys = []
+
+    for i in range(len(S_tot)):
+
+        y0 = [0, 0.0]   # y0 (list): initial concentrations of E·S and ES
+        y = signal_ode_induced_fit_insolution(
+            t, y0, kon, koff, kc, krev, E_tot, S_tot[i], 0,
+            signal_E, signal_S, signal_ES_int, signal_ES)
+
+        # Add small noise to the signal
+        noise = np.random.normal(0, 0.001, len(t))
+        y += noise
+
+        ys.append(y)
+
+    signal_lst       = ys
+    time_lst         = [t] * len(signal_lst)
+    ligand_conc_lst  = S_tot
+    protein_conc_lst = [E_tot] * len(signal_lst)
+
+    initial_parameters = [1] + ([1] * len(time_lst))
+    low_bounds         = [1e-3] + ([0.7] * len(time_lst))
+    high_bounds        = [1e3] + ([1.3] * len(time_lst))
+
+    global_fit_params, _, _, params_names = fit_induced_fit_solution(
+        signal_lst=signal_lst,
+        time_lst=time_lst,
+        ligand_conc_lst=ligand_conc_lst,
+        protein_conc_lst= protein_conc_lst,
+        initial_parameters= initial_parameters,
+        low_bounds= low_bounds,
+        high_bounds= high_bounds,
+        fixed_kon=True,
+        fixed_koff=True,
+        fixed_kc=True,
+        fixed_krev=True,
+        kon_value=kon,
+        koff_value=koff,
+        kc_value=kc,
+        krev_value=krev,
+        fit_signal_E=False,
+        fit_signal_S=False,
+        ESint_equals_ES=True,
+        fit_signal_ES=True,
+        fit_scale_factor=True,
+        fixed_t0=True)
+
+    expected_params = [signal_ES] + ([1] * len(time_lst))
+
+    np.testing.assert_array_almost_equal(global_fit_params, expected_params, decimal=0,
+                                         err_msg="The fitted parameters do not match the expected values.")
+
+    expected_params_names = ["Signal of the complex"] + [f'scale_factor_{i + 1}' for i in range(len(time_lst))]
+
+    assert params_names == expected_params_names, "The parameter names do not match the expected names."
+
+def test_find_initial_parameters_induced_fit_solution_with_scale_factor():
+
+    kon  = 100
+    koff = 100
+    kc   = 10
+    krev = 1
+
+    t = np.linspace(0, 0.25, 50)
+
+    E_tot = 1  # Total enzyme concentration
+    S_tot = np.logspace(-1.5, 1, 8)  # Total substrate concentrations
+
+    signal_E = 0
+    signal_S = 0
+    signal_ES_int = 3
+    signal_ES = 3
+
+    ys = []
+
+    for i in range(len(S_tot)):
+
+        y0 = [0, 0.0]   # y0 (list): initial concentrations of E·S and ES
+        y = signal_ode_induced_fit_insolution(
+            t, y0, kon, koff, kc, krev, E_tot, S_tot[i], 0,
+            signal_E, signal_S, signal_ES_int, signal_ES)
+
+        # Add small noise to the signal
+        noise = np.random.normal(0, 0.001, len(t))
+        y += noise
+
+        ys.append(y)
+
+    signal_lst       = ys
+    time_lst         = [t] * len(signal_lst)
+    ligand_conc_lst  = S_tot
+    protein_conc_lst = [E_tot] * len(signal_lst)
+
+    params = find_initial_parameters_induced_fit_solution(
+        signal_lst=signal_lst,
+        time_lst=time_lst,
+        ligand_conc_lst=ligand_conc_lst,
+        protein_conc_lst=protein_conc_lst,
+        fit_signal_E=False,
+        fit_signal_S=False,
+        fit_signal_ES=True,
+        ESint_equals_ES=True,
+        fixed_t0=True,
+        np_linspace_low=-1,
+        np_linspace_high=2,
+        np_linspace_num=3,
+        fit_scale_factor=True,
+        scale_factor_tolerance=0.2
+    )
+
+    expected_param_count = 5 + len(signal_lst)
+    assert len(params) == expected_param_count, "Unexpected number of initial parameters."
+
+    scale_factors = np.array(params[-len(signal_lst):])
+    assert np.all((scale_factors >= 0.8) & (scale_factors <= 1.2)), "Scale factors are outside expected bounds."

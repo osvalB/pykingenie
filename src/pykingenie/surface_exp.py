@@ -3,7 +3,7 @@ import numpy  as np
 
 import copy
 
-from pykingenie.utils.processing import if_string_to_list, find_index_of_previous_step_type
+from .utils.processing import if_string_to_list, find_index_of_previous_step_type
 
 class SurfaceBasedExperiment:
     """A class representing surface-based kinetics experiments.

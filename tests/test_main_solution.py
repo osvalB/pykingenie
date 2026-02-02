@@ -196,6 +196,44 @@ def test_submit_fitting_solution_if_with_t0():
                       rtol=0.1), "k_off should be close to 100 (within 10%)."
 
 
+def test_submit_fitting_solution_if_with_scale_factor():
+
+    pyKinetics.delete_experiment('test_kingenie_csv_2')
+    pyKinetics.add_experiment(kingenie2, 'test_kingenie_csv_2')
+    pyKinetics.merge_conc_df_solution()
+
+    df = pyKinetics.combined_conc_df.iloc[5:,:].copy() # Last 3 curves only to make it faster
+
+    assert not df.empty, "Combined concentration DataFrame should not be empty after merging."
+
+    pyKinetics.generate_fittings_solution(df)
+
+    kwargs = {
+        "fit_signal_E": False,
+        "fit_signal_S": False,
+        "fit_signal_ES": True,
+        "ESint_equals_ES": True,
+        "fixed_t0": True,
+        "fit_scale_factor": True,
+        "scale_factor_tolerance": 0.2
+    }
+
+    pyKinetics.submit_fitting_solution(fitting_model='one_binding_site_if', **kwargs)
+
+    fit_params_kinetics = pyKinetics.get_experiment_properties('fit_params_kinetics', fittings=True)[0]
+
+    scale_factor_columns = [col for col in fit_params_kinetics.columns if col.startswith('scale_factor_')]
+    assert len(scale_factor_columns) > 0, "Scale factor columns should be present in fit_params_kinetics."
+
+    scale_factors = fit_params_kinetics[scale_factor_columns].iloc[0].values.astype(float)
+    assert np.all((scale_factors >= 0.8) & (scale_factors <= 1.2)), "Scale factors should be within bounds."
+
+    assert np.isclose(fit_params_kinetics['k_c [1/s]'].iloc[0], 1, rtol=0.1), "k_c should be close to 1 (within 10%)."
+    assert np.isclose(fit_params_kinetics['k_rev [1/s]'].iloc[0], 10, rtol=0.1), "k_rev should be close to 10 (within 10%)."
+    assert np.isclose(fit_params_kinetics['k_on [1/(µM·s)]'].iloc[0], 100, rtol=0.1), "k_on should be close to 100 (within 10%)."
+    assert np.isclose(fit_params_kinetics['k_off [1/s]'].iloc[0], 100, rtol=0.1), "k_off should be close to 100 (within 10%)."
+
+
 def test_submit_fitting_solution_if_ESint():
 
     pyKinetics.delete_experiment('test_kingenie_csv_2')

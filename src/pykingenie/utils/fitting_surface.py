@@ -1,8 +1,8 @@
 import numpy as np
 
-from ..utils.processing import concat_signal_lst, detect_time_list_continuos
+from .processing import concat_signal_lst, detect_time_list_continuos
 
-from ..utils.signal_surface import (
+from .signal_surface import (
     steady_state_one_site,
     one_site_association_analytical,
     one_site_dissociation_analytical,
@@ -12,9 +12,9 @@ from ..utils.signal_surface import (
     solve_induced_fit_dissociation
 )
 
-from ..utils.math import get_rss
+from .math import get_rss
 
-from ..utils.fitting_general import fit_single_exponential
+from .fitting_general import fit_single_exponential
 
 from scipy.optimize import curve_fit
 from scipy.optimize import minimize_scalar

@@ -7,7 +7,7 @@ import pandas as pd
 
 import matplotlib.colors as mcolors
 
-from ..utils.palettes import set1_colors, set3_colors, VIRIDIS
+from .palettes import set1_colors, set3_colors, VIRIDIS
 
 __all__ = [
     'guess_experiment_name', 'etree_to_dict', 'combine_dicts','guess_experiment_type',

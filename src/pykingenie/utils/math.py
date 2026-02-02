@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from scipy           import stats
+from scipy import stats
 
 ___all__ = ['single_exponential',
            'double_exponential',

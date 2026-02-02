@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import curve_fit
 
-from ..utils.math import (
+from .math import (
     single_exponential,
     double_exponential
 )

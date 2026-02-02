@@ -4,14 +4,12 @@ import itertools
 
 from scipy.optimize import curve_fit
 
-from ..utils.signal_solution import (
+from .signal_solution import (
     signal_ode_one_site_insolution,
     signal_ode_induced_fit_insolution,
     signal_ode_conformational_selection_insolution,
     get_initial_concentration_conformational_selection
 )
-
-from ..utils.fitting_general import re_fit
 
 __all__ = [
     'fit_one_site_solution',
@@ -174,7 +172,8 @@ def fit_induced_fit_solution(
         kc_value=None,
         fixed_krev=False,
         krev_value=None,
-        max_nfev=None
+        max_nfev=None,
+        fit_scale_factor=False
 ):
     """
     Global fit to association and dissociation traces - one-to-one binding model with induced fit.
@@ -223,6 +222,8 @@ def fit_induced_fit_solution(
         Value of the reverse induced fit rate constant if fixed_krev is True.
     max_nfev : int, optional
         Maximum number of function evaluations for the fit.
+    fit_scale_factor : bool, optional
+        If True, fit a scale factor for each signal, default is False.
         
     Returns
     -------
@@ -250,6 +251,10 @@ def fit_induced_fit_solution(
     - k_rev        if not fixed_krev                          (reverse induced fit rate constant)
     - t0_1         if not fixed_t0                            (initial time point for the first signal array, default is 0)
     - t0_2         if not fixed_t0                            (initial time point for the second signal array, default is 0)
+    ...
+    - scale_factor_1 if fit_scale_factor                      (scale factor for the first signal)
+    - scale_factor_2 if fit_scale_factor                      (scale factor for the second signal)
+    ...
     """
     # Flatten signals once
     all_signal = np.concatenate(signal_lst)
@@ -275,6 +280,10 @@ def fit_induced_fit_solution(
     if not fixed_t0:
         for i in range(len(time_lst)):
             parameter_names.append(f't0_{i+1}')
+
+    if fit_scale_factor:
+        for i in range(len(time_lst)):
+            parameter_names.append(f'scale_factor_{i+1}')
 
     def fit_fx(_, *args):
         # Efficient argument unpacking
@@ -313,6 +322,8 @@ def fit_induced_fit_solution(
 
             t0 = 0 if fixed_t0 else args[idx + i]  # Initial time point for the current signal
 
+            scale_factor = 1 if not fit_scale_factor else args[idx + len(time_lst) * (not fixed_t0) + i]
+
             lig_conc  = ligand_conc_lst[i]
             prot_conc = protein_conc_lst[i]
 
@@ -332,7 +343,7 @@ def fit_induced_fit_solution(
                 signal_ES_int= signal_ESint,
                 signal_ES= signal_ES)
 
-            signal_a[i] = signal
+            signal_a[i] = signal * scale_factor
 
         return np.concatenate(signal_a)
 
@@ -598,7 +609,9 @@ def find_initial_parameters_induced_fit_solution(
         fixed_t0=True,
         np_linspace_low=-2,
         np_linspace_high=2,
-        np_linspace_num=5
+    np_linspace_num=5,
+    fit_scale_factor=False,
+    scale_factor_tolerance=0.2
         ):
 
     """
@@ -633,6 +646,10 @@ def find_initial_parameters_induced_fit_solution(
         Upper bound for the logarithmic space to sample kc and krev, default is 2.
     np_linspace_num : int, optional
         Number of points to sample in the logarithmic space, default is 5.
+    fit_scale_factor : bool, optional
+        If True, fit a scale factor for each signal, default is False.
+    scale_factor_tolerance : float, optional
+        Tolerance for the scale factor fit, default is 0.2.
         
     Returns
     -------
@@ -709,6 +726,13 @@ def find_initial_parameters_induced_fit_solution(
         low_bounds         += [-0.1] * n_t0
         high_bounds        += [0.1] * n_t0
 
+    # Include scale factors
+    if fit_scale_factor:
+        n_scale_factors = len(signal_lst)
+        initial_parameters += [1] * n_scale_factors
+        low_bounds  += [1 - scale_factor_tolerance] * n_scale_factors
+        high_bounds += [1 + scale_factor_tolerance] * n_scale_factors
+
     for _, row in df_combinations.iterrows():
 
         kc   = row['kc']
@@ -724,7 +748,8 @@ def find_initial_parameters_induced_fit_solution(
                                                                          fit_signal_S=fit_signal_S,
                                                                          fit_signal_ES=fit_signal_ES,
                                                                          ESint_equals_ES=ESint_equals_ES,
-                                                                         fixed_t0=fixed_t0)
+                                                                         fixed_t0=fixed_t0,
+                                                                         fit_scale_factor=fit_scale_factor)
 
         # We fit k_on and k_off, using fixed kc and krev
         rss = np.sum((np.concatenate(signal_lst) - np.concatenate(fitted_values)) ** 2)
@@ -733,10 +758,11 @@ def find_initial_parameters_induced_fit_solution(
             rss_init = rss
 
             # We need to include kc and krev before the t0 parameter
-            if fixed_t0:
+            if fixed_t0 and not fit_scale_factor:
                 best_params = np.concatenate((global_fit_params, [kc, krev]))
             else:
-                best_params = np.concatenate((global_fit_params[:-n_t0], [kc, krev],global_fit_params[-n_t0:]))
+                n_last = len(time_lst) * (not fixed_t0) + len(time_lst) * fit_scale_factor
+                best_params = np.concatenate((global_fit_params[:-n_last], [kc, krev], global_fit_params[-n_last:]))
 
             initial_parameters = global_fit_params.tolist() 
 
