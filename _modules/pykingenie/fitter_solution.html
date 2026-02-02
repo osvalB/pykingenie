@@ -826,7 +826,9 @@
                                <span class="n">fit_signal_S</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                                <span class="n">fit_signal_ES</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                <span class="n">ESint_equals_ES</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                               <span class="n">fixed_t0</span><span class="o">=</span><span class="kc">True</span>
+                               <span class="n">fixed_t0</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                               <span class="n">fit_scale_factor</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                               <span class="n">scale_factor_tolerance</span><span class="o">=</span><span class="mf">0.2</span>
                                <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find optimal initial parameters for the induced fit model.</span>
@@ -847,6 +849,10 @@
 <span class="sd">            to the signal of the complex ES, default is True.</span>
 <span class="sd">        fixed_t0 : bool, optional</span>
 <span class="sd">            If True, fix the t0 parameter to 0, default is True.</span>
+<span class="sd">        fit_scale_factor : bool, optional</span>
+<span class="sd">            If True, fit a scale factor for the signals, default is False.</span>
+<span class="sd">        scale_factor_tolerance : float, optional</span>
+<span class="sd">            Tolerance for the scale factor fit, default is 0.2.</span>
 <span class="sd">            </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -867,7 +873,9 @@
             <span class="n">fit_signal_S</span><span class="o">=</span><span class="n">fit_signal_S</span><span class="p">,</span>
             <span class="n">fit_signal_ES</span><span class="o">=</span><span class="n">fit_signal_ES</span><span class="p">,</span>
             <span class="n">ESint_equals_ES</span><span class="o">=</span><span class="n">ESint_equals_ES</span><span class="p">,</span>
-            <span class="n">fixed_t0</span><span class="o">=</span><span class="n">fixed_t0</span><span class="p">)</span>
+            <span class="n">fixed_t0</span><span class="o">=</span><span class="n">fixed_t0</span><span class="p">,</span>
+            <span class="n">fit_scale_factor</span><span class="o">=</span><span class="n">fit_scale_factor</span><span class="p">,</span>
+            <span class="n">scale_factor_tolerance</span><span class="o">=</span><span class="n">scale_factor_tolerance</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">params_guess</span> <span class="o">=</span> <span class="n">params_guess</span>
 
@@ -881,7 +889,9 @@
                         <span class="n">fit_signal_S</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                         <span class="n">fit_signal_ES</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                         <span class="n">ESint_equals_ES</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                        <span class="n">fixed_t0</span><span class="o">=</span><span class="kc">True</span>
+                        <span class="n">fixed_t0</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">fit_scale_factor</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">scale_factor_tolerance</span><span class="o">=</span><span class="mf">0.2</span>
                         <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Fit the association signals assuming an induced-fit mechanism.</span>
@@ -902,6 +912,10 @@
 <span class="sd">            If True, assume that the signal of the intermediate ESint is equal to the signal of the complex ES, default is True.</span>
 <span class="sd">        fixed_t0 : bool, optional</span>
 <span class="sd">            If True, fix the t0 parameter to 0, default is True.</span>
+<span class="sd">        fit_scale_factor : bool, optional</span>
+<span class="sd">            If True, fit a scale factor for the signals, default is False.</span>
+<span class="sd">        scale_factor_tolerance : float, optional</span>
+<span class="sd">            Tolerance for the scale factor fit, default is 0.2.</span>
 <span class="sd">            </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -918,10 +932,17 @@
 
         <span class="c1"># Set the bounds for the t0 parameter - between -0.1 and 0.1</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">fixed_t0</span><span class="p">:</span>
-            <span class="n">n_params</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">initial_parameters</span><span class="p">)</span>
+            <span class="n">n_params</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">initial_parameters</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="p">)</span> <span class="o">*</span> <span class="n">fit_scale_factor</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="p">)):</span>
                 <span class="n">low_bounds</span><span class="p">[</span><span class="n">n_params</span><span class="o">-</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.1</span>
                 <span class="n">high_bounds</span><span class="p">[</span><span class="n">n_params</span><span class="o">-</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+        <span class="c1"># Set the bounds for the scale factor parameter - between 1-scale_factor_tolerance and 1+scale_factor_tolerance</span>
+        <span class="k">if</span> <span class="n">fit_scale_factor</span><span class="p">:</span>
+            <span class="n">n_params</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">initial_parameters</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="p">)):</span>
+                <span class="n">low_bounds</span><span class="p">[</span><span class="n">n_params</span> <span class="o">-</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">scale_factor_tolerance</span>
+                <span class="n">high_bounds</span><span class="p">[</span><span class="n">n_params</span> <span class="o">-</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">scale_factor_tolerance</span>
 
         <span class="n">global_fit_params</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">fitted_values</span><span class="p">,</span> <span class="n">parameter_names</span> <span class="o">=</span> <span class="n">fit_induced_fit_solution</span><span class="p">(</span>
             <span class="n">signal_lst</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span><span class="p">,</span>
@@ -935,7 +956,8 @@
             <span class="n">fit_signal_S</span><span class="o">=</span><span class="n">fit_signal_S</span><span class="p">,</span>
             <span class="n">fit_signal_ES</span><span class="o">=</span><span class="n">fit_signal_ES</span><span class="p">,</span>
             <span class="n">ESint_equals_ES</span><span class="o">=</span><span class="n">ESint_equals_ES</span><span class="p">,</span>
-            <span class="n">fixed_t0</span><span class="o">=</span><span class="n">fixed_t0</span>
+            <span class="n">fixed_t0</span><span class="o">=</span><span class="n">fixed_t0</span><span class="p">,</span>
+            <span class="n">fit_scale_factor</span><span class="o">=</span><span class="n">fit_scale_factor</span>
         <span class="p">)</span>
 
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
@@ -947,7 +969,8 @@
             <span class="s1">&#39;fit_signal_S&#39;</span><span class="p">:</span> <span class="n">fit_signal_S</span><span class="p">,</span>
             <span class="s1">&#39;fit_signal_ES&#39;</span><span class="p">:</span> <span class="n">fit_signal_ES</span><span class="p">,</span>
             <span class="s1">&#39;ESint_equals_ES&#39;</span><span class="p">:</span> <span class="n">ESint_equals_ES</span><span class="p">,</span>
-            <span class="s1">&#39;fixed_t0&#39;</span><span class="p">:</span> <span class="n">fixed_t0</span>
+            <span class="s1">&#39;fixed_t0&#39;</span><span class="p">:</span> <span class="n">fixed_t0</span><span class="p">,</span>
+            <span class="s1">&#39;fit_scale_factor&#39;</span><span class="p">:</span> <span class="n">fit_scale_factor</span>
         <span class="p">}</span>
 
         <span class="c1"># Re-fit the parameters if they are close to the constraints</span>

@@ -349,9 +349,9 @@
   <h1>Source code for pykingenie.utils.fitting_surface</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.processing</span><span class="w"> </span><span class="kn">import</span> <span class="n">concat_signal_lst</span><span class="p">,</span> <span class="n">detect_time_list_continuos</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.processing</span><span class="w"> </span><span class="kn">import</span> <span class="n">concat_signal_lst</span><span class="p">,</span> <span class="n">detect_time_list_continuos</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.signal_surface</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.signal_surface</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">steady_state_one_site</span><span class="p">,</span>
     <span class="n">one_site_association_analytical</span><span class="p">,</span>
     <span class="n">one_site_dissociation_analytical</span><span class="p">,</span>
@@ -361,9 +361,9 @@
     <span class="n">solve_induced_fit_dissociation</span>
 <span class="p">)</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.math</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_rss</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.math</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_rss</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.fitting_general</span><span class="w"> </span><span class="kn">import</span> <span class="n">fit_single_exponential</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.fitting_general</span><span class="w"> </span><span class="kn">import</span> <span class="n">fit_single_exponential</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">curve_fit</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">minimize_scalar</span>
