@@ -322,3 +322,36 @@ def test_submit_fitting_solution_cs_fit_signal_E():
     assert np.allclose(fit_params_kinetics['k_off [1/s]'][0],1,rtol=0.1)
 
     assert np.allclose(fit_params_kinetics['k_rev [1/s]'][0],100,rtol=0.1)
+
+def test_submit_fitting_solution_cs_fit_signal_E_with_scale_factor():
+
+    pyKinetics.delete_experiment('test_kingenie_csv_6')
+    pyKinetics.add_experiment(kingenie6, 'test_kingenie_csv_6')
+    pyKinetics.merge_conc_df_solution()
+
+    df = pyKinetics.combined_conc_df
+
+    pyKinetics.generate_fittings_solution(df)
+
+    kwargs = {
+        "fit_signal_E": True,  # E alone does not produce a signal
+        "E1_equals_E2": True, # just to force code execution
+        "fit_signal_S": False, # S alone does not produce a signal
+        "fit_signal_E2S": False, # The complex ES and ES_int produce a signal
+        "fixed_t0": True, # t0 is fixed to 0
+        "fit_scale_factor": True # fit scale factor for signal E
+    }
+
+    # fit one binding site with induced fit and verify parameters
+    pyKinetics.submit_fitting_solution(fitting_model='one_binding_site_cs',**kwargs)
+
+    fit_params_kinetics = pyKinetics.get_experiment_properties('fit_params_kinetics', fittings=True)[0]
+
+    assert np.allclose(fit_params_kinetics['k_off [1/s]'][0],1,rtol=0.1)
+
+    assert np.allclose(fit_params_kinetics['k_rev [1/s]'][0],100,rtol=0.1)
+
+   # Verify that scale factor is close to 1
+    assert np.allclose(fit_params_kinetics['scale_factor_1'][0],1,rtol=0.1) 
+    assert np.allclose(fit_params_kinetics['scale_factor_2'][0],1,rtol=0.1) 
+    assert np.allclose(fit_params_kinetics['scale_factor_3'][0],1,rtol=0.1)

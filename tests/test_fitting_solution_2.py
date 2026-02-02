@@ -312,3 +312,86 @@ def test_fit_cs_solution_fixed_constants_different_signals():
         "Signal of the complex"]
 
     assert params_names == expected_params_names, "The parameter names do not match the expected names."
+
+def test_fit_cs_solution_fixed_constants_different_signals_scale_factor():
+
+    signal_E1 = 1
+    signal_E2 = 1
+    signal_S = 10
+    signal_E2S = 5
+
+    signal_lst = generate_ys(E_tot,S_tot,kc,krev,kon,koff,signal_E1, signal_E2, signal_S, signal_E2S)
+
+    time_lst = [t] * len(signal_lst)
+    ligand_conc_lst = S_tot
+    protein_conc_lst = [E_tot] * len(signal_lst)
+
+    best_params = find_initial_parameters_conformational_selection_solution(
+        signal_lst,
+        time_lst,
+        ligand_conc_lst,
+        protein_conc_lst,
+        np_linspace_low=0,
+        np_linspace_high=3,
+        np_linspace_num=4,
+        fit_signal_E=True,
+        E1_equals_E2=True,
+        fit_signal_S=True,
+        fit_signal_E2S=True,
+        fixed_t0=True,
+        fit_scale_factor=True
+        )
+
+    # Fit using as initial parameters the best found parameters
+    initial_parameters = np.array(best_params[:3])
+    low_bounds = initial_parameters / 1e2
+    high_bounds = initial_parameters * 1e2
+
+    initial_parameters = np.concatenate((initial_parameters, [1] * len(time_lst)))
+    low_bounds = np.concatenate((low_bounds, [0.7] * len(time_lst)))
+    high_bounds = np.concatenate((high_bounds, [1.3] * len(time_lst)))
+
+    global_fit_params, _, _, params_names = fit_conformational_selection_solution(
+        signal_lst=signal_lst,
+        time_lst=time_lst,
+        ligand_conc_lst=ligand_conc_lst,
+        protein_conc_lst=protein_conc_lst,
+        initial_parameters=initial_parameters,
+        low_bounds=low_bounds,
+        high_bounds=high_bounds,
+        fixed_kon=True,
+        fixed_koff=True,
+        fixed_kc=True,
+        fixed_krev=True,
+        kon_value=kon,
+        koff_value=koff,
+        kc_value=kc,
+        krev_value=krev,
+        fit_signal_E=True,
+        E1_equals_E2=True,
+        fit_signal_S=True,
+        fit_signal_E2S=True,
+        fit_scale_factor=True,
+        fixed_t0=True
+        )
+
+    expected_params = [signal_E1, signal_S, signal_E2S] + ([1] * len(time_lst))
+
+    np.testing.assert_allclose(
+        global_fit_params, expected_params, rtol=0.1,
+        err_msg="The fitted parameters do not match the expected values."
+    )
+
+    expected_params_names = [
+        "Signal of the free protein",
+        "Signal of the free ligand",
+        "Signal of the complex",
+        "scale_factor_1",
+        "scale_factor_2",
+        "scale_factor_3",
+        "scale_factor_4",
+        "scale_factor_5",
+        "scale_factor_6"
+    ]
+
+    assert params_names == expected_params_names, "The parameter names do not match the expected names."

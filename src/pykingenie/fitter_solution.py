@@ -611,13 +611,15 @@ class KineticsFitterSolution(KineticsFitterGeneral):
 
         return None
 
-    def find_initial_params_cs(self,
-                               fit_signal_E=False,
-                               E1_equals_E2=True,
-                               fit_signal_S=False,
-                               fit_signal_E2S=True,
-                               fixed_t0=True
-                               ):
+    def find_initial_params_cs(
+            self,
+            fit_signal_E=False,
+            E1_equals_E2=True,
+            fit_signal_S=False,
+            fit_signal_E2S=True,
+            fixed_t0=True,
+            fit_scale_factor=False,
+            scale_factor_tolerance=0.2):
         """
         Find optimal initial parameters for the conformational selection model.
 
@@ -637,6 +639,10 @@ class KineticsFitterSolution(KineticsFitterGeneral):
             If True, fit the signal of the complex E2S, default is True.
         fixed_t0 : bool, optional
             If True, fix the t0 parameter to 0, default is True.
+        fit_scale_factor : bool, optional
+            If True, fit a scale factor for the signals, default is False.
+        scale_factor_tolerance : float, optional
+            Tolerance for the scale factor fit, default is 0.2.
 
         Returns
         -------
@@ -657,8 +663,11 @@ class KineticsFitterSolution(KineticsFitterGeneral):
             E1_equals_E2=E1_equals_E2,
             fit_signal_S=fit_signal_S,
             fit_signal_E2S=fit_signal_E2S,
-            fixed_t0=fixed_t0)
-
+            fixed_t0=fixed_t0,
+            fit_scale_factor=fit_scale_factor,
+            scale_factor_tolerance=scale_factor_tolerance
+            )
+        
         self.params_guess = params_guess
 
         print(f"Initial parameters found for the conformational selection model: {params_guess}")
@@ -671,7 +680,9 @@ class KineticsFitterSolution(KineticsFitterGeneral):
             E1_equals_E2=True,
             fit_signal_S=False,
             fit_signal_E2S=True,
-            fixed_t0=True
+            fixed_t0=True,
+            fit_scale_factor=False,
+            scale_factor_tolerance=0.2
             ):
         """
         Fit the association signals assuming an conformational selection mechanism.
@@ -711,10 +722,18 @@ class KineticsFitterSolution(KineticsFitterGeneral):
 
         # Set the bounds for the t0 parameter - between -0.1 and 0.1
         if not fixed_t0:
-            n_params = len(initial_parameters)
+            n_params = len(initial_parameters) - len(self.assoc_lst) * fit_scale_factor
             for i in range(len(self.assoc_lst)):
                 low_bounds[n_params - i - 1] = -0.1
                 high_bounds[n_params - i - 1] = 0.1
+
+        # Set the bounds for the scale factor parameter - between 1-scale_factor_tolerance and 1+scale_factor_tolerance
+        if fit_scale_factor:
+            n_params = len(initial_parameters)
+            for i in range(len(self.assoc_lst)):
+                low_bounds[n_params - i - 1] = 1 - scale_factor_tolerance
+                high_bounds[n_params - i - 1] = 1 + scale_factor_tolerance
+
 
         global_fit_params, cov, fitted_values, parameter_names = fit_conformational_selection_solution(
             signal_lst=self.assoc_lst,
@@ -728,7 +747,8 @@ class KineticsFitterSolution(KineticsFitterGeneral):
             E1_equals_E2=E1_equals_E2,
             fit_signal_S=fit_signal_S,
             fit_signal_E2S=fit_signal_E2S,
-            fixed_t0=fixed_t0
+            fixed_t0=fixed_t0,
+            fit_scale_factor=fit_scale_factor
         )
 
         kwargs = {
@@ -740,7 +760,8 @@ class KineticsFitterSolution(KineticsFitterGeneral):
             'E1_equals_E2' : E1_equals_E2,
             'fit_signal_S': fit_signal_S,
             'fit_signal_E2S': fit_signal_E2S,
-            'fixed_t0': fixed_t0
+            'fixed_t0': fixed_t0,
+            'fit_scale_factor': fit_scale_factor
         }
 
         # Re-fit the parameters if they are close to the constraints
