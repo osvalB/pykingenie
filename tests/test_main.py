@@ -142,6 +142,19 @@ def test_submit_kinetic_fitting():
 
     assert np.round(Kd,decimals=3) == 0.01
 
+def test_export_data():
+
+    for type in ['raw','fit']:
+
+        export_df = pyKinetics.create_export_df(type)
+
+        assert isinstance(export_df, pd.DataFrame), "Exporting results should be a dataframe."
+
+        for word in ["Time","Signal","Analyte_concentration_micromolar"]:
+
+            assert word in export_df.columns, "Exported dataframe should contain {} column.".format(word)
+            assert  len(export_df) > 0, "Exported dataframe should not be empty."
+
 def test_calculate_asymmetric_error():
 
     pyKinetics.calculate_asymmetric_error(shared_smax=True, fixed_t0=True, fit_ktr=False)

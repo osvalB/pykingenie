@@ -74,6 +74,18 @@ def test_load_solution_data():
 
     assert np.allclose(fit_params_kinetics['Kd [µM]'][0],0.1,rtol=0.01)
 
+def test_export_data():
+
+    for type in ['raw','fit']:
+
+        export_df = pyKinetics.create_export_df(type)
+
+        assert isinstance(export_df, pd.DataFrame), "Exporting results should be a dataframe."
+
+        for word in ["Time","Signal","Ligand_concentration_micromolar","Protein_concentration_micromolar"]:
+
+            assert word in export_df.columns, "Exported dataframe should contain {} column.".format(word)
+            assert  len(export_df) > 0, "Exported dataframe should not be empty."
 
 def test_submit_fitting_solution_simple_fit_t0():
 

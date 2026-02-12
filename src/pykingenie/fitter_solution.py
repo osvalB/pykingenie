@@ -693,8 +693,6 @@ class KineticsFitterSolution(KineticsFitterGeneral):
         
         self.params_guess = params_guess
 
-        print(f"Initial parameters found for the conformational selection model: {params_guess}")
-
         return None
 
     def fit_conformational_selection(
@@ -824,3 +822,49 @@ class KineticsFitterSolution(KineticsFitterGeneral):
             self.fit_params_kinetics['t0'] = t0_params
 
         return None
+
+    def create_export_df(self,type='raw'):
+
+        """
+        Create
+
+
+        Parameters
+        ----------
+        type
+
+        Returns
+        -------
+    name : str
+        Name of the experiment.
+    assoc_lst : list
+        List containing the association signals.
+    lig_conc : list
+        List of ligand concentrations, one per element in assoc.
+    prot_conc : list
+        List of protein concentrations, one per element in assoc.
+    time_assoc_lst : list
+        List of time points for the association signals.
+        """
+
+        df_list = []
+
+        if type == 'raw':
+            assoc_lst = self.assoc_lst
+        else:
+            assoc_lst = self.signal_assoc_fit
+
+        for signal, time, lig, prot in zip(assoc_lst, self.time_assoc_lst, self.lig_conc, self.prot_conc):
+
+            df = pd.DataFrame({
+                'Time': time,
+                'Signal': signal,
+                'Ligand_concentration_micromolar': lig,
+                'Protein_concentration_micromolar': prot
+            })
+
+            df_list.append(df)
+
+        export_df = pd.concat(df_list, ignore_index=True)
+
+        return export_df

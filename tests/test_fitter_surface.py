@@ -1,5 +1,6 @@
 import pytest
 import numpy as np
+import pandas as pd
 
 from pykingenie.main                    import KineticsAnalyzer
 from pykingenie.kingenie_surface        import KinGenieCsv
@@ -50,6 +51,20 @@ def test_fitter_is_instance():
     """
     fitter_surface = create_fitter(test_file_1)
     assert isinstance(fitter_surface, KineticsFitter), "The fitter should be an instance of KinGenieCsv."
+
+
+def test_create_raw_data_df():
+
+    fitter_surface = create_fitter(test_file_1)
+    fitter_surface.get_steady_state()
+    df = fitter_surface.create_export_df()
+
+    assert isinstance(df, pd.DataFrame), "The exported data should be a pandas DataFrame."
+    assert "Analyte_concentration_micromolar" in df.columns, "The DataFrame should contain the 'Analyte_concentration_micromolar' column."
+    assert len(df) > 0, "The DataFrame should contain at least one row of data."
+
+    assert "Association" in np.unique(df["Type"])
+    assert "Dissociation" in np.unique(df["Type"])
 
 def test_get_k_off_initial_guess():
 
@@ -200,6 +215,16 @@ def test_fit_one_site_association():
     # Check if the fitting was successful - Kd should be between 9 and 11
     assert 9 < fitter_surface.Kd < 11, f"Expected Kd to be between 9 and 11, got {fitter_surface.Kd}."
 
+    # Check create fitted data df
+    df = fitter_surface.create_export_df(type='fit')
+
+    assert isinstance(df, pd.DataFrame), "The exported data should be a pandas DataFrame."
+    assert "Analyte_concentration_micromolar" in df.columns, "The DataFrame should contain the 'Analyte_concentration_micromolar' column."
+    assert len(df) > 0, "The DataFrame should contain at least one row of data."
+
+    assert "Association" in np.unique(df["Type"])
+    assert "Dissociation" not in np.unique(df["Type"])
+
     fitter_surface.fit_steady_state()
     fitter_surface.fit_one_site_association(shared_smax=False)
 
@@ -236,6 +261,16 @@ def test_fit_one_site_assoc_and_disso_0():
 
     # fit with shared_smax=True, fixed_t0=True and fit_ktr=False
     fitter_surface.fit_one_site_assoc_and_disso(shared_smax=True,fixed_t0=True,fit_ktr=False)
+
+    # Check create fitted data df
+    df = fitter_surface.create_export_df(type='fit')
+
+    assert isinstance(df, pd.DataFrame), "The exported data should be a pandas DataFrame."
+    assert "Analyte_concentration_micromolar" in df.columns, "The DataFrame should contain the 'Analyte_concentration_micromolar' column."
+    assert len(df) > 0, "The DataFrame should contain at least one row of data."
+
+    assert "Association" in np.unique(df["Type"])
+    assert "Dissociation" in np.unique(df["Type"])
 
     # Compute the asymmetric interval for Kd
     fitter_surface.calculate_ci95(shared_smax=True,fixed_t0=True,fit_ktr=False)

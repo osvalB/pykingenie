@@ -3,7 +3,6 @@ import numpy as np
 import pandas as pd
 
 from .utils.fitting_surface import (
-    guess_initial_signal,
     fit_steady_state_one_site,
     steady_state_one_site_asymmetric_ci95,
     fit_one_site_association,
@@ -901,4 +900,83 @@ class KineticsFitter(KineticsFitterGeneral):
         self.high_bounds = high_bounds
 
         return None
+
+    def create_export_df(self,type='raw'):
+
+        """
+        Create a data frame with the raw or fitted signals for the association and dissociation phases.
+
+        Parameters
+        ----------
+        type : str, optional
+         The type of signal to include in the 'Signal' column. If 'raw', the raw association and dissociation signals are used.
+         If 'fit', the fitted association and dissociation signals are used. Default is 'raw'.
+
+        Returns
+        -------
+        pd.DataFrame
+            A DataFrame with the following columns:
+            - 'Time': Time points for the association and dissociation signals.
+            - 'Signal': The corresponding signal values (raw or fitted).
+            - 'Analyte_concentration_micromolar': The analyte concentration in micromolar for each signal.
+            - 'Type': A categorical variable indicating whether the signal is from the association or dissociation phase.
+            - 'ID': The identifier corresponding to the fitter name for each signal.
+
+        """
+
+        df_list = []
+
+        for i, name in enumerate(self.names):
+
+            time_assoc = self.time_assoc_lst[i]
+
+            if type == 'raw':
+                signal_assoc = self.assoc_lst[i]
+            else:
+                signal_assoc = self.signal_assoc_fit[i]
+
+            lig_conc = self.lig_conc_lst[i]
+
+            dic = {
+                'Time': time_assoc,
+                'Signal': signal_assoc,
+                'Analyte_concentration_micromolar': lig_conc,
+                'Type': 'Association',
+                'ID': name
+            }
+
+            df = pd.DataFrame(dic)
+            df_list.append(df)
+
+            if self.disso_lst is not None and self.time_disso_lst is not None:
+
+                time_disso = self.time_disso_lst[i]
+
+                signal_disso = None
+
+                if type == 'raw':
+                    signal_disso = self.disso_lst[i]
+                else:
+
+                    if self.signal_disso_fit is not None:
+
+                        signal_disso = self.signal_disso_fit[i]
+
+                # Append only if we have signal_disso
+                if signal_disso is not None:
+
+                    dic = {
+                        'Time': time_disso,
+                        'Signal': signal_disso,
+                        'Analyte_concentration_micromolar': 0,
+                        'Type': 'Dissociation',
+                        'ID': name
+                    }
+
+                    df = pd.DataFrame(dic)
+                    df_list.append(df)
+
+        df = pd.concat(df_list, ignore_index=True)
+
+        return df
 

@@ -277,7 +277,7 @@ class KineticsAnalyzer:
             List of messages about fitting creation.
         """
 
-        # List of messages to be printed to the console
+        # List of messages to be shown in the console
         messages          = []
 
         time_diss_all  =  []
@@ -400,8 +400,6 @@ class KineticsAnalyzer:
             lig_conc_vec   = [lig_conc_vec[i]   for i in sorted_indices]
             smax_id_vec    = [smax_id_vec[i]    for i in sorted_indices]
 
-            print(len(time_assoc_lst))
-
             fit = KineticsFitter(
                 time_assoc_lst=time_assoc_lst,
                 association_signal_lst=assoc_lst,
@@ -434,7 +432,7 @@ class KineticsAnalyzer:
             List of messages about fitting creation.
         """
 
-        # List of messages to be printed to the console
+        # List of messages to be shown in the console
         messages          = []
 
         time_assoc_all =  []
@@ -702,3 +700,32 @@ class KineticsAnalyzer:
         labels = [item for sublist in labels for item in sublist]
 
         return get_plotting_df(labels)
+
+    def create_export_df(self,type='raw'):
+
+        """
+        Creates a DataFrame for exporting the kinetics data.
+
+        Parameters
+        -------
+        type : str, optional
+            Type of data to include in the export. Options: 'raw', 'fitted'. Default is 'raw'.
+
+        Returns
+        -------
+        pandas.DataFrame
+            DataFrame containing the data to be exported.
+        """
+
+        df_list = []
+
+        for fit_name in self.fittings_names:
+
+            fit = self.fittings[fit_name]
+
+            df = fit.create_export_df(type=type)
+            df_list.append(df)
+
+        df_export = pd.concat(df_list, ignore_index=True)
+
+        return df_export
