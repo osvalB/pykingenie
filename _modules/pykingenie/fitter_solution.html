@@ -1073,8 +1073,6 @@
         
         <span class="bp">self</span><span class="o">.</span><span class="n">params_guess</span> <span class="o">=</span> <span class="n">params_guess</span>
 
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Initial parameters found for the conformational selection model: </span><span class="si">{</span><span class="n">params_guess</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
         <span class="k">return</span> <span class="kc">None</span></div>
 
 
@@ -1207,6 +1205,55 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">fit_params_kinetics</span><span class="p">[</span><span class="s1">&#39;t0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t0_params</span>
 
         <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="KineticsFitterSolution.create_export_df">
+<a class="viewcode-back" href="../../pykingenie.html#pykingenie.fitter_solution.KineticsFitterSolution.create_export_df">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_export_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;raw&#39;</span><span class="p">):</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create</span>
+
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        type</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">    name : str</span>
+<span class="sd">        Name of the experiment.</span>
+<span class="sd">    assoc_lst : list</span>
+<span class="sd">        List containing the association signals.</span>
+<span class="sd">    lig_conc : list</span>
+<span class="sd">        List of ligand concentrations, one per element in assoc.</span>
+<span class="sd">    prot_conc : list</span>
+<span class="sd">        List of protein concentrations, one per element in assoc.</span>
+<span class="sd">    time_assoc_lst : list</span>
+<span class="sd">        List of time points for the association signals.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">df_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;raw&#39;</span><span class="p">:</span>
+            <span class="n">assoc_lst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">assoc_lst</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">assoc_lst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">signal_assoc_fit</span>
+
+        <span class="k">for</span> <span class="n">signal</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">lig</span><span class="p">,</span> <span class="n">prot</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">assoc_lst</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_assoc_lst</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lig_conc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">prot_conc</span><span class="p">):</span>
+
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+                <span class="s1">&#39;Time&#39;</span><span class="p">:</span> <span class="n">time</span><span class="p">,</span>
+                <span class="s1">&#39;Signal&#39;</span><span class="p">:</span> <span class="n">signal</span><span class="p">,</span>
+                <span class="s1">&#39;Ligand_concentration_micromolar&#39;</span><span class="p">:</span> <span class="n">lig</span><span class="p">,</span>
+                <span class="s1">&#39;Protein_concentration_micromolar&#39;</span><span class="p">:</span> <span class="n">prot</span>
+            <span class="p">})</span>
+
+            <span class="n">df_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+        <span class="n">export_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">df_list</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">export_df</span></div>
 </div>
 
 </pre></div>

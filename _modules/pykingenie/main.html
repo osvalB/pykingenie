@@ -657,7 +657,7 @@
 <span class="sd">            List of messages about fitting creation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># List of messages to be printed to the console</span>
+        <span class="c1"># List of messages to be shown in the console</span>
         <span class="n">messages</span>          <span class="o">=</span> <span class="p">[]</span>
 
         <span class="n">time_diss_all</span>  <span class="o">=</span>  <span class="p">[]</span>
@@ -780,8 +780,6 @@
             <span class="n">lig_conc_vec</span>   <span class="o">=</span> <span class="p">[</span><span class="n">lig_conc_vec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>   <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sorted_indices</span><span class="p">]</span>
             <span class="n">smax_id_vec</span>    <span class="o">=</span> <span class="p">[</span><span class="n">smax_id_vec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sorted_indices</span><span class="p">]</span>
 
-            <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">time_assoc_lst</span><span class="p">))</span>
-
             <span class="n">fit</span> <span class="o">=</span> <span class="n">KineticsFitter</span><span class="p">(</span>
                 <span class="n">time_assoc_lst</span><span class="o">=</span><span class="n">time_assoc_lst</span><span class="p">,</span>
                 <span class="n">association_signal_lst</span><span class="o">=</span><span class="n">assoc_lst</span><span class="p">,</span>
@@ -817,7 +815,7 @@
 <span class="sd">            List of messages about fitting creation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># List of messages to be printed to the console</span>
+        <span class="c1"># List of messages to be shown in the console</span>
         <span class="n">messages</span>          <span class="o">=</span> <span class="p">[]</span>
 
         <span class="n">time_assoc_all</span> <span class="o">=</span>  <span class="p">[]</span>
@@ -1103,6 +1101,38 @@
         <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">labels</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">get_plotting_df</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="KineticsAnalyzer.create_export_df">
+<a class="viewcode-back" href="../../pykingenie.html#pykingenie.main.KineticsAnalyzer.create_export_df">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_export_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;raw&#39;</span><span class="p">):</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a DataFrame for exporting the kinetics data.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -------</span>
+<span class="sd">        type : str, optional</span>
+<span class="sd">            Type of data to include in the export. Options: &#39;raw&#39;, &#39;fitted&#39;. Default is &#39;raw&#39;.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pandas.DataFrame</span>
+<span class="sd">            DataFrame containing the data to be exported.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">df_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">fit_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fittings_names</span><span class="p">:</span>
+
+            <span class="n">fit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fittings</span><span class="p">[</span><span class="n">fit_name</span><span class="p">]</span>
+
+            <span class="n">df</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">create_export_df</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">)</span>
+            <span class="n">df_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+        <span class="n">df_export</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">df_list</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">df_export</span></div>
 </div>
 
 </pre></div>

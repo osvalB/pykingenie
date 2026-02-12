@@ -1026,6 +1026,35 @@ and E2 are equal, default is True.</p></li>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter_solution.KineticsFitterSolution.create_export_df">
+<span class="sig-name descname"><span class="pre">create_export_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'raw'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_solution.html#KineticsFitterSolution.create_export_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_solution.KineticsFitterSolution.create_export_df" title="Link to this definition">#</a></dt>
+<dd><blockquote>
+<div><p>Create</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>type</strong></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>Name of the experiment.</p>
+</dd>
+<dt><strong>assoc_lst</strong><span class="classifier">list</span></dt><dd><p>List containing the association signals.</p>
+</dd>
+<dt><strong>lig_conc</strong><span class="classifier">list</span></dt><dd><p>List of ligand concentrations, one per element in assoc.</p>
+</dd>
+<dt><strong>prot_conc</strong><span class="classifier">list</span></dt><dd><p>List of protein concentrations, one per element in assoc.</p>
+</dd>
+<dt><strong>time_assoc_lst</strong><span class="classifier">list</span></dt><dd><p>List of time points for the association signals.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -1440,6 +1469,29 @@ induced fit model with these initial guesses.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter.create_export_df">
+<span class="sig-name descname"><span class="pre">create_export_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'raw'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_surface.html#KineticsFitter.create_export_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter.create_export_df" title="Link to this definition">#</a></dt>
+<dd><p>Create a data frame with the raw or fitted signals for the association and dissociation phases.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>type</strong> (<em>str</em><em>, </em><em>optional</em>) – The type of signal to include in the ‘Signal’ column. If ‘raw’, the raw association and dissociation signals are used.
+If ‘fit’, the fitted association and dissociation signals are used. Default is ‘raw’.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A DataFrame with the following columns:
+- ‘Time’: Time points for the association and dissociation signals.
+- ‘Signal’: The corresponding signal values (raw or fitted).
+- ‘Analyte_concentration_micromolar’: The analyte concentration in micromolar for each signal.
+- ‘Type’: A categorical variable indicating whether the signal is from the association or dissociation phase.
+- ‘ID’: The identifier corresponding to the fitter name for each signal.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2266,6 +2318,23 @@ confidence intervals. Returns None if no fitting results are available.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.main.KineticsAnalyzer.create_export_df">
+<span class="sig-name descname"><span class="pre">create_export_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'raw'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/main.html#KineticsAnalyzer.create_export_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.main.KineticsAnalyzer.create_export_df" title="Link to this definition">#</a></dt>
+<dd><p>Creates a DataFrame for exporting the kinetics data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>type</strong> (<em>str</em><em>, </em><em>optional</em>) – Type of data to include in the export. Options: ‘raw’, ‘fitted’. Default is ‘raw’.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataFrame containing the data to be exported.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
 </dd>
 </dl>
 </dd></dl>
@@ -3456,6 +3525,7 @@ For dissociation steps, time continues from the association step.</p>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_solution.KineticsFitterSolution.fit_induced_fit"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.fit_induced_fit()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_solution.KineticsFitterSolution.find_initial_params_cs"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.find_initial_params_cs()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_solution.KineticsFitterSolution.fit_conformational_selection"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.fit_conformational_selection()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_solution.KineticsFitterSolution.create_export_df"><code class="docutils literal notranslate"><span class="pre">KineticsFitterSolution.create_export_df()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -3488,6 +3558,7 @@ For dissociation steps, time continues from the association step.</p>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.fit_one_site_assoc_and_disso"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_one_site_assoc_and_disso()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.calculate_ci95"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.calculate_ci95()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.fit_one_site_if_assoc_and_disso"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_one_site_if_assoc_and_disso()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.create_export_df"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.create_export_df()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -3562,6 +3633,7 @@ For dissociation steps, time continues from the association step.</p>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.main.KineticsAnalyzer.calculate_asymmetric_error"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.calculate_asymmetric_error()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.main.KineticsAnalyzer.get_fitting_results"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.get_fitting_results()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.main.KineticsAnalyzer.get_legends_table"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.get_legends_table()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.main.KineticsAnalyzer.create_export_df"><code class="docutils literal notranslate"><span class="pre">KineticsAnalyzer.create_export_df()</span></code></a></li>
 </ul>
 </li>
 </ul>
