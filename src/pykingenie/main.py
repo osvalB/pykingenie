@@ -345,8 +345,8 @@ class KineticsAnalyzer:
             lig_conc_vec = []
             smax_id_vec  = []
 
-            ids = df.index[df['SampleID'] == unq].tolist()
-
+            ids = df.index[(df['SampleID'] == unq) & (df['Select'])].tolist()
+            
             # Iterate over the Smax IDs
             unq_smax_id = df.loc[ids, 'Smax_ID'].unique()
 
