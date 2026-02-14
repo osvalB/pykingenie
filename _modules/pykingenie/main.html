@@ -725,8 +725,8 @@
             <span class="n">lig_conc_vec</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">smax_id_vec</span>  <span class="o">=</span> <span class="p">[]</span>
 
-            <span class="n">ids</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;SampleID&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">unq</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-
+            <span class="n">ids</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">[(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;SampleID&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">unq</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Select&#39;</span><span class="p">])]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            
             <span class="c1"># Iterate over the Smax IDs</span>
             <span class="n">unq_smax_id</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ids</span><span class="p">,</span> <span class="s1">&#39;Smax_ID&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
 
