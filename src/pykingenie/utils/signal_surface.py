@@ -269,13 +269,13 @@ def differential_matrix_association_induced_fit(koff, kon, kc, krev, a):
     Parameters
     ----------
     koff : float
-        Rate constant for E2S -> E2 + S.
+        Rate constant for E1S -> E1 + S.
     kon : float
-        Rate constant for E2 + S -> E2S.
+        Rate constant for E1 + S -> E1S.
     kc : float
-        Rate constant for E1 -> E2.
+        Rate constant for E1S -> E2S.
     krev : float
-        Rate constant for E2 -> E1.
+        Rate constant for E2S -> E1S.
     a : float
         Concentration of the analyte (molecule being flown).
 
@@ -335,11 +335,11 @@ def differential_matrix_dissociation_induced_fit(koff, kc, krev):
     Parameters
     ----------
     koff : float
-        Rate constant for E2S -> E2 + S.
+        Rate constant for E1S -> E1 + S.
     kc : float
-        Rate constant for E1 -> E2.
+        Rate constant for E1S -> E2S.
     krev : float
-        Rate constant for E2 -> E1.
+        Rate constant for E2S -> E1S.
 
     Returns
     -------
@@ -463,9 +463,9 @@ def solve_induced_fit_association(time, a_conc, kon, koff, kc, krev, sP1L=0, sP2
     krev : float
         Rate constant for ES -> E·S.
     sP1L : float, optional
-        Initial concentration of E·S, default is 0.
+        Initial signal proportional to the concentration of E·S, default is 0.
     sP2L : float, optional
-        Initial concentration of ES, default is 0.
+        Initial signal proportional to the concentration of ES, default is 0.
     smax : float, optional
         Signal proportional to the complex (E·S or ES), default is 0.
 
@@ -560,9 +560,9 @@ def solve_conformational_selection_association(time, a_conc, kon, koff, kc, krev
     smax : float, optional
         Maximum signal that the complex (E2S) can produce, default is 0.
     sP1 : float, optional
-        Initial concentration of E1, default is 0.
+        Initial signal proportional to the concentration of E1, default is 0.
     sP2L : float, optional
-        Initial concentration of E2S, default is 0.
+        Initial signal proportional to the concentration of E2S, default is 0.
 
     Returns
     -------
@@ -610,7 +610,7 @@ def solve_induced_fit_dissociation(time, koff, kc, krev, s0=0, sP2L=0, smax=0):
     s0 : float, optional
         Initial signal, default is 0.
     sP2L : float, optional
-        Initial concentration of ES, default is 0.
+        Initial signal proportional to the concentration of ES, default is 0.
     smax : float, optional
         Signal proportional to the complex (E·S or ES), default is 0.
 
@@ -658,9 +658,9 @@ def solve_conformational_selection_dissociation(time, koff, kc, krev, smax=0, sP
     smax : float, optional
         Signal proportional to the complex (E2S), default is 0.
     sP1 : float, optional
-        Initial concentration of E1, default is 0.
+        Initial signal proportional to the concentration of E1, default is 0.
     sP2L : float, optional
-        Initial concentration of E2S, default is 0.
+        Initial signal proportional to the concentration of E2S, default is 0.
 
     Returns
     -------
