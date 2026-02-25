@@ -641,13 +641,13 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    koff : float</span>
-<span class="sd">        Rate constant for E2S -&gt; E2 + S.</span>
+<span class="sd">        Rate constant for E1S -&gt; E1 + S.</span>
 <span class="sd">    kon : float</span>
-<span class="sd">        Rate constant for E2 + S -&gt; E2S.</span>
+<span class="sd">        Rate constant for E1 + S -&gt; E1S.</span>
 <span class="sd">    kc : float</span>
-<span class="sd">        Rate constant for E1 -&gt; E2.</span>
+<span class="sd">        Rate constant for E1S -&gt; E2S.</span>
 <span class="sd">    krev : float</span>
-<span class="sd">        Rate constant for E2 -&gt; E1.</span>
+<span class="sd">        Rate constant for E2S -&gt; E1S.</span>
 <span class="sd">    a : float</span>
 <span class="sd">        Concentration of the analyte (molecule being flown).</span>
 
@@ -713,11 +713,11 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    koff : float</span>
-<span class="sd">        Rate constant for E2S -&gt; E2 + S.</span>
+<span class="sd">        Rate constant for E1S -&gt; E1 + S.</span>
 <span class="sd">    kc : float</span>
-<span class="sd">        Rate constant for E1 -&gt; E2.</span>
+<span class="sd">        Rate constant for E1S -&gt; E2S.</span>
 <span class="sd">    krev : float</span>
-<span class="sd">        Rate constant for E2 -&gt; E1.</span>
+<span class="sd">        Rate constant for E2S -&gt; E1S.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -856,9 +856,9 @@
 <span class="sd">    krev : float</span>
 <span class="sd">        Rate constant for ES -&gt; E·S.</span>
 <span class="sd">    sP1L : float, optional</span>
-<span class="sd">        Initial concentration of E·S, default is 0.</span>
+<span class="sd">        Initial signal proportional to the concentration of E·S, default is 0.</span>
 <span class="sd">    sP2L : float, optional</span>
-<span class="sd">        Initial concentration of ES, default is 0.</span>
+<span class="sd">        Initial signal proportional to the concentration of ES, default is 0.</span>
 <span class="sd">    smax : float, optional</span>
 <span class="sd">        Signal proportional to the complex (E·S or ES), default is 0.</span>
 
@@ -959,9 +959,9 @@
 <span class="sd">    smax : float, optional</span>
 <span class="sd">        Maximum signal that the complex (E2S) can produce, default is 0.</span>
 <span class="sd">    sP1 : float, optional</span>
-<span class="sd">        Initial concentration of E1, default is 0.</span>
+<span class="sd">        Initial signal proportional to the concentration of E1, default is 0.</span>
 <span class="sd">    sP2L : float, optional</span>
-<span class="sd">        Initial concentration of E2S, default is 0.</span>
+<span class="sd">        Initial signal proportional to the concentration of E2S, default is 0.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -1012,7 +1012,7 @@
 <span class="sd">    s0 : float, optional</span>
 <span class="sd">        Initial signal, default is 0.</span>
 <span class="sd">    sP2L : float, optional</span>
-<span class="sd">        Initial concentration of ES, default is 0.</span>
+<span class="sd">        Initial signal proportional to the concentration of ES, default is 0.</span>
 <span class="sd">    smax : float, optional</span>
 <span class="sd">        Signal proportional to the complex (E·S or ES), default is 0.</span>
 
@@ -1063,9 +1063,9 @@
 <span class="sd">    smax : float, optional</span>
 <span class="sd">        Signal proportional to the complex (E2S), default is 0.</span>
 <span class="sd">    sP1 : float, optional</span>
-<span class="sd">        Initial concentration of E1, default is 0.</span>
+<span class="sd">        Initial signal proportional to the concentration of E1, default is 0.</span>
 <span class="sd">    sP2L : float, optional</span>
-<span class="sd">        Initial concentration of E2S, default is 0.</span>
+<span class="sd">        Initial signal proportional to the concentration of E2S, default is 0.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>

@@ -2206,10 +2206,10 @@ The signal produced by E2S and E1S is the same.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>koff</strong> (<em>float</em>) – Rate constant for E2S -&gt; E2 + S.</p></li>
-<li><p><strong>kon</strong> (<em>float</em>) – Rate constant for E2 + S -&gt; E2S.</p></li>
-<li><p><strong>kc</strong> (<em>float</em>) – Rate constant for E1 -&gt; E2.</p></li>
-<li><p><strong>krev</strong> (<em>float</em>) – Rate constant for E2 -&gt; E1.</p></li>
+<li><p><strong>koff</strong> (<em>float</em>) – Rate constant for E1S -&gt; E1 + S.</p></li>
+<li><p><strong>kon</strong> (<em>float</em>) – Rate constant for E1 + S -&gt; E1S.</p></li>
+<li><p><strong>kc</strong> (<em>float</em>) – Rate constant for E1S -&gt; E2S.</p></li>
+<li><p><strong>krev</strong> (<em>float</em>) – Rate constant for E2S -&gt; E1S.</p></li>
 <li><p><strong>a</strong> (<em>float</em>) – Concentration of the analyte (molecule being flown).</p></li>
 </ul>
 </dd>
@@ -2257,9 +2257,9 @@ The signal is only given by E2S.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>koff</strong> (<em>float</em>) – Rate constant for E2S -&gt; E2 + S.</p></li>
-<li><p><strong>kc</strong> (<em>float</em>) – Rate constant for E1 -&gt; E2.</p></li>
-<li><p><strong>krev</strong> (<em>float</em>) – Rate constant for E2 -&gt; E1.</p></li>
+<li><p><strong>koff</strong> (<em>float</em>) – Rate constant for E1S -&gt; E1 + S.</p></li>
+<li><p><strong>kc</strong> (<em>float</em>) – Rate constant for E1S -&gt; E2S.</p></li>
+<li><p><strong>krev</strong> (<em>float</em>) – Rate constant for E2S -&gt; E1S.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -2394,8 +2394,8 @@ In other words, the complex before and after the conformational change produces 
 <li><p><strong>koff</strong> (<em>float</em>) – Rate constant for E·S -&gt; E + S.</p></li>
 <li><p><strong>kc</strong> (<em>float</em>) – Rate constant for E·S -&gt; ES.</p></li>
 <li><p><strong>krev</strong> (<em>float</em>) – Rate constant for ES -&gt; E·S.</p></li>
-<li><p><strong>sP1L</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial concentration of E·S, default is 0.</p></li>
-<li><p><strong>sP2L</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial concentration of ES, default is 0.</p></li>
+<li><p><strong>sP1L</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial signal proportional to the concentration of E·S, default is 0.</p></li>
+<li><p><strong>sP2L</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial signal proportional to the concentration of ES, default is 0.</p></li>
 <li><p><strong>smax</strong> (<em>float</em><em>, </em><em>optional</em>) – Signal proportional to the complex (E·S or ES), default is 0.</p></li>
 </ul>
 </dd>
@@ -2423,8 +2423,8 @@ In other words, the complex before and after the conformational change produces 
 <li><p><strong>kc</strong> (<em>float</em>) – Rate constant for E1 -&gt; E2.</p></li>
 <li><p><strong>krev</strong> (<em>float</em>) – Rate constant for E2 -&gt; E1.</p></li>
 <li><p><strong>smax</strong> (<em>float</em><em>, </em><em>optional</em>) – Maximum signal that the complex (E2S) can produce, default is 0.</p></li>
-<li><p><strong>sP1</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial concentration of E1, default is 0.</p></li>
-<li><p><strong>sP2L</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial concentration of E2S, default is 0.</p></li>
+<li><p><strong>sP1</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial signal proportional to the concentration of E1, default is 0.</p></li>
+<li><p><strong>sP2L</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial signal proportional to the concentration of E2S, default is 0.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -2450,7 +2450,7 @@ In other words, the complex before and after the conformational change produces 
 <li><p><strong>kc</strong> (<em>float</em>) – Rate constant for E·S -&gt; ES.</p></li>
 <li><p><strong>krev</strong> (<em>float</em>) – Rate constant for ES -&gt; E·S.</p></li>
 <li><p><strong>s0</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial signal, default is 0.</p></li>
-<li><p><strong>sP2L</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial concentration of ES, default is 0.</p></li>
+<li><p><strong>sP2L</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial signal proportional to the concentration of ES, default is 0.</p></li>
 <li><p><strong>smax</strong> (<em>float</em><em>, </em><em>optional</em>) – Signal proportional to the complex (E·S or ES), default is 0.</p></li>
 </ul>
 </dd>
@@ -2476,8 +2476,8 @@ In other words, the complex before and after the conformational change produces 
 <li><p><strong>kc</strong> (<em>float</em>) – Rate constant for E1 -&gt; E2.</p></li>
 <li><p><strong>krev</strong> (<em>float</em>) – Rate constant for E2 -&gt; E1.</p></li>
 <li><p><strong>smax</strong> (<em>float</em><em>, </em><em>optional</em>) – Signal proportional to the complex (E2S), default is 0.</p></li>
-<li><p><strong>sP1</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial concentration of E1, default is 0.</p></li>
-<li><p><strong>sP2L</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial concentration of E2S, default is 0.</p></li>
+<li><p><strong>sP1</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial signal proportional to the concentration of E1, default is 0.</p></li>
+<li><p><strong>sP2L</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial signal proportional to the concentration of E2S, default is 0.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
