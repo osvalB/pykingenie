@@ -1,8 +1,7 @@
 import  numpy as np
-from scipy.integrate import solve_ivp
+from scipy.integrate import odeint
 
 __all__ = [
-    'ode_one_site_insolution',
     'solve_ode_one_site_insolution',
     'signal_ode_one_site_insolution',
     'ode_induced_fit_insolution',
@@ -16,44 +15,22 @@ __all__ = [
     'get_kobs_conformational_selection'
 ]
 
-def ode_one_site_insolution(t, complex_conc, koff, Kd, a_total, b_total):
-    """
-    ODE for the one binding site model in solution.
-
-    Parameters
-    ----------
-    t : float
-        Time.
-    complex_conc : float
-        Concentration of the complex.
-    koff : float
-        Off rate constant.
-    Kd : float
-        Equilibrium dissociation constant.
-    a_total : float
-        Total concentration of the ligand.
-    b_total : float
-        Total concentration of the receptor.
-
-    Returns
-    -------
-    float
-        Rate of change of complex concentration.
-    """
-    kon = koff / Kd
-
-    a = a_total - complex_conc
-    b = b_total - complex_conc
-
-    dab_dt = kon * a * b - koff * complex_conc
-
-    return  dab_dt
-
 def solve_ode_one_site_insolution(t, koff, Kd, a_total, b_total, t0=0):
     """
-    Solve the ODE for the one binding site model in solution.
-    
+    Analytical solution for the one binding site model in solution.
+
     Assumes that the initial concentration of the complex is zero.
+
+    The ODE  dAB/dt = kon·(A_tot − AB)·(B_tot − AB) − koff·AB  is a Riccati
+    equation whose two fixed points x₁ (physical) and x₂ are the roots of
+
+        kon·x² − (kon·(A+B) + koff)·x + kon·A·B = 0
+
+    Starting from AB(0) = 0 the closed-form solution is
+
+        AB(t) = x₁·(1 − e^{λt}) / (1 − (x₁/x₂)·e^{λt})
+
+    with λ = −kon·√(p² − 4·A·B), p = A + B + Kd.
 
     Parameters
     ----------
@@ -77,10 +54,21 @@ def solve_ode_one_site_insolution(t, koff, Kd, a_total, b_total, t0=0):
     """
     t = t + t0
 
-    out = solve_ivp(ode_one_site_insolution,t_span=[np.min(t), np.max(t)],
-                    t_eval=t,y0=[0],args=(koff,Kd,a_total,b_total),method="LSODA")
+    kon = koff / Kd
 
-    return out.y[0]
+    p = a_total + b_total + Kd
+    disc = p * p - 4 * a_total * b_total   # always ≥ Kd² > 0
+    D = np.sqrt(disc)
+
+    x1 = (p - D) * 0.5          # physical steady state  (≤ min(A,B))
+    x2 = (p + D) * 0.5          # unphysical root
+
+    lam = -kon * D               # negative eigenvalue → decay
+
+    exp_lt = np.exp(lam * t)
+    AB = x1 * (1.0 - exp_lt) / (1.0 - (x1 / x2) * exp_lt)
+
+    return AB
 
 def signal_ode_one_site_insolution(t, koff, Kd, a_total, b_total, t0=0, signal_a=0, signal_b=0, signal_complex=0):
     """
@@ -187,12 +175,14 @@ def solve_ode_induced_fit_insolution(t, y0, k1, k_minus1, k2, k_minus2, E_tot, S
         Solution of the ODE, contains the concentration of E, S, E·S and ES.
     """
     t = t + t0
-    out = solve_ivp(ode_induced_fit_insolution, t_span=[np.min(t), np.max(t)],
-                    t_eval=t, y0=y0, args=(k1, k_minus1, k2, k_minus2, E_tot, S_tot), method="LSODA")
+    sol = odeint(ode_induced_fit_insolution, y0, t,
+                 args=(k1, k_minus1, k2, k_minus2, E_tot, S_tot), tfirst=True)
+    E_S = sol[:, 0]
+    ES  = sol[:, 1]
     # Include the concentrations of E and S in the output
-    E = E_tot - out.y[0] - out.y[1]  # E_S is out.y[0], ES is out.y[1]
-    S = S_tot - out.y[0] - out.y[1]  # E_S is out.y[0], ES is out.y[1]
-    out = np.vstack((E, S, out.y[0], out.y[1]))  # Stack E, S, E_S, ES
+    E = E_tot - E_S - ES
+    S = S_tot - E_S - ES
+    out = np.vstack((E, S, E_S, ES))  # Stack E, S, E_S, ES
 
     return out
 
@@ -293,19 +283,15 @@ def solve_ode_conformational_selection_insolution(t, y, k1, k_minus1, k2, k_minu
     """
     t = t + t0
 
-    out = solve_ivp(ode_conformational_selection_insolution,
-                    t_span=[np.min(t), np.max(t)],
-                    t_eval=t, y0=y, args=(k1, k_minus1, k2, k_minus2,E_tot,S_tot), method="LSODA")
+    sol = odeint(ode_conformational_selection_insolution, y, t,
+                 args=(k1, k_minus1, k2, k_minus2, E_tot, S_tot), tfirst=True)
 
-    # out includes [dE2, dE2S], we need to add E1 and S
-    # E1 in the first column, S in the third column
+    E2  = sol[:, 0]
+    E2S = sol[:, 1]
+    E1  = E_tot - E2 - E2S
+    S   = S_tot - E2S
 
-    E1 = E_tot - out.y[0] - out.y[1]
-    S  = S_tot - out.y[1]
-
-    out = np.vstack((E1, out.y[0], S, out.y[1]))
-
-    return out
+    return np.vstack((E1, E2, S, E2S))
 
 def signal_ode_conformational_selection_insolution(
         t, y,

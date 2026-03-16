@@ -21,7 +21,7 @@ koff = 1
 kc = 10
 krev = 100
 
-noise = np.random.normal(0, 0.0001, len(t))
+noise = np.random.default_rng(42).normal(0, 0.0001, len(t))
 
 def generate_ys(E_tot,S_tot,kc,krev,kon,koff,signal_E1, signal_E2, signal_S, signal_E2S):
 

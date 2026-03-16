@@ -794,11 +794,10 @@ class KineticsFitter(KineticsFitterGeneral):
         kc_init    = np.logspace(-4, 1, 6)
         k_rev_init = kc_init
 
-        combinations    = np.array(list(itertools.product(kc_init, k_rev_init)))
-        df_combinations = pd.DataFrame(combinations, columns=['kc_init', 'kc_rev'])
-
-        # We need kc > krev/100 - otherwise there is no detectable induced fit
-        df_combinations = df_combinations[df_combinations['kc_init'] >= df_combinations['kc_rev']/100]
+        # Build combinations as numpy array, filter kc >= krev/100
+        combinations = np.array(list(itertools.product(kc_init, k_rev_init)))
+        mask = combinations[:, 0] >= combinations[:, 1] / 100
+        combinations = combinations[mask]
 
         rss_init    = np.inf
         best_kc     = None
@@ -813,10 +812,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         # Loop through each combination of kc and krev
         # Apply fit_induced_fit_sites_assoc_and_disso with fixed kon2 and koff2 (corresponding to kc and krev)
-        for index, row in df_combinations.iterrows():
-
-            kc     = row['kc_init']
-            krev   = row['kc_rev']
+        for kc, krev in combinations:
 
             try:
 

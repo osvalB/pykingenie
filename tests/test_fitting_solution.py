@@ -15,6 +15,7 @@ from pykingenie.utils.fitting_solution import(
 
 def test_fit_one_site_solution():
 
+    rng = np.random.default_rng(42)
     t = np.linspace(0, 30, 30)
     koff = 0.1
     Kd = 0.5
@@ -30,7 +31,7 @@ def test_fit_one_site_solution():
 
         result = signal_ode_one_site_insolution(t, koff, Kd, a_total, b_total, t0,signal_a, signal_b, signal_complex)
         # Add small gaussian error 
-        noise = np.random.normal(0, 0.008, len(result))
+        noise = rng.normal(0, 0.008, len(result))
         result += noise
         signals.append(result)
 
@@ -67,11 +68,16 @@ def test_fit_one_site_solution():
     # Assert that the  signal_ES, K_d and k_off parameters are within expected ranges
     expected_params = [signal_complex, Kd, koff]
 
-    np.testing.assert_array_almost_equal(global_fit_params, expected_params, decimal=1,
-                                         err_msg="The fitted parameters do not match the expected values.")
+    np.testing.assert_array_almost_equal(
+        global_fit_params,
+        expected_params,
+        decimal=1,
+        err_msg="The fitted parameters do not match the expected values."
+    )
     
 def test_fit_one_site_solution_with_signal_b():
 
+    rng = np.random.default_rng(42)
     t = np.linspace(0, 30, 30)
     koff = 0.1
     Kd = 0.5
@@ -87,7 +93,7 @@ def test_fit_one_site_solution_with_signal_b():
 
         result = signal_ode_one_site_insolution(t, koff, Kd, a_total, b_total, t0,signal_a, signal_b, signal_complex)
         # Add small gaussian error 
-        noise = np.random.normal(0, 0.008, len(result))
+        noise = rng.normal(0, 0.008, len(result))
         result += noise
         signals.append(result)
 
@@ -129,6 +135,7 @@ def test_fit_one_site_solution_with_signal_b():
     
 def test_fit_one_site_solution_with_signal_a():
 
+    rng = np.random.default_rng(42)
     t = np.linspace(0, 30, 30)
     koff = 0.1
     Kd = 0.5
@@ -144,7 +151,7 @@ def test_fit_one_site_solution_with_signal_a():
 
         result = signal_ode_one_site_insolution(t, koff, Kd, a_total, b_total, t0,signal_a, signal_b, signal_complex)
         # Add small gaussian error 
-        noise = np.random.normal(0, 0.008, len(result))
+        noise = rng.normal(0, 0.008, len(result))
         result += noise
         signals.append(result)
 
@@ -187,6 +194,7 @@ def test_fit_one_site_solution_with_signal_a():
 
 def test_fit_one_site_solution_with_fixed_constants():
 
+    rng = np.random.default_rng(42)
     t = np.linspace(0, 30, 30)
     koff = 0.1
     Kd = 0.5
@@ -202,7 +210,7 @@ def test_fit_one_site_solution_with_fixed_constants():
 
         result = signal_ode_one_site_insolution(t, koff, Kd, a_total, b_total, t0,signal_a, signal_b, signal_complex)
         # Add small gaussian error 
-        noise = np.random.normal(0, 0.008, len(result))
+        noise = rng.normal(0, 0.008, len(result))
         result += noise
         signals.append(result)
 
@@ -247,6 +255,7 @@ def test_fit_one_site_solution_with_fixed_constants():
 
 def test_fit_one_site_solution_with_t0():
 
+    rng = np.random.default_rng(42)
     t = np.linspace(0, 30, 30)
     koff = 0.1
     Kd = 0.5
@@ -262,7 +271,7 @@ def test_fit_one_site_solution_with_t0():
 
         result = signal_ode_one_site_insolution(t, koff, Kd, a_total, b_total, t0,signal_a, signal_b, signal_complex)
         # Add small gaussian error 
-        noise = np.random.normal(0, 0.008, len(result))
+        noise = rng.normal(0, 0.008, len(result))
         result += noise
         signals.append(result)
 
@@ -306,6 +315,7 @@ def test_fit_one_site_solution_with_t0():
     
 def test_fit_induced_fit_solution():
 
+    rng = np.random.default_rng(42)
     kon  = 100
     koff = 100
     kc   = 10
@@ -331,7 +341,7 @@ def test_fit_induced_fit_solution():
             signal_E, signal_S, signal_ES_int, signal_ES)
 
         # Add small noise to the signal
-        noise = np.random.normal(0, 0.001, len(t))
+        noise = rng.normal(0, 0.001, len(t))
         y += noise
 
         ys.append(y)
@@ -368,6 +378,7 @@ def test_fit_induced_fit_solution():
 
 def test_fit_induced_fit_solution_fixed_constants():
 
+    rng = np.random.default_rng(42)
     kon  = 100
     koff = 100
     kc   = 10
@@ -393,7 +404,7 @@ def test_fit_induced_fit_solution_fixed_constants():
             signal_E, signal_S, signal_ES_int, signal_ES)
 
         # Add small noise to the signal
-        noise = np.random.normal(0, 0.001, len(t))
+        noise = rng.normal(0, 0.001, len(t))
         y += noise
 
         ys.append(y)
@@ -436,6 +447,7 @@ def test_fit_induced_fit_solution_fixed_constants():
 
 def test_fit_induced_fit_solution_fixed_constants_different_ES_signal():
 
+    rng = np.random.default_rng(42)
     kon  = 100
     koff = 100
     kc   = 10
@@ -461,7 +473,7 @@ def test_fit_induced_fit_solution_fixed_constants_different_ES_signal():
             signal_E, signal_S, signal_ES_int, signal_ES)
 
         # Add small noise to the signal
-        noise = np.random.normal(0, 0.001, len(t))
+        noise = rng.normal(0, 0.001, len(t))
         y += noise
 
         ys.append(y)
@@ -507,6 +519,7 @@ def test_fit_induced_fit_solution_fixed_constants_different_ES_signal():
 
 def test_fit_induced_fit_solution_fixed_constants_different_signals():
 
+    rng = np.random.default_rng(42)
     kon  = 100
     koff = 100
     kc   = 10
@@ -532,7 +545,7 @@ def test_fit_induced_fit_solution_fixed_constants_different_signals():
             signal_E, signal_S, signal_ES_int, signal_ES)
 
         # Add small noise to the signal
-        noise = np.random.normal(0, 0.001, len(t))
+        noise = rng.normal(0, 0.001, len(t))
         y += noise
 
         ys.append(y)
@@ -582,6 +595,7 @@ def test_fit_induced_fit_solution_fixed_constants_different_signals():
 
 def test_fit_induced_fit_solution_fixed_constants_t0():
 
+    rng = np.random.default_rng(42)
     kon  = 100
     koff = 100
     kc   = 10
@@ -607,7 +621,7 @@ def test_fit_induced_fit_solution_fixed_constants_t0():
             signal_E, signal_S, signal_ES_int, signal_ES)
 
         # Add small noise to the signal
-        noise = np.random.normal(0, 0.001, len(t))
+        noise = rng.normal(0, 0.001, len(t))
         y += noise
 
         ys.append(y)
@@ -654,6 +668,7 @@ def test_fit_induced_fit_solution_fixed_constants_t0():
 
 def test_fit_induced_fit_solution_fixed_constants_scale_factor():
 
+    rng = np.random.default_rng(42)
     kon  = 100
     koff = 100
     kc   = 10
@@ -679,7 +694,7 @@ def test_fit_induced_fit_solution_fixed_constants_scale_factor():
             signal_E, signal_S, signal_ES_int, signal_ES)
 
         # Add small noise to the signal
-        noise = np.random.normal(0, 0.001, len(t))
+        noise = rng.normal(0, 0.001, len(t))
         y += noise
 
         ys.append(y)
@@ -727,6 +742,7 @@ def test_fit_induced_fit_solution_fixed_constants_scale_factor():
 
 def test_find_initial_parameters_induced_fit_solution_with_scale_factor():
 
+    rng = np.random.default_rng(42)
     kon  = 100
     koff = 100
     kc   = 10
@@ -752,7 +768,7 @@ def test_find_initial_parameters_induced_fit_solution_with_scale_factor():
             signal_E, signal_S, signal_ES_int, signal_ES)
 
         # Add small noise to the signal
-        noise = np.random.normal(0, 0.001, len(t))
+        noise = rng.normal(0, 0.001, len(t))
         y += noise
 
         ys.append(y)

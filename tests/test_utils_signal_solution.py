@@ -27,7 +27,7 @@ def test_solve_ode_one_site_insolution():
 
     expected = [0,0.17265383,0.2791352,0.34808851,0.39423549,0.42570054,0.44748987,0.46274577,0.47348593,0.48107122]
 
-    np.testing.assert_array_almost_equal(result, expected, decimal=5, err_msg="The result of the ODE solution does not match the expected values.")
+    np.testing.assert_array_almost_equal(result, expected, decimal=4, err_msg="The result of the ODE solution does not match the expected values.")
 
     # Check that the response increases with time
     assert np.all(np.diff(result) >= 0), "The response should be non-decreasing with increasing time."

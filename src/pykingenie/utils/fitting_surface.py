@@ -141,15 +141,24 @@ def fit_steady_state_one_site(signal_lst, ligand_lst, initial_parameters,
         high_bounds = [x * 5 for x in high_bounds]
         start       = 0
 
+    # Pre-compute slice boundaries for output array
+    _lengths = [len(C) for C in ligand_lst]
+    _total   = sum(_lengths)
+    _offsets = np.empty(len(_lengths) + 1, dtype=int)
+    _offsets[0] = 0
+    for _k, _n in enumerate(_lengths):
+        _offsets[_k + 1] = _offsets[_k] + _n
+
     def fit_fx(dummyVariable, *args):
 
         Kd = Kd_value if fixed_Kd else args[0]
 
         Rmax_all = args[start:]
 
-        signal = [steady_state_one_site(C,Rmax,Kd) for C,Rmax in zip(ligand_lst,Rmax_all)]
-
-        return np.concatenate(signal, axis=0)
+        out = np.empty(_total)
+        for _k, (C, Rmax) in enumerate(zip(ligand_lst, Rmax_all)):
+            out[_offsets[_k]:_offsets[_k + 1]] = steady_state_one_site(C, Rmax, Kd)
+        return out
 
     global_fit_params, cov = curve_fit(fit_fx, 1, all_signal,
                                        p0=initial_parameters,
@@ -189,6 +198,9 @@ def steady_state_one_site_asymmetric_ci95(kd_estimated, signal_lst, ligand_lst, 
     np.ndarray
         95% asymmetric confidence interval for the Kd value [lower_bound, upper_bound].
     """
+    # Pre-concatenate the static reference signal once
+    _all_signal_ref = concat_signal_lst(signal_lst)
+
     def f_to_optimize(Kd):
 
         fit_params, _, fit_vals = fit_steady_state_one_site(signal_lst, ligand_lst,
@@ -198,7 +210,7 @@ def steady_state_one_site_asymmetric_ci95(kd_estimated, signal_lst, ligand_lst, 
                                                   fixed_Kd = True,
                                                   Kd_value = Kd)
 
-        rss = get_rss(concat_signal_lst(signal_lst), concat_signal_lst(fit_vals))
+        rss = get_rss(_all_signal_ref, concat_signal_lst(fit_vals))
 
         return np.abs(rss - rss_desired)
 
@@ -268,31 +280,27 @@ def fit_one_site_association(signal_lst, time_lst, analyte_conc_lst,
 
     start = 3 - sum([fixed_t0, fixed_Kd, fixed_koff])
 
+    # Pre-compute slice boundaries
+    _n_traces = len(time_lst)
+    _lengths  = [len(t) for t in time_lst]
+    _total    = sum(_lengths)
+    _offsets  = np.empty(_n_traces + 1, dtype=int)
+    _offsets[0] = 0
+    for _k, _n in enumerate(_lengths):
+        _offsets[_k + 1] = _offsets[_k] + _n
+
     def fit_fx(dummyVariable, *args):
-        """
-        Arguments order:
-            Kd, Koff, T0, Smax1, Smax2, Smax3, ...
-        """
         Kd = Kd_value if fixed_Kd else args[0]
-
         Koff = koff_value if fixed_koff else args[1 - sum([fixed_Kd])]
-
         t0 = args[2 - sum([fixed_Kd, fixed_koff])] if not fixed_t0 else 0
 
-        signal = []
-
-        for i in range(len(time_lst)):
-
+        out = np.empty(_total)
+        for i in range(_n_traces):
             t            = time_lst[i]
             analyte_conc = analyte_conc_lst[i]
-
             s_max        = args[start+smax_idx[i]] if shared_smax else args[start + i]
-
-            res = one_site_association_analytical(t,0,s_max,Koff,Kd,analyte_conc,t0)
-
-            signal.append(res)
-
-        return np.concatenate(signal, axis=0)
+            out[_offsets[i]:_offsets[i + 1]] = one_site_association_analytical(t,0,s_max,Koff,Kd,analyte_conc,t0)
+        return out
 
     global_fit_params, cov = curve_fit(fit_fx, 1, all_signal,
                                        p0=initial_parameters,
@@ -301,17 +309,8 @@ def fit_one_site_association(signal_lst, time_lst, analyte_conc_lst,
     predicted_curve = fit_fx(1, *global_fit_params)
 
     fitted_values_assoc = []
-
-    init = 0
-    for t in time_lst:
-
-        end  = init + len(t)
-
-        predicted_curve_i = predicted_curve[init:end]
-
-        fitted_values_assoc.append(predicted_curve_i)
-
-        init = end
+    for _k in range(_n_traces):
+        fitted_values_assoc.append(predicted_curve[_offsets[_k]:_offsets[_k + 1]])
 
     return global_fit_params, cov, fitted_values_assoc
 
@@ -361,29 +360,30 @@ def fit_one_site_dissociation(signal_lst, time_lst,
     time_lst = [t - t[0] for t in time_lst]
 
     if not fit_s0:
-
         s0_all = [s[0] for s in signal_lst]
 
-    def fit_fx(dummyVariable, *args):
-        """
-        Arguments order:
-           Koff, T0, S01, S02, S03, ...
-        """
-        Koff = koff_value if fixed_koff else args[0]
+    # Pre-compute slice boundaries
+    _n_traces = len(time_lst)
+    _lengths  = [len(t) for t in time_lst]
+    _total    = sum(_lengths)
+    _offsets  = np.empty(_n_traces + 1, dtype=int)
+    _offsets[0] = 0
+    for _k, _n in enumerate(_lengths):
+        _offsets[_k + 1] = _offsets[_k] + _n
 
+    def fit_fx(dummyVariable, *args):
+        Koff = koff_value if fixed_koff else args[0]
         t0 = args[1 - sum([fixed_koff])] if not fixed_t0 else 0
 
         if fit_s0:
-
             s0_vals = args[( 2 - sum([fixed_koff,fixed_t0]) ):]
-
         else:
-
             s0_vals = s0_all
 
-        signal  = [one_site_dissociation_analytical(t,s0,Koff,t0) for t,s0 in zip(time_lst,s0_vals)]
-
-        return np.concatenate(signal, axis=0)
+        out = np.empty(_total)
+        for _k, (t, s0) in enumerate(zip(time_lst, s0_vals)):
+            out[_offsets[_k]:_offsets[_k + 1]] = one_site_dissociation_analytical(t, s0, Koff, t0)
+        return out
 
     global_fit_params, cov = curve_fit(fit_fx, 1, all_signal,
                                        p0=initial_parameters,
@@ -392,17 +392,8 @@ def fit_one_site_dissociation(signal_lst, time_lst,
     predicted_curve = fit_fx(1, *global_fit_params)
 
     fitted_values_disso = []
-
-    init = 0
-    for t in time_lst:
-
-        end  = init + len(t)
-
-        predicted_curve_i = predicted_curve[init:end]
-
-        fitted_values_disso.append(predicted_curve_i)
-
-        init = end
+    for _k in range(_n_traces):
+        fitted_values_disso.append(predicted_curve[_offsets[_k]:_offsets[_k + 1]])
 
     return global_fit_params, cov, fitted_values_disso
 
@@ -462,7 +453,6 @@ def fit_one_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
         Fitted values for each dissociation signal, same dimensions as disso_signal_lst.
     """
     # Set a flag for the association that was done after a dissociation step
-    # We do this empirically by detecting if the initial time is greater than 2 seconds
     initial_signal_at_zero = [time[0] < 2 for time in assoc_time_lst]
 
     all_signal_assoc = concat_signal_lst(assoc_signal_lst)
@@ -477,61 +467,59 @@ def fit_one_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
 
     n_t0s = len(np.unique(smax_idx))*(not fixed_t0)
 
-    # The user may have deleted one of the association-dissociation steps
-    # In that case, we can't use for the next step the previous association signal
-    # We'll use the first signal value in that cases
     continuos_time = detect_time_list_continuos(time_lst_assoc,disso_time_lst)
     s0s            = guess_initial_signal(assoc_time_lst, assoc_signal_lst)
 
-    def fit_fx(dummyVariable, *args):
-        """
-        Arguments order:
-            Kd, Koff, T0, Smax1, Smax2, Smax3, ...
-        """
-        Kd   = Kd_value if fixed_Kd else args[0]
+    # Pre-compute slice boundaries for output array
+    _n_traces = len(time_lst_assoc)
+    _a_lengths = [len(t) for t in time_lst_assoc]
+    _d_lengths = [len(t) for t in time_lst_disso]
+    _total_a = sum(_a_lengths)
+    _total_d = sum(_d_lengths)
+    _total   = _total_a + _total_d
 
+    _a_offsets = np.empty(_n_traces + 1, dtype=int)
+    _a_offsets[0] = 0
+    for _k in range(_n_traces):
+        _a_offsets[_k + 1] = _a_offsets[_k] + _a_lengths[_k]
+
+    _d_offsets = np.empty(_n_traces + 1, dtype=int)
+    _d_offsets[0] = _total_a
+    for _k in range(_n_traces):
+        _d_offsets[_k + 1] = _d_offsets[_k] + _d_lengths[_k]
+
+    def fit_fx(dummyVariable, *args):
+        Kd   = Kd_value if fixed_Kd else args[0]
         Koff = koff_value if fixed_koff else args[1 - sum([fixed_Kd])]
 
-        signal_a = []
-        signal_d = []
+        out = np.empty(_total)
+        prev_disso_end = 0.0
 
-        i = 0
-        for t_assoc,t_dissoc in zip(time_lst_assoc,time_lst_disso):
-
+        for i in range(_n_traces):
+            t_assoc = time_lst_assoc[i]
+            t_dissoc = time_lst_disso[i]
             analyte_conc = analyte_conc_lst[i]
 
-            t0     = args[start + smax_idx[i]] if not fixed_t0 else 0
+            t0    = args[start + smax_idx[i]] if not fixed_t0 else 0
+            s_max = args[start+smax_idx[i]+n_t0s] if shared_smax else args[start + i + n_t0s]
 
-            s_max  = args[start+smax_idx[i]+n_t0s ]   if shared_smax  else args[start + i + n_t0s]
-
-            # Set s0 to zero if initial_signal_at_zero, otherwise set it to the value of the previous dissociation
-            if np.logical_or(i == 0,initial_signal_at_zero[i]) and continuos_time[i]:
-
+            if np.logical_or(i == 0, initial_signal_at_zero[i]) and continuos_time[i]:
                 s0 = 0
-
             elif continuos_time[i]:
-
-                s0 = signal_d[i-1][-1]
-
+                s0 = prev_disso_end
             else:
+                s0 = s0s[i]
 
-                s0 = s0s[i] # Use the first data point from a single-exponential fit
+            y_assoc = one_site_association_analytical(t_assoc-t_assoc[0],s0,s_max,Koff,Kd,analyte_conc,t0)
+            out[_a_offsets[i]:_a_offsets[i + 1]] = y_assoc
 
-            y_pred = one_site_association_analytical(t_assoc-t_assoc[0],s0,s_max,Koff,Kd,analyte_conc,t0)
+            s0_d = y_assoc[-1]
+            y_disso = one_site_dissociation_analytical(t_dissoc, s0_d, Koff)
+            out[_d_offsets[i]:_d_offsets[i + 1]] = y_disso
 
-            signal_a.append(y_pred)
+            prev_disso_end = y_disso[-1]
 
-            s0 = y_pred[-1]
-
-            y_pred = one_site_dissociation_analytical(t_dissoc, s0, Koff)
-            signal_d.append(y_pred)
-
-            i += 1
-
-        signal_assoc_fit  = np.concatenate(signal_a, axis=0)
-        signal_dissoc_fit = np.concatenate(signal_d, axis=0)
-
-        return np.concatenate([signal_assoc_fit,signal_dissoc_fit], axis=0)
+        return out
 
     all_signal = np.concatenate([all_signal_assoc,all_signal_disso], axis=0)
 
@@ -542,29 +530,12 @@ def fit_one_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
     predicted_curve = fit_fx(1, *global_fit_params)
 
     fitted_values_assoc = []
-
-    init = 0
-    for t in time_lst_assoc:
-
-        end  = init + len(t)
-
-        predicted_curve_i = predicted_curve[init:end]
-
-        fitted_values_assoc.append(predicted_curve_i)
-
-        init = end
+    for _k in range(_n_traces):
+        fitted_values_assoc.append(predicted_curve[_a_offsets[_k]:_a_offsets[_k + 1]])
 
     fitted_values_disso = []
-
-    for t in time_lst_disso:
-
-        end  = init + len(t)
-
-        predicted_curve_i = predicted_curve[init:end]
-
-        fitted_values_disso.append(predicted_curve_i)
-
-        init = end
+    for _k in range(_n_traces):
+        fitted_values_disso.append(predicted_curve[_d_offsets[_k]:_d_offsets[_k + 1]])
 
     return global_fit_params, cov, fitted_values_assoc, fitted_values_disso
 
@@ -639,13 +610,7 @@ def fit_induced_fit_sites_assoc_and_disso(
         Fitted values for each dissociation signal, same dimensions as disso_signal_lst.
     """
     # Set a flag for the association that was done after a dissociation step
-    # We do this empirically by detecting if the initial time is greater than 2 seconds
     initial_signal_at_zero = [time[0] < 2 for time in assoc_time_lst]
-
-    # Flatten signals once
-    all_signal_assoc = np.concatenate(assoc_signal_lst)
-    all_signal_disso = np.concatenate(disso_signal_lst)
-    all_signal = np.concatenate([all_signal_assoc, all_signal_disso])
 
     # Preprocess time
     time_lst_assoc = [np.asarray(t) for t in assoc_time_lst]
@@ -656,6 +621,29 @@ def fit_induced_fit_sites_assoc_and_disso(
     n_unq_smax = len(np.unique(smax_idx))
     n_t0s = n_unq_smax * (not fixed_t0)
 
+    # Pre-compute slice boundaries for output array
+    _n_traces  = len(time_lst_assoc)
+    _a_lengths = [len(t) for t in time_lst_assoc]
+    _d_lengths = [len(t) for t in time_lst_disso]
+    _total_a   = sum(_a_lengths)
+    _total_d   = sum(_d_lengths)
+    _total     = _total_a + _total_d
+
+    _a_offsets = np.empty(_n_traces + 1, dtype=int)
+    _a_offsets[0] = 0
+    for _k in range(_n_traces):
+        _a_offsets[_k + 1] = _a_offsets[_k] + _a_lengths[_k]
+
+    _d_offsets = np.empty(_n_traces + 1, dtype=int)
+    _d_offsets[0] = _total_a
+    for _k in range(_n_traces):
+        _d_offsets[_k + 1] = _d_offsets[_k] + _d_lengths[_k]
+
+    # Flatten signals once
+    all_signal = np.concatenate(
+        [np.concatenate(assoc_signal_lst), np.concatenate(disso_signal_lst)]
+    )
+
     def fit_fx(_, *args):
         # Efficient argument unpacking
         idx = 0
@@ -664,38 +652,32 @@ def fit_induced_fit_sites_assoc_and_disso(
         kon2 = kon2_value if fixed_kon2 else args[idx]; idx += not fixed_kon2
         koff2 = koff2_value if fixed_koff2 else args[idx]; idx += not fixed_koff2
 
-        # Preallocate lists
-        signal_a = [None] * len(time_lst_assoc)
-        signal_d = [None] * len(time_lst_disso)
-        last_y1  = [None] * len(time_lst_assoc)
+        out = np.empty(_total)
 
-        # Iterate over the association and dissociation phases
         i = 0
-
         for t_assoc, t_dissoc in zip(time_lst_assoc, time_lst_disso):
 
-            # Assign previous values for the amount of intermediate complex and trapped complex
             if i == 0 or initial_signal_at_zero[i]:
-                sP1L, sP2l = 0,0
+                sP1L, sP2l = 0, 0
             else:
                 s0, sP1L, sP2l = last
 
             conc = analyte_conc_lst[i]
             smax = args[start + smax_idx[i] + n_t0s] if shared_smax else args[start + i + n_t0s]
 
-            mat_assoc = solve_induced_fit_association(t_assoc, conc, kon1, koff1, kon2, koff2, sP1L=sP1L, sP2L=sP2l,smax=smax)
-            signal_a[i] = mat_assoc[:, 0]
+            mat_assoc = solve_induced_fit_association(t_assoc, conc, kon1, koff1, kon2, koff2, sP1L=sP1L, sP2L=sP2l, smax=smax)
+            out[_a_offsets[i]:_a_offsets[i + 1]] = mat_assoc[:, 0]
             last = mat_assoc[-1]
 
             s0, sP1L, sP2l = last
             mat_disso = solve_induced_fit_dissociation(t_dissoc, koff1, kon2, koff2, s0=s0, sP2L=sP2l, smax=smax)
-            signal_d[i] = mat_disso[:, 0]
+            out[_d_offsets[i]:_d_offsets[i + 1]] = mat_disso[:, 0]
 
-            last = mat_disso[-1] # Just in case we have single-cycle kinetics
+            last = mat_disso[-1]
 
             i += 1
 
-        return np.concatenate(signal_a + signal_d)
+        return out
 
     # Run fitting
     global_fit_params, cov = curve_fit(
@@ -708,17 +690,14 @@ def fit_induced_fit_sites_assoc_and_disso(
     # Predict
     predicted = fit_fx(1, *global_fit_params)
 
-    # Split fitted values
-    fitted_values_assoc, fitted_values_disso = [], []
-    idx = 0
-    for t in time_lst_assoc:
-        n = len(t)
-        fitted_values_assoc.append(predicted[idx:idx + n])
-        idx += n
-    for t in time_lst_disso:
-        n = len(t)
-        fitted_values_disso.append(predicted[idx:idx + n])
-        idx += n
+    # Split fitted values using pre-computed offsets
+    fitted_values_assoc = []
+    for _k in range(_n_traces):
+        fitted_values_assoc.append(predicted[_a_offsets[_k]:_a_offsets[_k + 1]])
+
+    fitted_values_disso = []
+    for _k in range(_n_traces):
+        fitted_values_disso.append(predicted[_d_offsets[_k]:_d_offsets[_k + 1]])
 
     return global_fit_params, cov, fitted_values_assoc, fitted_values_disso
 
@@ -793,56 +772,55 @@ def fit_one_site_assoc_and_disso_ktr(assoc_signal_lst, assoc_time_lst, analyte_c
     n_t0s = len(np.unique(smax_idx))*(not fixed_t0)
     n_ktr = len(np.unique(smax_idx))
 
+    # Pre-compute slice boundaries
+    _n_traces  = len(time_lst_assoc)
+    _a_lengths = [len(t) for t in time_lst_assoc]
+    _d_lengths = [len(t) for t in time_lst_disso]
+    _total_a   = sum(_a_lengths)
+    _total_d   = sum(_d_lengths)
+    _total     = _total_a + _total_d
+
+    _a_offsets = np.empty(_n_traces + 1, dtype=int)
+    _a_offsets[0] = 0
+    for _k in range(_n_traces):
+        _a_offsets[_k + 1] = _a_offsets[_k] + _a_lengths[_k]
+
+    _d_offsets = np.empty(_n_traces + 1, dtype=int)
+    _d_offsets[0] = _total_a
+    for _k in range(_n_traces):
+        _d_offsets[_k + 1] = _d_offsets[_k] + _d_lengths[_k]
+
     def fit_fx(dummyVariable, *args):
-
-        """
-        Arguments order:
-            Kd, Koff, T0, Smax1, Smax2, Smax3, ...
-        """
-
         Kd   = Kd_value if fixed_Kd else args[0]
-
         Koff = koff_value if fixed_koff else args[1 - sum([fixed_Kd])]
 
-        signal_a = []
-        signal_d = []
+        out = np.empty(_total)
+        prev_disso_end = 0.0
 
-        i = 0
-        for t_assoc,t_dissoc in zip(time_lst_assoc,time_lst_disso):
-
+        for i in range(_n_traces):
+            t_assoc  = time_lst_assoc[i]
+            t_dissoc = time_lst_disso[i]
             analyte_conc = analyte_conc_lst[i]
 
             t0     = args[start + smax_idx[i]] if not fixed_t0 else 0
-
             k_tr   = args[start + smax_idx[i]] if fixed_t0 else args[start + n_t0s + smax_idx[i]]
+            s_max  = args[start+smax_idx[i]+n_t0s+n_ktr] if shared_smax else args[start + i + n_t0s + n_ktr]
 
-            s_max  = args[start+smax_idx[i]+n_t0s+n_ktr ]   if shared_smax  else args[start + i + n_t0s + n_ktr]
-
-            # Set s0 to zero if initial_signal_at_zero, otherwise set it to the value of the previous dissociation
-            if np.logical_or(i == 0,initial_signal_at_zero[i]):
-
+            if np.logical_or(i == 0, initial_signal_at_zero[i]):
                 s0 = 0
-
             else:
+                s0 = prev_disso_end
 
-                s0 = signal_d[i-1][-1]
+            y_assoc = solve_ode_one_site_mass_transport_association(t_assoc-t_assoc[0],s0,analyte_conc/2,analyte_conc,Kd,Koff,k_tr,s_max,t0)
+            out[_a_offsets[i]:_a_offsets[i + 1]] = y_assoc
 
-            y_pred    = solve_ode_one_site_mass_transport_association(t_assoc-t_assoc[0],s0,analyte_conc/2,analyte_conc,Kd,Koff,k_tr,s_max,t0)
+            s0_d = y_assoc[-1]
+            y_disso = solve_ode_one_site_mass_transport_dissociation(t_dissoc,s0_d,Kd,Koff,k_tr,s_max)
+            out[_d_offsets[i]:_d_offsets[i + 1]] = y_disso
 
-            signal_a.append(y_pred)
+            prev_disso_end = y_disso[-1]
 
-            s0 = y_pred[-1]
-
-            y_pred = solve_ode_one_site_mass_transport_dissociation(t_dissoc,s0,Kd,Koff,k_tr,s_max)
-
-            signal_d.append(y_pred)
-
-            i += 1
-
-        signal_assoc_fit  = np.concatenate(signal_a, axis=0)
-        signal_dissoc_fit = np.concatenate(signal_d, axis=0)
-
-        return np.concatenate([signal_assoc_fit,signal_dissoc_fit], axis=0)
+        return out
 
     all_signal = np.concatenate([all_signal_assoc,all_signal_disso], axis=0)
 
@@ -853,29 +831,12 @@ def fit_one_site_assoc_and_disso_ktr(assoc_signal_lst, assoc_time_lst, analyte_c
     predicted_curve = fit_fx(1, *global_fit_params)
 
     fitted_values_assoc = []
-
-    init = 0
-    for t in time_lst_assoc:
-
-        end  = init + len(t)
-
-        predicted_curve_i = predicted_curve[init:end]
-
-        fitted_values_assoc.append(predicted_curve_i)
-
-        init = end
+    for _k in range(_n_traces):
+        fitted_values_assoc.append(predicted_curve[_a_offsets[_k]:_a_offsets[_k + 1]])
 
     fitted_values_disso = []
-
-    for t in time_lst_disso:
-
-        end  = init + len(t)
-
-        predicted_curve_i = predicted_curve[init:end]
-
-        fitted_values_disso.append(predicted_curve_i)
-
-        init = end
+    for _k in range(_n_traces):
+        fitted_values_disso.append(predicted_curve[_d_offsets[_k]:_d_offsets[_k + 1]])
 
     return global_fit_params, cov, fitted_values_assoc, fitted_values_disso
 
@@ -931,6 +892,10 @@ def one_site_assoc_and_disso_asymmetric_ci95(kd_estimated, rss_desired,
     float
         Maximum Kd value for the 95% confidence interval.
     """
+    # Pre-concatenate the static reference signals once
+    _ref_assoc = concat_signal_lst(assoc_signal_lst)
+    _ref_disso = concat_signal_lst(disso_signal_lst)
+
     boundsMax = np.array([kd_estimated*1e2, kd_estimated * 1e4]) * 1e3
 
     # Guess starting point for the upper bound
@@ -950,12 +915,12 @@ def one_site_assoc_and_disso_asymmetric_ci95(kd_estimated, rss_desired,
             fixed_Kd=True, Kd_value=kd_estimated*test_factor,
             fixed_koff=fixed_koff, koff_value=koff_value)
 
-        rss1 = get_rss(concat_signal_lst(assoc_signal_lst), concat_signal_lst(fitted_values_assoc))
-        rss2 = get_rss(concat_signal_lst(disso_signal_lst), concat_signal_lst(fitted_values_disso))
+        rss1 = get_rss(_ref_assoc, concat_signal_lst(fitted_values_assoc))
+        rss2 = get_rss(_ref_disso, concat_signal_lst(fitted_values_disso))
 
         if rss1 + rss2 > rss_desired:
             boundsMax = np.array([kd_estimated*test_factors[i-1],
-                                  kd_estimated *test_factor]) * 1e3  # Scale to nanomolar units
+                                  kd_estimated *test_factor]) * 1e3
             break
 
     boundsMin = np.array([kd_estimated/1e4, kd_estimated / 1e2]) * 1e3
@@ -976,17 +941,17 @@ def one_site_assoc_and_disso_asymmetric_ci95(kd_estimated, rss_desired,
             fixed_Kd=True, Kd_value=kd_estimated/test_factor,
             fixed_koff=fixed_koff, koff_value=koff_value)
 
-        rss1 = get_rss(concat_signal_lst(assoc_signal_lst), concat_signal_lst(fitted_values_assoc))
-        rss2 = get_rss(concat_signal_lst(disso_signal_lst), concat_signal_lst(fitted_values_disso))
+        rss1 = get_rss(_ref_assoc, concat_signal_lst(fitted_values_assoc))
+        rss2 = get_rss(_ref_disso, concat_signal_lst(fitted_values_disso))
 
         if rss1 + rss2 > rss_desired:
             boundsMin = np.array([kd_estimated/test_factor,
-                                  kd_estimated *test_factors[i-1]]) * 1e3  # Scale to nanomolar units
+                                  kd_estimated *test_factors[i-1]]) * 1e3
             break
 
     def f_to_optimize(Kd):
 
-        Kd = Kd / 1e3 # Input Kd is given in nanomolar, so we scale back to micromolar units
+        Kd = Kd / 1e3
 
         _, _, fitted_values_assoc, fitted_values_disso = fit_one_site_assoc_and_disso(
                                                             assoc_signal_lst, assoc_time_lst, analyte_conc_lst,
@@ -998,8 +963,8 @@ def one_site_assoc_and_disso_asymmetric_ci95(kd_estimated, rss_desired,
                                                             fixed_Kd=True,Kd_value=Kd,
                                                             fixed_koff=fixed_koff,koff_value=koff_value)
 
-        rss1 = get_rss(concat_signal_lst(assoc_signal_lst), concat_signal_lst(fitted_values_assoc))
-        rss2 = get_rss(concat_signal_lst(disso_signal_lst), concat_signal_lst(fitted_values_disso))
+        rss1 = get_rss(_ref_assoc, concat_signal_lst(fitted_values_assoc))
+        rss2 = get_rss(_ref_disso, concat_signal_lst(fitted_values_disso))
 
         return np.abs(rss1 + rss2 - rss_desired)
 
@@ -1059,6 +1024,10 @@ def one_site_assoc_and_disso_asymmetric_ci95_koff(koff_estimated, rss_desired,
     float
         Maximum koff value for the 95% confidence interval.
     """
+    # Pre-concatenate the static reference signals once
+    _ref_assoc = concat_signal_lst(assoc_signal_lst)
+    _ref_disso = concat_signal_lst(disso_signal_lst)
+
     boundsMax = np.array([koff_estimated*1e2, koff_estimated * 1e4]) * 1e3
 
     # Guess starting point for the upper bound
@@ -1077,8 +1046,8 @@ def one_site_assoc_and_disso_asymmetric_ci95_koff(koff_estimated, rss_desired,
             fixed_t0=fixed_t0,
             fixed_koff=True, koff_value=koff_estimated*test_factor)
 
-        rss1 = get_rss(concat_signal_lst(assoc_signal_lst), concat_signal_lst(fitted_values_assoc))
-        rss2 = get_rss(concat_signal_lst(disso_signal_lst), concat_signal_lst(fitted_values_disso))
+        rss1 = get_rss(_ref_assoc, concat_signal_lst(fitted_values_assoc))
+        rss2 = get_rss(_ref_disso, concat_signal_lst(fitted_values_disso))
 
         if rss1 + rss2 > rss_desired:
             boundsMax = np.array([koff_estimated*test_factors[i-1],
@@ -1102,8 +1071,8 @@ def one_site_assoc_and_disso_asymmetric_ci95_koff(koff_estimated, rss_desired,
             fixed_t0=fixed_t0,
             fixed_koff=True, koff_value=koff_estimated*test_factor)
 
-        rss1 = get_rss(concat_signal_lst(assoc_signal_lst), concat_signal_lst(fitted_values_assoc))
-        rss2 = get_rss(concat_signal_lst(disso_signal_lst), concat_signal_lst(fitted_values_disso))
+        rss1 = get_rss(_ref_assoc, concat_signal_lst(fitted_values_assoc))
+        rss2 = get_rss(_ref_disso, concat_signal_lst(fitted_values_disso))
 
         if rss1 + rss2 > rss_desired:
             boundsMin = np.array([koff_estimated/test_factor,
@@ -1124,8 +1093,8 @@ def one_site_assoc_and_disso_asymmetric_ci95_koff(koff_estimated, rss_desired,
                                                             fixed_koff=True,
                                                             koff_value=Koff)
 
-        rss1 = get_rss(concat_signal_lst(assoc_signal_lst), concat_signal_lst(fitted_values_assoc))
-        rss2 = get_rss(concat_signal_lst(disso_signal_lst), concat_signal_lst(fitted_values_disso))
+        rss1 = get_rss(_ref_assoc, concat_signal_lst(fitted_values_assoc))
+        rss2 = get_rss(_ref_disso, concat_signal_lst(fitted_values_disso))
 
         return np.abs(rss1 + rss2 - rss_desired)
 

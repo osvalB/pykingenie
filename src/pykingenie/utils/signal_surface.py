@@ -511,8 +511,16 @@ def solve_induced_fit_association(time, a_conc, kon, koff, kc, krev, sP1L=0, sP2
 
 def solve_all_states_fast(time, A, initial_conditions, steady_state_value):
     """
-    Solve the system of differential equations for all time points using matrix exponentiation.
-    
+    Solve the system of differential equations for all time points using eigendecomposition.
+
+    The system  dx/dt = A·x + b  has the analytical solution
+
+        x(t) = x_ss + V · diag(exp(λ·t)) · V⁻¹ · (x₀ − x_ss)
+
+    where λ and V are the eigenvalues/vectors of A and x_ss is the steady
+    state.  All time points are evaluated in a single vectorised operation
+    (no Python loop).
+
     Parameters
     ----------
     time : np.ndarray
@@ -523,30 +531,26 @@ def solve_all_states_fast(time, A, initial_conditions, steady_state_value):
         Initial conditions for the system.
     steady_state_value : np.ndarray
         Steady state solution of the system.
-        
+
     Returns
     -------
     np.ndarray
-        Array of shape (len(time), len(initial_conditions)) containing the state of the system at each time point.
+        Array of shape (len(time), len(initial_conditions)) containing the
+        state of the system at each time point.
     """
-
     v = initial_conditions - steady_state_value
     eigvals, eigvecs = np.linalg.eig(A)
-    Vinv = np.linalg.inv(eigvecs)
+    alpha = np.linalg.solve(eigvecs, v)          # more stable than inv @ v
 
-    # Precompute eigvecs @ v once
-    alpha = Vinv @ v
+    # exp_matrix[i, j] = exp(eigvals[j] * time[i])   — shape (N, n)
+    exp_matrix = np.exp(np.outer(time, eigvals))
 
-    # Preallocate output
-    states = np.empty((len(time), len(v)))
+    # For each time point: state = ss + eigvecs @ (exp_diag * alpha)
+    # Vectorised:  (exp_matrix * alpha) has shape (N, n),
+    #              @ eigvecs.T  gives (N, n)
+    states = steady_state_value + (exp_matrix * alpha) @ eigvecs.T
 
-    # Loop over time using vectorized exponentials
-    for i, t in enumerate(time):
-        exp_diag = np.exp(eigvals * t)
-        exp_v = eigvecs @ (exp_diag * alpha)
-        states[i] = steady_state_value + exp_v
-
-    return states
+    return states.real                           # discard tiny imaginary noise
 
 def solve_conformational_selection_association(time, a_conc, kon, koff, kc, krev, smax=0, sP1=0, sP2L=0):
     """
