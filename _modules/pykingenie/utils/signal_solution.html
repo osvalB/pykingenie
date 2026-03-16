@@ -348,10 +348,9 @@
                   
   <h1>Source code for pykingenie.utils.signal_solution</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w">  </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.integrate</span><span class="w"> </span><span class="kn">import</span> <span class="n">solve_ivp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.integrate</span><span class="w"> </span><span class="kn">import</span> <span class="n">odeint</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s1">&#39;ode_one_site_insolution&#39;</span><span class="p">,</span>
     <span class="s1">&#39;solve_ode_one_site_insolution&#39;</span><span class="p">,</span>
     <span class="s1">&#39;signal_ode_one_site_insolution&#39;</span><span class="p">,</span>
     <span class="s1">&#39;ode_induced_fit_insolution&#39;</span><span class="p">,</span>
@@ -365,49 +364,24 @@
     <span class="s1">&#39;get_kobs_conformational_selection&#39;</span>
 <span class="p">]</span>
 
-<div class="viewcode-block" id="ode_one_site_insolution">
-<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_solution.ode_one_site_insolution">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">ode_one_site_insolution</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">complex_conc</span><span class="p">,</span> <span class="n">koff</span><span class="p">,</span> <span class="n">Kd</span><span class="p">,</span> <span class="n">a_total</span><span class="p">,</span> <span class="n">b_total</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    ODE for the one binding site model in solution.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    t : float</span>
-<span class="sd">        Time.</span>
-<span class="sd">    complex_conc : float</span>
-<span class="sd">        Concentration of the complex.</span>
-<span class="sd">    koff : float</span>
-<span class="sd">        Off rate constant.</span>
-<span class="sd">    Kd : float</span>
-<span class="sd">        Equilibrium dissociation constant.</span>
-<span class="sd">    a_total : float</span>
-<span class="sd">        Total concentration of the ligand.</span>
-<span class="sd">    b_total : float</span>
-<span class="sd">        Total concentration of the receptor.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    float</span>
-<span class="sd">        Rate of change of complex concentration.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">kon</span> <span class="o">=</span> <span class="n">koff</span> <span class="o">/</span> <span class="n">Kd</span>
-
-    <span class="n">a</span> <span class="o">=</span> <span class="n">a_total</span> <span class="o">-</span> <span class="n">complex_conc</span>
-    <span class="n">b</span> <span class="o">=</span> <span class="n">b_total</span> <span class="o">-</span> <span class="n">complex_conc</span>
-
-    <span class="n">dab_dt</span> <span class="o">=</span> <span class="n">kon</span> <span class="o">*</span> <span class="n">a</span> <span class="o">*</span> <span class="n">b</span> <span class="o">-</span> <span class="n">koff</span> <span class="o">*</span> <span class="n">complex_conc</span>
-
-    <span class="k">return</span>  <span class="n">dab_dt</span></div>
-
-
 <div class="viewcode-block" id="solve_ode_one_site_insolution">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_solution.solve_ode_one_site_insolution">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">solve_ode_one_site_insolution</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">koff</span><span class="p">,</span> <span class="n">Kd</span><span class="p">,</span> <span class="n">a_total</span><span class="p">,</span> <span class="n">b_total</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Solve the ODE for the one binding site model in solution.</span>
-<span class="sd">    </span>
+<span class="sd">    Analytical solution for the one binding site model in solution.</span>
+
 <span class="sd">    Assumes that the initial concentration of the complex is zero.</span>
+
+<span class="sd">    The ODE  dAB/dt = kon·(A_tot − AB)·(B_tot − AB) − koff·AB  is a Riccati</span>
+<span class="sd">    equation whose two fixed points x₁ (physical) and x₂ are the roots of</span>
+
+<span class="sd">        kon·x² − (kon·(A+B) + koff)·x + kon·A·B = 0</span>
+
+<span class="sd">    Starting from AB(0) = 0 the closed-form solution is</span>
+
+<span class="sd">        AB(t) = x₁·(1 − e^{λt}) / (1 − (x₁/x₂)·e^{λt})</span>
+
+<span class="sd">    with λ = −kon·√(p² − 4·A·B), p = A + B + Kd.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -431,10 +405,21 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">t</span> <span class="o">=</span> <span class="n">t</span> <span class="o">+</span> <span class="n">t0</span>
 
-    <span class="n">out</span> <span class="o">=</span> <span class="n">solve_ivp</span><span class="p">(</span><span class="n">ode_one_site_insolution</span><span class="p">,</span><span class="n">t_span</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">t</span><span class="p">)],</span>
-                    <span class="n">t_eval</span><span class="o">=</span><span class="n">t</span><span class="p">,</span><span class="n">y0</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">koff</span><span class="p">,</span><span class="n">Kd</span><span class="p">,</span><span class="n">a_total</span><span class="p">,</span><span class="n">b_total</span><span class="p">),</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;LSODA&quot;</span><span class="p">)</span>
+    <span class="n">kon</span> <span class="o">=</span> <span class="n">koff</span> <span class="o">/</span> <span class="n">Kd</span>
 
-    <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">a_total</span> <span class="o">+</span> <span class="n">b_total</span> <span class="o">+</span> <span class="n">Kd</span>
+    <span class="n">disc</span> <span class="o">=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">p</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">a_total</span> <span class="o">*</span> <span class="n">b_total</span>   <span class="c1"># always ≥ Kd² &gt; 0</span>
+    <span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">disc</span><span class="p">)</span>
+
+    <span class="n">x1</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="n">D</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.5</span>          <span class="c1"># physical steady state  (≤ min(A,B))</span>
+    <span class="n">x2</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">+</span> <span class="n">D</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.5</span>          <span class="c1"># unphysical root</span>
+
+    <span class="n">lam</span> <span class="o">=</span> <span class="o">-</span><span class="n">kon</span> <span class="o">*</span> <span class="n">D</span>               <span class="c1"># negative eigenvalue → decay</span>
+
+    <span class="n">exp_lt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">lam</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span>
+    <span class="n">AB</span> <span class="o">=</span> <span class="n">x1</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">exp_lt</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="p">(</span><span class="n">x1</span> <span class="o">/</span> <span class="n">x2</span><span class="p">)</span> <span class="o">*</span> <span class="n">exp_lt</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">AB</span></div>
 
 
 <div class="viewcode-block" id="signal_ode_one_site_insolution">
@@ -550,12 +535,14 @@
 <span class="sd">        Solution of the ODE, contains the concentration of E, S, E·S and ES.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">t</span> <span class="o">=</span> <span class="n">t</span> <span class="o">+</span> <span class="n">t0</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="n">solve_ivp</span><span class="p">(</span><span class="n">ode_induced_fit_insolution</span><span class="p">,</span> <span class="n">t_span</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">t</span><span class="p">)],</span>
-                    <span class="n">t_eval</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">y0</span><span class="o">=</span><span class="n">y0</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">k1</span><span class="p">,</span> <span class="n">k_minus1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">k_minus2</span><span class="p">,</span> <span class="n">E_tot</span><span class="p">,</span> <span class="n">S_tot</span><span class="p">),</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;LSODA&quot;</span><span class="p">)</span>
+    <span class="n">sol</span> <span class="o">=</span> <span class="n">odeint</span><span class="p">(</span><span class="n">ode_induced_fit_insolution</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span>
+                 <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">k1</span><span class="p">,</span> <span class="n">k_minus1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">k_minus2</span><span class="p">,</span> <span class="n">E_tot</span><span class="p">,</span> <span class="n">S_tot</span><span class="p">),</span> <span class="n">tfirst</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">E_S</span> <span class="o">=</span> <span class="n">sol</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">ES</span>  <span class="o">=</span> <span class="n">sol</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
     <span class="c1"># Include the concentrations of E and S in the output</span>
-    <span class="n">E</span> <span class="o">=</span> <span class="n">E_tot</span> <span class="o">-</span> <span class="n">out</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">out</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># E_S is out.y[0], ES is out.y[1]</span>
-    <span class="n">S</span> <span class="o">=</span> <span class="n">S_tot</span> <span class="o">-</span> <span class="n">out</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">out</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># E_S is out.y[0], ES is out.y[1]</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">E</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">out</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>  <span class="c1"># Stack E, S, E_S, ES</span>
+    <span class="n">E</span> <span class="o">=</span> <span class="n">E_tot</span> <span class="o">-</span> <span class="n">E_S</span> <span class="o">-</span> <span class="n">ES</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="n">S_tot</span> <span class="o">-</span> <span class="n">E_S</span> <span class="o">-</span> <span class="n">ES</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">E</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">E_S</span><span class="p">,</span> <span class="n">ES</span><span class="p">))</span>  <span class="c1"># Stack E, S, E_S, ES</span>
 
     <span class="k">return</span> <span class="n">out</span></div>
 
@@ -665,19 +652,15 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">t</span> <span class="o">=</span> <span class="n">t</span> <span class="o">+</span> <span class="n">t0</span>
 
-    <span class="n">out</span> <span class="o">=</span> <span class="n">solve_ivp</span><span class="p">(</span><span class="n">ode_conformational_selection_insolution</span><span class="p">,</span>
-                    <span class="n">t_span</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">t</span><span class="p">)],</span>
-                    <span class="n">t_eval</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">y0</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">k1</span><span class="p">,</span> <span class="n">k_minus1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">k_minus2</span><span class="p">,</span><span class="n">E_tot</span><span class="p">,</span><span class="n">S_tot</span><span class="p">),</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;LSODA&quot;</span><span class="p">)</span>
+    <span class="n">sol</span> <span class="o">=</span> <span class="n">odeint</span><span class="p">(</span><span class="n">ode_conformational_selection_insolution</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span>
+                 <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">k1</span><span class="p">,</span> <span class="n">k_minus1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">k_minus2</span><span class="p">,</span> <span class="n">E_tot</span><span class="p">,</span> <span class="n">S_tot</span><span class="p">),</span> <span class="n">tfirst</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="c1"># out includes [dE2, dE2S], we need to add E1 and S</span>
-    <span class="c1"># E1 in the first column, S in the third column</span>
+    <span class="n">E2</span>  <span class="o">=</span> <span class="n">sol</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">E2S</span> <span class="o">=</span> <span class="n">sol</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">E1</span>  <span class="o">=</span> <span class="n">E_tot</span> <span class="o">-</span> <span class="n">E2</span> <span class="o">-</span> <span class="n">E2S</span>
+    <span class="n">S</span>   <span class="o">=</span> <span class="n">S_tot</span> <span class="o">-</span> <span class="n">E2S</span>
 
-    <span class="n">E1</span> <span class="o">=</span> <span class="n">E_tot</span> <span class="o">-</span> <span class="n">out</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">out</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">S</span>  <span class="o">=</span> <span class="n">S_tot</span> <span class="o">-</span> <span class="n">out</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-
-    <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">E1</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">S</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-
-    <span class="k">return</span> <span class="n">out</span></div>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">E1</span><span class="p">,</span> <span class="n">E2</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">E2S</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="signal_ode_conformational_selection_insolution">

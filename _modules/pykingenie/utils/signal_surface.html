@@ -907,8 +907,16 @@
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.solve_all_states_fast">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">solve_all_states_fast</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">initial_conditions</span><span class="p">,</span> <span class="n">steady_state_value</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Solve the system of differential equations for all time points using matrix exponentiation.</span>
-<span class="sd">    </span>
+<span class="sd">    Solve the system of differential equations for all time points using eigendecomposition.</span>
+
+<span class="sd">    The system  dx/dt = A·x + b  has the analytical solution</span>
+
+<span class="sd">        x(t) = x_ss + V · diag(exp(λ·t)) · V⁻¹ · (x₀ − x_ss)</span>
+
+<span class="sd">    where λ and V are the eigenvalues/vectors of A and x_ss is the steady</span>
+<span class="sd">    state.  All time points are evaluated in a single vectorised operation</span>
+<span class="sd">    (no Python loop).</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    time : np.ndarray</span>
@@ -919,30 +927,26 @@
 <span class="sd">        Initial conditions for the system.</span>
 <span class="sd">    steady_state_value : np.ndarray</span>
 <span class="sd">        Steady state solution of the system.</span>
-<span class="sd">        </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    np.ndarray</span>
-<span class="sd">        Array of shape (len(time), len(initial_conditions)) containing the state of the system at each time point.</span>
+<span class="sd">        Array of shape (len(time), len(initial_conditions)) containing the</span>
+<span class="sd">        state of the system at each time point.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">v</span> <span class="o">=</span> <span class="n">initial_conditions</span> <span class="o">-</span> <span class="n">steady_state_value</span>
     <span class="n">eigvals</span><span class="p">,</span> <span class="n">eigvecs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-    <span class="n">Vinv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">eigvecs</span><span class="p">)</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">eigvecs</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>          <span class="c1"># more stable than inv @ v</span>
 
-    <span class="c1"># Precompute eigvecs @ v once</span>
-    <span class="n">alpha</span> <span class="o">=</span> <span class="n">Vinv</span> <span class="o">@</span> <span class="n">v</span>
+    <span class="c1"># exp_matrix[i, j] = exp(eigvals[j] * time[i])   — shape (N, n)</span>
+    <span class="n">exp_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">eigvals</span><span class="p">))</span>
 
-    <span class="c1"># Preallocate output</span>
-    <span class="n">states</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">time</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)))</span>
+    <span class="c1"># For each time point: state = ss + eigvecs @ (exp_diag * alpha)</span>
+    <span class="c1"># Vectorised:  (exp_matrix * alpha) has shape (N, n),</span>
+    <span class="c1">#              @ eigvecs.T  gives (N, n)</span>
+    <span class="n">states</span> <span class="o">=</span> <span class="n">steady_state_value</span> <span class="o">+</span> <span class="p">(</span><span class="n">exp_matrix</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">@</span> <span class="n">eigvecs</span><span class="o">.</span><span class="n">T</span>
 
-    <span class="c1"># Loop over time using vectorized exponentials</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">time</span><span class="p">):</span>
-        <span class="n">exp_diag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">eigvals</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span>
-        <span class="n">exp_v</span> <span class="o">=</span> <span class="n">eigvecs</span> <span class="o">@</span> <span class="p">(</span><span class="n">exp_diag</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">)</span>
-        <span class="n">states</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">steady_state_value</span> <span class="o">+</span> <span class="n">exp_v</span>
-
-    <span class="k">return</span> <span class="n">states</span></div>
+    <span class="k">return</span> <span class="n">states</span><span class="o">.</span><span class="n">real</span>                           <span class="c1"># discard tiny imaginary noise</span></div>
 
 
 <div class="viewcode-block" id="solve_conformational_selection_association">

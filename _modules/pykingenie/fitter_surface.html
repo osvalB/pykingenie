@@ -1174,11 +1174,10 @@
         <span class="n">kc_init</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
         <span class="n">k_rev_init</span> <span class="o">=</span> <span class="n">kc_init</span>
 
-        <span class="n">combinations</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">kc_init</span><span class="p">,</span> <span class="n">k_rev_init</span><span class="p">)))</span>
-        <span class="n">df_combinations</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">combinations</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;kc_init&#39;</span><span class="p">,</span> <span class="s1">&#39;kc_rev&#39;</span><span class="p">])</span>
-
-        <span class="c1"># We need kc &gt; krev/100 - otherwise there is no detectable induced fit</span>
-        <span class="n">df_combinations</span> <span class="o">=</span> <span class="n">df_combinations</span><span class="p">[</span><span class="n">df_combinations</span><span class="p">[</span><span class="s1">&#39;kc_init&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">df_combinations</span><span class="p">[</span><span class="s1">&#39;kc_rev&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">100</span><span class="p">]</span>
+        <span class="c1"># Build combinations as numpy array, filter kc &gt;= krev/100</span>
+        <span class="n">combinations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">kc_init</span><span class="p">,</span> <span class="n">k_rev_init</span><span class="p">)))</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">combinations</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">combinations</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">100</span>
+        <span class="n">combinations</span> <span class="o">=</span> <span class="n">combinations</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
 
         <span class="n">rss_init</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
         <span class="n">best_kc</span>     <span class="o">=</span> <span class="kc">None</span>
@@ -1193,10 +1192,7 @@
 
         <span class="c1"># Loop through each combination of kc and krev</span>
         <span class="c1"># Apply fit_induced_fit_sites_assoc_and_disso with fixed kon2 and koff2 (corresponding to kc and krev)</span>
-        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df_combinations</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
-
-            <span class="n">kc</span>     <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;kc_init&#39;</span><span class="p">]</span>
-            <span class="n">krev</span>   <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;kc_rev&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">kc</span><span class="p">,</span> <span class="n">krev</span> <span class="ow">in</span> <span class="n">combinations</span><span class="p">:</span>
 
             <span class="k">try</span><span class="p">:</span>
 

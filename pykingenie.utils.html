@@ -1720,34 +1720,20 @@ or None if no matching step is found.</p>
 <section id="module-pykingenie.utils.signal_solution">
 <span id="pykingenie-utils-signal-solution-module"></span><h2>pykingenie.utils.signal_solution module<a class="headerlink" href="#module-pykingenie.utils.signal_solution" title="Link to this heading">#</a></h2>
 <dl class="py function">
-<dt class="sig sig-object py" id="pykingenie.utils.signal_solution.ode_one_site_insolution">
-<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_solution.</span></span><span class="sig-name descname"><span class="pre">ode_one_site_insolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">complex_conc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">koff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Kd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_total</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b_total</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_solution.html#ode_one_site_insolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_solution.ode_one_site_insolution" title="Link to this definition">#</a></dt>
-<dd><p>ODE for the one binding site model in solution.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>t</strong> (<em>float</em>) – Time.</p></li>
-<li><p><strong>complex_conc</strong> (<em>float</em>) – Concentration of the complex.</p></li>
-<li><p><strong>koff</strong> (<em>float</em>) – Off rate constant.</p></li>
-<li><p><strong>Kd</strong> (<em>float</em>) – Equilibrium dissociation constant.</p></li>
-<li><p><strong>a_total</strong> (<em>float</em>) – Total concentration of the ligand.</p></li>
-<li><p><strong>b_total</strong> (<em>float</em>) – Total concentration of the receptor.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Rate of change of complex concentration.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="pykingenie.utils.signal_solution.solve_ode_one_site_insolution">
 <span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_solution.</span></span><span class="sig-name descname"><span class="pre">solve_ode_one_site_insolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">koff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Kd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_total</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b_total</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_solution.html#solve_ode_one_site_insolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_solution.solve_ode_one_site_insolution" title="Link to this definition">#</a></dt>
-<dd><p>Solve the ODE for the one binding site model in solution.</p>
+<dd><p>Analytical solution for the one binding site model in solution.</p>
 <p>Assumes that the initial concentration of the complex is zero.</p>
+<p>The ODE  dAB/dt = kon·(A_tot − AB)·(B_tot − AB) − koff·AB  is a Riccati
+equation whose two fixed points x₁ (physical) and x₂ are the roots of</p>
+<blockquote>
+<div><p>kon·x² − (kon·(A+B) + koff)·x + kon·A·B = 0</p>
+</div></blockquote>
+<p>Starting from AB(0) = 0 the closed-form solution is</p>
+<blockquote>
+<div><p>AB(t) = x₁·(1 − e^{λt}) / (1 − (x₁/x₂)·e^{λt})</p>
+</div></blockquote>
+<p>with λ = −kon·√(p² − 4·A·B), p = A + B + Kd.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2360,7 +2346,14 @@ The signal is only proportional to E2S.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pykingenie.utils.signal_surface.solve_all_states_fast">
 <span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_surface.</span></span><span class="sig-name descname"><span class="pre">solve_all_states_fast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_conditions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steady_state_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_surface.html#solve_all_states_fast"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_surface.solve_all_states_fast" title="Link to this definition">#</a></dt>
-<dd><p>Solve the system of differential equations for all time points using matrix exponentiation.</p>
+<dd><p>Solve the system of differential equations for all time points using eigendecomposition.</p>
+<p>The system  dx/dt = A·x + b  has the analytical solution</p>
+<blockquote>
+<div><p>x(t) = x_ss + V · diag(exp(λ·t)) · V⁻¹ · (x₀ − x_ss)</p>
+</div></blockquote>
+<p>where λ and V are the eigenvalues/vectors of A and x_ss is the steady
+state.  All time points are evaluated in a single vectorised operation
+(no Python loop).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2371,7 +2364,8 @@ The signal is only proportional to E2S.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Array of shape (len(time), len(initial_conditions)) containing the state of the system at each time point.</p>
+<dd class="field-even"><p>Array of shape (len(time), len(initial_conditions)) containing the
+state of the system at each time point.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>np.ndarray</p>
@@ -3034,7 +3028,6 @@ factor <code class="docutils literal notranslate"><span class="pre">sigma</span>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-pykingenie.utils.signal_solution">pykingenie.utils.signal_solution module</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_solution.ode_one_site_insolution"><code class="docutils literal notranslate"><span class="pre">ode_one_site_insolution()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_solution.solve_ode_one_site_insolution"><code class="docutils literal notranslate"><span class="pre">solve_ode_one_site_insolution()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_solution.signal_ode_one_site_insolution"><code class="docutils literal notranslate"><span class="pre">signal_ode_one_site_insolution()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_solution.ode_induced_fit_insolution"><code class="docutils literal notranslate"><span class="pre">ode_induced_fit_insolution()</span></code></a></li>
