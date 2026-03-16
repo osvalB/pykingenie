@@ -377,7 +377,18 @@
     <span class="s1">&#39;ode_mixture_analyte_association&#39;</span><span class="p">,</span>
     <span class="s1">&#39;solve_ode_mixture_analyte_association&#39;</span><span class="p">,</span>
     <span class="s1">&#39;ode_mixture_analyte_dissociation&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;solve_ode_mixture_analyte_dissociation&#39;</span>
+    <span class="s1">&#39;solve_ode_mixture_analyte_dissociation&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;steady_state_two_site&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;steady_state_two_site_cooperative&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;differential_matrix_association_two_site&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;differential_matrix_association_two_site_cooperative&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;constant_vector_two_site&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;differential_matrix_dissociation_two_site&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;differential_matrix_dissociation_two_site_cooperative&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;solve_two_site_association&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;solve_two_site_cooperative_association&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;solve_two_site_dissociation&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;solve_two_site_cooperative_dissociation&#39;</span>
 <span class="p">]</span>
 
 <div class="viewcode-block" id="steady_state_one_site">
@@ -1244,6 +1255,472 @@
                     <span class="n">t_eval</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">y0</span><span class="o">=</span><span class="n">Ris0</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">koffs</span><span class="p">,),</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;LSODA&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">y</span></div>
+
+
+
+<div class="viewcode-block" id="steady_state_two_site">
+<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.steady_state_two_site">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">steady_state_two_site</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">Rmax_PL</span><span class="p">,</span> <span class="n">Rmax_LPL</span><span class="p">,</span> <span class="n">Kd</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Steady state signal for a ligand with two identical, independent binding sites.</span>
+
+<span class="sd">    The immobilized ligand P has two equivalent binding sites for the analyte L.</span>
+<span class="sd">    PL (= LP) denotes singly-bound ligand, LPL denotes doubly-bound ligand.</span>
+
+<span class="sd">    For two identical independent sites with intrinsic dissociation constant Kd,</span>
+<span class="sd">    the equilibrium fractions are:</span>
+
+<span class="sd">    - fPL  = 2 * theta * (1 - theta)</span>
+<span class="sd">    - fLPL = theta ** 2</span>
+
+<span class="sd">    where theta = C / (C + Kd) is the single-site occupancy.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    C : np.ndarray</span>
+<span class="sd">        Concentration of the analyte.</span>
+<span class="sd">    Rmax_PL : float</span>
+<span class="sd">        Maximum signal when all ligand is singly bound (PL state).</span>
+<span class="sd">    Rmax_LPL : float</span>
+<span class="sd">        Maximum signal when all ligand is doubly bound (LPL state).</span>
+<span class="sd">    Kd : float</span>
+<span class="sd">        Intrinsic equilibrium dissociation constant (per site).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Steady state signal.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">C</span>     <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">C</span><span class="p">)</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">C</span> <span class="o">/</span> <span class="p">(</span><span class="n">C</span> <span class="o">+</span> <span class="n">Kd</span><span class="p">)</span>
+    <span class="n">fPL</span>   <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">theta</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">theta</span><span class="p">)</span>
+    <span class="n">fLPL</span>  <span class="o">=</span> <span class="n">theta</span> <span class="o">**</span> <span class="mi">2</span>
+    <span class="n">signal</span> <span class="o">=</span> <span class="n">Rmax_PL</span> <span class="o">*</span> <span class="n">fPL</span> <span class="o">+</span> <span class="n">Rmax_LPL</span> <span class="o">*</span> <span class="n">fLPL</span>
+    <span class="k">return</span> <span class="n">signal</span></div>
+
+
+
+<div class="viewcode-block" id="steady_state_two_site_cooperative">
+<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.steady_state_two_site_cooperative">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">steady_state_two_site_cooperative</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">Rmax_PL</span><span class="p">,</span> <span class="n">Rmax_LPL</span><span class="p">,</span> <span class="n">Kd</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Steady state signal for a ligand with two identical binding sites and cooperativity.</span>
+
+<span class="sd">    The cooperativity factor sigma modifies the second binding event.</span>
+<span class="sd">    The intrinsic dissociation constant for the second site becomes Kd / sigma.</span>
+
+<span class="sd">    - sigma &gt; 1 : positive cooperativity (second binding is tighter).</span>
+<span class="sd">    - sigma &lt; 1 : negative cooperativity.</span>
+<span class="sd">    - sigma = 1 : identical independent sites (non-cooperative).</span>
+
+<span class="sd">    The equilibrium fractions are computed from the partition function:</span>
+
+<span class="sd">        Z = 1 + 2 * C / Kd + sigma * (C / Kd) ** 2</span>
+
+<span class="sd">    - fPL  = (2 * C / Kd) / Z</span>
+<span class="sd">    - fLPL = sigma * (C / Kd) ** 2 / Z</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    C : np.ndarray</span>
+<span class="sd">        Concentration of the analyte.</span>
+<span class="sd">    Rmax_PL : float</span>
+<span class="sd">        Maximum signal when all ligand is singly bound (PL state).</span>
+<span class="sd">    Rmax_LPL : float</span>
+<span class="sd">        Maximum signal when all ligand is doubly bound (LPL state).</span>
+<span class="sd">    Kd : float</span>
+<span class="sd">        Intrinsic equilibrium dissociation constant (per site).</span>
+<span class="sd">    sigma : float</span>
+<span class="sd">        Cooperativity factor.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Steady state signal.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">C</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">C</span><span class="p">)</span>
+    <span class="n">r</span>    <span class="o">=</span> <span class="n">C</span> <span class="o">/</span> <span class="n">Kd</span>
+    <span class="n">Z</span>    <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span> <span class="n">sigma</span> <span class="o">*</span> <span class="n">r</span> <span class="o">**</span> <span class="mi">2</span>
+    <span class="n">fPL</span>  <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">r</span><span class="p">)</span> <span class="o">/</span> <span class="n">Z</span>
+    <span class="n">fLPL</span> <span class="o">=</span> <span class="p">(</span><span class="n">sigma</span> <span class="o">*</span> <span class="n">r</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">Z</span>
+    <span class="n">signal</span> <span class="o">=</span> <span class="n">Rmax_PL</span> <span class="o">*</span> <span class="n">fPL</span> <span class="o">+</span> <span class="n">Rmax_LPL</span> <span class="o">*</span> <span class="n">fLPL</span>
+    <span class="k">return</span> <span class="n">signal</span></div>
+
+
+
+<div class="viewcode-block" id="differential_matrix_association_two_site">
+<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.differential_matrix_association_two_site">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">differential_matrix_association_two_site</span><span class="p">(</span><span class="n">kon</span><span class="p">,</span> <span class="n">koff</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Differential matrix for the two-site model during association (non-cooperative).</span>
+
+<span class="sd">    The ligand P (immobilized) has two equivalent, independent binding sites.</span>
+<span class="sd">    The analyte L flows at fixed concentration ``a``.</span>
+
+<span class="sd">    State variables: [fPL, fLPL] where</span>
+
+<span class="sd">    - fPL  = fraction of ligand in the singly-bound state (PL + LP)</span>
+<span class="sd">    - fLPL = fraction of ligand in the doubly-bound state (LPL)</span>
+<span class="sd">    - fP   = 1 - fPL - fLPL (free ligand, from conservation)</span>
+
+<span class="sd">    Reactions with statistical factors::</span>
+
+<span class="sd">        P  + L  -&gt; PL  : 2 * kon * a * fP    (2 equivalent empty sites)</span>
+<span class="sd">        PL      -&gt; P+L : koff * fPL           (1 occupied site)</span>
+<span class="sd">        PL + L  -&gt; LPL : kon * a * fPL        (1 remaining empty site)</span>
+<span class="sd">        LPL     -&gt; PL+L: 2 * koff * fLPL      (2 occupied sites)</span>
+
+<span class="sd">    The resulting ODE is  d[fPL, fLPL]/dt = A @ [fPL, fLPL] + b</span>
+<span class="sd">    where b = constant_vector_two_site(kon, a).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    kon : float</span>
+<span class="sd">        Intrinsic association rate constant (per site).</span>
+<span class="sd">    koff : float</span>
+<span class="sd">        Intrinsic dissociation rate constant (per site).</span>
+<span class="sd">    a : float</span>
+<span class="sd">        Analyte concentration.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        2×2 differential matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">row1</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">kon</span> <span class="o">*</span> <span class="n">a</span> <span class="o">+</span> <span class="n">koff</span><span class="p">),</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">koff</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">kon</span> <span class="o">*</span> <span class="n">a</span><span class="p">]</span>
+    <span class="n">row2</span> <span class="o">=</span> <span class="p">[</span><span class="n">kon</span> <span class="o">*</span> <span class="n">a</span><span class="p">,</span>               <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">koff</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">row1</span><span class="p">,</span> <span class="n">row2</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="differential_matrix_association_two_site_cooperative">
+<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.differential_matrix_association_two_site_cooperative">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">differential_matrix_association_two_site_cooperative</span><span class="p">(</span><span class="n">kon</span><span class="p">,</span> <span class="n">koff</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Differential matrix for the two-site model during association (cooperative).</span>
+
+<span class="sd">    Same as :func:`differential_matrix_association_two_site`, but the second</span>
+<span class="sd">    binding step is modified by the cooperativity factor sigma.</span>
+
+<span class="sd">    The kinetic effect is split symmetrically between on-rate and off-rate</span>
+<span class="sd">    using sqrt(sigma):</span>
+
+<span class="sd">    - Second site on-rate  = sqrt(sigma) * kon</span>
+<span class="sd">    - Second site off-rate = koff / sqrt(sigma)</span>
+
+<span class="sd">    This gives an effective Kd for the second site of Kd / sigma.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    kon : float</span>
+<span class="sd">        Intrinsic association rate constant (per site).</span>
+<span class="sd">    koff : float</span>
+<span class="sd">        Intrinsic dissociation rate constant (per site).</span>
+<span class="sd">    sigma : float</span>
+<span class="sd">        Cooperativity factor. sigma &gt; 1 for positive cooperativity.</span>
+<span class="sd">    a : float</span>
+<span class="sd">        Analyte concentration.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        2×2 differential matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
+    <span class="n">row1</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">kon</span> <span class="o">*</span> <span class="n">a</span> <span class="o">+</span> <span class="n">koff</span> <span class="o">+</span> <span class="n">s</span> <span class="o">*</span> <span class="n">kon</span> <span class="o">*</span> <span class="n">a</span><span class="p">),</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">koff</span> <span class="o">/</span> <span class="n">s</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">kon</span> <span class="o">*</span> <span class="n">a</span><span class="p">]</span>
+    <span class="n">row2</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="o">*</span> <span class="n">kon</span> <span class="o">*</span> <span class="n">a</span><span class="p">,</span>                         <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">koff</span> <span class="o">/</span> <span class="n">s</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">row1</span><span class="p">,</span> <span class="n">row2</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="constant_vector_two_site">
+<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.constant_vector_two_site">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">constant_vector_two_site</span><span class="p">(</span><span class="n">kon</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Constant vector for the two-site association ODE.</span>
+
+<span class="sd">    This vector is the same for both cooperative and non-cooperative cases.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    kon : float</span>
+<span class="sd">        Intrinsic association rate constant (per site).</span>
+<span class="sd">    a : float</span>
+<span class="sd">        Analyte concentration.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Constant vector [2*kon*a, 0].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">2</span> <span class="o">*</span> <span class="n">kon</span> <span class="o">*</span> <span class="n">a</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="differential_matrix_dissociation_two_site">
+<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.differential_matrix_dissociation_two_site">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">differential_matrix_dissociation_two_site</span><span class="p">(</span><span class="n">koff</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Differential matrix for the two-site model during dissociation (non-cooperative).</span>
+
+<span class="sd">    When analyte concentration is zero, only dissociation occurs::</span>
+
+<span class="sd">        PL  -&gt; P + L  : koff * fPL          (1 occupied site)</span>
+<span class="sd">        LPL -&gt; PL + L : 2 * koff * fLPL     (2 occupied sites, either can leave)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    koff : float</span>
+<span class="sd">        Intrinsic dissociation rate constant (per site).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        2×2 differential matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">row1</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="n">koff</span><span class="p">,</span>  <span class="mi">2</span> <span class="o">*</span> <span class="n">koff</span><span class="p">]</span>
+    <span class="n">row2</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span>     <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">koff</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">row1</span><span class="p">,</span> <span class="n">row2</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="differential_matrix_dissociation_two_site_cooperative">
+<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.differential_matrix_dissociation_two_site_cooperative">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">differential_matrix_dissociation_two_site_cooperative</span><span class="p">(</span><span class="n">koff</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Differential matrix for the two-site model during dissociation (cooperative).</span>
+
+<span class="sd">    The kinetic effect is split symmetrically using sqrt(sigma), so the</span>
+<span class="sd">    per-site off-rate in the doubly-bound state is koff / sqrt(sigma)::</span>
+
+<span class="sd">        PL  -&gt; P + L  : koff * fPL                       (first site, unmodified)</span>
+<span class="sd">        LPL -&gt; PL + L : 2 * (koff / sqrt(sigma)) * fLPL  (second site, modified)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    koff : float</span>
+<span class="sd">        Intrinsic dissociation rate constant (per site).</span>
+<span class="sd">    sigma : float</span>
+<span class="sd">        Cooperativity factor.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        2×2 differential matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
+    <span class="n">row1</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="n">koff</span><span class="p">,</span>  <span class="mi">2</span> <span class="o">*</span> <span class="n">koff</span> <span class="o">/</span> <span class="n">s</span><span class="p">]</span>
+    <span class="n">row2</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span>     <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">koff</span> <span class="o">/</span> <span class="n">s</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">row1</span><span class="p">,</span> <span class="n">row2</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="solve_two_site_association">
+<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.solve_two_site_association">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">solve_two_site_association</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">a_conc</span><span class="p">,</span> <span class="n">kon</span><span class="p">,</span> <span class="n">koff</span><span class="p">,</span> <span class="n">Rmax_PL</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">Rmax_LPL</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fPL_0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fLPL_0</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Solve the two-site binding model (non-cooperative) during association.</span>
+
+<span class="sd">    The immobilized ligand P has two equivalent, independent binding sites.</span>
+<span class="sd">    The analyte L flows at fixed concentration ``a_conc``.</span>
+<span class="sd">    The observed signal is a weighted sum of the singly-bound and doubly-bound</span>
+<span class="sd">    fractions, with different response factors ``Rmax_PL`` and ``Rmax_LPL``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    time : np.ndarray</span>
+<span class="sd">        Time array.</span>
+<span class="sd">    a_conc : float</span>
+<span class="sd">        Analyte concentration.</span>
+<span class="sd">    kon : float</span>
+<span class="sd">        Intrinsic association rate constant (per site).</span>
+<span class="sd">    koff : float</span>
+<span class="sd">        Intrinsic dissociation rate constant (per site).</span>
+<span class="sd">    Rmax_PL : float, optional</span>
+<span class="sd">        Signal when all ligand is singly bound (PL), default is 0.</span>
+<span class="sd">    Rmax_LPL : float, optional</span>
+<span class="sd">        Signal when all ligand is doubly bound (LPL), default is 0.</span>
+<span class="sd">    fPL_0 : float, optional</span>
+<span class="sd">        Initial fraction of singly-bound ligand, default is 0.</span>
+<span class="sd">    fLPL_0 : float, optional</span>
+<span class="sd">        Initial fraction of doubly-bound ligand, default is 0.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Array with columns [total_signal, signal_PL, signal_LPL].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="n">time</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+
+    <span class="n">A</span> <span class="o">=</span> <span class="n">differential_matrix_association_two_site</span><span class="p">(</span><span class="n">kon</span><span class="p">,</span> <span class="n">koff</span><span class="p">,</span> <span class="n">a_conc</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">constant_vector_two_site</span><span class="p">(</span><span class="n">kon</span><span class="p">,</span> <span class="n">a_conc</span><span class="p">)</span>
+
+    <span class="n">initial_conditions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">fPL_0</span><span class="p">,</span> <span class="n">fLPL_0</span><span class="p">])</span>
+    <span class="n">steady_state</span>       <span class="o">=</span> <span class="n">solve_steady_state</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+    <span class="n">states</span> <span class="o">=</span> <span class="n">solve_all_states_fast</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">initial_conditions</span><span class="p">,</span> <span class="n">steady_state</span><span class="p">)</span>
+
+    <span class="n">signal_PL</span>    <span class="o">=</span> <span class="n">Rmax_PL</span>  <span class="o">*</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">signal_LPL</span>   <span class="o">=</span> <span class="n">Rmax_LPL</span> <span class="o">*</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">total_signal</span> <span class="o">=</span> <span class="n">signal_PL</span> <span class="o">+</span> <span class="n">signal_LPL</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">total_signal</span><span class="p">,</span> <span class="n">signal_PL</span><span class="p">,</span> <span class="n">signal_LPL</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="solve_two_site_cooperative_association">
+<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.solve_two_site_cooperative_association">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">solve_two_site_cooperative_association</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">a_conc</span><span class="p">,</span> <span class="n">kon</span><span class="p">,</span> <span class="n">koff</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">Rmax_PL</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">Rmax_LPL</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fPL_0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fLPL_0</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Solve the two-site binding model (cooperative) during association.</span>
+
+<span class="sd">    Same as :func:`solve_two_site_association` but with a cooperativity</span>
+<span class="sd">    factor ``sigma`` that modifies the second binding step:</span>
+
+<span class="sd">    - Second site on-rate  = sqrt(sigma) * kon</span>
+<span class="sd">    - Second site off-rate = koff / sqrt(sigma)</span>
+<span class="sd">    - Effective Kd for the second site = Kd / sigma</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    time : np.ndarray</span>
+<span class="sd">        Time array.</span>
+<span class="sd">    a_conc : float</span>
+<span class="sd">        Analyte concentration.</span>
+<span class="sd">    kon : float</span>
+<span class="sd">        Intrinsic association rate constant (per site).</span>
+<span class="sd">    koff : float</span>
+<span class="sd">        Intrinsic dissociation rate constant (per site).</span>
+<span class="sd">    sigma : float</span>
+<span class="sd">        Cooperativity factor. sigma &gt; 1 for positive cooperativity.</span>
+<span class="sd">    Rmax_PL : float, optional</span>
+<span class="sd">        Signal when all ligand is singly bound (PL), default is 0.</span>
+<span class="sd">    Rmax_LPL : float, optional</span>
+<span class="sd">        Signal when all ligand is doubly bound (LPL), default is 0.</span>
+<span class="sd">    fPL_0 : float, optional</span>
+<span class="sd">        Initial fraction of singly-bound ligand, default is 0.</span>
+<span class="sd">    fLPL_0 : float, optional</span>
+<span class="sd">        Initial fraction of doubly-bound ligand, default is 0.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Array with columns [total_signal, signal_PL, signal_LPL].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="n">time</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+
+    <span class="n">A</span> <span class="o">=</span> <span class="n">differential_matrix_association_two_site_cooperative</span><span class="p">(</span><span class="n">kon</span><span class="p">,</span> <span class="n">koff</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">a_conc</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">constant_vector_two_site</span><span class="p">(</span><span class="n">kon</span><span class="p">,</span> <span class="n">a_conc</span><span class="p">)</span>
+
+    <span class="n">initial_conditions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">fPL_0</span><span class="p">,</span> <span class="n">fLPL_0</span><span class="p">])</span>
+    <span class="n">steady_state</span>       <span class="o">=</span> <span class="n">solve_steady_state</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+    <span class="n">states</span> <span class="o">=</span> <span class="n">solve_all_states_fast</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">initial_conditions</span><span class="p">,</span> <span class="n">steady_state</span><span class="p">)</span>
+
+    <span class="n">signal_PL</span>    <span class="o">=</span> <span class="n">Rmax_PL</span>  <span class="o">*</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">signal_LPL</span>   <span class="o">=</span> <span class="n">Rmax_LPL</span> <span class="o">*</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">total_signal</span> <span class="o">=</span> <span class="n">signal_PL</span> <span class="o">+</span> <span class="n">signal_LPL</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">total_signal</span><span class="p">,</span> <span class="n">signal_PL</span><span class="p">,</span> <span class="n">signal_LPL</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="solve_two_site_dissociation">
+<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.solve_two_site_dissociation">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">solve_two_site_dissociation</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">koff</span><span class="p">,</span> <span class="n">Rmax_PL</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">Rmax_LPL</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fPL_0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fLPL_0</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Solve the two-site binding model (non-cooperative) during dissociation.</span>
+
+<span class="sd">    Analyte concentration is zero. Only dissociation of existing complexes occurs.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    time : np.ndarray</span>
+<span class="sd">        Time array.</span>
+<span class="sd">    koff : float</span>
+<span class="sd">        Intrinsic dissociation rate constant (per site).</span>
+<span class="sd">    Rmax_PL : float, optional</span>
+<span class="sd">        Signal when all ligand is singly bound (PL), default is 0.</span>
+<span class="sd">    Rmax_LPL : float, optional</span>
+<span class="sd">        Signal when all ligand is doubly bound (LPL), default is 0.</span>
+<span class="sd">    fPL_0 : float, optional</span>
+<span class="sd">        Initial fraction of singly-bound ligand.</span>
+<span class="sd">    fLPL_0 : float, optional</span>
+<span class="sd">        Initial fraction of doubly-bound ligand.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Array with columns [total_signal, signal_PL, signal_LPL].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="n">time</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+
+    <span class="n">A</span> <span class="o">=</span> <span class="n">differential_matrix_dissociation_two_site</span><span class="p">(</span><span class="n">koff</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">initial_conditions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">fPL_0</span><span class="p">,</span> <span class="n">fLPL_0</span><span class="p">])</span>
+    <span class="n">steady_state</span>       <span class="o">=</span> <span class="n">solve_steady_state</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+    <span class="n">states</span> <span class="o">=</span> <span class="n">solve_all_states_fast</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">initial_conditions</span><span class="p">,</span> <span class="n">steady_state</span><span class="p">)</span>
+
+    <span class="n">signal_PL</span>    <span class="o">=</span> <span class="n">Rmax_PL</span>  <span class="o">*</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">signal_LPL</span>   <span class="o">=</span> <span class="n">Rmax_LPL</span> <span class="o">*</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">total_signal</span> <span class="o">=</span> <span class="n">signal_PL</span> <span class="o">+</span> <span class="n">signal_LPL</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">total_signal</span><span class="p">,</span> <span class="n">signal_PL</span><span class="p">,</span> <span class="n">signal_LPL</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="solve_two_site_cooperative_dissociation">
+<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.solve_two_site_cooperative_dissociation">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">solve_two_site_cooperative_dissociation</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">koff</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">Rmax_PL</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">Rmax_LPL</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fPL_0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fLPL_0</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Solve the two-site binding model (cooperative) during dissociation.</span>
+
+<span class="sd">    Same as :func:`solve_two_site_dissociation` but with a cooperativity</span>
+<span class="sd">    factor ``sigma`` that modifies the second site off-rate:</span>
+
+<span class="sd">    - First site off-rate  = koff                (PL -&gt; P + L, unmodified)</span>
+<span class="sd">    - Second site off-rate = koff / sqrt(sigma)   (LPL -&gt; PL + L, modified)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    time : np.ndarray</span>
+<span class="sd">        Time array.</span>
+<span class="sd">    koff : float</span>
+<span class="sd">        Intrinsic dissociation rate constant (per site).</span>
+<span class="sd">    sigma : float</span>
+<span class="sd">        Cooperativity factor.</span>
+<span class="sd">    Rmax_PL : float, optional</span>
+<span class="sd">        Signal when all ligand is singly bound (PL), default is 0.</span>
+<span class="sd">    Rmax_LPL : float, optional</span>
+<span class="sd">        Signal when all ligand is doubly bound (LPL), default is 0.</span>
+<span class="sd">    fPL_0 : float, optional</span>
+<span class="sd">        Initial fraction of singly-bound ligand.</span>
+<span class="sd">    fLPL_0 : float, optional</span>
+<span class="sd">        Initial fraction of doubly-bound ligand.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Array with columns [total_signal, signal_PL, signal_LPL].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="n">time</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+
+    <span class="n">A</span> <span class="o">=</span> <span class="n">differential_matrix_dissociation_two_site_cooperative</span><span class="p">(</span><span class="n">koff</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">initial_conditions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">fPL_0</span><span class="p">,</span> <span class="n">fLPL_0</span><span class="p">])</span>
+    <span class="n">steady_state</span>       <span class="o">=</span> <span class="n">solve_steady_state</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+    <span class="n">states</span> <span class="o">=</span> <span class="n">solve_all_states_fast</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">initial_conditions</span><span class="p">,</span> <span class="n">steady_state</span><span class="p">)</span>
+
+    <span class="n">signal_PL</span>    <span class="o">=</span> <span class="n">Rmax_PL</span>  <span class="o">*</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">signal_LPL</span>   <span class="o">=</span> <span class="n">Rmax_LPL</span> <span class="o">*</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">total_signal</span> <span class="o">=</span> <span class="n">signal_PL</span> <span class="o">+</span> <span class="n">signal_LPL</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">total_signal</span><span class="p">,</span> <span class="n">signal_PL</span><span class="p">,</span> <span class="n">signal_LPL</span><span class="p">))</span></div>
+
 
 </pre></div>
 

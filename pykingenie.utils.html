@@ -2592,6 +2592,333 @@ the dissociation rate constants (koffs), and the equilibrium dissociation consta
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="pykingenie.utils.signal_surface.steady_state_two_site">
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_surface.</span></span><span class="sig-name descname"><span class="pre">steady_state_two_site</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">C</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Rmax_PL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Rmax_LPL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Kd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_surface.html#steady_state_two_site"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_surface.steady_state_two_site" title="Link to this definition">#</a></dt>
+<dd><p>Steady state signal for a ligand with two identical, independent binding sites.</p>
+<p>The immobilized ligand P has two equivalent binding sites for the analyte L.
+PL (= LP) denotes singly-bound ligand, LPL denotes doubly-bound ligand.</p>
+<p>For two identical independent sites with intrinsic dissociation constant Kd,
+the equilibrium fractions are:</p>
+<ul class="simple">
+<li><p>fPL  = 2 * theta * (1 - theta)</p></li>
+<li><p>fLPL = theta ** 2</p></li>
+</ul>
+<p>where theta = C / (C + Kd) is the single-site occupancy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>C</strong> (<em>np.ndarray</em>) – Concentration of the analyte.</p></li>
+<li><p><strong>Rmax_PL</strong> (<em>float</em>) – Maximum signal when all ligand is singly bound (PL state).</p></li>
+<li><p><strong>Rmax_LPL</strong> (<em>float</em>) – Maximum signal when all ligand is doubly bound (LPL state).</p></li>
+<li><p><strong>Kd</strong> (<em>float</em>) – Intrinsic equilibrium dissociation constant (per site).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Steady state signal.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pykingenie.utils.signal_surface.steady_state_two_site_cooperative">
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_surface.</span></span><span class="sig-name descname"><span class="pre">steady_state_two_site_cooperative</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">C</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Rmax_PL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Rmax_LPL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Kd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_surface.html#steady_state_two_site_cooperative"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_surface.steady_state_two_site_cooperative" title="Link to this definition">#</a></dt>
+<dd><p>Steady state signal for a ligand with two identical binding sites and cooperativity.</p>
+<p>The cooperativity factor sigma modifies the second binding event.
+The intrinsic dissociation constant for the second site becomes Kd / sigma.</p>
+<ul class="simple">
+<li><p>sigma &gt; 1 : positive cooperativity (second binding is tighter).</p></li>
+<li><p>sigma &lt; 1 : negative cooperativity.</p></li>
+<li><p>sigma = 1 : identical independent sites (non-cooperative).</p></li>
+</ul>
+<p>The equilibrium fractions are computed from the partition function:</p>
+<blockquote>
+<div><p>Z = 1 + 2 * C / Kd + sigma * (C / Kd) ** 2</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>fPL  = (2 * C / Kd) / Z</p></li>
+<li><p>fLPL = sigma * (C / Kd) ** 2 / Z</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>C</strong> (<em>np.ndarray</em>) – Concentration of the analyte.</p></li>
+<li><p><strong>Rmax_PL</strong> (<em>float</em>) – Maximum signal when all ligand is singly bound (PL state).</p></li>
+<li><p><strong>Rmax_LPL</strong> (<em>float</em>) – Maximum signal when all ligand is doubly bound (LPL state).</p></li>
+<li><p><strong>Kd</strong> (<em>float</em>) – Intrinsic equilibrium dissociation constant (per site).</p></li>
+<li><p><strong>sigma</strong> (<em>float</em>) – Cooperativity factor.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Steady state signal.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pykingenie.utils.signal_surface.differential_matrix_association_two_site">
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_surface.</span></span><span class="sig-name descname"><span class="pre">differential_matrix_association_two_site</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">koff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_surface.html#differential_matrix_association_two_site"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_surface.differential_matrix_association_two_site" title="Link to this definition">#</a></dt>
+<dd><p>Differential matrix for the two-site model during association (non-cooperative).</p>
+<p>The ligand P (immobilized) has two equivalent, independent binding sites.
+The analyte L flows at fixed concentration <code class="docutils literal notranslate"><span class="pre">a</span></code>.</p>
+<p>State variables: [fPL, fLPL] where</p>
+<ul class="simple">
+<li><p>fPL  = fraction of ligand in the singly-bound state (PL + LP)</p></li>
+<li><p>fLPL = fraction of ligand in the doubly-bound state (LPL)</p></li>
+<li><p>fP   = 1 - fPL - fLPL (free ligand, from conservation)</p></li>
+</ul>
+<p>Reactions with statistical factors:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">P</span>  <span class="o">+</span> <span class="n">L</span>  <span class="o">-&gt;</span> <span class="n">PL</span>  <span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">kon</span> <span class="o">*</span> <span class="n">a</span> <span class="o">*</span> <span class="n">fP</span>    <span class="p">(</span><span class="mi">2</span> <span class="n">equivalent</span> <span class="n">empty</span> <span class="n">sites</span><span class="p">)</span>
+<span class="n">PL</span>      <span class="o">-&gt;</span> <span class="n">P</span><span class="o">+</span><span class="n">L</span> <span class="p">:</span> <span class="n">koff</span> <span class="o">*</span> <span class="n">fPL</span>           <span class="p">(</span><span class="mi">1</span> <span class="n">occupied</span> <span class="n">site</span><span class="p">)</span>
+<span class="n">PL</span> <span class="o">+</span> <span class="n">L</span>  <span class="o">-&gt;</span> <span class="n">LPL</span> <span class="p">:</span> <span class="n">kon</span> <span class="o">*</span> <span class="n">a</span> <span class="o">*</span> <span class="n">fPL</span>        <span class="p">(</span><span class="mi">1</span> <span class="n">remaining</span> <span class="n">empty</span> <span class="n">site</span><span class="p">)</span>
+<span class="n">LPL</span>     <span class="o">-&gt;</span> <span class="n">PL</span><span class="o">+</span><span class="n">L</span><span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">koff</span> <span class="o">*</span> <span class="n">fLPL</span>      <span class="p">(</span><span class="mi">2</span> <span class="n">occupied</span> <span class="n">sites</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The resulting ODE is  d[fPL, fLPL]/dt = A &#64; [fPL, fLPL] + b
+where b = constant_vector_two_site(kon, a).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kon</strong> (<em>float</em>) – Intrinsic association rate constant (per site).</p></li>
+<li><p><strong>koff</strong> (<em>float</em>) – Intrinsic dissociation rate constant (per site).</p></li>
+<li><p><strong>a</strong> (<em>float</em>) – Analyte concentration.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>2×2 differential matrix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pykingenie.utils.signal_surface.differential_matrix_association_two_site_cooperative">
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_surface.</span></span><span class="sig-name descname"><span class="pre">differential_matrix_association_two_site_cooperative</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">koff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_surface.html#differential_matrix_association_two_site_cooperative"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_surface.differential_matrix_association_two_site_cooperative" title="Link to this definition">#</a></dt>
+<dd><p>Differential matrix for the two-site model during association (cooperative).</p>
+<p>Same as <a class="reference internal" href="#pykingenie.utils.signal_surface.differential_matrix_association_two_site" title="pykingenie.utils.signal_surface.differential_matrix_association_two_site"><code class="xref py py-func docutils literal notranslate"><span class="pre">differential_matrix_association_two_site()</span></code></a>, but the second
+binding step is modified by the cooperativity factor sigma.</p>
+<p>The kinetic effect is split symmetrically between on-rate and off-rate
+using sqrt(sigma):</p>
+<ul class="simple">
+<li><p>Second site on-rate  = sqrt(sigma) * kon</p></li>
+<li><p>Second site off-rate = koff / sqrt(sigma)</p></li>
+</ul>
+<p>This gives an effective Kd for the second site of Kd / sigma.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kon</strong> (<em>float</em>) – Intrinsic association rate constant (per site).</p></li>
+<li><p><strong>koff</strong> (<em>float</em>) – Intrinsic dissociation rate constant (per site).</p></li>
+<li><p><strong>sigma</strong> (<em>float</em>) – Cooperativity factor. sigma &gt; 1 for positive cooperativity.</p></li>
+<li><p><strong>a</strong> (<em>float</em>) – Analyte concentration.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>2×2 differential matrix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pykingenie.utils.signal_surface.constant_vector_two_site">
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_surface.</span></span><span class="sig-name descname"><span class="pre">constant_vector_two_site</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_surface.html#constant_vector_two_site"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_surface.constant_vector_two_site" title="Link to this definition">#</a></dt>
+<dd><p>Constant vector for the two-site association ODE.</p>
+<p>This vector is the same for both cooperative and non-cooperative cases.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kon</strong> (<em>float</em>) – Intrinsic association rate constant (per site).</p></li>
+<li><p><strong>a</strong> (<em>float</em>) – Analyte concentration.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Constant vector [2*kon*a, 0].</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pykingenie.utils.signal_surface.differential_matrix_dissociation_two_site">
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_surface.</span></span><span class="sig-name descname"><span class="pre">differential_matrix_dissociation_two_site</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">koff</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_surface.html#differential_matrix_dissociation_two_site"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_surface.differential_matrix_dissociation_two_site" title="Link to this definition">#</a></dt>
+<dd><p>Differential matrix for the two-site model during dissociation (non-cooperative).</p>
+<p>When analyte concentration is zero, only dissociation occurs:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PL</span>  <span class="o">-&gt;</span> <span class="n">P</span> <span class="o">+</span> <span class="n">L</span>  <span class="p">:</span> <span class="n">koff</span> <span class="o">*</span> <span class="n">fPL</span>          <span class="p">(</span><span class="mi">1</span> <span class="n">occupied</span> <span class="n">site</span><span class="p">)</span>
+<span class="n">LPL</span> <span class="o">-&gt;</span> <span class="n">PL</span> <span class="o">+</span> <span class="n">L</span> <span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">koff</span> <span class="o">*</span> <span class="n">fLPL</span>     <span class="p">(</span><span class="mi">2</span> <span class="n">occupied</span> <span class="n">sites</span><span class="p">,</span> <span class="n">either</span> <span class="n">can</span> <span class="n">leave</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>koff</strong> (<em>float</em>) – Intrinsic dissociation rate constant (per site).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>2×2 differential matrix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pykingenie.utils.signal_surface.differential_matrix_dissociation_two_site_cooperative">
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_surface.</span></span><span class="sig-name descname"><span class="pre">differential_matrix_dissociation_two_site_cooperative</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">koff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_surface.html#differential_matrix_dissociation_two_site_cooperative"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_surface.differential_matrix_dissociation_two_site_cooperative" title="Link to this definition">#</a></dt>
+<dd><p>Differential matrix for the two-site model during dissociation (cooperative).</p>
+<p>The kinetic effect is split symmetrically using sqrt(sigma), so the
+per-site off-rate in the doubly-bound state is koff / sqrt(sigma):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PL</span>  <span class="o">-&gt;</span> <span class="n">P</span> <span class="o">+</span> <span class="n">L</span>  <span class="p">:</span> <span class="n">koff</span> <span class="o">*</span> <span class="n">fPL</span>                       <span class="p">(</span><span class="n">first</span> <span class="n">site</span><span class="p">,</span> <span class="n">unmodified</span><span class="p">)</span>
+<span class="n">LPL</span> <span class="o">-&gt;</span> <span class="n">PL</span> <span class="o">+</span> <span class="n">L</span> <span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">koff</span> <span class="o">/</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">sigma</span><span class="p">))</span> <span class="o">*</span> <span class="n">fLPL</span>  <span class="p">(</span><span class="n">second</span> <span class="n">site</span><span class="p">,</span> <span class="n">modified</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>koff</strong> (<em>float</em>) – Intrinsic dissociation rate constant (per site).</p></li>
+<li><p><strong>sigma</strong> (<em>float</em>) – Cooperativity factor.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>2×2 differential matrix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pykingenie.utils.signal_surface.solve_two_site_association">
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_surface.</span></span><span class="sig-name descname"><span class="pre">solve_two_site_association</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_conc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">koff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Rmax_PL</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Rmax_LPL</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fPL_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fLPL_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_surface.html#solve_two_site_association"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_surface.solve_two_site_association" title="Link to this definition">#</a></dt>
+<dd><p>Solve the two-site binding model (non-cooperative) during association.</p>
+<p>The immobilized ligand P has two equivalent, independent binding sites.
+The analyte L flows at fixed concentration <code class="docutils literal notranslate"><span class="pre">a_conc</span></code>.
+The observed signal is a weighted sum of the singly-bound and doubly-bound
+fractions, with different response factors <code class="docutils literal notranslate"><span class="pre">Rmax_PL</span></code> and <code class="docutils literal notranslate"><span class="pre">Rmax_LPL</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>time</strong> (<em>np.ndarray</em>) – Time array.</p></li>
+<li><p><strong>a_conc</strong> (<em>float</em>) – Analyte concentration.</p></li>
+<li><p><strong>kon</strong> (<em>float</em>) – Intrinsic association rate constant (per site).</p></li>
+<li><p><strong>koff</strong> (<em>float</em>) – Intrinsic dissociation rate constant (per site).</p></li>
+<li><p><strong>Rmax_PL</strong> (<em>float</em><em>, </em><em>optional</em>) – Signal when all ligand is singly bound (PL), default is 0.</p></li>
+<li><p><strong>Rmax_LPL</strong> (<em>float</em><em>, </em><em>optional</em>) – Signal when all ligand is doubly bound (LPL), default is 0.</p></li>
+<li><p><strong>fPL_0</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial fraction of singly-bound ligand, default is 0.</p></li>
+<li><p><strong>fLPL_0</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial fraction of doubly-bound ligand, default is 0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Array with columns [total_signal, signal_PL, signal_LPL].</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pykingenie.utils.signal_surface.solve_two_site_cooperative_association">
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_surface.</span></span><span class="sig-name descname"><span class="pre">solve_two_site_cooperative_association</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_conc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">koff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Rmax_PL</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Rmax_LPL</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fPL_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fLPL_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_surface.html#solve_two_site_cooperative_association"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_surface.solve_two_site_cooperative_association" title="Link to this definition">#</a></dt>
+<dd><p>Solve the two-site binding model (cooperative) during association.</p>
+<p>Same as <a class="reference internal" href="#pykingenie.utils.signal_surface.solve_two_site_association" title="pykingenie.utils.signal_surface.solve_two_site_association"><code class="xref py py-func docutils literal notranslate"><span class="pre">solve_two_site_association()</span></code></a> but with a cooperativity
+factor <code class="docutils literal notranslate"><span class="pre">sigma</span></code> that modifies the second binding step:</p>
+<ul class="simple">
+<li><p>Second site on-rate  = sqrt(sigma) * kon</p></li>
+<li><p>Second site off-rate = koff / sqrt(sigma)</p></li>
+<li><p>Effective Kd for the second site = Kd / sigma</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>time</strong> (<em>np.ndarray</em>) – Time array.</p></li>
+<li><p><strong>a_conc</strong> (<em>float</em>) – Analyte concentration.</p></li>
+<li><p><strong>kon</strong> (<em>float</em>) – Intrinsic association rate constant (per site).</p></li>
+<li><p><strong>koff</strong> (<em>float</em>) – Intrinsic dissociation rate constant (per site).</p></li>
+<li><p><strong>sigma</strong> (<em>float</em>) – Cooperativity factor. sigma &gt; 1 for positive cooperativity.</p></li>
+<li><p><strong>Rmax_PL</strong> (<em>float</em><em>, </em><em>optional</em>) – Signal when all ligand is singly bound (PL), default is 0.</p></li>
+<li><p><strong>Rmax_LPL</strong> (<em>float</em><em>, </em><em>optional</em>) – Signal when all ligand is doubly bound (LPL), default is 0.</p></li>
+<li><p><strong>fPL_0</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial fraction of singly-bound ligand, default is 0.</p></li>
+<li><p><strong>fLPL_0</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial fraction of doubly-bound ligand, default is 0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Array with columns [total_signal, signal_PL, signal_LPL].</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pykingenie.utils.signal_surface.solve_two_site_dissociation">
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_surface.</span></span><span class="sig-name descname"><span class="pre">solve_two_site_dissociation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">koff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Rmax_PL</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Rmax_LPL</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fPL_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fLPL_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_surface.html#solve_two_site_dissociation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_surface.solve_two_site_dissociation" title="Link to this definition">#</a></dt>
+<dd><p>Solve the two-site binding model (non-cooperative) during dissociation.</p>
+<p>Analyte concentration is zero. Only dissociation of existing complexes occurs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>time</strong> (<em>np.ndarray</em>) – Time array.</p></li>
+<li><p><strong>koff</strong> (<em>float</em>) – Intrinsic dissociation rate constant (per site).</p></li>
+<li><p><strong>Rmax_PL</strong> (<em>float</em><em>, </em><em>optional</em>) – Signal when all ligand is singly bound (PL), default is 0.</p></li>
+<li><p><strong>Rmax_LPL</strong> (<em>float</em><em>, </em><em>optional</em>) – Signal when all ligand is doubly bound (LPL), default is 0.</p></li>
+<li><p><strong>fPL_0</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial fraction of singly-bound ligand.</p></li>
+<li><p><strong>fLPL_0</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial fraction of doubly-bound ligand.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Array with columns [total_signal, signal_PL, signal_LPL].</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pykingenie.utils.signal_surface.solve_two_site_cooperative_dissociation">
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.signal_surface.</span></span><span class="sig-name descname"><span class="pre">solve_two_site_cooperative_dissociation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">koff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Rmax_PL</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Rmax_LPL</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fPL_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fLPL_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/signal_surface.html#solve_two_site_cooperative_dissociation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.signal_surface.solve_two_site_cooperative_dissociation" title="Link to this definition">#</a></dt>
+<dd><p>Solve the two-site binding model (cooperative) during dissociation.</p>
+<p>Same as <a class="reference internal" href="#pykingenie.utils.signal_surface.solve_two_site_dissociation" title="pykingenie.utils.signal_surface.solve_two_site_dissociation"><code class="xref py py-func docutils literal notranslate"><span class="pre">solve_two_site_dissociation()</span></code></a> but with a cooperativity
+factor <code class="docutils literal notranslate"><span class="pre">sigma</span></code> that modifies the second site off-rate:</p>
+<ul class="simple">
+<li><p>First site off-rate  = koff                (PL -&gt; P + L, unmodified)</p></li>
+<li><p>Second site off-rate = koff / sqrt(sigma)   (LPL -&gt; PL + L, modified)</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>time</strong> (<em>np.ndarray</em>) – Time array.</p></li>
+<li><p><strong>koff</strong> (<em>float</em>) – Intrinsic dissociation rate constant (per site).</p></li>
+<li><p><strong>sigma</strong> (<em>float</em>) – Cooperativity factor.</p></li>
+<li><p><strong>Rmax_PL</strong> (<em>float</em><em>, </em><em>optional</em>) – Signal when all ligand is singly bound (PL), default is 0.</p></li>
+<li><p><strong>Rmax_LPL</strong> (<em>float</em><em>, </em><em>optional</em>) – Signal when all ligand is doubly bound (LPL), default is 0.</p></li>
+<li><p><strong>fPL_0</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial fraction of singly-bound ligand.</p></li>
+<li><p><strong>fLPL_0</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial fraction of doubly-bound ligand.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Array with columns [total_signal, signal_PL, signal_LPL].</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 </section>
 
@@ -2745,6 +3072,17 @@ the dissociation rate constants (koffs), and the equilibrium dissociation consta
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_surface.solve_ode_mixture_analyte_association"><code class="docutils literal notranslate"><span class="pre">solve_ode_mixture_analyte_association()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_surface.ode_mixture_analyte_dissociation"><code class="docutils literal notranslate"><span class="pre">ode_mixture_analyte_dissociation()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_surface.solve_ode_mixture_analyte_dissociation"><code class="docutils literal notranslate"><span class="pre">solve_ode_mixture_analyte_dissociation()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_surface.steady_state_two_site"><code class="docutils literal notranslate"><span class="pre">steady_state_two_site()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_surface.steady_state_two_site_cooperative"><code class="docutils literal notranslate"><span class="pre">steady_state_two_site_cooperative()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_surface.differential_matrix_association_two_site"><code class="docutils literal notranslate"><span class="pre">differential_matrix_association_two_site()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_surface.differential_matrix_association_two_site_cooperative"><code class="docutils literal notranslate"><span class="pre">differential_matrix_association_two_site_cooperative()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_surface.constant_vector_two_site"><code class="docutils literal notranslate"><span class="pre">constant_vector_two_site()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_surface.differential_matrix_dissociation_two_site"><code class="docutils literal notranslate"><span class="pre">differential_matrix_dissociation_two_site()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_surface.differential_matrix_dissociation_two_site_cooperative"><code class="docutils literal notranslate"><span class="pre">differential_matrix_dissociation_two_site_cooperative()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_surface.solve_two_site_association"><code class="docutils literal notranslate"><span class="pre">solve_two_site_association()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_surface.solve_two_site_cooperative_association"><code class="docutils literal notranslate"><span class="pre">solve_two_site_cooperative_association()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_surface.solve_two_site_dissociation"><code class="docutils literal notranslate"><span class="pre">solve_two_site_dissociation()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.signal_surface.solve_two_site_cooperative_dissociation"><code class="docutils literal notranslate"><span class="pre">solve_two_site_cooperative_dissociation()</span></code></a></li>
 </ul>
 </li>
 </ul>
