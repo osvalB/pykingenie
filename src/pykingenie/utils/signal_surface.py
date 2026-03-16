@@ -28,7 +28,18 @@ __all__ = [
     'ode_mixture_analyte_association',
     'solve_ode_mixture_analyte_association',
     'ode_mixture_analyte_dissociation',
-    'solve_ode_mixture_analyte_dissociation'
+    'solve_ode_mixture_analyte_dissociation',
+    'steady_state_two_site',
+    'steady_state_two_site_cooperative',
+    'differential_matrix_association_two_site',
+    'differential_matrix_association_two_site_cooperative',
+    'constant_vector_two_site',
+    'differential_matrix_dissociation_two_site',
+    'differential_matrix_dissociation_two_site_cooperative',
+    'solve_two_site_association',
+    'solve_two_site_cooperative_association',
+    'solve_two_site_dissociation',
+    'solve_two_site_cooperative_dissociation'
 ]
 
 def steady_state_one_site(C, Rmax, Kd):
@@ -827,3 +838,436 @@ def solve_ode_mixture_analyte_dissociation(t, Ris0, koffs, t0=0):
                     t_eval=t, y0=Ris0, args=(koffs,), method="LSODA")
 
     return out.y
+
+
+def steady_state_two_site(C, Rmax_PL, Rmax_LPL, Kd):
+    """
+    Steady state signal for a ligand with two identical, independent binding sites.
+
+    The immobilized ligand P has two equivalent binding sites for the analyte L.
+    PL (= LP) denotes singly-bound ligand, LPL denotes doubly-bound ligand.
+
+    For two identical independent sites with intrinsic dissociation constant Kd,
+    the equilibrium fractions are:
+
+    - fPL  = 2 * theta * (1 - theta)
+    - fLPL = theta ** 2
+
+    where theta = C / (C + Kd) is the single-site occupancy.
+
+    Parameters
+    ----------
+    C : np.ndarray
+        Concentration of the analyte.
+    Rmax_PL : float
+        Maximum signal when all ligand is singly bound (PL state).
+    Rmax_LPL : float
+        Maximum signal when all ligand is doubly bound (LPL state).
+    Kd : float
+        Intrinsic equilibrium dissociation constant (per site).
+
+    Returns
+    -------
+    np.ndarray
+        Steady state signal.
+    """
+    C     = np.array(C)
+    theta = C / (C + Kd)
+    fPL   = 2 * theta * (1 - theta)
+    fLPL  = theta ** 2
+    signal = Rmax_PL * fPL + Rmax_LPL * fLPL
+    return signal
+
+
+def steady_state_two_site_cooperative(C, Rmax_PL, Rmax_LPL, Kd, sigma):
+    """
+    Steady state signal for a ligand with two identical binding sites and cooperativity.
+
+    The cooperativity factor sigma modifies the second binding event.
+    The intrinsic dissociation constant for the second site becomes Kd / sigma.
+
+    - sigma > 1 : positive cooperativity (second binding is tighter).
+    - sigma < 1 : negative cooperativity.
+    - sigma = 1 : identical independent sites (non-cooperative).
+
+    The equilibrium fractions are computed from the partition function:
+
+        Z = 1 + 2 * C / Kd + sigma * (C / Kd) ** 2
+
+    - fPL  = (2 * C / Kd) / Z
+    - fLPL = sigma * (C / Kd) ** 2 / Z
+
+    Parameters
+    ----------
+    C : np.ndarray
+        Concentration of the analyte.
+    Rmax_PL : float
+        Maximum signal when all ligand is singly bound (PL state).
+    Rmax_LPL : float
+        Maximum signal when all ligand is doubly bound (LPL state).
+    Kd : float
+        Intrinsic equilibrium dissociation constant (per site).
+    sigma : float
+        Cooperativity factor.
+
+    Returns
+    -------
+    np.ndarray
+        Steady state signal.
+    """
+    C    = np.array(C)
+    r    = C / Kd
+    Z    = 1 + 2 * r + sigma * r ** 2
+    fPL  = (2 * r) / Z
+    fLPL = (sigma * r ** 2) / Z
+    signal = Rmax_PL * fPL + Rmax_LPL * fLPL
+    return signal
+
+
+def differential_matrix_association_two_site(kon, koff, a):
+    """
+    Differential matrix for the two-site model during association (non-cooperative).
+
+    The ligand P (immobilized) has two equivalent, independent binding sites.
+    The analyte L flows at fixed concentration ``a``.
+
+    State variables: [fPL, fLPL] where
+
+    - fPL  = fraction of ligand in the singly-bound state (PL + LP)
+    - fLPL = fraction of ligand in the doubly-bound state (LPL)
+    - fP   = 1 - fPL - fLPL (free ligand, from conservation)
+
+    Reactions with statistical factors::
+
+        P  + L  -> PL  : 2 * kon * a * fP    (2 equivalent empty sites)
+        PL      -> P+L : koff * fPL           (1 occupied site)
+        PL + L  -> LPL : kon * a * fPL        (1 remaining empty site)
+        LPL     -> PL+L: 2 * koff * fLPL      (2 occupied sites)
+
+    The resulting ODE is  d[fPL, fLPL]/dt = A @ [fPL, fLPL] + b
+    where b = constant_vector_two_site(kon, a).
+
+    Parameters
+    ----------
+    kon : float
+        Intrinsic association rate constant (per site).
+    koff : float
+        Intrinsic dissociation rate constant (per site).
+    a : float
+        Analyte concentration.
+
+    Returns
+    -------
+    np.ndarray
+        2×2 differential matrix.
+    """
+    row1 = [-(3 * kon * a + koff), 2 * koff - 2 * kon * a]
+    row2 = [kon * a,               -2 * koff]
+    return np.array([row1, row2])
+
+
+def differential_matrix_association_two_site_cooperative(kon, koff, sigma, a):
+    """
+    Differential matrix for the two-site model during association (cooperative).
+
+    Same as :func:`differential_matrix_association_two_site`, but the second
+    binding step is modified by the cooperativity factor sigma.
+
+    The kinetic effect is split symmetrically between on-rate and off-rate
+    using sqrt(sigma):
+
+    - Second site on-rate  = sqrt(sigma) * kon
+    - Second site off-rate = koff / sqrt(sigma)
+
+    This gives an effective Kd for the second site of Kd / sigma.
+
+    Parameters
+    ----------
+    kon : float
+        Intrinsic association rate constant (per site).
+    koff : float
+        Intrinsic dissociation rate constant (per site).
+    sigma : float
+        Cooperativity factor. sigma > 1 for positive cooperativity.
+    a : float
+        Analyte concentration.
+
+    Returns
+    -------
+    np.ndarray
+        2×2 differential matrix.
+    """
+    s = np.sqrt(sigma)
+    row1 = [-(2 * kon * a + koff + s * kon * a), 2 * koff / s - 2 * kon * a]
+    row2 = [s * kon * a,                         -2 * koff / s]
+    return np.array([row1, row2])
+
+
+def constant_vector_two_site(kon, a):
+    """
+    Constant vector for the two-site association ODE.
+
+    This vector is the same for both cooperative and non-cooperative cases.
+
+    Parameters
+    ----------
+    kon : float
+        Intrinsic association rate constant (per site).
+    a : float
+        Analyte concentration.
+
+    Returns
+    -------
+    np.ndarray
+        Constant vector [2*kon*a, 0].
+    """
+    return np.array([2 * kon * a, 0.0])
+
+
+def differential_matrix_dissociation_two_site(koff):
+    """
+    Differential matrix for the two-site model during dissociation (non-cooperative).
+
+    When analyte concentration is zero, only dissociation occurs::
+
+        PL  -> P + L  : koff * fPL          (1 occupied site)
+        LPL -> PL + L : 2 * koff * fLPL     (2 occupied sites, either can leave)
+
+    Parameters
+    ----------
+    koff : float
+        Intrinsic dissociation rate constant (per site).
+
+    Returns
+    -------
+    np.ndarray
+        2×2 differential matrix.
+    """
+    row1 = [-koff,  2 * koff]
+    row2 = [0,     -2 * koff]
+    return np.array([row1, row2])
+
+
+def differential_matrix_dissociation_two_site_cooperative(koff, sigma):
+    """
+    Differential matrix for the two-site model during dissociation (cooperative).
+
+    The kinetic effect is split symmetrically using sqrt(sigma), so the
+    per-site off-rate in the doubly-bound state is koff / sqrt(sigma)::
+
+        PL  -> P + L  : koff * fPL                       (first site, unmodified)
+        LPL -> PL + L : 2 * (koff / sqrt(sigma)) * fLPL  (second site, modified)
+
+    Parameters
+    ----------
+    koff : float
+        Intrinsic dissociation rate constant (per site).
+    sigma : float
+        Cooperativity factor.
+
+    Returns
+    -------
+    np.ndarray
+        2×2 differential matrix.
+    """
+    s = np.sqrt(sigma)
+    row1 = [-koff,  2 * koff / s]
+    row2 = [0,     -2 * koff / s]
+    return np.array([row1, row2])
+
+
+def solve_two_site_association(time, a_conc, kon, koff, Rmax_PL=0, Rmax_LPL=0, fPL_0=0, fLPL_0=0):
+    """
+    Solve the two-site binding model (non-cooperative) during association.
+
+    The immobilized ligand P has two equivalent, independent binding sites.
+    The analyte L flows at fixed concentration ``a_conc``.
+    The observed signal is a weighted sum of the singly-bound and doubly-bound
+    fractions, with different response factors ``Rmax_PL`` and ``Rmax_LPL``.
+
+    Parameters
+    ----------
+    time : np.ndarray
+        Time array.
+    a_conc : float
+        Analyte concentration.
+    kon : float
+        Intrinsic association rate constant (per site).
+    koff : float
+        Intrinsic dissociation rate constant (per site).
+    Rmax_PL : float, optional
+        Signal when all ligand is singly bound (PL), default is 0.
+    Rmax_LPL : float, optional
+        Signal when all ligand is doubly bound (LPL), default is 0.
+    fPL_0 : float, optional
+        Initial fraction of singly-bound ligand, default is 0.
+    fLPL_0 : float, optional
+        Initial fraction of doubly-bound ligand, default is 0.
+
+    Returns
+    -------
+    np.ndarray
+        Array with columns [total_signal, signal_PL, signal_LPL].
+    """
+    time = time - np.min(time)
+
+    A = differential_matrix_association_two_site(kon, koff, a_conc)
+    b = constant_vector_two_site(kon, a_conc)
+
+    initial_conditions = np.array([fPL_0, fLPL_0])
+    steady_state       = solve_steady_state(A, b)
+
+    states = solve_all_states_fast(time, A, initial_conditions, steady_state)
+
+    signal_PL    = Rmax_PL  * states[:, 0]
+    signal_LPL   = Rmax_LPL * states[:, 1]
+    total_signal = signal_PL + signal_LPL
+
+    return np.column_stack((total_signal, signal_PL, signal_LPL))
+
+
+def solve_two_site_cooperative_association(time, a_conc, kon, koff, sigma, Rmax_PL=0, Rmax_LPL=0, fPL_0=0, fLPL_0=0):
+    """
+    Solve the two-site binding model (cooperative) during association.
+
+    Same as :func:`solve_two_site_association` but with a cooperativity
+    factor ``sigma`` that modifies the second binding step:
+
+    - Second site on-rate  = sqrt(sigma) * kon
+    - Second site off-rate = koff / sqrt(sigma)
+    - Effective Kd for the second site = Kd / sigma
+
+    Parameters
+    ----------
+    time : np.ndarray
+        Time array.
+    a_conc : float
+        Analyte concentration.
+    kon : float
+        Intrinsic association rate constant (per site).
+    koff : float
+        Intrinsic dissociation rate constant (per site).
+    sigma : float
+        Cooperativity factor. sigma > 1 for positive cooperativity.
+    Rmax_PL : float, optional
+        Signal when all ligand is singly bound (PL), default is 0.
+    Rmax_LPL : float, optional
+        Signal when all ligand is doubly bound (LPL), default is 0.
+    fPL_0 : float, optional
+        Initial fraction of singly-bound ligand, default is 0.
+    fLPL_0 : float, optional
+        Initial fraction of doubly-bound ligand, default is 0.
+
+    Returns
+    -------
+    np.ndarray
+        Array with columns [total_signal, signal_PL, signal_LPL].
+    """
+    time = time - np.min(time)
+
+    A = differential_matrix_association_two_site_cooperative(kon, koff, sigma, a_conc)
+    b = constant_vector_two_site(kon, a_conc)
+
+    initial_conditions = np.array([fPL_0, fLPL_0])
+    steady_state       = solve_steady_state(A, b)
+
+    states = solve_all_states_fast(time, A, initial_conditions, steady_state)
+
+    signal_PL    = Rmax_PL  * states[:, 0]
+    signal_LPL   = Rmax_LPL * states[:, 1]
+    total_signal = signal_PL + signal_LPL
+
+    return np.column_stack((total_signal, signal_PL, signal_LPL))
+
+
+def solve_two_site_dissociation(time, koff, Rmax_PL=0, Rmax_LPL=0, fPL_0=0, fLPL_0=0):
+    """
+    Solve the two-site binding model (non-cooperative) during dissociation.
+
+    Analyte concentration is zero. Only dissociation of existing complexes occurs.
+
+    Parameters
+    ----------
+    time : np.ndarray
+        Time array.
+    koff : float
+        Intrinsic dissociation rate constant (per site).
+    Rmax_PL : float, optional
+        Signal when all ligand is singly bound (PL), default is 0.
+    Rmax_LPL : float, optional
+        Signal when all ligand is doubly bound (LPL), default is 0.
+    fPL_0 : float, optional
+        Initial fraction of singly-bound ligand.
+    fLPL_0 : float, optional
+        Initial fraction of doubly-bound ligand.
+
+    Returns
+    -------
+    np.ndarray
+        Array with columns [total_signal, signal_PL, signal_LPL].
+    """
+    time = time - np.min(time)
+
+    A = differential_matrix_dissociation_two_site(koff)
+    b = np.zeros(2)
+
+    initial_conditions = np.array([fPL_0, fLPL_0])
+    steady_state       = solve_steady_state(A, b)
+
+    states = solve_all_states_fast(time, A, initial_conditions, steady_state)
+
+    signal_PL    = Rmax_PL  * states[:, 0]
+    signal_LPL   = Rmax_LPL * states[:, 1]
+    total_signal = signal_PL + signal_LPL
+
+    return np.column_stack((total_signal, signal_PL, signal_LPL))
+
+
+def solve_two_site_cooperative_dissociation(time, koff, sigma, Rmax_PL=0, Rmax_LPL=0, fPL_0=0, fLPL_0=0):
+    """
+    Solve the two-site binding model (cooperative) during dissociation.
+
+    Same as :func:`solve_two_site_dissociation` but with a cooperativity
+    factor ``sigma`` that modifies the second site off-rate:
+
+    - First site off-rate  = koff                (PL -> P + L, unmodified)
+    - Second site off-rate = koff / sqrt(sigma)   (LPL -> PL + L, modified)
+
+    Parameters
+    ----------
+    time : np.ndarray
+        Time array.
+    koff : float
+        Intrinsic dissociation rate constant (per site).
+    sigma : float
+        Cooperativity factor.
+    Rmax_PL : float, optional
+        Signal when all ligand is singly bound (PL), default is 0.
+    Rmax_LPL : float, optional
+        Signal when all ligand is doubly bound (LPL), default is 0.
+    fPL_0 : float, optional
+        Initial fraction of singly-bound ligand.
+    fLPL_0 : float, optional
+        Initial fraction of doubly-bound ligand.
+
+    Returns
+    -------
+    np.ndarray
+        Array with columns [total_signal, signal_PL, signal_LPL].
+    """
+    time = time - np.min(time)
+
+    A = differential_matrix_dissociation_two_site_cooperative(koff, sigma)
+    b = np.zeros(2)
+
+    initial_conditions = np.array([fPL_0, fLPL_0])
+    steady_state       = solve_steady_state(A, b)
+
+    states = solve_all_states_fast(time, A, initial_conditions, steady_state)
+
+    signal_PL    = Rmax_PL  * states[:, 0]
+    signal_LPL   = Rmax_LPL * states[:, 1]
+    total_signal = signal_PL + signal_LPL
+
+    return np.column_stack((total_signal, signal_PL, signal_LPL))
+
