@@ -776,6 +776,43 @@ This function is used to find the initial parameters for the fit_conformational_
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="pykingenie.utils.fitting_surface.fit_steady_state_two_site">
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.fitting_surface.</span></span><span class="sig-name descname"><span class="pre">fit_steady_state_two_site</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ligand_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">low_bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">high_bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_Kd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Kd_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/fitting_surface.html#fit_steady_state_two_site"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.fitting_surface.fit_steady_state_two_site" title="Link to this definition">#</a></dt>
+<dd><p>Fit a two-site steady-state binding model with optional cooperativity.</p>
+<p>Model parameters are one shared Kd and, for each trace, two response terms:
+Rmax_PL (singly-bound state) and Rmax_LPL (doubly-bound state).
+Optionally, a shared cooperativity factor sigma can also be fitted.
+If fit_sigma=False, the non-cooperative model is used (sigma=1).</p>
+<p>Parameter order when fitting:
+- fixed_Kd=False, fit_sigma=False: [Kd, Rmax_PL_1, Rmax_LPL_1, …]
+- fixed_Kd=False, fit_sigma=True : [Kd, sigma, Rmax_PL_1, Rmax_LPL_1, …]
+- fixed_Kd=True,  fit_sigma=False: [Rmax_PL_1, Rmax_LPL_1, …]
+- fixed_Kd=True,  fit_sigma=True : [sigma, Rmax_PL_1, Rmax_LPL_1, …]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>signal_lst</strong> (<em>list</em>) – List of steady-state signal arrays.</p></li>
+<li><p><strong>ligand_lst</strong> (<em>list</em>) – List of ligand concentration arrays (same structure as signal_lst).</p></li>
+<li><p><strong>initial_parameters</strong> (<em>list</em>) – Initial guess vector in the order documented above.</p></li>
+<li><p><strong>low_bounds</strong> (<em>list</em>) – Lower bounds for each fitted parameter.</p></li>
+<li><p><strong>high_bounds</strong> (<em>list</em>) – Upper bounds for each fitted parameter.</p></li>
+<li><p><strong>fixed_Kd</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, keep Kd fixed to Kd_value.</p></li>
+<li><p><strong>Kd_value</strong> (<em>float</em><em>, </em><em>optional</em>) – Value to use when fixed_Kd=True.</p></li>
+<li><p><strong>fit_sigma</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, fit sigma as a shared parameter.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>list</em> – Fitted parameters.</p></li>
+<li><p><em>np.ndarray</em> – Covariance matrix of the fitted parameters.</p></li>
+<li><p><em>list</em> – Fitted values for each trace, same dimensions as signal_lst.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="pykingenie.utils.fitting_surface.steady_state_one_site_asymmetric_ci95">
 <span class="sig-prename descclassname"><span class="pre">pykingenie.utils.fitting_surface.</span></span><span class="sig-name descname"><span class="pre">steady_state_one_site_asymmetric_ci95</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kd_estimated</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ligand_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">low_bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">high_bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rss_desired</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/fitting_surface.html#steady_state_one_site_asymmetric_ci95"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.fitting_surface.steady_state_one_site_asymmetric_ci95" title="Link to this definition">#</a></dt>
 <dd><p>Calculate the asymmetric confidence interval for the steady-state signal.</p>
@@ -896,6 +933,24 @@ This function is used to find the initial parameters for the fit_conformational_
 </p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pykingenie.utils.fitting_surface.fit_two_site_assoc_and_disso">
+<span class="sig-prename descclassname"><span class="pre">pykingenie.utils.fitting_surface.</span></span><span class="sig-name descname"><span class="pre">fit_two_site_assoc_and_disso</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">assoc_signal_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assoc_time_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analyte_conc_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disso_signal_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disso_time_lst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">low_bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">high_bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smax_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shared_smax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_Kd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Kd_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_koff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">koff_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/utils/fitting_surface.html#fit_two_site_assoc_and_disso"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.utils.fitting_surface.fit_two_site_assoc_and_disso" title="Link to this definition">#</a></dt>
+<dd><p>Global fit to association and dissociation traces - two-site binding model.</p>
+<p>Parameters follow the same structure as <cite>fit_one_site_assoc_and_disso</cite>,
+but each trace uses two amplitudes: Rmax_PL and Rmax_LPL.
+Optional cooperativity can be fitted through a shared sigma.</p>
+<p>Parameter order when fitting:
+- fixed_Kd=False, fixed_koff=False, fit_sigma=False:</p>
+<blockquote>
+<div><p>[Kd, koff, (t0…), (Rmax_PL, Rmax_LPL)…]</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>fixed_Kd=False, fixed_koff=False, fit_sigma=True:
+[Kd, koff, sigma, (t0…), (Rmax_PL, Rmax_LPL)…]</p></li>
+</ul>
 </dd></dl>
 
 <dl class="py function">
@@ -2973,10 +3028,12 @@ factor <code class="docutils literal notranslate"><span class="pre">sigma</span>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-pykingenie.utils.fitting_surface">pykingenie.utils.fitting_surface module</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.fitting_surface.guess_initial_signal"><code class="docutils literal notranslate"><span class="pre">guess_initial_signal()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.fitting_surface.fit_steady_state_one_site"><code class="docutils literal notranslate"><span class="pre">fit_steady_state_one_site()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.fitting_surface.fit_steady_state_two_site"><code class="docutils literal notranslate"><span class="pre">fit_steady_state_two_site()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.fitting_surface.steady_state_one_site_asymmetric_ci95"><code class="docutils literal notranslate"><span class="pre">steady_state_one_site_asymmetric_ci95()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.fitting_surface.fit_one_site_association"><code class="docutils literal notranslate"><span class="pre">fit_one_site_association()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.fitting_surface.fit_one_site_dissociation"><code class="docutils literal notranslate"><span class="pre">fit_one_site_dissociation()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.fitting_surface.fit_one_site_assoc_and_disso"><code class="docutils literal notranslate"><span class="pre">fit_one_site_assoc_and_disso()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.fitting_surface.fit_two_site_assoc_and_disso"><code class="docutils literal notranslate"><span class="pre">fit_two_site_assoc_and_disso()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.fitting_surface.fit_induced_fit_sites_assoc_and_disso"><code class="docutils literal notranslate"><span class="pre">fit_induced_fit_sites_assoc_and_disso()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.fitting_surface.fit_one_site_assoc_and_disso_ktr"><code class="docutils literal notranslate"><span class="pre">fit_one_site_assoc_and_disso_ktr()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.utils.fitting_surface.one_site_assoc_and_disso_asymmetric_ci95"><code class="docutils literal notranslate"><span class="pre">one_site_assoc_and_disso_asymmetric_ci95()</span></code></a></li>

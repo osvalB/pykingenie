@@ -903,17 +903,37 @@
 
 <div class="viewcode-block" id="KineticsAnalyzer.submit_steady_state_fitting">
 <a class="viewcode-back" href="../../pykingenie.html#pykingenie.main.KineticsAnalyzer.submit_steady_state_fitting">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">submit_steady_state_fitting</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">submit_steady_state_fitting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fitting_model</span><span class="o">=</span><span class="s1">&#39;one_site&#39;</span><span class="p">,</span> <span class="n">fit_sigma</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Submit steady-state fitting for all fitting objects.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fitting_model : str, optional</span>
+<span class="sd">            Steady-state model to fit for surface data.</span>
+<span class="sd">            Options: &#39;one_site&#39;, &#39;two_site&#39;. Default is &#39;one_site&#39;.</span>
+<span class="sd">        fit_sigma : bool, optional</span>
+<span class="sd">            Only used when fitting_model=&#39;two_site&#39;. If True, fit a shared</span>
+<span class="sd">            cooperativity factor (sigma). Default is False.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">fitting_model</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;one_site&#39;</span><span class="p">,</span> <span class="s1">&#39;two_site&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown steady-state fitting model: &quot;</span> <span class="o">+</span> <span class="n">fitting_model</span><span class="p">)</span>
+
         <span class="k">for</span> <span class="n">kf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fittings</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">kf</span><span class="o">.</span><span class="n">is_single_cycle</span><span class="p">:</span>
-                <span class="n">kf</span><span class="o">.</span><span class="n">fit_steady_state</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">fitting_model</span> <span class="o">==</span> <span class="s1">&#39;one_site&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">kf</span><span class="p">,</span> <span class="s1">&#39;fit_steady_state_one_site&#39;</span><span class="p">):</span>
+                        <span class="n">kf</span><span class="o">.</span><span class="n">fit_steady_state_one_site</span><span class="p">()</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># Backward compatibility for older fitter classes</span>
+                        <span class="n">kf</span><span class="o">.</span><span class="n">fit_steady_state</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">kf</span><span class="o">.</span><span class="n">fit_steady_state_two_site</span><span class="p">(</span><span class="n">fit_sigma</span><span class="o">=</span><span class="n">fit_sigma</span><span class="p">)</span>
+
                 <span class="n">kf</span><span class="o">.</span><span class="n">create_fitting_bounds_table</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">kf</span><span class="o">.</span><span class="n">Smax_upper_bound_factor</span> <span class="o">=</span> <span class="mf">1e2</span> <span class="c1"># Normal values for lower than micromolar affinity</span>

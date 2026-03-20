@@ -353,12 +353,18 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.signal_surface</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">steady_state_one_site</span><span class="p">,</span>
+    <span class="n">steady_state_two_site</span><span class="p">,</span>
+    <span class="n">steady_state_two_site_cooperative</span><span class="p">,</span>
     <span class="n">one_site_association_analytical</span><span class="p">,</span>
     <span class="n">one_site_dissociation_analytical</span><span class="p">,</span>
     <span class="n">solve_ode_one_site_mass_transport_association</span><span class="p">,</span>
     <span class="n">solve_ode_one_site_mass_transport_dissociation</span><span class="p">,</span>
     <span class="n">solve_induced_fit_association</span><span class="p">,</span>
-    <span class="n">solve_induced_fit_dissociation</span>
+    <span class="n">solve_induced_fit_dissociation</span><span class="p">,</span>
+    <span class="n">solve_two_site_association</span><span class="p">,</span>
+    <span class="n">solve_two_site_cooperative_association</span><span class="p">,</span>
+    <span class="n">solve_two_site_dissociation</span><span class="p">,</span>
+    <span class="n">solve_two_site_cooperative_dissociation</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.math</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_rss</span>
@@ -371,10 +377,12 @@
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s1">&#39;guess_initial_signal&#39;</span><span class="p">,</span>
     <span class="s1">&#39;fit_steady_state_one_site&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;fit_steady_state_two_site&#39;</span><span class="p">,</span>
     <span class="s1">&#39;steady_state_one_site_asymmetric_ci95&#39;</span><span class="p">,</span>
     <span class="s1">&#39;fit_one_site_association&#39;</span><span class="p">,</span>
     <span class="s1">&#39;fit_one_site_dissociation&#39;</span><span class="p">,</span>
     <span class="s1">&#39;fit_one_site_assoc_and_disso&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;fit_two_site_assoc_and_disso&#39;</span><span class="p">,</span>
     <span class="s1">&#39;fit_induced_fit_sites_assoc_and_disso&#39;</span><span class="p">,</span>
     <span class="s1">&#39;fit_one_site_assoc_and_disso_ktr&#39;</span><span class="p">,</span>
     <span class="s1">&#39;one_site_assoc_and_disso_asymmetric_ci95&#39;</span><span class="p">,</span>
@@ -529,6 +537,125 @@
     <span class="k">return</span> <span class="n">global_fit_params</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">fitted_values</span></div>
 
 
+
+<div class="viewcode-block" id="fit_steady_state_two_site">
+<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.fitting_surface.fit_steady_state_two_site">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fit_steady_state_two_site</span><span class="p">(</span>
+    <span class="n">signal_lst</span><span class="p">,</span>
+    <span class="n">ligand_lst</span><span class="p">,</span>
+    <span class="n">initial_parameters</span><span class="p">,</span>
+    <span class="n">low_bounds</span><span class="p">,</span>
+    <span class="n">high_bounds</span><span class="p">,</span>
+    <span class="n">fixed_Kd</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">Kd_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">fit_sigma</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fit a two-site steady-state binding model with optional cooperativity.</span>
+
+<span class="sd">    Model parameters are one shared Kd and, for each trace, two response terms:</span>
+<span class="sd">    Rmax_PL (singly-bound state) and Rmax_LPL (doubly-bound state).</span>
+<span class="sd">    Optionally, a shared cooperativity factor sigma can also be fitted.</span>
+<span class="sd">    If fit_sigma=False, the non-cooperative model is used (sigma=1).</span>
+
+<span class="sd">    Parameter order when fitting:</span>
+<span class="sd">    - fixed_Kd=False, fit_sigma=False: [Kd, Rmax_PL_1, Rmax_LPL_1, ...]</span>
+<span class="sd">    - fixed_Kd=False, fit_sigma=True : [Kd, sigma, Rmax_PL_1, Rmax_LPL_1, ...]</span>
+<span class="sd">    - fixed_Kd=True,  fit_sigma=False: [Rmax_PL_1, Rmax_LPL_1, ...]</span>
+<span class="sd">    - fixed_Kd=True,  fit_sigma=True : [sigma, Rmax_PL_1, Rmax_LPL_1, ...]</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    signal_lst : list</span>
+<span class="sd">        List of steady-state signal arrays.</span>
+<span class="sd">    ligand_lst : list</span>
+<span class="sd">        List of ligand concentration arrays (same structure as signal_lst).</span>
+<span class="sd">    initial_parameters : list</span>
+<span class="sd">        Initial guess vector in the order documented above.</span>
+<span class="sd">    low_bounds : list</span>
+<span class="sd">        Lower bounds for each fitted parameter.</span>
+<span class="sd">    high_bounds : list</span>
+<span class="sd">        Upper bounds for each fitted parameter.</span>
+<span class="sd">    fixed_Kd : bool, optional</span>
+<span class="sd">        If True, keep Kd fixed to Kd_value.</span>
+<span class="sd">    Kd_value : float, optional</span>
+<span class="sd">        Value to use when fixed_Kd=True.</span>
+<span class="sd">    fit_sigma : bool, optional</span>
+<span class="sd">        If True, fit sigma as a shared parameter.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        Fitted parameters.</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Covariance matrix of the fitted parameters.</span>
+<span class="sd">    list</span>
+<span class="sd">        Fitted values for each trace, same dimensions as signal_lst.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">all_signal</span> <span class="o">=</span> <span class="n">concat_signal_lst</span><span class="p">(</span><span class="n">signal_lst</span><span class="p">)</span>
+
+    <span class="c1"># Pre-compute slice boundaries for output array</span>
+    <span class="n">_lengths</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">C</span><span class="p">)</span> <span class="k">for</span> <span class="n">C</span> <span class="ow">in</span> <span class="n">ligand_lst</span><span class="p">]</span>
+    <span class="n">_total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">_lengths</span><span class="p">)</span>
+    <span class="n">_offsets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">_lengths</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">_offsets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">_k</span><span class="p">,</span> <span class="n">_n</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">_lengths</span><span class="p">):</span>
+        <span class="n">_offsets</span><span class="p">[</span><span class="n">_k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">_offsets</span><span class="p">[</span><span class="n">_k</span><span class="p">]</span> <span class="o">+</span> <span class="n">_n</span>
+
+    <span class="c1"># Number of leading shared parameters before per-trace Rmax pairs.</span>
+    <span class="n">_start</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">fixed_Kd</span><span class="p">:</span>
+        <span class="n">_start</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">fit_sigma</span><span class="p">:</span>
+        <span class="n">_start</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit_fx</span><span class="p">(</span><span class="n">dummyVariable</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="n">dummyVariable</span>
+
+        <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">Kd</span> <span class="o">=</span> <span class="n">Kd_value</span> <span class="k">if</span> <span class="n">fixed_Kd</span> <span class="k">else</span> <span class="n">args</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fixed_Kd</span><span class="p">:</span>
+            <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">sigma</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">fit_sigma</span><span class="p">:</span>
+            <span class="n">sigma</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">_total</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">_k</span><span class="p">,</span> <span class="n">C</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ligand_lst</span><span class="p">):</span>
+            <span class="n">rmax_pl</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">_k</span><span class="p">]</span>
+            <span class="n">rmax_lpl</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">_k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">fit_sigma</span><span class="p">:</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">_offsets</span><span class="p">[</span><span class="n">_k</span><span class="p">]:</span><span class="n">_offsets</span><span class="p">[</span><span class="n">_k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">steady_state_two_site_cooperative</span><span class="p">(</span>
+                    <span class="n">C</span><span class="p">,</span> <span class="n">rmax_pl</span><span class="p">,</span> <span class="n">rmax_lpl</span><span class="p">,</span> <span class="n">Kd</span><span class="p">,</span> <span class="n">sigma</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">_offsets</span><span class="p">[</span><span class="n">_k</span><span class="p">]:</span><span class="n">_offsets</span><span class="p">[</span><span class="n">_k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">steady_state_two_site</span><span class="p">(</span>
+                    <span class="n">C</span><span class="p">,</span> <span class="n">rmax_pl</span><span class="p">,</span> <span class="n">rmax_lpl</span><span class="p">,</span> <span class="n">Kd</span>
+                <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="n">global_fit_params</span><span class="p">,</span> <span class="n">cov</span> <span class="o">=</span> <span class="n">curve_fit</span><span class="p">(</span>
+        <span class="n">fit_fx</span><span class="p">,</span>
+        <span class="mi">1</span><span class="p">,</span>
+        <span class="n">all_signal</span><span class="p">,</span>
+        <span class="n">p0</span><span class="o">=</span><span class="n">initial_parameters</span><span class="p">,</span>
+        <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="n">low_bounds</span><span class="p">,</span> <span class="n">high_bounds</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">fit_values_flat</span> <span class="o">=</span> <span class="n">fit_fx</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="n">global_fit_params</span><span class="p">)</span>
+    <span class="n">fitted_values</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">_k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ligand_lst</span><span class="p">)):</span>
+        <span class="n">fitted_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fit_values_flat</span><span class="p">[</span><span class="n">_offsets</span><span class="p">[</span><span class="n">_k</span><span class="p">]:</span><span class="n">_offsets</span><span class="p">[</span><span class="n">_k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]])</span>
+
+    <span class="k">return</span> <span class="n">global_fit_params</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">fitted_values</span></div>
+
+
+
+
 <div class="viewcode-block" id="steady_state_one_site_asymmetric_ci95">
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.fitting_surface.steady_state_one_site_asymmetric_ci95">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">steady_state_one_site_asymmetric_ci95</span><span class="p">(</span><span class="n">kd_estimated</span><span class="p">,</span> <span class="n">signal_lst</span><span class="p">,</span> <span class="n">ligand_lst</span><span class="p">,</span> <span class="n">initial_parameters</span><span class="p">,</span>
@@ -563,7 +690,7 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">f_to_optimize</span><span class="p">(</span><span class="n">Kd</span><span class="p">):</span>
 
-        <span class="n">fit_params</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">fit_vals</span> <span class="o">=</span> <span class="n">fit_steady_state_one_site</span><span class="p">(</span><span class="n">signal_lst</span><span class="p">,</span> <span class="n">ligand_lst</span><span class="p">,</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">fit_vals</span> <span class="o">=</span> <span class="n">fit_steady_state_one_site</span><span class="p">(</span><span class="n">signal_lst</span><span class="p">,</span> <span class="n">ligand_lst</span><span class="p">,</span>
                                                   <span class="n">initial_parameters</span><span class="p">,</span>
                                                   <span class="n">low_bounds</span><span class="p">,</span>
                                                   <span class="n">high_bounds</span><span class="p">,</span>
@@ -904,6 +1031,178 @@
 
     <span class="n">fitted_values_disso</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">_k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_n_traces</span><span class="p">):</span>
+        <span class="n">fitted_values_disso</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">predicted_curve</span><span class="p">[</span><span class="n">_d_offsets</span><span class="p">[</span><span class="n">_k</span><span class="p">]:</span><span class="n">_d_offsets</span><span class="p">[</span><span class="n">_k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]])</span>
+
+    <span class="k">return</span> <span class="n">global_fit_params</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">fitted_values_assoc</span><span class="p">,</span> <span class="n">fitted_values_disso</span></div>
+
+
+
+<div class="viewcode-block" id="fit_two_site_assoc_and_disso">
+<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.fitting_surface.fit_two_site_assoc_and_disso">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fit_two_site_assoc_and_disso</span><span class="p">(</span><span class="n">assoc_signal_lst</span><span class="p">,</span> <span class="n">assoc_time_lst</span><span class="p">,</span> <span class="n">analyte_conc_lst</span><span class="p">,</span>
+                                 <span class="n">disso_signal_lst</span><span class="p">,</span> <span class="n">disso_time_lst</span><span class="p">,</span>
+                                 <span class="n">initial_parameters</span><span class="p">,</span> <span class="n">low_bounds</span><span class="p">,</span> <span class="n">high_bounds</span><span class="p">,</span>
+                                 <span class="n">smax_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                 <span class="n">shared_smax</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                 <span class="n">fixed_t0</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                 <span class="n">fixed_Kd</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">Kd_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                 <span class="n">fixed_koff</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">koff_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                 <span class="n">fit_sigma</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Global fit to association and dissociation traces - two-site binding model.</span>
+
+<span class="sd">    Parameters follow the same structure as `fit_one_site_assoc_and_disso`,</span>
+<span class="sd">    but each trace uses two amplitudes: Rmax_PL and Rmax_LPL.</span>
+<span class="sd">    Optional cooperativity can be fitted through a shared sigma.</span>
+
+<span class="sd">    Parameter order when fitting:</span>
+<span class="sd">    - fixed_Kd=False, fixed_koff=False, fit_sigma=False:</span>
+<span class="sd">      [Kd, koff, (t0...), (Rmax_PL, Rmax_LPL)...]</span>
+<span class="sd">    - fixed_Kd=False, fixed_koff=False, fit_sigma=True:</span>
+<span class="sd">      [Kd, koff, sigma, (t0...), (Rmax_PL, Rmax_LPL)...]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">smax_idx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">smax_idx</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">assoc_signal_lst</span><span class="p">)))</span>
+
+    <span class="c1"># Set a flag for associations that start from near-zero time.</span>
+    <span class="n">initial_signal_at_zero</span> <span class="o">=</span> <span class="p">[</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">time</span> <span class="ow">in</span> <span class="n">assoc_time_lst</span><span class="p">]</span>
+
+    <span class="n">all_signal_assoc</span> <span class="o">=</span> <span class="n">concat_signal_lst</span><span class="p">(</span><span class="n">assoc_signal_lst</span><span class="p">)</span>
+    <span class="n">all_signal_disso</span> <span class="o">=</span> <span class="n">concat_signal_lst</span><span class="p">(</span><span class="n">disso_signal_lst</span><span class="p">)</span>
+
+    <span class="n">time_lst_assoc</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">assoc_time_lst</span><span class="p">]</span>
+    <span class="n">time_lst_disso</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">disso_time_lst</span><span class="p">]</span>
+    <span class="n">time_lst_disso</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">time_lst_disso</span><span class="p">]</span>
+
+    <span class="n">n_unq_smax</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">smax_idx</span><span class="p">))</span>
+    <span class="n">n_traces</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">time_lst_assoc</span><span class="p">)</span>
+
+    <span class="n">continuos_time</span> <span class="o">=</span> <span class="n">detect_time_list_continuos</span><span class="p">(</span><span class="n">time_lst_assoc</span><span class="p">,</span> <span class="n">disso_time_lst</span><span class="p">)</span>
+
+    <span class="c1"># Pre-compute slice boundaries for output array</span>
+    <span class="n">_a_lengths</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">time_lst_assoc</span><span class="p">]</span>
+    <span class="n">_d_lengths</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">time_lst_disso</span><span class="p">]</span>
+    <span class="n">_total_a</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">_a_lengths</span><span class="p">)</span>
+    <span class="n">_total_d</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">_d_lengths</span><span class="p">)</span>
+    <span class="n">_total</span> <span class="o">=</span> <span class="n">_total_a</span> <span class="o">+</span> <span class="n">_total_d</span>
+
+    <span class="n">_a_offsets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n_traces</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">_a_offsets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">_k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_traces</span><span class="p">):</span>
+        <span class="n">_a_offsets</span><span class="p">[</span><span class="n">_k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">_a_offsets</span><span class="p">[</span><span class="n">_k</span><span class="p">]</span> <span class="o">+</span> <span class="n">_a_lengths</span><span class="p">[</span><span class="n">_k</span><span class="p">]</span>
+
+    <span class="n">_d_offsets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n_traces</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">_d_offsets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_total_a</span>
+    <span class="k">for</span> <span class="n">_k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_traces</span><span class="p">):</span>
+        <span class="n">_d_offsets</span><span class="p">[</span><span class="n">_k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">_d_offsets</span><span class="p">[</span><span class="n">_k</span><span class="p">]</span> <span class="o">+</span> <span class="n">_d_lengths</span><span class="p">[</span><span class="n">_k</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit_fx</span><span class="p">(</span><span class="n">dummyVariable</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="n">dummyVariable</span>
+
+        <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">Kd</span> <span class="o">=</span> <span class="n">Kd_value</span> <span class="k">if</span> <span class="n">fixed_Kd</span> <span class="k">else</span> <span class="n">args</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fixed_Kd</span><span class="p">:</span>
+            <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">Koff</span> <span class="o">=</span> <span class="n">koff_value</span> <span class="k">if</span> <span class="n">fixed_koff</span> <span class="k">else</span> <span class="n">args</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fixed_koff</span><span class="p">:</span>
+            <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">sigma</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="k">if</span> <span class="n">fit_sigma</span> <span class="k">else</span> <span class="mf">1.0</span>
+        <span class="k">if</span> <span class="n">fit_sigma</span><span class="p">:</span>
+            <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">t0_vals</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fixed_t0</span><span class="p">:</span>
+            <span class="n">t0_vals</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="n">idx</span><span class="p">:</span><span class="n">idx</span> <span class="o">+</span> <span class="n">n_unq_smax</span><span class="p">]</span>
+            <span class="n">idx</span> <span class="o">+=</span> <span class="n">n_unq_smax</span>
+
+        <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">_total</span><span class="p">)</span>
+
+        <span class="n">prev_fpl_end</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">prev_flpl_end</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_traces</span><span class="p">):</span>
+            <span class="n">t_assoc</span> <span class="o">=</span> <span class="n">time_lst_assoc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">t_dissoc</span> <span class="o">=</span> <span class="n">time_lst_disso</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">analyte_conc</span> <span class="o">=</span> <span class="n">analyte_conc_lst</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">sidx</span> <span class="o">=</span> <span class="n">smax_idx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">shared_smax</span><span class="p">:</span>
+                <span class="n">rmax_base</span> <span class="o">=</span> <span class="n">idx</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">sidx</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">rmax_base</span> <span class="o">=</span> <span class="n">idx</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">i</span>
+
+            <span class="n">rmax_pl</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="n">rmax_base</span><span class="p">]</span>
+            <span class="n">rmax_lpl</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="n">rmax_base</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+            <span class="n">t0</span> <span class="o">=</span> <span class="n">t0_vals</span><span class="p">[</span><span class="n">sidx</span><span class="p">]</span> <span class="k">if</span> <span class="p">(</span><span class="n">t0_vals</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="k">else</span> <span class="mf">0.0</span>
+            <span class="n">t_assoc_rel</span> <span class="o">=</span> <span class="n">t_assoc</span> <span class="o">-</span> <span class="n">t_assoc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">t0</span>
+
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">initial_signal_at_zero</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="ow">and</span> <span class="n">continuos_time</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="n">fpl0</span><span class="p">,</span> <span class="n">flpl0</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span>
+            <span class="k">elif</span> <span class="n">continuos_time</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="n">fpl0</span><span class="p">,</span> <span class="n">flpl0</span> <span class="o">=</span> <span class="n">prev_fpl_end</span><span class="p">,</span> <span class="n">prev_flpl_end</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">fpl0</span><span class="p">,</span> <span class="n">flpl0</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span>
+
+            <span class="k">if</span> <span class="n">fit_sigma</span><span class="p">:</span>
+                <span class="n">y_assoc</span> <span class="o">=</span> <span class="n">solve_two_site_cooperative_association</span><span class="p">(</span>
+                    <span class="n">t_assoc_rel</span><span class="p">,</span> <span class="n">analyte_conc</span><span class="p">,</span> <span class="n">Koff</span> <span class="o">/</span> <span class="n">Kd</span><span class="p">,</span> <span class="n">Koff</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span>
+                    <span class="n">Rmax_PL</span><span class="o">=</span><span class="n">rmax_pl</span><span class="p">,</span> <span class="n">Rmax_LPL</span><span class="o">=</span><span class="n">rmax_lpl</span><span class="p">,</span>
+                    <span class="n">fPL_0</span><span class="o">=</span><span class="n">fpl0</span><span class="p">,</span> <span class="n">fLPL_0</span><span class="o">=</span><span class="n">flpl0</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">y_assoc</span> <span class="o">=</span> <span class="n">solve_two_site_association</span><span class="p">(</span>
+                    <span class="n">t_assoc_rel</span><span class="p">,</span> <span class="n">analyte_conc</span><span class="p">,</span> <span class="n">Koff</span> <span class="o">/</span> <span class="n">Kd</span><span class="p">,</span> <span class="n">Koff</span><span class="p">,</span>
+                    <span class="n">Rmax_PL</span><span class="o">=</span><span class="n">rmax_pl</span><span class="p">,</span> <span class="n">Rmax_LPL</span><span class="o">=</span><span class="n">rmax_lpl</span><span class="p">,</span>
+                    <span class="n">fPL_0</span><span class="o">=</span><span class="n">fpl0</span><span class="p">,</span> <span class="n">fLPL_0</span><span class="o">=</span><span class="n">flpl0</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="n">out</span><span class="p">[</span><span class="n">_a_offsets</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="n">_a_offsets</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">y_assoc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+
+            <span class="c1"># Convert end signals back to fractions for dissociation initialization.</span>
+            <span class="n">fpl0_d</span> <span class="o">=</span> <span class="n">y_assoc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">rmax_pl</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">rmax_pl</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-15</span> <span class="k">else</span> <span class="mf">0.0</span>
+            <span class="n">flpl0_d</span> <span class="o">=</span> <span class="n">y_assoc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="n">rmax_lpl</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">rmax_lpl</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-15</span> <span class="k">else</span> <span class="mf">0.0</span>
+
+            <span class="k">if</span> <span class="n">fit_sigma</span><span class="p">:</span>
+                <span class="n">y_disso</span> <span class="o">=</span> <span class="n">solve_two_site_cooperative_dissociation</span><span class="p">(</span>
+                    <span class="n">t_dissoc</span><span class="p">,</span> <span class="n">Koff</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span>
+                    <span class="n">Rmax_PL</span><span class="o">=</span><span class="n">rmax_pl</span><span class="p">,</span> <span class="n">Rmax_LPL</span><span class="o">=</span><span class="n">rmax_lpl</span><span class="p">,</span>
+                    <span class="n">fPL_0</span><span class="o">=</span><span class="n">fpl0_d</span><span class="p">,</span> <span class="n">fLPL_0</span><span class="o">=</span><span class="n">flpl0_d</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">y_disso</span> <span class="o">=</span> <span class="n">solve_two_site_dissociation</span><span class="p">(</span>
+                    <span class="n">t_dissoc</span><span class="p">,</span> <span class="n">Koff</span><span class="p">,</span>
+                    <span class="n">Rmax_PL</span><span class="o">=</span><span class="n">rmax_pl</span><span class="p">,</span> <span class="n">Rmax_LPL</span><span class="o">=</span><span class="n">rmax_lpl</span><span class="p">,</span>
+                    <span class="n">fPL_0</span><span class="o">=</span><span class="n">fpl0_d</span><span class="p">,</span> <span class="n">fLPL_0</span><span class="o">=</span><span class="n">flpl0_d</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="n">out</span><span class="p">[</span><span class="n">_d_offsets</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="n">_d_offsets</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">y_disso</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">prev_fpl_end</span> <span class="o">=</span> <span class="n">y_disso</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">rmax_pl</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">rmax_pl</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-15</span> <span class="k">else</span> <span class="mf">0.0</span>
+            <span class="n">prev_flpl_end</span> <span class="o">=</span> <span class="n">y_disso</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="n">rmax_lpl</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">rmax_lpl</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-15</span> <span class="k">else</span> <span class="mf">0.0</span>
+
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="n">all_signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">all_signal_assoc</span><span class="p">,</span> <span class="n">all_signal_disso</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">global_fit_params</span><span class="p">,</span> <span class="n">cov</span> <span class="o">=</span> <span class="n">curve_fit</span><span class="p">(</span>
+        <span class="n">fit_fx</span><span class="p">,</span>
+        <span class="mi">1</span><span class="p">,</span>
+        <span class="n">all_signal</span><span class="p">,</span>
+        <span class="n">p0</span><span class="o">=</span><span class="n">initial_parameters</span><span class="p">,</span>
+        <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="n">low_bounds</span><span class="p">,</span> <span class="n">high_bounds</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">predicted_curve</span> <span class="o">=</span> <span class="n">fit_fx</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="n">global_fit_params</span><span class="p">)</span>
+
+    <span class="n">fitted_values_assoc</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">_k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_traces</span><span class="p">):</span>
+        <span class="n">fitted_values_assoc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">predicted_curve</span><span class="p">[</span><span class="n">_a_offsets</span><span class="p">[</span><span class="n">_k</span><span class="p">]:</span><span class="n">_a_offsets</span><span class="p">[</span><span class="n">_k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]])</span>
+
+    <span class="n">fitted_values_disso</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">_k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_traces</span><span class="p">):</span>
         <span class="n">fitted_values_disso</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">predicted_curve</span><span class="p">[</span><span class="n">_d_offsets</span><span class="p">[</span><span class="n">_k</span><span class="p">]:</span><span class="n">_d_offsets</span><span class="p">[</span><span class="n">_k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]])</span>
 
     <span class="k">return</span> <span class="n">global_fit_params</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">fitted_values_assoc</span><span class="p">,</span> <span class="n">fitted_values_disso</span></div>

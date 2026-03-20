@@ -392,10 +392,12 @@
 <li class="toctree-l2"><a class="reference internal" href="pykingenie.utils.html#module-pykingenie.utils.fitting_surface">pykingenie.utils.fitting_surface module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.guess_initial_signal"><code class="docutils literal notranslate"><span class="pre">guess_initial_signal()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.fit_steady_state_one_site"><code class="docutils literal notranslate"><span class="pre">fit_steady_state_one_site()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.fit_steady_state_two_site"><code class="docutils literal notranslate"><span class="pre">fit_steady_state_two_site()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.steady_state_one_site_asymmetric_ci95"><code class="docutils literal notranslate"><span class="pre">steady_state_one_site_asymmetric_ci95()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.fit_one_site_association"><code class="docutils literal notranslate"><span class="pre">fit_one_site_association()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.fit_one_site_dissociation"><code class="docutils literal notranslate"><span class="pre">fit_one_site_dissociation()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.fit_one_site_assoc_and_disso"><code class="docutils literal notranslate"><span class="pre">fit_one_site_assoc_and_disso()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.fit_two_site_assoc_and_disso"><code class="docutils literal notranslate"><span class="pre">fit_two_site_assoc_and_disso()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.fit_induced_fit_sites_assoc_and_disso"><code class="docutils literal notranslate"><span class="pre">fit_induced_fit_sites_assoc_and_disso()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.fit_one_site_assoc_and_disso_ktr"><code class="docutils literal notranslate"><span class="pre">fit_one_site_assoc_and_disso_ktr()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="pykingenie.utils.html#pykingenie.utils.fitting_surface.one_site_assoc_and_disso_asymmetric_ci95"><code class="docutils literal notranslate"><span class="pre">one_site_assoc_and_disso_asymmetric_ci95()</span></code></a></li>
@@ -1311,9 +1313,9 @@ for each association signal.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter.fit_steady_state">
-<span class="sig-name descname"><span class="pre">fit_steady_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_surface.html#KineticsFitter.fit_steady_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter.fit_steady_state" title="Link to this definition">#</a></dt>
-<dd><p>Fit the steady state signal using the one-site binding model.</p>
+<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter.fit_steady_state_one_site">
+<span class="sig-name descname"><span class="pre">fit_steady_state_one_site</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_surface.html#KineticsFitter.fit_steady_state_one_site"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter.fit_steady_state_one_site" title="Link to this definition">#</a></dt>
+<dd><p>Fit the steady state signal to a one-site binding model.</p>
 <p>This function fits the steady state signal to a one-site binding model
 to estimate the equilibrium dissociation constant (Kd) and maximum signal (Smax).
 It also calculates the 95% confidence intervals for the Kd.</p>
@@ -1323,11 +1325,59 @@ It also calculates the 95% confidence intervals for the Kd.</p>
 - params: The fitted parameters [Kd, Smax1, Smax2, …]
 - signal_ss_fit: The fitted steady state signals
 - fit_params_ss: DataFrame with the fitted parameters
-- Kd_ss: The equilibrium dissociation constant
+- Kd_ss: The equilibrium dissociation constant(s)
 - Smax_upper_bound_factor: Factor to determine the upper bound for Smax</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter.fit_steady_state">
+<span class="sig-name descname"><span class="pre">fit_steady_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'one_site'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_surface.html#KineticsFitter.fit_steady_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter.fit_steady_state" title="Link to this definition">#</a></dt>
+<dd><p>Backward-compatible steady-state fitting entry point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>str</em><em>, </em><em>optional</em>) – Steady-state model to use. Options: ‘one_site’, ‘two_site’.
+Default is ‘one_site’.</p></li>
+<li><p><strong>fit_sigma</strong> (<em>bool</em><em>, </em><em>optional</em>) – Only used for model=’two_site’. If True, fit cooperativity.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pykingenie.fitter_surface.KineticsFitter.fit_steady_state_two_site">
+<span class="sig-name descname"><span class="pre">fit_steady_state_two_site</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fit_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/fitter_surface.html#KineticsFitter.fit_steady_state_two_site"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.fitter_surface.KineticsFitter.fit_steady_state_two_site" title="Link to this definition">#</a></dt>
+<dd><p>Fit the steady state signal to a two-site binding model.</p>
+<p>This function fits the steady state signal to a two-site binding model
+to estimate the intrinsic equilibrium dissociation constant (Kd), plus
+two response amplitudes per Smax group:
+- Rmax_PL  : singly-bound state
+- Rmax_LPL : doubly-bound state</p>
+<p>Optionally, a shared cooperativity factor (sigma) can be fitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fit_sigma</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, fit a shared cooperativity factor sigma. If False, use
+the non-cooperative two-site model.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Updates the following instance attributes:
+- params: The fitted parameters
+- signal_ss_fit: The fitted steady state signals
+- fit_params_ss: DataFrame with the fitted parameters
+- Kd_ss: The fitted intrinsic dissociation constant
+- sigma_ss: The fitted cooperativity factor (if fit_sigma=True)
+- Smax_upper_bound_factor: Factor to determine upper Smax bounds</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2227,11 +2277,19 @@ which can be used for filtering data in subsequent analyses.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pykingenie.main.KineticsAnalyzer.submit_steady_state_fitting">
-<span class="sig-name descname"><span class="pre">submit_steady_state_fitting</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/main.html#KineticsAnalyzer.submit_steady_state_fitting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.main.KineticsAnalyzer.submit_steady_state_fitting" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">submit_steady_state_fitting</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fitting_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'one_site'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pykingenie/main.html#KineticsAnalyzer.submit_steady_state_fitting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pykingenie.main.KineticsAnalyzer.submit_steady_state_fitting" title="Link to this definition">#</a></dt>
 <dd><p>Submit steady-state fitting for all fitting objects.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fitting_model</strong> (<em>str</em><em>, </em><em>optional</em>) – Steady-state model to fit for surface data.
+Options: ‘one_site’, ‘two_site’. Default is ‘one_site’.</p></li>
+<li><p><strong>fit_sigma</strong> (<em>bool</em><em>, </em><em>optional</em>) – Only used when fitting_model=’two_site’. If True, fit a shared
+cooperativity factor (sigma). Default is False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -3560,7 +3618,9 @@ For dissociation steps, time continues from the association step.</p>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.fit_params_ss"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_params_ss</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.__init__"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.__init__()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.get_steady_state"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.get_steady_state()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.fit_steady_state_one_site"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_steady_state_one_site()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.fit_steady_state"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_steady_state()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.fit_steady_state_two_site"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_steady_state_two_site()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.get_k_off_initial_guess"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.get_k_off_initial_guess()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.fit_one_site_association"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_one_site_association()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pykingenie.fitter_surface.KineticsFitter.fit_one_site_dissociation"><code class="docutils literal notranslate"><span class="pre">KineticsFitter.fit_one_site_dissociation()</span></code></a></li>
