@@ -517,17 +517,37 @@ class KineticsAnalyzer:
 
         return messages
 
-    def submit_steady_state_fitting(self):
+    def submit_steady_state_fitting(self, fitting_model='one_site', fit_sigma=False):
         """
         Submit steady-state fitting for all fitting objects.
+
+        Parameters
+        ----------
+        fitting_model : str, optional
+            Steady-state model to fit for surface data.
+            Options: 'one_site', 'two_site'. Default is 'one_site'.
+        fit_sigma : bool, optional
+            Only used when fitting_model='two_site'. If True, fit a shared
+            cooperativity factor (sigma). Default is False.
 
         Returns
         -------
         None
         """
+        if fitting_model not in ['one_site', 'two_site']:
+            raise ValueError("Unknown steady-state fitting model: " + fitting_model)
+
         for kf in self.fittings.values():
             if not kf.is_single_cycle:
-                kf.fit_steady_state()
+                if fitting_model == 'one_site':
+                    if hasattr(kf, 'fit_steady_state_one_site'):
+                        kf.fit_steady_state_one_site()
+                    else:
+                        # Backward compatibility for older fitter classes
+                        kf.fit_steady_state()
+                else:
+                    kf.fit_steady_state_two_site(fit_sigma=fit_sigma)
+
                 kf.create_fitting_bounds_table()
             else:
                 kf.Smax_upper_bound_factor = 1e2 # Normal values for lower than micromolar affinity

@@ -11,6 +11,10 @@ from pykingenie.utils.fitting_surface   import (
     fit_steady_state_one_site,
     get_smax_upper_bound_factor
 )
+from pykingenie.utils.signal_surface import (
+    steady_state_two_site,
+    steady_state_two_site_cooperative,
+)
 
 test_file_1 = "./test_files/simulation_Kd-10_koff-0.01.csv"
 test_file_2 = "./test_files/simulation_Kd-0.5_koff-0.01_Ktr-0.005.csv"
@@ -201,6 +205,177 @@ def test_get_smax_upper_bound_factor():
 
     assert  val == 1e3, f"Expected Smax upper bound factor to be 1e3, got {val}."
 
+
+def _create_synthetic_ss_fitter(ligand_conc, steady_state_signal):
+    time = np.linspace(0, 100, 30)
+    assoc_lst = [np.full_like(time, s, dtype=float) for s in steady_state_signal]
+    time_assoc_lst = [time.copy() for _ in steady_state_signal]
+
+    return KineticsFitter(
+        time_assoc_lst=time_assoc_lst,
+        association_signal_lst=assoc_lst,
+        lig_conc_lst=list(ligand_conc),
+        time_diss_lst=None,
+        dissociation_signal_lst=None,
+        smax_id=[0 for _ in steady_state_signal],
+        name_lst=["synthetic"],
+    )
+
+
+def _create_synthetic_ss_fitter_custom(ligand_conc, steady_state_signal, smax_id, name_lst):
+    time = np.linspace(0, 100, 30)
+    assoc_lst = [np.full_like(time, s, dtype=float) for s in steady_state_signal]
+    time_assoc_lst = [time.copy() for _ in steady_state_signal]
+
+    return KineticsFitter(
+        time_assoc_lst=time_assoc_lst,
+        association_signal_lst=assoc_lst,
+        lig_conc_lst=list(ligand_conc),
+        time_diss_lst=None,
+        dissociation_signal_lst=None,
+        smax_id=list(smax_id),
+        name_lst=name_lst,
+    )
+
+
+def test_fit_steady_state_two_site_non_cooperative():
+
+    C = np.logspace(-3, 2, 12)
+    Kd_true = 0.25
+    Rmax_PL_true = 6.0
+    Rmax_LPL_true = 11.0
+
+    y = steady_state_two_site(C, Rmax_PL_true, Rmax_LPL_true, Kd_true)
+    fitter_surface = _create_synthetic_ss_fitter(C, y)
+
+    fitter_surface.fit_steady_state_two_site(fit_sigma=False)
+
+    assert np.isclose(fitter_surface.Kd_ss, Kd_true, rtol=1e-2)
+
+    df = fitter_surface.fit_params_ss
+    assert np.isclose(df["Rmax_PL"].iloc[0], Rmax_PL_true, rtol=1e-2)
+    assert np.isclose(df["Rmax_LPL"].iloc[0], Rmax_LPL_true, rtol=1e-2)
+    assert "sigma" not in df.columns
+
+
+def test_fit_steady_state_two_site_cooperative():
+
+    C = np.logspace(-3, 2, 12)
+    Kd_true = 0.2
+    sigma_true = 3.5
+    Rmax_PL_true = 5.5
+    Rmax_LPL_true = 12.5
+
+    y = steady_state_two_site_cooperative(C, Rmax_PL_true, Rmax_LPL_true, Kd_true, sigma_true)
+    fitter_surface = _create_synthetic_ss_fitter(C, y)
+
+    fitter_surface.fit_steady_state_two_site(fit_sigma=True)
+
+    assert np.isclose(fitter_surface.Kd_ss, Kd_true, rtol=1e-2)
+    assert np.isclose(fitter_surface.sigma_ss, sigma_true, rtol=1e-2)
+
+    df = fitter_surface.fit_params_ss
+    assert np.isclose(df["Rmax_PL"].iloc[0], Rmax_PL_true, rtol=1e-2)
+    assert np.isclose(df["Rmax_LPL"].iloc[0], Rmax_LPL_true, rtol=1e-2)
+    assert "sigma" in df.columns
+
+
+def test_fit_steady_state_dispatch_invalid_model():
+    C = np.logspace(-3, 2, 10)
+    y = steady_state_two_site(C, 5.0, 9.0, 0.2)
+    fitter_surface = _create_synthetic_ss_fitter(C, y)
+
+    with pytest.raises(ValueError):
+        fitter_surface.fit_steady_state(model='invalid_model')
+
+
+def test_fit_steady_state_dispatch_two_site_branch():
+    C = np.logspace(-3, 2, 10)
+    y = steady_state_two_site(C, 5.0, 9.0, 0.2)
+    fitter_surface = _create_synthetic_ss_fitter(C, y)
+
+    fitter_surface.fit_steady_state(model='two_site', fit_sigma=False)
+
+    assert fitter_surface.fit_params_ss is not None
+    assert 'Rmax_PL' in fitter_surface.fit_params_ss.columns
+
+
+def test_fit_steady_state_two_site_name_fallbacks():
+    # names is None -> group names should be auto-generated
+    C = np.logspace(-3, 2, 10)
+    y = steady_state_two_site(C, 5.0, 9.0, 0.2)
+    fitter_none = _create_synthetic_ss_fitter_custom(
+        C, y, smax_id=[0 for _ in C], name_lst=None
+    )
+    fitter_none.fit_steady_state_two_site(fit_sigma=False)
+    assert fitter_none.fit_params_ss['Name'].iloc[0] == 'group_0'
+
+    # names length mismatch -> first name repeated across groups
+    C0 = np.logspace(-3, 2, 6)
+    C1 = np.logspace(-3, 2, 6)
+    y0 = steady_state_two_site(C0, 4.0, 8.0, 0.2)
+    y1 = steady_state_two_site(C1, 7.0, 13.0, 0.2)
+
+    ligand = list(C0) + list(C1)
+    signal = list(y0) + list(y1)
+    smax_id = [0 for _ in C0] + [1 for _ in C1]
+
+    fitter_mismatch = _create_synthetic_ss_fitter_custom(
+        ligand, signal, smax_id=smax_id, name_lst=['single_name']
+    )
+    fitter_mismatch.fit_steady_state_two_site(fit_sigma=False)
+    assert set(fitter_mismatch.fit_params_ss['Name']) == {'single_name'}
+
+
+def test_get_k_off_initial_guess_with_dissociation_data_branch():
+    fitter_surface = _create_synthetic_ss_fitter(
+        ligand_conc=np.logspace(-3, 1, 6),
+        steady_state_signal=np.linspace(0.1, 1.0, 6),
+    )
+    fitter_surface.Kd_ss = 0.5
+    fitter_surface.disso_lst = [np.array([1.0, 0.8, 0.6])]
+    fitter_surface.time_disso_lst = [np.array([0.0, 1.0, 2.0])]
+
+    def _fake_fit_disso():
+        fitter_surface.k_off = 0.02
+
+    fitter_surface.fit_one_site_dissociation = _fake_fit_disso
+
+    p0, low_bounds, high_bounds = fitter_surface.get_k_off_initial_guess()
+
+    assert p0 == [0.5, 0.02]
+    assert low_bounds == [0.5 / 7e2, 0.02 / 7e2]
+    assert high_bounds == [0.5 * 7e2, 0.02 * 7e2]
+
+
+def test_calculate_ci95_failure_returns_empty_dataframe():
+    fitter_surface = _create_synthetic_ss_fitter(
+        ligand_conc=np.logspace(-3, 1, 6),
+        steady_state_signal=np.linspace(0.1, 1.0, 6),
+    )
+
+    fitter_surface.calculate_ci95(shared_smax=True, fixed_t0=True, fit_ktr=False)
+
+    assert isinstance(fitter_surface.fit_params_kinetics_ci95, pd.DataFrame)
+    assert fitter_surface.fit_params_kinetics_ci95.empty
+
+
+def test_create_export_df_fit_skips_dissociation_if_not_fitted():
+    fitter_surface = KineticsFitter(
+        time_assoc_lst=[np.array([0.0, 1.0])],
+        association_signal_lst=[np.array([0.1, 0.2])],
+        lig_conc_lst=[1.0],
+        time_diss_lst=[np.array([0.0, 1.0])],
+        dissociation_signal_lst=[np.array([0.2, 0.1])],
+        smax_id=[0],
+        name_lst=['synthetic'],
+    )
+    fitter_surface.signal_assoc_fit = [np.array([0.11, 0.19])]
+    fitter_surface.signal_disso_fit = None
+
+    df = fitter_surface.create_export_df(type='fit')
+    assert set(df['Type']) == {'Association'}
+
 def test_fit_one_site_association():
 
     fitter_surface = create_fitter(test_file_1)
@@ -367,3 +542,5 @@ def test_fit_one_site_assoc_and_disso_if():
     assert 7 < fitter_surface.k_rev < 13, f"Expected k_rev to be between 7 and 13, got {fitter_surface.k_rev}."
 
     # Now fit with shared_smax=False
+
+

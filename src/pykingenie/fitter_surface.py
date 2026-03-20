@@ -4,6 +4,7 @@ import pandas as pd
 
 from .utils.fitting_surface import (
     fit_steady_state_one_site,
+    fit_steady_state_two_site,
     steady_state_one_site_asymmetric_ci95,
     fit_one_site_association,
     fit_one_site_dissociation,
@@ -203,15 +204,15 @@ class KineticsFitter(KineticsFitterGeneral):
 
         return None
 
-    def fit_steady_state(self):
+    def fit_steady_state_one_site(self):
 
         """
-        Fit the steady state signal using the one-site binding model.
+        Fit the steady state signal to a one-site binding model.
         
         This function fits the steady state signal to a one-site binding model
         to estimate the equilibrium dissociation constant (Kd) and maximum signal (Smax).
         It also calculates the 95% confidence intervals for the Kd.
-        
+
         Returns
         -------
         None
@@ -219,15 +220,13 @@ class KineticsFitter(KineticsFitterGeneral):
             - params: The fitted parameters [Kd, Smax1, Smax2, ...]
             - signal_ss_fit: The fitted steady state signals
             - fit_params_ss: DataFrame with the fitted parameters
-            - Kd_ss: The equilibrium dissociation constant
+            - Kd_ss: The equilibrium dissociation constant(s)
             - Smax_upper_bound_factor: Factor to determine the upper bound for Smax
         """
 
         self.clear_fittings()
 
-        if self.signal_ss is None:
-
-            self.get_steady_state()
+        self.get_steady_state()
 
         Kd_init = np.median(self.lig_conc_lst_per_id[0])
         p0      = [Kd_init] + [np.max(signal) for signal in self.signal_ss]
@@ -235,16 +234,18 @@ class KineticsFitter(KineticsFitterGeneral):
         kd_min  = np.min(self.lig_conc_lst_per_id[0]) / 1e3
         kd_max  = np.max(self.lig_conc_lst_per_id[0]) * 1e3
 
+        low_bounds  = [kd_min]  
+        high_bounds = [kd_max]  
+
+        fit_fx = fit_steady_state_one_site
+
         # Find the upper bound for the Kd
         upper_bound = 1e3 if Kd_init >= 1 else 1e2
 
-        low_bounds  = [kd_min]  + [x*0.5          for x in p0[1:]]
-        high_bounds = [kd_max]  + [x*upper_bound  for x in p0[1:]]
+        low_bounds  = low_bounds  + [x*0.5          for x in p0[1:]]
+        high_bounds = high_bounds + [x*upper_bound  for x in p0[1:]]
 
-        # testing - set upper bound for smax to smax
-        high_bounds = [kd_max]  + [x*1  for x in p0[1:]]
-
-        fit, cov, fit_vals = fit_steady_state_one_site(
+        fit, cov, fit_vals = fit_fx(
             self.signal_ss,self.lig_conc_lst_per_id,
             p0,low_bounds,high_bounds)
 
@@ -258,7 +259,7 @@ class KineticsFitter(KineticsFitterGeneral):
             fit=fit,
             cov=cov,
             fit_vals=fit_vals,
-            fit_fx=fit_steady_state_one_site,
+            fit_fx=fit_fx,
             low_bounds=low_bounds,
             high_bounds= high_bounds,
             times=3,
@@ -297,6 +298,161 @@ class KineticsFitter(KineticsFitterGeneral):
         self.fit_params_ss = df_fit
 
         # Fit the steady state signal
+        return None
+
+    def fit_steady_state(self, model='one_site', fit_sigma=False):
+
+        """
+        Backward-compatible steady-state fitting entry point.
+
+        Parameters
+        ----------
+        model : str, optional
+            Steady-state model to use. Options: 'one_site', 'two_site'.
+            Default is 'one_site'.
+        fit_sigma : bool, optional
+            Only used for model='two_site'. If True, fit cooperativity.
+
+        Returns
+        -------
+        None
+        """
+        if model == 'one_site':
+            return self.fit_steady_state_one_site()
+
+        if model == 'two_site':
+            return self.fit_steady_state_two_site(fit_sigma=fit_sigma)
+
+        raise ValueError("Unknown steady-state model: " + model)
+
+    def fit_steady_state_two_site(self, fit_sigma=False):
+
+        """
+        Fit the steady state signal to a two-site binding model.
+
+        This function fits the steady state signal to a two-site binding model
+        to estimate the intrinsic equilibrium dissociation constant (Kd), plus
+        two response amplitudes per Smax group:
+        - Rmax_PL  : singly-bound state
+        - Rmax_LPL : doubly-bound state
+
+        Optionally, a shared cooperativity factor (sigma) can be fitted.
+
+        Parameters
+        ----------
+        fit_sigma : bool, optional
+            If True, fit a shared cooperativity factor sigma. If False, use
+            the non-cooperative two-site model.
+
+        Returns
+        -------
+        None
+            Updates the following instance attributes:
+            - params: The fitted parameters
+            - signal_ss_fit: The fitted steady state signals
+            - fit_params_ss: DataFrame with the fitted parameters
+            - Kd_ss: The fitted intrinsic dissociation constant
+            - sigma_ss: The fitted cooperativity factor (if fit_sigma=True)
+            - Smax_upper_bound_factor: Factor to determine upper Smax bounds
+        """
+
+        self.clear_fittings()
+
+        self.get_steady_state()
+
+        Kd_init = np.median(self.lig_conc_lst_per_id[0])
+        kd_min  = np.min(self.lig_conc_lst_per_id[0]) / 1e3
+        kd_max  = np.max(self.lig_conc_lst_per_id[0]) * 1e3
+
+        # Per-group two-site amplitudes: [Rmax_PL_i, Rmax_LPL_i]
+        p0_rmax = []
+        for signal in self.signal_ss:
+            ymax = np.max(signal)
+            p0_rmax.extend([0.5 * ymax, 1.2 * ymax])
+
+        p0 = [Kd_init]
+        low_bounds = [kd_min]
+        high_bounds = [kd_max]
+
+        if fit_sigma:
+            p0.append(1.0)
+            low_bounds.append(1e-6)
+            high_bounds.append(1e3)
+
+        upper_bound = 1e3 if Kd_init >= 1 else 1e2
+        for i, val in enumerate(p0_rmax):
+            factor_low = 0.2 if i % 2 == 0 else 0.2
+            low_bounds.append(val * factor_low)
+            high_bounds.append(val * upper_bound)
+
+        p0 += p0_rmax
+
+        fit, cov, fit_vals = fit_steady_state_two_site(
+            self.signal_ss,
+            self.lig_conc_lst_per_id,
+            p0,
+            low_bounds,
+            high_bounds,
+            fit_sigma=fit_sigma,
+        )
+
+        kwargs = {
+            "signal_lst": self.signal_ss,
+            "ligand_lst": self.lig_conc_lst_per_id,
+            "fit_sigma": fit_sigma,
+        }
+
+        fit, cov, fit_vals, low_bounds, high_bounds = re_fit(
+            fit=fit,
+            cov=cov,
+            fit_vals=fit_vals,
+            fit_fx=fit_steady_state_two_site,
+            low_bounds=low_bounds,
+            high_bounds=high_bounds,
+            times=3,
+            **kwargs,
+        )
+
+        self.Kd_ss = fit[0]
+        idx = 1
+        if fit_sigma:
+            self.sigma_ss = fit[1]
+            idx = 2
+        else:
+            self.sigma_ss = None
+
+        rmax_vals = fit[idx:]
+        rmax_pl = rmax_vals[0::2]
+        rmax_lpl = rmax_vals[1::2]
+
+        self.params = fit
+        self.p0 = p0
+        self.low_bounds = low_bounds
+        self.high_bounds = high_bounds
+        self.signal_ss_fit = fit_vals
+
+        n_groups = len(rmax_pl)
+        if self.names is None:
+            names = [f"group_{i}" for i in range(n_groups)]
+        elif len(self.names) == n_groups:
+            names = self.names
+        else:
+            names = [self.names[0] for _ in range(n_groups)]
+
+        df_fit = pd.DataFrame(
+            {
+                'Kd [µM]': [self.Kd_ss] * n_groups,
+                'Rmax_PL': rmax_pl,
+                'Rmax_LPL': rmax_lpl,
+                'Name': names,
+            }
+        )
+        if fit_sigma:
+            df_fit['sigma'] = [self.sigma_ss] * n_groups
+
+        self.fit_params_ss = df_fit
+        self.Smax_upper_bound_factor = get_smax_upper_bound_factor(self.Kd_ss)
+
         return None
 
     def get_k_off_initial_guess(self):

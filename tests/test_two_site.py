@@ -141,6 +141,35 @@ class TestSteadyStateAgreement:
                 f"({result[-1, 0]:.6f}) != analytical ({expected:.6f})"
             )
 
+    def test_strong_negative_cooperativity_high_ligand_matches_steady_state(self):
+        """At very high ligand and long time, strong negative cooperativity
+        must converge to the cooperative analytical steady state (near Rmax_PL)."""
+        kon, koff = 0.1, 0.01
+        sigma = 1e-10
+        Kd = koff / kon
+        a_conc = 100.0
+        Rmax_PL, Rmax_LPL = 1, 10.0
+
+        time = np.linspace(0, 5000, 500)
+        result = solve_two_site_cooperative_association(
+            time, a_conc, kon, koff, sigma,
+            Rmax_PL=Rmax_PL, Rmax_LPL=Rmax_LPL,
+        )
+
+        kinetic_ss = result[-1, 0]
+        expected_ss = steady_state_two_site_cooperative(
+            a_conc, Rmax_PL, Rmax_LPL, Kd, sigma,
+        )
+
+        assert np.isclose(kinetic_ss, expected_ss, rtol=1e-3), (
+            f"Strong negative cooperativity at high [L]: kinetic "
+            f"({kinetic_ss:.6f}) != analytical ({expected_ss:.6f})"
+        )
+        assert np.isclose(kinetic_ss, Rmax_PL, rtol=1e-2), (
+            f"Strong negative cooperativity at high [L]: signal "
+            f"({kinetic_ss:.6f}) should be close to Rmax_PL ({Rmax_PL})"
+        )
+
 
 class TestAnalyticalDissociation:
     """The dissociation ODE has a closed-form solution (triangular matrix).

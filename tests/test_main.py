@@ -5,6 +5,8 @@ import os
 
 from pykingenie.main  import KineticsAnalyzer
 from pykingenie.octet import OctetExperiment
+from pykingenie.fitter_surface import KineticsFitter
+from pykingenie.utils.signal_surface import steady_state_two_site_cooperative
 
 pyKinetics = KineticsAnalyzer()
 
@@ -111,6 +113,61 @@ def test_submit_steady_state_fitting():
     expected = [0.019602607912092396]
 
     assert np.allclose(Kd_ss, expected), f"Expected {expected}, got {Kd_ss}"
+
+
+def test_submit_steady_state_fitting_model_routing():
+
+    # Build a real surface fitter from simulated two-site cooperative steady-state data.
+    C = np.logspace(-3, 2, 12)
+    Kd_true = 0.2
+    sigma_true = 3.0
+    Rmax_PL_true = 6.0
+    Rmax_LPL_true = 12.0
+
+    ss_signal = steady_state_two_site_cooperative(
+        C, Rmax_PL_true, Rmax_LPL_true, Kd_true, sigma_true
+    )
+
+    t = np.linspace(0, 100, 40)
+    assoc_lst = [np.full_like(t, s, dtype=float) for s in ss_signal]
+    time_assoc_lst = [t.copy() for _ in ss_signal]
+
+    fitter = KineticsFitter(
+        time_assoc_lst=time_assoc_lst,
+        association_signal_lst=assoc_lst,
+        lig_conc_lst=list(C),
+        smax_id=[0 for _ in ss_signal],
+        name_lst=["simulated"],
+        is_single_cycle=False,
+    )
+
+    ka = KineticsAnalyzer()
+    ka.add_fitting(fitter, "simulated")
+
+    # one-site route
+    ka.submit_steady_state_fitting(fitting_model='one_site')
+    assert fitter.fit_params_ss is not None
+    assert 'Smax' in fitter.fit_params_ss.columns
+
+    # two-site non-cooperative route
+    ka.submit_steady_state_fitting(fitting_model='two_site', fit_sigma=False)
+    assert fitter.fit_params_ss is not None
+    assert 'Rmax_PL' in fitter.fit_params_ss.columns
+    assert 'Rmax_LPL' in fitter.fit_params_ss.columns
+    assert 'sigma' not in fitter.fit_params_ss.columns
+
+    # two-site cooperative route
+    ka.submit_steady_state_fitting(fitting_model='two_site', fit_sigma=True)
+    assert fitter.fit_params_ss is not None
+    assert 'sigma' in fitter.fit_params_ss.columns
+    assert np.isclose(fitter.sigma_ss, sigma_true, rtol=0.25)
+
+
+def test_submit_steady_state_fitting_invalid_model_raises():
+    ka = KineticsAnalyzer()
+
+    with pytest.raises(ValueError):
+        ka.submit_steady_state_fitting(fitting_model='invalid_model')
 
 def test_submit_kinetic_fitting():
 

@@ -4,12 +4,18 @@ from .processing import concat_signal_lst, detect_time_list_continuos
 
 from .signal_surface import (
     steady_state_one_site,
+    steady_state_two_site,
+    steady_state_two_site_cooperative,
     one_site_association_analytical,
     one_site_dissociation_analytical,
     solve_ode_one_site_mass_transport_association,
     solve_ode_one_site_mass_transport_dissociation,
     solve_induced_fit_association,
-    solve_induced_fit_dissociation
+    solve_induced_fit_dissociation,
+    solve_two_site_association,
+    solve_two_site_cooperative_association,
+    solve_two_site_dissociation,
+    solve_two_site_cooperative_dissociation,
 )
 
 from .math import get_rss
@@ -22,10 +28,12 @@ from scipy.optimize import minimize_scalar
 __all__ = [
     'guess_initial_signal',
     'fit_steady_state_one_site',
+    'fit_steady_state_two_site',
     'steady_state_one_site_asymmetric_ci95',
     'fit_one_site_association',
     'fit_one_site_dissociation',
     'fit_one_site_assoc_and_disso',
+    'fit_two_site_assoc_and_disso',
     'fit_induced_fit_sites_assoc_and_disso',
     'fit_one_site_assoc_and_disso_ktr',
     'one_site_assoc_and_disso_asymmetric_ci95',
@@ -171,6 +179,122 @@ def fit_steady_state_one_site(signal_lst, ligand_lst, initial_parameters,
 
     return global_fit_params, cov, fitted_values
 
+
+def fit_steady_state_two_site(
+    signal_lst,
+    ligand_lst,
+    initial_parameters,
+    low_bounds,
+    high_bounds,
+    fixed_Kd=False,
+    Kd_value=None,
+    fit_sigma=False,
+):
+    """
+    Fit a two-site steady-state binding model with optional cooperativity.
+
+    Model parameters are one shared Kd and, for each trace, two response terms:
+    Rmax_PL (singly-bound state) and Rmax_LPL (doubly-bound state).
+    Optionally, a shared cooperativity factor sigma can also be fitted.
+    If fit_sigma=False, the non-cooperative model is used (sigma=1).
+
+    Parameter order when fitting:
+    - fixed_Kd=False, fit_sigma=False: [Kd, Rmax_PL_1, Rmax_LPL_1, ...]
+    - fixed_Kd=False, fit_sigma=True : [Kd, sigma, Rmax_PL_1, Rmax_LPL_1, ...]
+    - fixed_Kd=True,  fit_sigma=False: [Rmax_PL_1, Rmax_LPL_1, ...]
+    - fixed_Kd=True,  fit_sigma=True : [sigma, Rmax_PL_1, Rmax_LPL_1, ...]
+
+    Parameters
+    ----------
+    signal_lst : list
+        List of steady-state signal arrays.
+    ligand_lst : list
+        List of ligand concentration arrays (same structure as signal_lst).
+    initial_parameters : list
+        Initial guess vector in the order documented above.
+    low_bounds : list
+        Lower bounds for each fitted parameter.
+    high_bounds : list
+        Upper bounds for each fitted parameter.
+    fixed_Kd : bool, optional
+        If True, keep Kd fixed to Kd_value.
+    Kd_value : float, optional
+        Value to use when fixed_Kd=True.
+    fit_sigma : bool, optional
+        If True, fit sigma as a shared parameter.
+
+    Returns
+    -------
+    list
+        Fitted parameters.
+    np.ndarray
+        Covariance matrix of the fitted parameters.
+    list
+        Fitted values for each trace, same dimensions as signal_lst.
+    """
+    all_signal = concat_signal_lst(signal_lst)
+
+    # Pre-compute slice boundaries for output array
+    _lengths = [len(C) for C in ligand_lst]
+    _total = sum(_lengths)
+    _offsets = np.empty(len(_lengths) + 1, dtype=int)
+    _offsets[0] = 0
+    for _k, _n in enumerate(_lengths):
+        _offsets[_k + 1] = _offsets[_k] + _n
+
+    # Number of leading shared parameters before per-trace Rmax pairs.
+    _start = 0
+    if not fixed_Kd:
+        _start += 1
+    if fit_sigma:
+        _start += 1
+
+    def fit_fx(dummyVariable, *args):
+        _ = dummyVariable
+
+        idx = 0
+        Kd = Kd_value if fixed_Kd else args[idx]
+        if not fixed_Kd:
+            idx += 1
+
+        sigma = None
+        if fit_sigma:
+            sigma = args[idx]
+            idx += 1
+
+        out = np.empty(_total)
+        for _k, C in enumerate(ligand_lst):
+            rmax_pl = args[idx + 2 * _k]
+            rmax_lpl = args[idx + 2 * _k + 1]
+
+            if fit_sigma:
+                out[_offsets[_k]:_offsets[_k + 1]] = steady_state_two_site_cooperative(
+                    C, rmax_pl, rmax_lpl, Kd, sigma
+                )
+            else:
+                out[_offsets[_k]:_offsets[_k + 1]] = steady_state_two_site(
+                    C, rmax_pl, rmax_lpl, Kd
+                )
+
+        return out
+
+    global_fit_params, cov = curve_fit(
+        fit_fx,
+        1,
+        all_signal,
+        p0=initial_parameters,
+        bounds=(low_bounds, high_bounds),
+    )
+
+    fit_values_flat = fit_fx(1, *global_fit_params)
+    fitted_values = []
+    for _k in range(len(ligand_lst)):
+        fitted_values.append(fit_values_flat[_offsets[_k]:_offsets[_k + 1]])
+
+    return global_fit_params, cov, fitted_values
+
+
+
 def steady_state_one_site_asymmetric_ci95(kd_estimated, signal_lst, ligand_lst, initial_parameters,
                                           low_bounds, high_bounds, rss_desired):
     """
@@ -203,7 +327,7 @@ def steady_state_one_site_asymmetric_ci95(kd_estimated, signal_lst, ligand_lst, 
 
     def f_to_optimize(Kd):
 
-        fit_params, _, fit_vals = fit_steady_state_one_site(signal_lst, ligand_lst,
+        _, _, fit_vals = fit_steady_state_one_site(signal_lst, ligand_lst,
                                                   initial_parameters,
                                                   low_bounds,
                                                   high_bounds,
@@ -535,6 +659,175 @@ def fit_one_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
 
     fitted_values_disso = []
     for _k in range(_n_traces):
+        fitted_values_disso.append(predicted_curve[_d_offsets[_k]:_d_offsets[_k + 1]])
+
+    return global_fit_params, cov, fitted_values_assoc, fitted_values_disso
+
+
+def fit_two_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_lst,
+                                 disso_signal_lst, disso_time_lst,
+                                 initial_parameters, low_bounds, high_bounds,
+                                 smax_idx=None,
+                                 shared_smax=False,
+                                 fixed_t0=True,
+                                 fixed_Kd=False, Kd_value=None,
+                                 fixed_koff=False, koff_value=None,
+                                 fit_sigma=False):
+    """
+    Global fit to association and dissociation traces - two-site binding model.
+
+    Parameters follow the same structure as `fit_one_site_assoc_and_disso`,
+    but each trace uses two amplitudes: Rmax_PL and Rmax_LPL.
+    Optional cooperativity can be fitted through a shared sigma.
+
+    Parameter order when fitting:
+    - fixed_Kd=False, fixed_koff=False, fit_sigma=False:
+      [Kd, koff, (t0...), (Rmax_PL, Rmax_LPL)...]
+    - fixed_Kd=False, fixed_koff=False, fit_sigma=True:
+      [Kd, koff, sigma, (t0...), (Rmax_PL, Rmax_LPL)...]
+    """
+    if smax_idx is None:
+        smax_idx = list(range(len(assoc_signal_lst)))
+
+    # Set a flag for associations that start from near-zero time.
+    initial_signal_at_zero = [time[0] < 2 for time in assoc_time_lst]
+
+    all_signal_assoc = concat_signal_lst(assoc_signal_lst)
+    all_signal_disso = concat_signal_lst(disso_signal_lst)
+
+    time_lst_assoc = [np.array(t) for t in assoc_time_lst]
+    time_lst_disso = [np.array(t) for t in disso_time_lst]
+    time_lst_disso = [t - t[0] for t in time_lst_disso]
+
+    n_unq_smax = len(np.unique(smax_idx))
+    n_traces = len(time_lst_assoc)
+
+    continuos_time = detect_time_list_continuos(time_lst_assoc, disso_time_lst)
+
+    # Pre-compute slice boundaries for output array
+    _a_lengths = [len(t) for t in time_lst_assoc]
+    _d_lengths = [len(t) for t in time_lst_disso]
+    _total_a = sum(_a_lengths)
+    _total_d = sum(_d_lengths)
+    _total = _total_a + _total_d
+
+    _a_offsets = np.empty(n_traces + 1, dtype=int)
+    _a_offsets[0] = 0
+    for _k in range(n_traces):
+        _a_offsets[_k + 1] = _a_offsets[_k] + _a_lengths[_k]
+
+    _d_offsets = np.empty(n_traces + 1, dtype=int)
+    _d_offsets[0] = _total_a
+    for _k in range(n_traces):
+        _d_offsets[_k + 1] = _d_offsets[_k] + _d_lengths[_k]
+
+    def fit_fx(dummyVariable, *args):
+        _ = dummyVariable
+
+        idx = 0
+        Kd = Kd_value if fixed_Kd else args[idx]
+        if not fixed_Kd:
+            idx += 1
+
+        Koff = koff_value if fixed_koff else args[idx]
+        if not fixed_koff:
+            idx += 1
+
+        sigma = args[idx] if fit_sigma else 1.0
+        if fit_sigma:
+            idx += 1
+
+        t0_vals = None
+        if not fixed_t0:
+            t0_vals = args[idx:idx + n_unq_smax]
+            idx += n_unq_smax
+
+        out = np.empty(_total)
+
+        prev_fpl_end = 0.0
+        prev_flpl_end = 0.0
+
+        for i in range(n_traces):
+            t_assoc = time_lst_assoc[i]
+            t_dissoc = time_lst_disso[i]
+            analyte_conc = analyte_conc_lst[i]
+            sidx = smax_idx[i]
+
+            if shared_smax:
+                rmax_base = idx + 2 * sidx
+            else:
+                rmax_base = idx + 2 * i
+
+            rmax_pl = args[rmax_base]
+            rmax_lpl = args[rmax_base + 1]
+
+            t0 = t0_vals[sidx] if (t0_vals is not None) else 0.0
+            t_assoc_rel = t_assoc - t_assoc[0] - t0
+
+            if np.logical_or(i == 0, initial_signal_at_zero[i]) and continuos_time[i]:
+                fpl0, flpl0 = 0.0, 0.0
+            elif continuos_time[i]:
+                fpl0, flpl0 = prev_fpl_end, prev_flpl_end
+            else:
+                fpl0, flpl0 = 0.0, 0.0
+
+            if fit_sigma:
+                y_assoc = solve_two_site_cooperative_association(
+                    t_assoc_rel, analyte_conc, Koff / Kd, Koff, sigma,
+                    Rmax_PL=rmax_pl, Rmax_LPL=rmax_lpl,
+                    fPL_0=fpl0, fLPL_0=flpl0,
+                )
+            else:
+                y_assoc = solve_two_site_association(
+                    t_assoc_rel, analyte_conc, Koff / Kd, Koff,
+                    Rmax_PL=rmax_pl, Rmax_LPL=rmax_lpl,
+                    fPL_0=fpl0, fLPL_0=flpl0,
+                )
+
+            out[_a_offsets[i]:_a_offsets[i + 1]] = y_assoc[:, 0]
+
+            # Convert end signals back to fractions for dissociation initialization.
+            fpl0_d = y_assoc[-1, 1] / rmax_pl if np.abs(rmax_pl) > 1e-15 else 0.0
+            flpl0_d = y_assoc[-1, 2] / rmax_lpl if np.abs(rmax_lpl) > 1e-15 else 0.0
+
+            if fit_sigma:
+                y_disso = solve_two_site_cooperative_dissociation(
+                    t_dissoc, Koff, sigma,
+                    Rmax_PL=rmax_pl, Rmax_LPL=rmax_lpl,
+                    fPL_0=fpl0_d, fLPL_0=flpl0_d,
+                )
+            else:
+                y_disso = solve_two_site_dissociation(
+                    t_dissoc, Koff,
+                    Rmax_PL=rmax_pl, Rmax_LPL=rmax_lpl,
+                    fPL_0=fpl0_d, fLPL_0=flpl0_d,
+                )
+
+            out[_d_offsets[i]:_d_offsets[i + 1]] = y_disso[:, 0]
+
+            prev_fpl_end = y_disso[-1, 1] / rmax_pl if np.abs(rmax_pl) > 1e-15 else 0.0
+            prev_flpl_end = y_disso[-1, 2] / rmax_lpl if np.abs(rmax_lpl) > 1e-15 else 0.0
+
+        return out
+
+    all_signal = np.concatenate([all_signal_assoc, all_signal_disso], axis=0)
+
+    global_fit_params, cov = curve_fit(
+        fit_fx,
+        1,
+        all_signal,
+        p0=initial_parameters,
+        bounds=(low_bounds, high_bounds),
+    )
+
+    predicted_curve = fit_fx(1, *global_fit_params)
+
+    fitted_values_assoc = []
+    for _k in range(n_traces):
+        fitted_values_assoc.append(predicted_curve[_a_offsets[_k]:_a_offsets[_k + 1]])
+
+    fitted_values_disso = []
+    for _k in range(n_traces):
         fitted_values_disso.append(predicted_curve[_d_offsets[_k]:_d_offsets[_k + 1]])
 
     return global_fit_params, cov, fitted_values_assoc, fitted_values_disso
