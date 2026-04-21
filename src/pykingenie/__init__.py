@@ -49,7 +49,9 @@ from .utils.signal_surface import (
     ode_mixture_analyte_association,
     solve_ode_mixture_analyte_association,
     ode_mixture_analyte_dissociation,
-    solve_ode_mixture_analyte_dissociation
+    solve_ode_mixture_analyte_dissociation,
+    solve_two_site_cooperative_association,
+    solve_two_site_cooperative_dissociation
 )
 
 from .utils.signal_solution  import (
