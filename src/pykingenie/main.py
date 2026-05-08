@@ -517,7 +517,7 @@ class KineticsAnalyzer:
 
         return messages
 
-    def submit_steady_state_fitting(self, fitting_model='one_site', fit_sigma=False):
+    def submit_steady_state_fitting(self, fitting_model='one_to_one', fit_sigma=False):
         """
         Submit steady-state fitting for all fitting objects.
 
@@ -525,26 +525,22 @@ class KineticsAnalyzer:
         ----------
         fitting_model : str, optional
             Steady-state model to fit for surface data.
-            Options: 'one_site', 'two_site'. Default is 'one_site'.
+            Options: 'one_to_one', 'two_to_one'. Default is 'one_to_one'.
         fit_sigma : bool, optional
-            Only used when fitting_model='two_site'. If True, fit a shared
+            Only used when fitting_model='two_to_one'. If True, fit a shared
             cooperativity factor (sigma). Default is False.
 
         Returns
         -------
         None
         """
-        if fitting_model not in ['one_site', 'two_site']:
+        if fitting_model not in ['one_to_one', 'two_to_one']:
             raise ValueError("Unknown steady-state fitting model: " + fitting_model)
 
         for kf in self.fittings.values():
             if not kf.is_single_cycle:
-                if fitting_model == 'one_site':
-                    if hasattr(kf, 'fit_steady_state_one_site'):
-                        kf.fit_steady_state_one_site()
-                    else:
-                        # Backward compatibility for older fitter classes
-                        kf.fit_steady_state()
+                if fitting_model == 'one_to_one':
+                    kf.fit_steady_state_one_site()
                 else:
                     kf.fit_steady_state_two_site(fit_sigma=fit_sigma)
 

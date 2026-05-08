@@ -147,19 +147,19 @@ def test_submit_steady_state_fitting_model_routing():
     ka.add_fitting(fitter, "simulated")
 
     # one-site route
-    ka.submit_steady_state_fitting(fitting_model='one_site')
+    ka.submit_steady_state_fitting(fitting_model='one_to_one')
     assert fitter.fit_params_ss is not None
     assert 'Smax' in fitter.fit_params_ss.columns
 
     # two-site non-cooperative route
-    ka.submit_steady_state_fitting(fitting_model='two_site', fit_sigma=False)
+    ka.submit_steady_state_fitting(fitting_model='two_to_one', fit_sigma=False)
     assert fitter.fit_params_ss is not None
     assert 'Rmax_PL' in fitter.fit_params_ss.columns
     assert 'Rmax_LPL' in fitter.fit_params_ss.columns
     assert 'sigma' not in fitter.fit_params_ss.columns
 
     # two-site cooperative route
-    ka.submit_steady_state_fitting(fitting_model='two_site', fit_sigma=True)
+    ka.submit_steady_state_fitting(fitting_model='two_to_one', fit_sigma=True)
     assert fitter.fit_params_ss is not None
     assert 'sigma' in fitter.fit_params_ss.columns
     assert np.isclose(fitter.sigma_ss, sigma_true, rtol=0.25)
