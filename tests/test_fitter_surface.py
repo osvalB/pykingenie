@@ -16,9 +16,12 @@ from pykingenie.utils.signal_surface import (
     steady_state_two_site_cooperative,
 )
 
+from itertools import product
+
 test_file_1 = "./test_files/simulation_Kd-10_koff-0.01.csv"
 test_file_2 = "./test_files/simulation_Kd-0.5_koff-0.01_Ktr-0.005.csv"
 test_file_3 = "./test_files/simulation_kon-0.1_koff-0.01_kc-1_krev-10.csv"
+test_file_4 = "./test_files/simulation_KinGenie_kon-0.5_koff-0.005_sigma-1_plRmax-3.5_pl2_Rmax-7.csv"
 
 ### Obtain a fitter instance
 
@@ -473,6 +476,87 @@ def test_fit_one_site_assoc_and_disso_0():
 
     assert n_fitted_params == 3 + len(fitter_surface.lig_conc_lst), \
            f"Expected 3 + {len(fitter_surface.lig_conc_lst)} t0 parameters, got {n_fitted_params}."
+
+
+def test_fit_two_site_assoc_and_disso_dataframe_shapes_kingenie_csv():
+    """
+    Regression test based on test.py workflow and
+    simulation_KinGenie_kon-0.5_koff-0.005_sigma-1_plRmax-3.5_pl2_Rmax-7.csv.
+
+    Validate that the completed two-site fitting method creates parameter/error
+    dataframes with correct shape for:
+    - per-curve Smax pair fitting (shared_smax=False)
+    - global Smax pair fitting (shared_smax=True with one shared smax_id)
+    """
+
+    # Ground truth from filename:
+    # simulation_KinGenie_kon-0.5_koff-0.005_sigma-1_plRmax-3.5_pl2_Rmax-7.csv
+    kon_true = 0.5
+    koff_true = 0.005
+    sigma_true = 1.0
+    rmax_pl_true = 3.5
+    rmax_lpl_true = 7.0
+    kd_true = koff_true / kon_true
+
+    # Generate a list of combinations of shared_smax, fit_sigma, and fixed_t0 to test.
+    combinations = list(product([False, True], repeat=3))
+
+    # Test across combinations of shared_smax and sigma fitting.
+    for shared_smax, fit_sigma, fixed_t0 in combinations:
+
+        fitter_surface = create_fitter(test_file_4)
+        fitter_surface.fit_steady_state_one_site()
+
+        n_curves = len(fitter_surface.assoc_lst)
+        if shared_smax:
+            # Force one global Smax group for this branch.
+            fitter_surface.smax_id = [0 for _ in range(n_curves)]
+
+        fitter_surface.fit_two_site_assoc_and_disso(
+            shared_smax=shared_smax,
+            fit_sigma=fit_sigma,
+            fixed_t0=fixed_t0
+        )
+
+        df_fit = fitter_surface.fit_params_kinetics
+        df_err = fitter_surface.fit_params_kinetics_error
+
+        assert isinstance(df_fit, pd.DataFrame)
+        assert isinstance(df_err, pd.DataFrame)
+
+        for col in ['Kd [µM]', 'k_off [1/s]', 'Rmax_PL', 'Rmax_LPL']:
+            assert col in df_fit.columns
+            assert col in df_err.columns
+
+        if fit_sigma:
+            assert 'sigma' in df_fit.columns
+            assert 'sigma' in df_err.columns
+        else:
+            assert 'sigma' not in df_fit.columns
+            assert 'sigma' not in df_err.columns
+
+        expected_rows = 1 if shared_smax else n_curves
+        assert len(df_fit) == expected_rows
+        assert len(df_err) == expected_rows
+
+        expected_n_params = 2 + fit_sigma + 2 * (1 if shared_smax else n_curves)
+        
+        if not fixed_t0:
+            expected_n_params += np.max(fitter_surface.smax_id) + 1  # t0 per curve
+
+        assert len(fitter_surface.params) == expected_n_params
+
+        # Parameter checks (tolerances are intentionally moderate for nonlinear global fits).
+        assert np.isclose(float(df_fit['Kd [µM]'].median()), kd_true, rtol=0.6)
+        assert np.isclose(float(df_fit['k_off [1/s]'].median()), koff_true, rtol=0.6)
+        assert np.isclose(float(df_fit['Rmax_PL'].median()), rmax_pl_true, rtol=0.4)
+        assert np.isclose(float(df_fit['Rmax_LPL'].median()), rmax_lpl_true, rtol=0.4)
+
+        if fit_sigma:
+            assert np.isclose(float(df_fit['sigma'].median()), sigma_true, rtol=0.5)
+
+        assert '(Derived) k_on [1/µM/s]' in df_fit.columns
+        assert np.isclose(float(df_fit['(Derived) k_on [1/µM/s]'].median()), kon_true, rtol=0.8)
 
 def test_fit_one_site_assoc_and_disso_1():
 

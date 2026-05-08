@@ -521,6 +521,8 @@ def fit_one_site_dissociation(signal_lst, time_lst,
 
     return global_fit_params, cov, fitted_values_disso
 
+
+
 def fit_one_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_lst,
                                  disso_signal_lst, disso_time_lst,
                                  initial_parameters, low_bounds, high_bounds,
@@ -685,6 +687,53 @@ def fit_two_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
       [Kd, koff, (t0...), (Rmax_PL, Rmax_LPL)...]
     - fixed_Kd=False, fixed_koff=False, fit_sigma=True:
       [Kd, koff, sigma, (t0...), (Rmax_PL, Rmax_LPL)...]
+
+    Parameters
+    ----------
+    assoc_signal_lst : list
+        List of association signals to fit, each signal is a numpy array.
+    assoc_time_lst : list
+        List of association time arrays.
+    analyte_conc_lst : list
+        List of analyte concentrations, each element is a numpy array.
+    disso_signal_lst : list
+        List of dissociation signals to fit, each signal is a numpy array.
+    disso_time_lst : list
+        List of dissociation time arrays.
+    initial_parameters : list
+        Initial guess for the parameters.
+    low_bounds : list
+        Lower bounds for the parameters.
+    high_bounds : list
+        Upper bounds for the parameters.
+    smax_idx : list, optional
+        List of indices for the s_max parameters, used if shared_smax is True.
+    shared_smax : bool, optional
+        If True, the s_max parameters are shared between traces, default is False.
+    fixed_t0 : bool, optional
+        If True, t0 is fixed to 0, otherwise we fit it, default is True.
+    fixed_Kd : bool, optional
+        If True, Kd is fixed to Kd_value, default is False.
+    Kd_value : float, optional
+        Value of Kd to use if fixed_Kd is True.
+    fixed_koff : bool, optional
+        If True, koff is fixed to koff_value, default is False.
+    koff_value : float, optional
+        Value of koff to use if fixed_koff is True.
+    fit_sigma : bool, optional
+        If True, fit sigma as a shared parameter for cooperativity, default is False.
+    
+    Returns
+    -------
+    list
+        Fitted parameters.
+    np.ndarray
+        Covariance matrix of the fitted parameters.
+    list
+        Fitted values for each association signal, same dimensions as assoc_signal_lst.
+    list
+        Fitted values for each dissociation signal, same dimensions as disso_signal_lst.
+
     """
     if smax_idx is None:
         smax_idx = list(range(len(assoc_signal_lst)))
@@ -729,7 +778,7 @@ def fit_two_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
         if not fixed_Kd:
             idx += 1
 
-        Koff = koff_value if fixed_koff else args[idx]
+        k_off = koff_value if fixed_koff else args[idx]
         if not fixed_koff:
             idx += 1
 
@@ -773,13 +822,13 @@ def fit_two_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
 
             if fit_sigma:
                 y_assoc = solve_two_site_cooperative_association(
-                    t_assoc_rel, analyte_conc, Koff / Kd, Koff, sigma,
+                    t_assoc_rel, analyte_conc, k_off / Kd, k_off, sigma,
                     Rmax_PL=rmax_pl, Rmax_LPL=rmax_lpl,
                     fPL_0=fpl0, fLPL_0=flpl0,
                 )
             else:
                 y_assoc = solve_two_site_association(
-                    t_assoc_rel, analyte_conc, Koff / Kd, Koff,
+                    t_assoc_rel, analyte_conc, k_off / Kd, k_off,
                     Rmax_PL=rmax_pl, Rmax_LPL=rmax_lpl,
                     fPL_0=fpl0, fLPL_0=flpl0,
                 )
@@ -792,13 +841,13 @@ def fit_two_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
 
             if fit_sigma:
                 y_disso = solve_two_site_cooperative_dissociation(
-                    t_dissoc, Koff, sigma,
+                    t_dissoc, k_off, sigma,
                     Rmax_PL=rmax_pl, Rmax_LPL=rmax_lpl,
                     fPL_0=fpl0_d, fLPL_0=flpl0_d,
                 )
             else:
                 y_disso = solve_two_site_dissociation(
-                    t_dissoc, Koff,
+                    t_dissoc, k_off,
                     Rmax_PL=rmax_pl, Rmax_LPL=rmax_lpl,
                     fPL_0=fpl0_d, fLPL_0=flpl0_d,
                 )

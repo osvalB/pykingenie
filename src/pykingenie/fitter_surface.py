@@ -5,6 +5,7 @@ import pandas as pd
 from .utils.fitting_surface import (
     fit_steady_state_one_site,
     fit_steady_state_two_site,
+    fit_two_site_assoc_and_disso,
     steady_state_one_site_asymmetric_ci95,
     fit_one_site_association,
     fit_one_site_dissociation,
@@ -695,7 +696,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         if fit_ktr:
 
-            for i, _ in enumerate(self.smax_guesses_unq):
+            for _ in self.smax_guesses_unq:
                 p0.insert(2, 1e-4)
                 low_bounds.insert(2, 1e-7)
                 high_bounds.insert(2, 1)
@@ -703,7 +704,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         if not fixed_t0:
 
-            for i,_ in enumerate(self.smax_guesses_unq):
+            for _ in self.smax_guesses_unq:
                 p0.insert(2,0)
                 low_bounds.insert(2,-0.01)
                 high_bounds.insert(2,0.1)
@@ -823,6 +824,203 @@ class KineticsFitter(KineticsFitterGeneral):
         self.high_bounds = high_bounds
 
         return  None
+
+    def fit_two_site_assoc_and_disso(self, shared_smax=True, fixed_t0=True, fit_sigma=False):
+
+        """
+        Fit a two-to-one binding model, where the ligand (attached molecule) has two binding sites
+
+        Parameters
+        ----------
+        shared_smax : bool, optional
+            Whether to share Smax across curves with the same Smax ID, default is True.
+            In this case, there are two Smax parameters, one for the single-bound state and one for the double-bound state, but they are shared across curves with the same Smax ID.
+        fixed_t0 : bool, optional
+            Whether to fix the time offset (t0) to zero, default is True.
+        fit_sigma : bool, optional
+            Whether to fit a shared cooperativity factor (sigma) for the two binding sites, default is False. If False, the model assumes non-cooperative binding (sigma=1).
+        """
+
+        self.clear_fittings()
+
+        # Obtain initial guesses and bounds for Kd and k_off
+        self.fit_one_site_assoc_and_disso(shared_smax=shared_smax, fixed_t0=True, fit_ktr=False)
+
+        k_off_init = self.k_off
+        Kd_init  = self.Kd
+
+        # Increase Kd initial guess by a factor of 10, to account for the higher apparent affinity of the two-site model
+        Kd_init *= 10
+
+        # Expand Smax, we need two Smax values per Smax ID, one for the single-bound state and one for the double-bound state
+        Smax_init = []
+        for smax in self.Smax:
+            Smax_init.extend([0.5*smax, 0.5*smax])
+
+        n_unq_smax = len(np.unique(self.smax_id))
+
+        # Stage 1: fit without sigma and without t0.
+        p0 = [Kd_init, k_off_init] + Smax_init
+        p0_low  = [Kd_init/1e3, k_off_init/1e3] + [x/50 for x in Smax_init]
+        p0_high = [Kd_init*1e3, k_off_init*1e3] + [x*25 for x in Smax_init]
+
+        kwargs = {
+            'assoc_signal_lst' : self.assoc_lst,
+            'assoc_time_lst' : self.time_assoc_lst,
+            'analyte_conc_lst' : self.lig_conc_lst,
+            'disso_signal_lst' :self.disso_lst,
+            'disso_time_lst' : self.time_disso_lst,
+            'shared_smax' : shared_smax,
+            'smax_idx' : self.smax_id,
+        }
+
+        global_fit_params, cov, fitted_values_assoc, fitted_values_disso = fit_two_site_assoc_and_disso(
+            **kwargs,
+            initial_parameters=p0,
+            low_bounds=p0_low,
+            high_bounds=p0_high,
+            fixed_t0=True,
+            fit_sigma=False,
+        )
+
+        # Stage 2: optionally fit sigma (still without t0).
+        if fit_sigma:
+            sigma_init = 1.0
+            # Insert sigma_init at the correct position in p0, which is after Kd and k_off, but before the Smax values
+            p0 = np.insert(global_fit_params, 2, sigma_init).tolist()
+            p0_low  = [p0[0]/1e3, p0[1]/1e3, 1e-3] + [x/50 for x in p0[3:]]
+            p0_high = [p0[0]*1e3, p0[1]*1e3, 1e3] + [x*25 for x in p0[3:]]
+
+            global_fit_params, cov, fitted_values_assoc, fitted_values_disso = fit_two_site_assoc_and_disso(
+                **kwargs,
+                initial_parameters=p0,
+                low_bounds=p0_low,
+                high_bounds=p0_high,
+                fixed_t0=True,
+                fit_sigma=True,
+            )
+
+        # Stage 3: optionally fit t0 with the selected sigma mode.
+        if not fixed_t0:
+            insert_idx = 3 if fit_sigma else 2
+            p0 = np.array(global_fit_params, dtype=float).tolist()
+            p0 = p0[:insert_idx] + [0.0 for _ in range(len(self.smax_guesses_unq))] + p0[insert_idx:]
+
+            p0_low = [p0[0]/1e3, p0[1]/1e3]
+            p0_high = [p0[0]*1e3, p0[1]*1e3]
+
+            if fit_sigma:
+                p0_low += [1e-3]
+                p0_high += [1e3]
+
+            # Keep t0 tightly centered around zero.
+            p0_low += [-1e-3 for _ in range(len(self.smax_guesses_unq))]
+            p0_high += [1e-3 for _ in range(len(self.smax_guesses_unq))]
+
+            amp_start = insert_idx + n_unq_smax
+            p0_low += [x/50 for x in p0[amp_start:]]
+            p0_high += [x*25 for x in p0[amp_start:]]
+
+            global_fit_params, cov, fitted_values_assoc, fitted_values_disso = fit_two_site_assoc_and_disso(
+                **kwargs,
+                initial_parameters=p0,
+                low_bounds=p0_low,
+                high_bounds=p0_high,
+                fixed_t0=False,
+                fit_sigma=fit_sigma,
+            )
+
+        self.signal_assoc_fit = fitted_values_assoc
+        self.signal_disso_fit = fitted_values_disso
+
+        fit = np.array(global_fit_params, dtype=float)
+        self.Kd = fit[0]
+        self.k_off = fit[1]
+
+        idx = 2
+        sigma_val = None
+        if fit_sigma:
+            sigma_val = fit[idx]
+            idx += 1
+
+        n_unq_smax = len(np.unique(self.smax_id))
+
+        t0_vals = None
+        if not fixed_t0:
+            t0_vals = fit[idx:idx + n_unq_smax]
+            idx += n_unq_smax
+
+        rmax_vals = fit[idx:]
+        rmax_pl = rmax_vals[0::2]
+        rmax_lpl = rmax_vals[1::2]
+
+        self.Smax = rmax_vals
+
+        # Create dataframe with fitted parameters
+        df_fit = pd.DataFrame(
+            {
+                'Kd [µM]': self.Kd,
+                'k_off [1/s]': self.k_off,
+                'Rmax_PL': rmax_pl,
+                'Rmax_LPL': rmax_lpl,
+            }
+        )
+
+        if fit_sigma:
+            df_fit['sigma'] = sigma_val
+
+        df_fit['(Derived) k_on [1/µM/s]'] = df_fit['k_off [1/s]'] / df_fit['Kd [µM]']
+
+        # Relative errors (in %) from covariance diagonal
+        error = np.sqrt(np.diag(cov))
+        rel_error = error / fit * 100
+
+        idx_err = 2
+        sigma_err = None
+        if fit_sigma:
+            sigma_err = rel_error[idx_err]
+            idx_err += 1
+
+        t0_err_vals = None
+        if not fixed_t0:
+            t0_err_vals = rel_error[idx_err:idx_err + n_unq_smax]
+            idx_err += n_unq_smax
+
+        rmax_err = rel_error[idx_err:]
+        rmax_pl_err = rmax_err[0::2]
+        rmax_lpl_err = rmax_err[1::2]
+
+        df_error = pd.DataFrame(
+            {
+                'Kd [µM]': rel_error[0],
+                'k_off [1/s]': rel_error[1],
+                'Rmax_PL': rmax_pl_err,
+                'Rmax_LPL': rmax_lpl_err,
+            }
+        )
+
+        if fit_sigma:
+            df_error['sigma'] = sigma_err
+
+        if not fixed_t0:
+            if not shared_smax:
+                t0_all = expand_parameter_list(t0_vals, self.smax_id)
+                t0_err_all = expand_parameter_list(t0_err_vals, self.smax_id)
+                df_fit['t0'] = t0_all
+                df_error['t0'] = t0_err_all
+            else:
+                df_fit['t0'] = t0_vals
+                df_error['t0'] = t0_err_vals
+
+        self.fit_params_kinetics = df_fit
+        self.fit_params_kinetics_error = df_error
+
+        self.params = fit
+        self.p0 = p0
+        self.low_bounds = p0_low
+        self.high_bounds = p0_high
+
+        return None
 
     def calculate_ci95(self, shared_smax=True, fixed_t0=True, fit_ktr=False):
         """

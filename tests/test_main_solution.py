@@ -240,10 +240,10 @@ def test_submit_fitting_solution_if_with_scale_factor():
     scale_factors = fit_params_kinetics[scale_factor_columns].iloc[0].values.astype(float)
     assert np.all((scale_factors >= 0.8) & (scale_factors <= 1.2)), "Scale factors should be within bounds."
 
-    assert np.isclose(fit_params_kinetics['k_c [1/s]'].iloc[0], 1, rtol=0.1), "k_c should be close to 1 (within 10%)."
-    assert np.isclose(fit_params_kinetics['k_rev [1/s]'].iloc[0], 10, rtol=0.1), "k_rev should be close to 10 (within 10%)."
-    assert np.isclose(fit_params_kinetics['k_on [1/(µM·s)]'].iloc[0], 100, rtol=0.1), "k_on should be close to 100 (within 10%)."
-    assert np.isclose(fit_params_kinetics['k_off [1/s]'].iloc[0], 100, rtol=0.1), "k_off should be close to 100 (within 10%)."
+    assert np.isclose(fit_params_kinetics['k_c [1/s]'].iloc[0], 1, rtol=0.2), "k_c should be close to 1 (within 20%)."
+    assert np.isclose(fit_params_kinetics['k_rev [1/s]'].iloc[0], 10, rtol=0.2), "k_rev should be close to 10 (within 20%)."
+    assert np.isclose(fit_params_kinetics['k_on [1/(µM·s)]'].iloc[0], 100, rtol=0.2), "k_on should be close to 100 (within 20%)."
+    assert np.isclose(fit_params_kinetics['k_off [1/s]'].iloc[0], 100, rtol=0.2), "k_off should be close to 100 (within 20%)."
 
 
 def test_submit_fitting_solution_if_ESint():

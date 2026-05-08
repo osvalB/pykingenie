@@ -278,7 +278,7 @@ class KineticsAnalyzer:
         """
 
         # List of messages to be shown in the console
-        messages          = []
+        messages = []
 
         time_diss_all  =  []
         diss_all       =  []
@@ -613,7 +613,7 @@ class KineticsAnalyzer:
         -------
         None
         """
-        if fitting_model not in ['one_to_one', 'one_to_one_mtl', 'one_to_one_if']:
+        if fitting_model not in ['one_to_one', 'one_to_one_mtl', 'one_to_one_if','two_to_one']:
             raise ValueError("Unknown fitting model: " + fitting_model)
 
         for kf in self.fittings.values():
@@ -634,6 +634,9 @@ class KineticsAnalyzer:
 
             if fitting_model == 'one_to_one_if' and fitting_region == 'association_dissociation':
                 kf.fit_one_site_if_assoc_and_disso(shared_smax=linkedSmax)
+
+            if fitting_model == 'two_to_one' and fitting_region == 'association_dissociation':
+                kf.fit_two_site_assoc_and_disso(shared_smax=linkedSmax)
 
             kf.create_fitting_bounds_table()
 
