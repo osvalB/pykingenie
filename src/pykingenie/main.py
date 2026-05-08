@@ -596,7 +596,8 @@ class KineticsAnalyzer:
 
     def submit_kinetics_fitting(self, fitting_model='one_to_one',
                                 fitting_region='association_dissociation',
-                                linkedSmax=False):
+                                linkedSmax=False,
+                                fit_sigma=False):
         """
         Fit models to surface-based kinetics data.
 
@@ -608,6 +609,9 @@ class KineticsAnalyzer:
             Region to fit. Options: 'association_dissociation', 'association', 'dissociation'. Default is 'association_dissociation'.
         linkedSmax : bool, optional
             Whether to link Smax values across curves. Default is False.
+        fit_sigma : bool, optional
+            Whether to fit sigma (cooperativity) for the two_to_one model.
+            Ignored for one_to_one and one_to_one_if models. Default is False.
 
         Returns
         -------
@@ -636,7 +640,7 @@ class KineticsAnalyzer:
                 kf.fit_one_site_if_assoc_and_disso(shared_smax=linkedSmax)
 
             if fitting_model == 'two_to_one' and fitting_region == 'association_dissociation':
-                kf.fit_two_site_assoc_and_disso(shared_smax=linkedSmax)
+                kf.fit_two_site_assoc_and_disso(shared_smax=linkedSmax, fit_sigma=fit_sigma)
 
             kf.create_fitting_bounds_table()
 

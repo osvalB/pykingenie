@@ -5,6 +5,7 @@ import os
 
 from pykingenie.main  import KineticsAnalyzer
 from pykingenie.octet import OctetExperiment
+from pykingenie.kingenie_surface import KinGenieCsv
 from pykingenie.fitter_surface import KineticsFitter
 from pykingenie.utils.signal_surface import steady_state_two_site_cooperative
 
@@ -12,6 +13,7 @@ pyKinetics = KineticsAnalyzer()
 
 folder = "./test_files/"
 frd_files = os.listdir(folder)
+two_site_sim_file = "./test_files/simulation_KinGenie_kon-2_koff-0.1_sigma-2_plRmax-3.5_pl2_Rmax-7.csv"
 
 frd_files = [os.path.join(folder, file) for file in frd_files if file.endswith('.frd') and file.startswith('230309')]
 frd_files.sort()
@@ -271,4 +273,60 @@ def test_submit_kinetics_fitting():
     df = pyKinetics.fit_params_kinetics_all
     assert isinstance(df, pd.DataFrame), "Fitting results should be a dataframe."
     assert not df.empty, "Fitting results dataframe should not be empty."
+
+
+def test_submit_kinetics_fitting_two_to_one_parameter_recovery_from_kingenie_csv():
+    """
+    Exercise the main submit_kinetics_fitting branch:
+    kf.fit_two_site_assoc_and_disso(shared_smax=linkedSmax)
+    using simulation_KinGenie_kon-2_koff-0.1_sigma-2_plRmax-3.5_pl2_Rmax-5.csv.
+    """
+    kon_true = 2.0
+    koff_true = 0.1
+    sigma_true = 2.0
+    kd_true = koff_true / kon_true
+    rmax_pl_true = 3.5
+    rmax_lpl_true = 5.0
+
+    kingenie = KinGenieCsv("two_site_sim")
+    kingenie.read_csv(two_site_sim_file)
+
+    ka = KineticsAnalyzer()
+    ka.add_experiment(kingenie, "two_site_sim")
+    ka.merge_ligand_conc_df()
+    ka.generate_fittings(ka.combined_ligand_conc_df.copy())
+
+    fitter = list(ka.fittings.values())[0]
+
+    # Required precondition for kinetic fitting in this path.
+    fitter.fit_steady_state()
+
+    ka.submit_kinetics_fitting(
+        fitting_model="two_to_one",
+        fitting_region="association_dissociation",
+        linkedSmax=True,
+        fit_sigma=True,
+    )
+
+    df_fit = fitter.fit_params_kinetics
+    assert isinstance(df_fit, pd.DataFrame)
+    assert len(df_fit) == 1
+
+    for col in ["Kd [µM]", "k_off [1/s]", "Rmax_PL", "Rmax_LPL", "sigma", "(Derived) k_on [1/µM/s]"]:
+        assert col in df_fit.columns
+
+    kd_fit = float(df_fit["Kd [µM]"].iloc[0])
+    koff_fit = float(df_fit["k_off [1/s]"].iloc[0])
+    kon_fit = float(df_fit["(Derived) k_on [1/µM/s]"].iloc[0])
+    sigma_fit = float(df_fit["sigma"].iloc[0])
+    rmax_pl_fit = float(df_fit["Rmax_PL"].iloc[0])
+    rmax_lpl_fit = float(df_fit["Rmax_LPL"].iloc[0])
+
+    # Tolerances are moderate for this nonlinear global two-site fit.
+    assert np.isclose(kd_fit, kd_true, rtol=0.1)
+    assert np.isclose(koff_fit, koff_true, rtol=0.1)
+    assert np.isclose(kon_fit, kon_true, rtol=0.1)
+    assert np.isclose(sigma_fit, sigma_true, rtol=0.1)
+    assert np.isclose(rmax_pl_fit, rmax_pl_true, rtol=0.1)
+    assert np.isclose(rmax_lpl_fit, rmax_lpl_true, rtol=0.1)
     
