@@ -592,7 +592,7 @@ class KineticsAnalyzer:
 
     def submit_kinetics_fitting(self, fitting_model='one_to_one',
                                 fitting_region='association_dissociation',
-                                linkedSmax=False,
+                                shared_smax=False,
                                 fit_sigma=False):
         """
         Fit models to surface-based kinetics data.
@@ -603,8 +603,8 @@ class KineticsAnalyzer:
             Model to fit. Options: 'one_to_one', 'one_to_one_mtl', 'one_to_one_if'. Default is 'one_to_one'.
         fitting_region : str, optional
             Region to fit. Options: 'association_dissociation', 'association', 'dissociation'. Default is 'association_dissociation'.
-        linkedSmax : bool, optional
-            Whether to link Smax values across curves. Default is False.
+        shared_smax : bool, optional
+            Whether to share Smax values across curves. Default is False.
         fit_sigma : bool, optional
             Whether to fit sigma (cooperativity) for the two_to_one model.
             Ignored for one_to_one and one_to_one_if models. Default is False.
@@ -619,24 +619,24 @@ class KineticsAnalyzer:
         for kf in self.fittings.values():
 
             if fitting_model == 'one_to_one' and fitting_region == 'association_dissociation':
-                kf.fit_one_site_assoc_and_disso(shared_smax=linkedSmax)
+                kf.fit_one_site_assoc_and_disso(shared_smax=shared_smax)
                 kf.fit_single_exponentials()
 
             if fitting_model == 'one_to_one_mtl' and fitting_region == 'association_dissociation':
-                kf.fit_one_site_assoc_and_disso(shared_smax=linkedSmax, fit_ktr=True)
+                kf.fit_one_site_assoc_and_disso(shared_smax=shared_smax, fit_ktr=True)
 
             if fitting_model == 'one_to_one' and fitting_region == 'association':
-                kf.fit_one_site_association(shared_smax=linkedSmax)
+                kf.fit_one_site_association(shared_smax=shared_smax)
                 kf.fit_single_exponentials()
 
             if fitting_model == 'one_to_one' and fitting_region == 'dissociation':
                 kf.fit_one_site_dissociation()
 
             if fitting_model == 'one_to_one_if' and fitting_region == 'association_dissociation':
-                kf.fit_one_site_if_assoc_and_disso(shared_smax=linkedSmax)
+                kf.fit_one_site_if_assoc_and_disso(shared_smax=shared_smax)
 
             if fitting_model == 'two_to_one' and fitting_region == 'association_dissociation':
-                kf.fit_two_site_assoc_and_disso(shared_smax=linkedSmax, fit_sigma=fit_sigma)
+                kf.fit_two_site_assoc_and_disso(shared_smax=shared_smax, fit_sigma=fit_sigma)
 
             kf.create_fitting_bounds_table()
 
