@@ -119,7 +119,7 @@ def test_plot_association_dissociation():
 
     pyKinetics.submit_kinetics_fitting(fitting_model='one_to_one',
                                 fitting_region='association_dissociation',
-                                linkedSmax=True)
+                                shared_smax=True)
 
     fig = plot_association_dissociation(
         pyKinetics,

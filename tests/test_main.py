@@ -179,7 +179,7 @@ def test_submit_kinetic_fitting():
 
     pyKinetics.submit_kinetics_fitting(fitting_model='one_to_one',
                                        fitting_region='dissociation',
-                                       linkedSmax=False)
+                                       shared_smax=False)
 
     k_off = pyKinetics.get_experiment_properties('k_off', fittings=True)[0]
 
@@ -187,7 +187,7 @@ def test_submit_kinetic_fitting():
 
     pyKinetics.submit_kinetics_fitting(fitting_model='one_to_one',
                                        fitting_region='association_dissociation',
-                                       linkedSmax=False)
+                                       shared_smax=False)
 
     Kd = pyKinetics.get_experiment_properties('Kd', fittings=True)[0]
 
@@ -195,7 +195,7 @@ def test_submit_kinetic_fitting():
 
     pyKinetics.submit_kinetics_fitting(fitting_model='one_to_one',
                                        fitting_region='association_dissociation',
-                                       linkedSmax=True)
+                                       shared_smax=True)
 
     Kd = pyKinetics.get_experiment_properties('Kd', fittings=True)[0]
 
@@ -245,7 +245,7 @@ def test_submit_kinetics_fitting():
     # We want to run fitting_model == 'one_to_one_mtl' and fitting_region == 'association_dissociation'
     pyKinetics.submit_kinetics_fitting(fitting_model='one_to_one_mtl',
                                        fitting_region='association_dissociation',
-                                       linkedSmax=True)
+                                       shared_smax=True)
 
     pyKinetics.get_fitting_results()
 
@@ -257,17 +257,17 @@ def test_submit_kinetics_fitting():
     # Now we trigger fitting_model == 'one_to_one' and fitting_region == 'association'
     pyKinetics.submit_kinetics_fitting(fitting_model='one_to_one',
                                        fitting_region='association',
-                                       linkedSmax=True)
+                                       shared_smax=True)
 
     pyKinetics.get_fitting_results()
     df = pyKinetics.fit_params_kinetics_all
     assert isinstance(df, pd.DataFrame), "Fitting results should be a dataframe."
     assert not df.empty, "Fitting results dataframe should not be empty."
 
-    # Now we trigger kf.fit_one_site_if_assoc_and_disso(shared_smax=linkedSmax)
+    # Now we trigger kf.fit_one_site_if_assoc_and_disso(shared_smax=shared_smax)
     pyKinetics.submit_kinetics_fitting(fitting_model='one_to_one_if',
                                        fitting_region='association_dissociation',
-                                       linkedSmax=True)
+                                       shared_smax=True)
 
     pyKinetics.get_fitting_results()
     df = pyKinetics.fit_params_kinetics_all
@@ -278,7 +278,7 @@ def test_submit_kinetics_fitting():
 def test_submit_kinetics_fitting_two_to_one_parameter_recovery_from_kingenie_csv():
     """
     Exercise the main submit_kinetics_fitting branch:
-    kf.fit_two_site_assoc_and_disso(shared_smax=linkedSmax)
+    kf.fit_two_site_assoc_and_disso(shared_smax=shared_smax)
     using simulation_KinGenie_kon-2_koff-0.1_sigma-2_plRmax-3.5_pl2_Rmax-5.csv.
     """
     kon_true = 2.0
@@ -304,7 +304,7 @@ def test_submit_kinetics_fitting_two_to_one_parameter_recovery_from_kingenie_csv
     ka.submit_kinetics_fitting(
         fitting_model="two_to_one",
         fitting_region="association_dissociation",
-        linkedSmax=True,
+        shared_smax=True,
         fit_sigma=True,
     )
 
