@@ -1,12 +1,13 @@
 
-import os
 import sys
-sys.path.insert(0, os.path.abspath('../src'))
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
 
 project = 'PyKinGenie'
-copyright = '2025, osvalB'
-author = 'osvalB'
-release = '0.1.0'
+copyright = '2025, Osvaldo Burastero'
+author = 'Osvaldo Burastero'
+release = '0.1.19'
 
 extensions = [
     'sphinx.ext.autodoc',
@@ -14,6 +15,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.autosummary',
     'numpydoc',
+    'nbsphinx',
     'sphinx_copybutton',
     'sphinx_design',
 ]
@@ -22,9 +24,9 @@ extensions = [
 autodoc_default_options = {
     'members': True,
     'member-order': 'bysource',
-    'special-members': '__init__',
     'undoc-members': True,
-    'exclude-members': '__weakref__'
+    'show-inheritance': True,
+    'exclude-members': '__weakref__',
 }
 
 # Autosummary settings
@@ -34,19 +36,17 @@ autosummary_imported_members = True
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
-html_theme = 'pydata_sphinx_theme'
-html_theme_options = {
-    "github_url": "https://github.com/osvalB/pykingenie",
-    "use_edit_page_button": False,  # Disable for local builds
-    "show_toc_level": 2,
-    "navigation_with_keys": False,
-}
-
+html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 
 napoleon_google_docstring = True
 napoleon_numpy_docstring = True
-napoleon_include_init_with_doc = False
-napoleon_include_private_with_doc = False
 
 numpydoc_show_class_members = False
+nbsphinx_execute = 'never'
+nbsphinx_allow_errors = False
+nbsphinx_codecell_lexer = 'python'
+
+
+def setup(app):
+    app.add_css_file('custom.css')

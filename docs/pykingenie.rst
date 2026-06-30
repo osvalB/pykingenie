@@ -33,6 +33,14 @@ pykingenie.fitter\_solution module
    :show-inheritance:
    :undoc-members:
 
+pykingenie.fitter\_surface module
+---------------------------------
+
+.. automodule:: pykingenie.fitter_surface
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 pykingenie.gator module
 -----------------------
 

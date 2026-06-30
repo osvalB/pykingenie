@@ -1,4 +1,4 @@
-name: Test and build
+name: CI/CD Pipeline
 
 on:
   push:
@@ -9,20 +9,20 @@ on:
     types: [published]
 
 env:
-  UV_CACHE_DIR: ${{ github.workspace }}/.cache/uv
+  UV_CACHE_DIR: /tmp/uv-cache
 
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.11", "3.12","3.13"]
+        python-version: ["3.12", "3.13"]
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: Install uv
-      uses: astral-sh/setup-uv@v4
+      uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
       with:
         version: "latest"
 
@@ -30,7 +30,7 @@ jobs:
       run: uv python install ${{ matrix.python-version }}
 
     - name: Cache uv packages
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ${{ env.UV_CACHE_DIR }}
         key: ${{ runner.os }}-uv-${{ matrix.python-version }}-${{ hashFiles('**/pyproject.toml') }}
@@ -44,8 +44,8 @@ jobs:
         uv run pytest --cov=src/pykingenie --cov-report=xml --cov-report=term-missing
 
     - name: Upload coverage reports to Codecov
-      if: matrix.python-version == '3.11'
-      uses: codecov/codecov-action@v5
+      if: matrix.python-version == '3.12'
+      uses: codecov/codecov-action@v7
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: ./coverage.xml
@@ -56,23 +56,23 @@ jobs:
     needs: test
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: Install uv
-      uses: astral-sh/setup-uv@v4
+      uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
       with:
         version: "latest"
 
-    - name: Set up Python 3.13
-      run: uv python install 3.13
+    - name: Set up Python 3.12
+      run: uv python install 3.12
 
     - name: Cache uv packages
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ${{ env.UV_CACHE_DIR }}
-        key: ${{ runner.os }}-uv-3.13-${{ hashFiles('**/pyproject.toml') }}
+        key: ${{ runner.os }}-uv-3.12-${{ hashFiles('**/pyproject.toml') }}
         restore-keys: |
-          ${{ runner.os }}-uv-3.13-
+          ${{ runner.os }}-uv-3.12-
           ${{ runner.os }}-uv-
 
     - name: Build package
@@ -81,8 +81,7 @@ jobs:
         uv build
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: dist-packages
         path: dist/*
-        retention-days: 7

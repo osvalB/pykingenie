@@ -1,0 +1,20 @@
+/* Add spacing between field-list entries */
+.rst-content dl.field-list > dt:not(:first-of-type),
+.rst-content dl.field-list > dt:not(:first-of-type) + dd {
+    padding-top: 1em !important;
+}
+
+/* Keep parameter bullet lists compact */
+.rst-content dl.field-list dd ul.simple {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.rst-content dl.field-list dd ul.simple li {
+    margin-bottom: 0.15em !important;
+}
+
+/* Only the first documented member gets extra spacing */
+.rst-content dl.py.class > dd > dl:first-of-type {
+    margin-top: 2em;
+}

@@ -1,351 +1,82 @@
 
+
 <!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pykingenie.utils.signal_surface &mdash; PyKinGenie 0.1.19 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=81b03e52" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
 
-
-<html lang="en" data-content_root="../../../" >
-
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>pykingenie.utils.signal_surface &#8212; PyKinGenie 0.1.0 documentation</title>
   
-  
-  
-  <script data-cfasync="false">
-    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
-  </script>
-  <!--
-    this give us a css class that will be invisible only if js is disabled
-  -->
-  <noscript>
-    <style>
-      .pst-js-only { display: none !important; }
-
-    </style>
-  </noscript>
-  
-  <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
-  
-  <!-- So that users can add custom icons -->
-  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
-  <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
-
-    <script src="../../../_static/documentation_options.js?v=01f34227"></script>
-    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
-    <script src="../../../_static/copybutton.js?v=f281be69"></script>
-    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/pykingenie/utils/signal_surface';</script>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=3d116926"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
+      <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" />
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="" />
-  </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
 
-  
-  
-  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
-  
-  <div id="pst-scroll-pixel-helper"></div>
-  
-  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
 
-  
-  <dialog id="pst-search-dialog">
-    
-<form class="bd-search d-flex align-items-center"
-      action="../../../search.html"
-      method="get">
-  <i class="fa-solid fa-magnifying-glass"></i>
-  <input type="search"
-         class="form-control"
-         name="q"
-         placeholder="Search the docs ..."
-         aria-label="Search the docs ..."
-         autocomplete="off"
-         autocorrect="off"
-         autocapitalize="off"
-         spellcheck="false"/>
-  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form>
-  </dialog>
-
-  <div class="pst-async-banner-revealer d-none">
-  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
-</div>
-
-  
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
-<div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
-    <span class="fa-solid fa-bars"></span>
-  </button>
-  
-  
-  <div class="col-lg-3 navbar-header-items__start">
-    
-      <div class="navbar-item">
-
-  
-    
-  
-
-<a class="navbar-brand logo" href="../../../index.html">
-  
-  
-  
-  
-  
-  
-    <p class="title logo__title">PyKinGenie 0.1.0 documentation</p>
-  
-</a></div>
-    
-  </div>
-  
-  <div class="col-lg-9 navbar-header-items">
-    
-    <div class="me-auto navbar-header-items__center">
-      
-        <div class="navbar-item">
-<nav>
-  <ul class="bd-navbar-elements navbar-nav">
-    
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../installation.html">
-    Installation
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../quickstart.html">
-    Quickstart
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../modules.html">
-    pykingenie
-  </a>
-</li>
-
-  </ul>
-</nav></div>
-      
-    </div>
-    
-    
-    <div class="navbar-header-items__end">
-      
-        <div class="navbar-item navbar-persistent--container">
           
+          
+          <a href="../../../index.html" class="icon icon-home">
+            PyKinGenie
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">pykingenie</a></li>
+</ul>
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
- <i class="fa-solid fa-magnifying-glass"></i>
- <span class="search-button__default-text">Search</span>
- <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-</button>
         </div>
-      
-      
-        <div class="navbar-item">
+      </div>
+    </nav>
 
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button></div>
-      
-        <div class="navbar-item"><ul class="navbar-icon-links"
-    aria-label="Icon Links">
-        <li class="nav-item">
-          
-          
-          
-          
-          
-          
-          
-          
-          <a href="https://github.com/osvalB/pykingenie" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">GitHub</span></a>
-        </li>
-</ul></div>
-      
-    </div>
-    
-  </div>
-  
-  
-    <div class="navbar-persistent--mobile">
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PyKinGenie</a>
+      </nav>
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
- <i class="fa-solid fa-magnifying-glass"></i>
- <span class="search-button__default-text">Search</span>
- <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-</button>
-    </div>
-  
-
-  
-</div>
-
-    </header>
-  
-
-  <div class="bd-container">
-    <div class="bd-container__inner bd-page-width">
-      
-      
-      
-        
-      
-      <dialog id="pst-primary-sidebar-modal"></dialog>
-      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
-        
-
-  
-  <div class="sidebar-header-items sidebar-primary__section">
-    
-    
-      <div class="sidebar-header-items__center">
-        
-          
-          
-            <div class="navbar-item">
-<nav>
-  <ul class="bd-navbar-elements navbar-nav">
-    
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../installation.html">
-    Installation
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../quickstart.html">
-    Quickstart
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../modules.html">
-    pykingenie
-  </a>
-</li>
-
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pykingenie.utils.signal_surface</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
   </ul>
-</nav></div>
-          
-        
-      </div>
-    
-    
-    
-      <div class="sidebar-header-items__end">
-        
-          <div class="navbar-item">
-
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button></div>
-        
-          <div class="navbar-item"><ul class="navbar-icon-links"
-    aria-label="Icon Links">
-        <li class="nav-item">
-          
-          
-          
-          
-          
-          
-          
-          
-          <a href="https://github.com/osvalB/pykingenie" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">GitHub</span></a>
-        </li>
-</ul></div>
-        
-      </div>
-    
-  </div>
-  
-  
-  <div class="sidebar-primary-items__end sidebar-primary__section">
-      <div class="sidebar-primary-item">
-<div id="ethical-ad-placement"
-      class="flat"
-      data-ea-publisher="readthedocs"
-      data-ea-type="readthedocs-sidebar"
-      data-ea-manual="true">
-</div></div>
-  </div>
-
-
-      </div>
-      
-      <main id="main-content" class="bd-main" role="main">
-        
-        
-          <div class="bd-content">
-            <div class="bd-article-container">
-              
-              <div class="bd-header-article d-print-none">
-<div class="header-article-items header-article__inner">
-  
-    <div class="header-article-items__start">
-      
-        <div class="header-article-item">
-
-<nav aria-label="Breadcrumb" class="d-print-none">
-  <ul class="bd-breadcrumbs">
-    
-    <li class="breadcrumb-item breadcrumb-home">
-      <a href="../../../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
-      </a>
-    </li>
-    
-    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
-    
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">pykingenie.utils.signal_surface</span></li>
-  </ul>
-</nav>
+  <hr/>
 </div>
-      
-    </div>
-  
-  
-</div>
-</div>
-              
-              
-              
-                
-<div id="searchbox"></div>
-                <article class="bd-article">
-                  
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
   <h1>Source code for pykingenie.utils.signal_surface</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w">         </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w">        </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
@@ -377,7 +108,18 @@
     <span class="s1">&#39;ode_mixture_analyte_association&#39;</span><span class="p">,</span>
     <span class="s1">&#39;solve_ode_mixture_analyte_association&#39;</span><span class="p">,</span>
     <span class="s1">&#39;ode_mixture_analyte_dissociation&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;solve_ode_mixture_analyte_dissociation&#39;</span>
+    <span class="s1">&#39;solve_ode_mixture_analyte_dissociation&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;steady_state_two_site&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;steady_state_two_site_cooperative&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;differential_matrix_association_two_site&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;differential_matrix_association_two_site_cooperative&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;constant_vector_two_site&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;differential_matrix_dissociation_two_site&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;differential_matrix_dissociation_two_site_cooperative&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;solve_two_site_association&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;solve_two_site_cooperative_association&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;solve_two_site_dissociation&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;solve_two_site_cooperative_dissociation&#39;</span>
 <span class="p">]</span>
 
 <div class="viewcode-block" id="steady_state_one_site">
@@ -641,13 +383,13 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    koff : float</span>
-<span class="sd">        Rate constant for E2S -&gt; E2 + S.</span>
+<span class="sd">        Rate constant for E1S -&gt; E1 + S.</span>
 <span class="sd">    kon : float</span>
-<span class="sd">        Rate constant for E2 + S -&gt; E2S.</span>
+<span class="sd">        Rate constant for E1 + S -&gt; E1S.</span>
 <span class="sd">    kc : float</span>
-<span class="sd">        Rate constant for E1 -&gt; E2.</span>
+<span class="sd">        Rate constant for E1S -&gt; E2S.</span>
 <span class="sd">    krev : float</span>
-<span class="sd">        Rate constant for E2 -&gt; E1.</span>
+<span class="sd">        Rate constant for E2S -&gt; E1S.</span>
 <span class="sd">    a : float</span>
 <span class="sd">        Concentration of the analyte (molecule being flown).</span>
 
@@ -713,11 +455,11 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    koff : float</span>
-<span class="sd">        Rate constant for E2S -&gt; E2 + S.</span>
+<span class="sd">        Rate constant for E1S -&gt; E1 + S.</span>
 <span class="sd">    kc : float</span>
-<span class="sd">        Rate constant for E1 -&gt; E2.</span>
+<span class="sd">        Rate constant for E1S -&gt; E2S.</span>
 <span class="sd">    krev : float</span>
-<span class="sd">        Rate constant for E2 -&gt; E1.</span>
+<span class="sd">        Rate constant for E2S -&gt; E1S.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -856,9 +598,9 @@
 <span class="sd">    krev : float</span>
 <span class="sd">        Rate constant for ES -&gt; E·S.</span>
 <span class="sd">    sP1L : float, optional</span>
-<span class="sd">        Initial concentration of E·S, default is 0.</span>
+<span class="sd">        Initial signal proportional to the concentration of E·S, default is 0.</span>
 <span class="sd">    sP2L : float, optional</span>
-<span class="sd">        Initial concentration of ES, default is 0.</span>
+<span class="sd">        Initial signal proportional to the concentration of ES, default is 0.</span>
 <span class="sd">    smax : float, optional</span>
 <span class="sd">        Signal proportional to the complex (E·S or ES), default is 0.</span>
 
@@ -896,8 +638,16 @@
 <a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.solve_all_states_fast">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">solve_all_states_fast</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">initial_conditions</span><span class="p">,</span> <span class="n">steady_state_value</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Solve the system of differential equations for all time points using matrix exponentiation.</span>
-<span class="sd">    </span>
+<span class="sd">    Solve the system of differential equations for all time points using eigendecomposition.</span>
+
+<span class="sd">    The system  dx/dt = A·x + b  has the analytical solution</span>
+
+<span class="sd">        x(t) = x_ss + V · diag(exp(λ·t)) · V⁻¹ · (x₀ − x_ss)</span>
+
+<span class="sd">    where λ and V are the eigenvalues/vectors of A and x_ss is the steady</span>
+<span class="sd">    state.  All time points are evaluated in a single vectorised operation</span>
+<span class="sd">    (no Python loop).</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    time : np.ndarray</span>
@@ -908,30 +658,26 @@
 <span class="sd">        Initial conditions for the system.</span>
 <span class="sd">    steady_state_value : np.ndarray</span>
 <span class="sd">        Steady state solution of the system.</span>
-<span class="sd">        </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    np.ndarray</span>
-<span class="sd">        Array of shape (len(time), len(initial_conditions)) containing the state of the system at each time point.</span>
+<span class="sd">        Array of shape (len(time), len(initial_conditions)) containing the</span>
+<span class="sd">        state of the system at each time point.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">v</span> <span class="o">=</span> <span class="n">initial_conditions</span> <span class="o">-</span> <span class="n">steady_state_value</span>
     <span class="n">eigvals</span><span class="p">,</span> <span class="n">eigvecs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-    <span class="n">Vinv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">eigvecs</span><span class="p">)</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">eigvecs</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>          <span class="c1"># more stable than inv @ v</span>
 
-    <span class="c1"># Precompute eigvecs @ v once</span>
-    <span class="n">alpha</span> <span class="o">=</span> <span class="n">Vinv</span> <span class="o">@</span> <span class="n">v</span>
+    <span class="c1"># exp_matrix[i, j] = exp(eigvals[j] * time[i])   — shape (N, n)</span>
+    <span class="n">exp_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">eigvals</span><span class="p">))</span>
 
-    <span class="c1"># Preallocate output</span>
-    <span class="n">states</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">time</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)))</span>
+    <span class="c1"># For each time point: state = ss + eigvecs @ (exp_diag * alpha)</span>
+    <span class="c1"># Vectorised:  (exp_matrix * alpha) has shape (N, n),</span>
+    <span class="c1">#              @ eigvecs.T  gives (N, n)</span>
+    <span class="n">states</span> <span class="o">=</span> <span class="n">steady_state_value</span> <span class="o">+</span> <span class="p">(</span><span class="n">exp_matrix</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">@</span> <span class="n">eigvecs</span><span class="o">.</span><span class="n">T</span>
 
-    <span class="c1"># Loop over time using vectorized exponentials</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">time</span><span class="p">):</span>
-        <span class="n">exp_diag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">eigvals</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span>
-        <span class="n">exp_v</span> <span class="o">=</span> <span class="n">eigvecs</span> <span class="o">@</span> <span class="p">(</span><span class="n">exp_diag</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">)</span>
-        <span class="n">states</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">steady_state_value</span> <span class="o">+</span> <span class="n">exp_v</span>
-
-    <span class="k">return</span> <span class="n">states</span></div>
+    <span class="k">return</span> <span class="n">states</span><span class="o">.</span><span class="n">real</span>                           <span class="c1"># discard tiny imaginary noise</span></div>
 
 
 <div class="viewcode-block" id="solve_conformational_selection_association">
@@ -959,9 +705,9 @@
 <span class="sd">    smax : float, optional</span>
 <span class="sd">        Maximum signal that the complex (E2S) can produce, default is 0.</span>
 <span class="sd">    sP1 : float, optional</span>
-<span class="sd">        Initial concentration of E1, default is 0.</span>
+<span class="sd">        Initial signal proportional to the concentration of E1, default is 0.</span>
 <span class="sd">    sP2L : float, optional</span>
-<span class="sd">        Initial concentration of E2S, default is 0.</span>
+<span class="sd">        Initial signal proportional to the concentration of E2S, default is 0.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -1012,7 +758,7 @@
 <span class="sd">    s0 : float, optional</span>
 <span class="sd">        Initial signal, default is 0.</span>
 <span class="sd">    sP2L : float, optional</span>
-<span class="sd">        Initial concentration of ES, default is 0.</span>
+<span class="sd">        Initial signal proportional to the concentration of ES, default is 0.</span>
 <span class="sd">    smax : float, optional</span>
 <span class="sd">        Signal proportional to the complex (E·S or ES), default is 0.</span>
 
@@ -1063,9 +809,9 @@
 <span class="sd">    smax : float, optional</span>
 <span class="sd">        Signal proportional to the complex (E2S), default is 0.</span>
 <span class="sd">    sP1 : float, optional</span>
-<span class="sd">        Initial concentration of E1, default is 0.</span>
+<span class="sd">        Initial signal proportional to the concentration of E1, default is 0.</span>
 <span class="sd">    sP2L : float, optional</span>
-<span class="sd">        Initial concentration of E2S, default is 0.</span>
+<span class="sd">        Initial signal proportional to the concentration of E2S, default is 0.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -1245,77 +991,499 @@
 
     <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">y</span></div>
 
+
+
+<div class="viewcode-block" id="steady_state_two_site">
+<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.steady_state_two_site">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">steady_state_two_site</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">Rmax_PL</span><span class="p">,</span> <span class="n">Rmax_LPL</span><span class="p">,</span> <span class="n">Kd</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Steady state signal for a ligand with two identical, independent binding sites.</span>
+
+<span class="sd">    The immobilized ligand P has two equivalent binding sites for the analyte L.</span>
+<span class="sd">    PL (= LP) denotes singly-bound ligand, LPL denotes doubly-bound ligand.</span>
+
+<span class="sd">    For two identical independent sites with intrinsic dissociation constant Kd,</span>
+<span class="sd">    the equilibrium fractions are:</span>
+
+<span class="sd">    - fPL  = 2 * theta * (1 - theta)</span>
+<span class="sd">    - fLPL = theta ** 2</span>
+
+<span class="sd">    where theta = C / (C + Kd) is the single-site occupancy.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    C : np.ndarray</span>
+<span class="sd">        Concentration of the analyte.</span>
+<span class="sd">    Rmax_PL : float</span>
+<span class="sd">        Maximum signal when all ligand is singly bound (PL state).</span>
+<span class="sd">    Rmax_LPL : float</span>
+<span class="sd">        Maximum signal when all ligand is doubly bound (LPL state).</span>
+<span class="sd">    Kd : float</span>
+<span class="sd">        Intrinsic equilibrium dissociation constant (per site).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Steady state signal.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">C</span>     <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">C</span><span class="p">)</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">C</span> <span class="o">/</span> <span class="p">(</span><span class="n">C</span> <span class="o">+</span> <span class="n">Kd</span><span class="p">)</span>
+    <span class="n">fPL</span>   <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">theta</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">theta</span><span class="p">)</span>
+    <span class="n">fLPL</span>  <span class="o">=</span> <span class="n">theta</span> <span class="o">**</span> <span class="mi">2</span>
+    <span class="n">signal</span> <span class="o">=</span> <span class="n">Rmax_PL</span> <span class="o">*</span> <span class="n">fPL</span> <span class="o">+</span> <span class="n">Rmax_LPL</span> <span class="o">*</span> <span class="n">fLPL</span>
+    <span class="k">return</span> <span class="n">signal</span></div>
+
+
+
+<div class="viewcode-block" id="steady_state_two_site_cooperative">
+<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.steady_state_two_site_cooperative">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">steady_state_two_site_cooperative</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">Rmax_PL</span><span class="p">,</span> <span class="n">Rmax_LPL</span><span class="p">,</span> <span class="n">Kd</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Steady state signal for a ligand with two identical binding sites and cooperativity.</span>
+
+<span class="sd">    The cooperativity factor sigma modifies the second binding event.</span>
+<span class="sd">    The intrinsic dissociation constant for the second site becomes Kd / sigma.</span>
+
+<span class="sd">    - sigma &gt; 1 : positive cooperativity (second binding is tighter).</span>
+<span class="sd">    - sigma &lt; 1 : negative cooperativity.</span>
+<span class="sd">    - sigma = 1 : identical independent sites (non-cooperative).</span>
+
+<span class="sd">    The equilibrium fractions are computed from the partition function:</span>
+
+<span class="sd">        Z = 1 + 2 * C / Kd + sigma * (C / Kd) ** 2</span>
+
+<span class="sd">    - fPL  = (2 * C / Kd) / Z</span>
+<span class="sd">    - fLPL = sigma * (C / Kd) ** 2 / Z</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    C : np.ndarray</span>
+<span class="sd">        Concentration of the analyte.</span>
+<span class="sd">    Rmax_PL : float</span>
+<span class="sd">        Maximum signal when all ligand is singly bound (PL state).</span>
+<span class="sd">    Rmax_LPL : float</span>
+<span class="sd">        Maximum signal when all ligand is doubly bound (LPL state).</span>
+<span class="sd">    Kd : float</span>
+<span class="sd">        Intrinsic equilibrium dissociation constant (per site).</span>
+<span class="sd">    sigma : float</span>
+<span class="sd">        Cooperativity factor.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Steady state signal.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">C</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">C</span><span class="p">)</span>
+    <span class="n">r</span>    <span class="o">=</span> <span class="n">C</span> <span class="o">/</span> <span class="n">Kd</span>
+    <span class="n">Z</span>    <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span> <span class="n">sigma</span> <span class="o">*</span> <span class="n">r</span> <span class="o">**</span> <span class="mi">2</span>
+    <span class="n">fPL</span>  <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">r</span><span class="p">)</span> <span class="o">/</span> <span class="n">Z</span>
+    <span class="n">fLPL</span> <span class="o">=</span> <span class="p">(</span><span class="n">sigma</span> <span class="o">*</span> <span class="n">r</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">Z</span>
+    <span class="n">signal</span> <span class="o">=</span> <span class="n">Rmax_PL</span> <span class="o">*</span> <span class="n">fPL</span> <span class="o">+</span> <span class="n">Rmax_LPL</span> <span class="o">*</span> <span class="n">fLPL</span>
+    <span class="k">return</span> <span class="n">signal</span></div>
+
+
+
+<div class="viewcode-block" id="differential_matrix_association_two_site">
+<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.differential_matrix_association_two_site">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">differential_matrix_association_two_site</span><span class="p">(</span><span class="n">kon</span><span class="p">,</span> <span class="n">koff</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Differential matrix for the two-site model during association (non-cooperative).</span>
+
+<span class="sd">    The ligand P (immobilized) has two equivalent, independent binding sites.</span>
+<span class="sd">    The analyte L flows at fixed concentration ``a``.</span>
+
+<span class="sd">    State variables: [fPL, fLPL] where</span>
+
+<span class="sd">    - fPL  = fraction of ligand in the singly-bound state (PL + LP)</span>
+<span class="sd">    - fLPL = fraction of ligand in the doubly-bound state (LPL)</span>
+<span class="sd">    - fP   = 1 - fPL - fLPL (free ligand, from conservation)</span>
+
+<span class="sd">    Reactions with statistical factors::</span>
+
+<span class="sd">        P  + L  -&gt; PL  : 2 * kon * a * fP    (2 equivalent empty sites)</span>
+<span class="sd">        PL      -&gt; P+L : koff * fPL           (1 occupied site)</span>
+<span class="sd">        PL + L  -&gt; LPL : kon * a * fPL        (1 remaining empty site)</span>
+<span class="sd">        LPL     -&gt; PL+L: 2 * koff * fLPL      (2 occupied sites)</span>
+
+<span class="sd">    The resulting ODE is  d[fPL, fLPL]/dt = A @ [fPL, fLPL] + b</span>
+<span class="sd">    where b = constant_vector_two_site(kon, a).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    kon : float</span>
+<span class="sd">        Intrinsic association rate constant (per site).</span>
+<span class="sd">    koff : float</span>
+<span class="sd">        Intrinsic dissociation rate constant (per site).</span>
+<span class="sd">    a : float</span>
+<span class="sd">        Analyte concentration.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        2×2 differential matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">row1</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">kon</span> <span class="o">*</span> <span class="n">a</span> <span class="o">+</span> <span class="n">koff</span><span class="p">),</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">koff</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">kon</span> <span class="o">*</span> <span class="n">a</span><span class="p">]</span>
+    <span class="n">row2</span> <span class="o">=</span> <span class="p">[</span><span class="n">kon</span> <span class="o">*</span> <span class="n">a</span><span class="p">,</span>               <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">koff</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">row1</span><span class="p">,</span> <span class="n">row2</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="differential_matrix_association_two_site_cooperative">
+<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.differential_matrix_association_two_site_cooperative">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">differential_matrix_association_two_site_cooperative</span><span class="p">(</span><span class="n">kon</span><span class="p">,</span> <span class="n">koff</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Differential matrix for the two-site model during association (cooperative).</span>
+
+<span class="sd">    Same as :func:`differential_matrix_association_two_site`, but the second</span>
+<span class="sd">    binding step is modified by the cooperativity factor sigma.</span>
+
+<span class="sd">    The kinetic effect is split symmetrically between on-rate and off-rate</span>
+<span class="sd">    using sqrt(sigma):</span>
+
+<span class="sd">    - Second site on-rate  = sqrt(sigma) * kon</span>
+<span class="sd">    - Second site off-rate = koff / sqrt(sigma)</span>
+
+<span class="sd">    This gives an effective Kd for the second site of Kd / sigma.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    kon : float</span>
+<span class="sd">        Intrinsic association rate constant (per site).</span>
+<span class="sd">    koff : float</span>
+<span class="sd">        Intrinsic dissociation rate constant (per site).</span>
+<span class="sd">    sigma : float</span>
+<span class="sd">        Cooperativity factor. sigma &gt; 1 for positive cooperativity.</span>
+<span class="sd">    a : float</span>
+<span class="sd">        Analyte concentration.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        2×2 differential matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
+    <span class="n">row1</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">kon</span> <span class="o">*</span> <span class="n">a</span> <span class="o">+</span> <span class="n">koff</span> <span class="o">+</span> <span class="n">s</span> <span class="o">*</span> <span class="n">kon</span> <span class="o">*</span> <span class="n">a</span><span class="p">),</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">koff</span> <span class="o">/</span> <span class="n">s</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">kon</span> <span class="o">*</span> <span class="n">a</span><span class="p">]</span>
+    <span class="n">row2</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="o">*</span> <span class="n">kon</span> <span class="o">*</span> <span class="n">a</span><span class="p">,</span>                         <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">koff</span> <span class="o">/</span> <span class="n">s</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">row1</span><span class="p">,</span> <span class="n">row2</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="constant_vector_two_site">
+<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.constant_vector_two_site">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">constant_vector_two_site</span><span class="p">(</span><span class="n">kon</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Constant vector for the two-site association ODE.</span>
+
+<span class="sd">    This vector is the same for both cooperative and non-cooperative cases.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    kon : float</span>
+<span class="sd">        Intrinsic association rate constant (per site).</span>
+<span class="sd">    a : float</span>
+<span class="sd">        Analyte concentration.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Constant vector [2*kon*a, 0].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">2</span> <span class="o">*</span> <span class="n">kon</span> <span class="o">*</span> <span class="n">a</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="differential_matrix_dissociation_two_site">
+<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.differential_matrix_dissociation_two_site">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">differential_matrix_dissociation_two_site</span><span class="p">(</span><span class="n">koff</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Differential matrix for the two-site model during dissociation (non-cooperative).</span>
+
+<span class="sd">    When analyte concentration is zero, only dissociation occurs::</span>
+
+<span class="sd">        PL  -&gt; P + L  : koff * fPL          (1 occupied site)</span>
+<span class="sd">        LPL -&gt; PL + L : 2 * koff * fLPL     (2 occupied sites, either can leave)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    koff : float</span>
+<span class="sd">        Intrinsic dissociation rate constant (per site).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        2×2 differential matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">row1</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="n">koff</span><span class="p">,</span>  <span class="mi">2</span> <span class="o">*</span> <span class="n">koff</span><span class="p">]</span>
+    <span class="n">row2</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span>     <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">koff</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">row1</span><span class="p">,</span> <span class="n">row2</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="differential_matrix_dissociation_two_site_cooperative">
+<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.differential_matrix_dissociation_two_site_cooperative">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">differential_matrix_dissociation_two_site_cooperative</span><span class="p">(</span><span class="n">koff</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Differential matrix for the two-site model during dissociation (cooperative).</span>
+
+<span class="sd">    The kinetic effect is split symmetrically using sqrt(sigma), so the</span>
+<span class="sd">    per-site off-rate in the doubly-bound state is koff / sqrt(sigma)::</span>
+
+<span class="sd">        PL  -&gt; P + L  : koff * fPL                       (first site, unmodified)</span>
+<span class="sd">        LPL -&gt; PL + L : 2 * (koff / sqrt(sigma)) * fLPL  (second site, modified)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    koff : float</span>
+<span class="sd">        Intrinsic dissociation rate constant (per site).</span>
+<span class="sd">    sigma : float</span>
+<span class="sd">        Cooperativity factor.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        2×2 differential matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
+    <span class="n">row1</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="n">koff</span><span class="p">,</span>  <span class="mi">2</span> <span class="o">*</span> <span class="n">koff</span> <span class="o">/</span> <span class="n">s</span><span class="p">]</span>
+    <span class="n">row2</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span>     <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">koff</span> <span class="o">/</span> <span class="n">s</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">row1</span><span class="p">,</span> <span class="n">row2</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="solve_two_site_association">
+<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.solve_two_site_association">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">solve_two_site_association</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">a_conc</span><span class="p">,</span> <span class="n">kon</span><span class="p">,</span> <span class="n">koff</span><span class="p">,</span> <span class="n">Rmax_PL</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">Rmax_LPL</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fPL_0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fLPL_0</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Solve the two-site binding model (non-cooperative) during association.</span>
+
+<span class="sd">    The immobilized ligand P has two equivalent, independent binding sites.</span>
+<span class="sd">    The analyte L flows at fixed concentration ``a_conc``.</span>
+<span class="sd">    The observed signal is a weighted sum of the singly-bound and doubly-bound</span>
+<span class="sd">    fractions, with different response factors ``Rmax_PL`` and ``Rmax_LPL``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    time : np.ndarray</span>
+<span class="sd">        Time array.</span>
+<span class="sd">    a_conc : float</span>
+<span class="sd">        Analyte concentration.</span>
+<span class="sd">    kon : float</span>
+<span class="sd">        Intrinsic association rate constant (per site).</span>
+<span class="sd">    koff : float</span>
+<span class="sd">        Intrinsic dissociation rate constant (per site).</span>
+<span class="sd">    Rmax_PL : float, optional</span>
+<span class="sd">        Signal when all ligand is singly bound (PL), default is 0.</span>
+<span class="sd">    Rmax_LPL : float, optional</span>
+<span class="sd">        Signal when all ligand is doubly bound (LPL), default is 0.</span>
+<span class="sd">    fPL_0 : float, optional</span>
+<span class="sd">        Initial fraction of singly-bound ligand, default is 0.</span>
+<span class="sd">    fLPL_0 : float, optional</span>
+<span class="sd">        Initial fraction of doubly-bound ligand, default is 0.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Array with columns [total_signal, signal_PL, signal_LPL].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="n">time</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+
+    <span class="n">A</span> <span class="o">=</span> <span class="n">differential_matrix_association_two_site</span><span class="p">(</span><span class="n">kon</span><span class="p">,</span> <span class="n">koff</span><span class="p">,</span> <span class="n">a_conc</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">constant_vector_two_site</span><span class="p">(</span><span class="n">kon</span><span class="p">,</span> <span class="n">a_conc</span><span class="p">)</span>
+
+    <span class="n">initial_conditions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">fPL_0</span><span class="p">,</span> <span class="n">fLPL_0</span><span class="p">])</span>
+    <span class="n">steady_state</span>       <span class="o">=</span> <span class="n">solve_steady_state</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+    <span class="n">states</span> <span class="o">=</span> <span class="n">solve_all_states_fast</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">initial_conditions</span><span class="p">,</span> <span class="n">steady_state</span><span class="p">)</span>
+
+    <span class="n">signal_PL</span>    <span class="o">=</span> <span class="n">Rmax_PL</span>  <span class="o">*</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">signal_LPL</span>   <span class="o">=</span> <span class="n">Rmax_LPL</span> <span class="o">*</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">total_signal</span> <span class="o">=</span> <span class="n">signal_PL</span> <span class="o">+</span> <span class="n">signal_LPL</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">total_signal</span><span class="p">,</span> <span class="n">signal_PL</span><span class="p">,</span> <span class="n">signal_LPL</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="solve_two_site_cooperative_association">
+<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.solve_two_site_cooperative_association">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">solve_two_site_cooperative_association</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">a_conc</span><span class="p">,</span> <span class="n">kon</span><span class="p">,</span> <span class="n">koff</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">Rmax_PL</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">Rmax_LPL</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fPL_0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fLPL_0</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Solve the two-site binding model (cooperative) during association.</span>
+
+<span class="sd">    Same as :func:`solve_two_site_association` but with a cooperativity</span>
+<span class="sd">    factor ``sigma`` that modifies the second binding step:</span>
+
+<span class="sd">    - Second site on-rate  = sqrt(sigma) * kon</span>
+<span class="sd">    - Second site off-rate = koff / sqrt(sigma)</span>
+<span class="sd">    - Effective Kd for the second site = Kd / sigma</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    time : np.ndarray</span>
+<span class="sd">        Time array.</span>
+<span class="sd">    a_conc : float</span>
+<span class="sd">        Analyte concentration.</span>
+<span class="sd">    kon : float</span>
+<span class="sd">        Intrinsic association rate constant (per site).</span>
+<span class="sd">    koff : float</span>
+<span class="sd">        Intrinsic dissociation rate constant (per site).</span>
+<span class="sd">    sigma : float</span>
+<span class="sd">        Cooperativity factor. sigma &gt; 1 for positive cooperativity.</span>
+<span class="sd">    Rmax_PL : float, optional</span>
+<span class="sd">        Signal when all ligand is singly bound (PL), default is 0.</span>
+<span class="sd">    Rmax_LPL : float, optional</span>
+<span class="sd">        Signal when all ligand is doubly bound (LPL), default is 0.</span>
+<span class="sd">    fPL_0 : float, optional</span>
+<span class="sd">        Initial fraction of singly-bound ligand, default is 0.</span>
+<span class="sd">    fLPL_0 : float, optional</span>
+<span class="sd">        Initial fraction of doubly-bound ligand, default is 0.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Array with columns [total_signal, signal_PL, signal_LPL].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="n">time</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+
+    <span class="n">A</span> <span class="o">=</span> <span class="n">differential_matrix_association_two_site_cooperative</span><span class="p">(</span><span class="n">kon</span><span class="p">,</span> <span class="n">koff</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">a_conc</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">constant_vector_two_site</span><span class="p">(</span><span class="n">kon</span><span class="p">,</span> <span class="n">a_conc</span><span class="p">)</span>
+
+    <span class="n">initial_conditions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">fPL_0</span><span class="p">,</span> <span class="n">fLPL_0</span><span class="p">])</span>
+    <span class="n">steady_state</span>       <span class="o">=</span> <span class="n">solve_steady_state</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+    <span class="n">states</span> <span class="o">=</span> <span class="n">solve_all_states_fast</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">initial_conditions</span><span class="p">,</span> <span class="n">steady_state</span><span class="p">)</span>
+
+    <span class="n">signal_PL</span>    <span class="o">=</span> <span class="n">Rmax_PL</span>  <span class="o">*</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">signal_LPL</span>   <span class="o">=</span> <span class="n">Rmax_LPL</span> <span class="o">*</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">total_signal</span> <span class="o">=</span> <span class="n">signal_PL</span> <span class="o">+</span> <span class="n">signal_LPL</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">total_signal</span><span class="p">,</span> <span class="n">signal_PL</span><span class="p">,</span> <span class="n">signal_LPL</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="solve_two_site_dissociation">
+<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.solve_two_site_dissociation">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">solve_two_site_dissociation</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">koff</span><span class="p">,</span> <span class="n">Rmax_PL</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">Rmax_LPL</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fPL_0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fLPL_0</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Solve the two-site binding model (non-cooperative) during dissociation.</span>
+
+<span class="sd">    Analyte concentration is zero. Only dissociation of existing complexes occurs.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    time : np.ndarray</span>
+<span class="sd">        Time array.</span>
+<span class="sd">    koff : float</span>
+<span class="sd">        Intrinsic dissociation rate constant (per site).</span>
+<span class="sd">    Rmax_PL : float, optional</span>
+<span class="sd">        Signal when all ligand is singly bound (PL), default is 0.</span>
+<span class="sd">    Rmax_LPL : float, optional</span>
+<span class="sd">        Signal when all ligand is doubly bound (LPL), default is 0.</span>
+<span class="sd">    fPL_0 : float, optional</span>
+<span class="sd">        Initial fraction of singly-bound ligand.</span>
+<span class="sd">    fLPL_0 : float, optional</span>
+<span class="sd">        Initial fraction of doubly-bound ligand.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Array with columns [total_signal, signal_PL, signal_LPL].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="n">time</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+
+    <span class="n">A</span> <span class="o">=</span> <span class="n">differential_matrix_dissociation_two_site</span><span class="p">(</span><span class="n">koff</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">initial_conditions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">fPL_0</span><span class="p">,</span> <span class="n">fLPL_0</span><span class="p">])</span>
+    <span class="n">steady_state</span>       <span class="o">=</span> <span class="n">solve_steady_state</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+    <span class="n">states</span> <span class="o">=</span> <span class="n">solve_all_states_fast</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">initial_conditions</span><span class="p">,</span> <span class="n">steady_state</span><span class="p">)</span>
+
+    <span class="n">signal_PL</span>    <span class="o">=</span> <span class="n">Rmax_PL</span>  <span class="o">*</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">signal_LPL</span>   <span class="o">=</span> <span class="n">Rmax_LPL</span> <span class="o">*</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">total_signal</span> <span class="o">=</span> <span class="n">signal_PL</span> <span class="o">+</span> <span class="n">signal_LPL</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">total_signal</span><span class="p">,</span> <span class="n">signal_PL</span><span class="p">,</span> <span class="n">signal_LPL</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="solve_two_site_cooperative_dissociation">
+<a class="viewcode-back" href="../../../pykingenie.utils.html#pykingenie.utils.signal_surface.solve_two_site_cooperative_dissociation">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">solve_two_site_cooperative_dissociation</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">koff</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">Rmax_PL</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">Rmax_LPL</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fPL_0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fLPL_0</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Solve the two-site binding model (cooperative) during dissociation.</span>
+
+<span class="sd">    Same as :func:`solve_two_site_dissociation` but with a cooperativity</span>
+<span class="sd">    factor ``sigma`` that modifies the second site off-rate:</span>
+
+<span class="sd">    - First site off-rate  = koff                (PL -&gt; P + L, unmodified)</span>
+<span class="sd">    - Second site off-rate = koff / sqrt(sigma)   (LPL -&gt; PL + L, modified)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    time : np.ndarray</span>
+<span class="sd">        Time array.</span>
+<span class="sd">    koff : float</span>
+<span class="sd">        Intrinsic dissociation rate constant (per site).</span>
+<span class="sd">    sigma : float</span>
+<span class="sd">        Cooperativity factor.</span>
+<span class="sd">    Rmax_PL : float, optional</span>
+<span class="sd">        Signal when all ligand is singly bound (PL), default is 0.</span>
+<span class="sd">    Rmax_LPL : float, optional</span>
+<span class="sd">        Signal when all ligand is doubly bound (LPL), default is 0.</span>
+<span class="sd">    fPL_0 : float, optional</span>
+<span class="sd">        Initial fraction of singly-bound ligand.</span>
+<span class="sd">    fLPL_0 : float, optional</span>
+<span class="sd">        Initial fraction of doubly-bound ligand.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Array with columns [total_signal, signal_PL, signal_LPL].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="n">time</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+
+    <span class="n">A</span> <span class="o">=</span> <span class="n">differential_matrix_dissociation_two_site_cooperative</span><span class="p">(</span><span class="n">koff</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">initial_conditions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">fPL_0</span><span class="p">,</span> <span class="n">fLPL_0</span><span class="p">])</span>
+    <span class="n">steady_state</span>       <span class="o">=</span> <span class="n">solve_steady_state</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+    <span class="n">states</span> <span class="o">=</span> <span class="n">solve_all_states_fast</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">initial_conditions</span><span class="p">,</span> <span class="n">steady_state</span><span class="p">)</span>
+
+    <span class="n">signal_PL</span>    <span class="o">=</span> <span class="n">Rmax_PL</span>  <span class="o">*</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">signal_LPL</span>   <span class="o">=</span> <span class="n">Rmax_LPL</span> <span class="o">*</span> <span class="n">states</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">total_signal</span> <span class="o">=</span> <span class="n">signal_PL</span> <span class="o">+</span> <span class="n">signal_LPL</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">total_signal</span><span class="p">,</span> <span class="n">signal_PL</span><span class="p">,</span> <span class="n">signal_LPL</span><span class="p">))</span></div>
+
+
 </pre></div>
 
-                </article>
-              
-              
-              
-              
-              
-                <footer class="prev-next-footer d-print-none">
-                  
-<div class="prev-next-area">
-</div>
-                </footer>
-              
-            </div>
-            
-            
-              
-            
+           </div>
           </div>
-          <footer class="bd-footer-content">
-            
-          </footer>
-        
-      </main>
-    </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Osvaldo Burastero.</p>
   </div>
-  
-  <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
-  <footer class="bd-footer">
-<div class="bd-footer__inner bd-page-width">
-  
-    <div class="footer-items__start">
-      
-        <div class="footer-item">
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
-  <p class="copyright">
-    
-      © Copyright 2025, osvalB.
-      <br/>
-    
-  </p>
-</div>
-      
-        <div class="footer-item">
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
 
-  <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
-    <br/>
-  </p>
-</div>
-      
-    </div>
-  
-  
-  
-    <div class="footer-items__end">
-      
-        <div class="footer-item">
-<p class="theme-version">
-  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
-</p></div>
-      
-    </div>
-  
-</div>
-
-  </footer>
-  </body>
+</body>
 </html>

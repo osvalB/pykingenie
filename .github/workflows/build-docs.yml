@@ -3,7 +3,6 @@ name: Build Documentation
 # This workflow handles all documentation-related tasks:
 # 1. Building the documentation using Sphinx
 # 2. Uploading the documentation as an artifact
-# 3. Deploying the documentation to GitHub Pages 
 
 on:
   push:
@@ -15,6 +14,8 @@ on:
       - 'build_docs.py'
       - '.github/workflows/build-docs.yml'
       - 'pyproject.toml'
+      - 'uv.lock'
+      - '!docs/_build/**'
   pull_request:
     branches: [ main ]
     paths:
@@ -24,19 +25,24 @@ on:
       - 'build_docs.py'
       - '.github/workflows/build-docs.yml'
       - 'pyproject.toml'
+      - 'uv.lock'
+      - '!docs/_build/**'
+
+permissions:
+  contents: read
 
 env:
-  UV_CACHE_DIR: ${{ github.workspace }}/.cache/uv
+  UV_CACHE_DIR: /tmp/uv-cache
 
 jobs:
   build-docs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: Install uv
-      uses: astral-sh/setup-uv@v4
+      uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
       with:
         version: "latest"
 
@@ -44,13 +50,18 @@ jobs:
       run: uv python install 3.13
 
     - name: Cache uv packages
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ${{ env.UV_CACHE_DIR }}
-        key: ${{ runner.os }}-uv-3.13-${{ hashFiles('**/pyproject.toml') }}
+        key: ${{ runner.os }}-uv-3.13-${{ hashFiles('pyproject.toml', 'uv.lock') }}
         restore-keys: |
           ${{ runner.os }}-uv-3.13-
           ${{ runner.os }}-uv-
+
+    - name: Install Pandoc
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y pandoc
 
     - name: Build documentation
       run: |
@@ -58,32 +69,10 @@ jobs:
         uv run build_docs.py
         
     - name: Upload documentation artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: documentation
         path: docs/_build/html/
         retention-days: 7
         if-no-files-found: error # Fail the workflow if no files are found
         overwrite: true
-
-  deploy-docs:
-    if: github.ref == 'refs/heads/main'
-    needs: build-docs
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Download documentation artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: documentation
-          path: docs-out
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: docs-out
