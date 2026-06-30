@@ -3,6 +3,7 @@ name: Build Documentation
 # This workflow handles all documentation-related tasks:
 # 1. Building the documentation using Sphinx
 # 2. Uploading the documentation as an artifact
+# 3. Deploying the documentation from a GitHub Actions artifact
 
 on:
   push:
@@ -32,6 +33,8 @@ on:
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
 
 env:
   UV_CACHE_DIR: /tmp/uv-cache
@@ -78,3 +81,30 @@ jobs:
         retention-days: 7
         if-no-files-found: error # Fail the workflow if no files are found
         overwrite: true
+
+  deploy-docs:
+    if: github.ref == 'refs/heads/main'
+    needs: build-docs
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Download documentation artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: documentation
+          path: docs-out
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: docs-out
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
