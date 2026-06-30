@@ -6,6 +6,7 @@ on:
     branches: [ main ]
     paths:
       - 'docs/**'
+      - 'notebooks/**'
       - 'src/**'
       - 'README.md'
       - 'build_docs.py'
@@ -60,7 +61,8 @@ jobs:
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git add docs/_build/html docs/*.rst
+        git add -f docs/_build/html
+        git add docs/*.rst docs/notebooks
         if git diff --cached --quiet; then
           echo "No documentation changes to push."
         else

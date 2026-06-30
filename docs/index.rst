@@ -10,6 +10,7 @@ Welcome to PyKinGenie, a Python package for analyzing binding kinetics data with
 
    installation
    quickstart
+   examples
    modules
 
 Indices and tables

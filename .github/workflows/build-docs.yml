@@ -9,6 +9,7 @@ on:
     branches: [ main, develop ]
     paths:
       - 'docs/**'
+      - 'notebooks/**'
       - 'src/**'
       - 'README.md'
       - 'build_docs.py'
@@ -20,6 +21,7 @@ on:
     branches: [ main ]
     paths:
       - 'docs/**'
+      - 'notebooks/**'
       - 'src/**'
       - 'README.md'
       - 'build_docs.py'
