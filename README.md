@@ -100,7 +100,7 @@ Contributions are welcome! Please contact me at oburastero@embl-hamburg.de
 
 If you use `pyKinGenie`, please cite it as:
 
-Burastero, O. (2026). `pyKinGenie` (Version 1.0.0) [Computer software].
+Burastero, O. (2026). `pyKinGenie` (Version 1.0) [Computer software].
 GitHub. https://github.com/osvalB/pykingenie
 
 ```bibtex
