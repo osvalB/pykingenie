@@ -96,5 +96,22 @@ fig.write_image('test_bli_fitted.png')
 
 Contributions are welcome! Please contact me at oburastero@embl-hamburg.de
 
+## Citation
+
+If you use `pyKinGenie`, please cite it as:
+
+Burastero, O. (2026). `pyKinGenie` (Version 1.0.0) [Computer software].
+GitHub. https://github.com/osvalB/pykingenie
+
+```bibtex
+@software{burastero_2026_pykingenie,
+  author = {Burastero, Osvaldo},
+  title = {pykingenie},
+  version = {1.0},
+  year = {2026},
+  url = {https://github.com/osvalB/pykingenie}
+}
+```
+
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
