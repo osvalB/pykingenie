@@ -7,7 +7,19 @@ Install PyKinGenie using pip:
 
    pip install pykingenie
 
-Or for development (requires uv):
+If you use uv, install PyKinGenie into the current environment with:
+
+.. code-block:: bash
+
+   uv pip install pykingenie
+
+Or add it to an existing uv-managed project:
+
+.. code-block:: bash
+
+   uv add pykingenie
+
+For development (requires uv):
 
 .. code-block:: bash
 

@@ -7,7 +7,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
 project = 'PyKinGenie'
 copyright = '2025, Osvaldo Burastero'
 author = 'Osvaldo Burastero'
-release = '0.1.19'
+release = '1.0.0'
 
 extensions = [
     'sphinx.ext.autodoc',

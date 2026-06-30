@@ -102,7 +102,7 @@ from .utils.plotting import (
 )
 
 # Package metadata
-__version__ = '0.1.0'
+__version__ = '1.0.0'
 __author__ = 'osvalB'
 __email__ = 'oburastero@gmail.com'
 __description__ = 'A Python package for kinetics data analysis'
