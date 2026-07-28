@@ -228,7 +228,7 @@ def fit_many_double_exponential(signal_lst, time_lst, min_log_k=-4, max_log_k=4,
             params, cov, fitted_y = fit_double_exponential(y, t, min_log_k=min_log_k, max_log_k=max_log_k,
                                                            log_k_points=log_k_points)
 
-            errors = (np.sqrt(cov) / params) * 100
+            errors = (np.sqrt(np.diag(cov)) / params) * 100
 
             k_obs_both = [params[2], params[4]]
             k_obs_both_err = [errors[2], errors[4]]
