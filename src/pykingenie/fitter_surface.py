@@ -1170,7 +1170,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
             try:
 
-                params, cov, fit_vals_assoc, fit_vals_disso = fit_induced_fit_sites_assoc_and_disso(
+                params, _, fit_vals_assoc, fit_vals_disso = fit_induced_fit_sites_assoc_and_disso(
                     assoc_lst_subsampled,time_assoc_lst_subsampled,self.lig_conc_lst,
                     disso_lst_subsampled,time_disso_lst_subsampled,
                     p0,low_bounds,high_bounds,
