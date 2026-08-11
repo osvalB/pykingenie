@@ -13,5 +13,6 @@ and visualize binding kinetics models with PyKinGenie.
    One-site induced fit <notebooks/3_one_site_induced_fit>
    One-site conformational selection <notebooks/4_one_site_conformational_selection>
    Heterogeneous analyte model <notebooks/5_heterogeneous_analyte_model>
-   Two-site binding model <notebooks/6_two_site_model>
-   Two-site binding model with cooperativity <notebooks/7_two_site_cooperativity_model>
+   Heterogeneous ligand model <notebooks/6_heterogeneous_ligand_model>
+   Two-site binding model <notebooks/7_two_site_model>
+   Two-site binding model with cooperativity <notebooks/8_two_site_cooperativity_model>
