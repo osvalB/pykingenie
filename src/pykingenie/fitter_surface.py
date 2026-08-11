@@ -5,6 +5,7 @@ import pandas as pd
 from .utils.fitting_surface import (
     fit_steady_state_one_site,
     fit_steady_state_two_site,
+    fit_steady_state_two_site_heterogeneous_ligand,
     fit_two_site_assoc_and_disso,
     steady_state_one_site_asymmetric_ci95,
     fit_one_site_association,
@@ -12,6 +13,7 @@ from .utils.fitting_surface import (
     fit_one_site_assoc_and_disso,
     fit_induced_fit_sites_assoc_and_disso,
     fit_one_site_assoc_and_disso_ktr,
+    fit_two_site_heterogeneous_ligand_assoc_and_disso,
     one_site_assoc_and_disso_asymmetric_ci95,
     one_site_assoc_and_disso_asymmetric_ci95_koff,
     get_smax_upper_bound_factor
@@ -309,7 +311,8 @@ class KineticsFitter(KineticsFitterGeneral):
         Parameters
         ----------
         model : str, optional
-            Steady-state model to use. Options: 'one_site', 'two_site'.
+            Steady-state model to use. Options: 'one_site', 'two_site',
+            'two_site_heterogeneous_ligand'.
             Default is 'one_site'.
         fit_sigma : bool, optional
             Only used for model='two_site'. If True, fit cooperativity.
@@ -324,7 +327,105 @@ class KineticsFitter(KineticsFitterGeneral):
         if model == 'two_site':
             return self.fit_steady_state_two_site(fit_sigma=fit_sigma)
 
+        if model == 'two_site_heterogeneous_ligand':
+            return self.fit_steady_state_two_site_heterogeneous_ligand()
+
         raise ValueError("Unknown steady-state model: " + model)
+
+    def fit_steady_state_two_site_heterogeneous_ligand(self):
+        """
+        Fit the steady-state signal to a 2:1 heterogeneous ligand model.
+
+        The model is the weighted sum of two independent 1:1 interactions.
+        Kd1, Kd2, and fraction_site1 are shared across all Smax groups; each
+        group has its own total Rmax.
+
+        Returns
+        -------
+        None
+            Updates fitted steady-state signals, fitted parameters, and bounds.
+        """
+
+        self.clear_fittings()
+
+        self.get_steady_state()
+
+        ligand_values = np.array(self.lig_conc_lst_per_id[0], dtype=float)
+        Kd_init = np.median(ligand_values)
+        kd_min = np.min(ligand_values) / 1e3
+        kd_max = np.max(ligand_values) * 1e3
+        kd_mid = Kd_init
+
+        Kd1_init = max(kd_min * 10, Kd_init / 10)
+        Kd2_init = min(kd_max / 10, Kd_init * 10)
+
+        p0 = [Kd1_init, Kd2_init, 0.5]
+        low_bounds = [kd_min, kd_mid, 1e-6]
+        high_bounds = [kd_mid, kd_max, 1.0]
+
+        upper_bound = 1e3 if Kd_init >= 1 else 1e2
+        for signal in self.signal_ss:
+            ymax = np.max(signal)
+            p0.append(ymax)
+            low_bounds.append(max(ymax * 0.2, 1e-12))
+            high_bounds.append(max(ymax * upper_bound, 1e-12))
+
+        fit, cov, fit_vals = fit_steady_state_two_site_heterogeneous_ligand(
+            self.signal_ss,
+            self.lig_conc_lst_per_id,
+            p0,
+            low_bounds,
+            high_bounds,
+        )
+
+        kwargs = {
+            "signal_lst": self.signal_ss,
+            "ligand_lst": self.lig_conc_lst_per_id,
+        }
+
+        fit, cov, fit_vals, low_bounds, high_bounds = re_fit(
+            fit=fit,
+            cov=cov,
+            fit_vals=fit_vals,
+            fit_fx=fit_steady_state_two_site_heterogeneous_ligand,
+            low_bounds=low_bounds,
+            high_bounds=high_bounds,
+            times=3,
+            **kwargs,
+        )
+
+        self.Kd1_ss = fit[0]
+        self.Kd2_ss = fit[1]
+        self.fraction_site1_ss = fit[2]
+        self.Kd_ss = np.sqrt(self.Kd1_ss * self.Kd2_ss)
+        Rmax = fit[3:]
+
+        self.params = fit
+        self.p0 = p0
+        self.low_bounds = low_bounds
+        self.high_bounds = high_bounds
+        self.signal_ss_fit = fit_vals
+
+        n_groups = len(Rmax)
+        if self.names is None:
+            names = [f"group_{i}" for i in range(n_groups)]
+        elif len(self.names) == n_groups:
+            names = self.names
+        else:
+            names = [self.names[0] for _ in range(n_groups)]
+
+        self.fit_params_ss = pd.DataFrame(
+            {
+                'Kd1 [µM]': [self.Kd1_ss] * n_groups,
+                'Kd2 [µM]': [self.Kd2_ss] * n_groups,
+                'fraction_site1': [self.fraction_site1_ss] * n_groups,
+                'Rmax': Rmax,
+                'Name': names,
+            }
+        )
+        self.Smax_upper_bound_factor = get_smax_upper_bound_factor(self.Kd_ss)
+
+        return None
 
     def fit_steady_state_two_site(self, fit_sigma=False):
 
@@ -1022,6 +1123,248 @@ class KineticsFitter(KineticsFitterGeneral):
 
         return None
 
+    def fit_two_site_heterogeneous_ligand_assoc_and_disso(
+        self,
+        shared_smax=True,
+        fixed_t0=True,
+        Kd1_values=None,
+        Kd2_values=None,
+    ):
+        """
+        Fit a 2:1 heterogeneous ligand kinetic model.
+
+        The model is a weighted sum of two independent 1:1 interactions. A grid
+        search over fixed Kd1/Kd2 pairs is used to find initial parameters before
+        the full model is fitted. Only pairs where Kd1 < Kd2 are evaluated, so
+        Kd1 represents the higher-affinity site.
+
+        Parameters
+        ----------
+        shared_smax : bool, optional
+            Whether to share Rmax across curves with the same Smax ID.
+        fixed_t0 : bool, optional
+            Whether to fix the time offset (t0) to zero.
+        Kd1_values : list, optional
+            Candidate Kd1 values for the grid search.
+        Kd2_values : list, optional
+            Candidate Kd2 values for the grid search.
+
+        Returns
+        -------
+        None
+            Updates fitted signal, parameter, bounds, and grid-search attributes.
+        """
+        self.clear_fittings()
+
+        if self.Kd_ss is None and not self.is_single_cycle:
+            self.fit_steady_state_one_site()
+
+        if self.smax_guesses_unq is None or self.smax_guesses_shared is None:
+            self.get_steady_state()
+
+        self.fit_one_site_assoc_and_disso(shared_smax=shared_smax, fixed_t0=True, fit_ktr=False)
+
+        Kd_init = float(self.Kd)
+        koff_init = float(self.k_off)
+        smax_init = np.array(self.Smax, dtype=float).tolist()
+
+        if Kd1_values is None:
+            Kd1_values = Kd_init * np.array([1e-2, 3e-2, 1e-1, 3e-1, 1.0])
+        if Kd2_values is None:
+            Kd2_values = Kd_init * np.array([1.0, 3.0, 1e1, 3e1, 1e2])
+
+        Kd1_values = np.array(Kd1_values, dtype=float)
+        Kd2_values = np.array(Kd2_values, dtype=float)
+
+        candidate_pairs = [(Kd1, Kd2) for Kd1, Kd2 in itertools.product(Kd1_values, Kd2_values) if Kd1 > 0 and Kd2 > 0 and Kd1 < Kd2]
+
+        if len(candidate_pairs) == 0:
+            raise ValueError("Grid search requires at least one Kd pair with Kd1 < Kd2.")
+
+        time_assoc_lst_subsampled = [subset_data(t) for t in self.time_assoc_lst]
+        time_disso_lst_subsampled = [subset_data(t) for t in self.time_disso_lst]
+        assoc_lst_subsampled = [subset_data(y) for y in self.assoc_lst]
+        disso_lst_subsampled = [subset_data(y) for y in self.disso_lst]
+
+        kwargs_grid = {
+            'assoc_signal_lst': assoc_lst_subsampled,
+            'assoc_time_lst': time_assoc_lst_subsampled,
+            'analyte_conc_lst': self.lig_conc_lst,
+            'disso_signal_lst': disso_lst_subsampled,
+            'disso_time_lst': time_disso_lst_subsampled,
+            'shared_smax': shared_smax,
+            'smax_idx': self.smax_id,
+            'fixed_t0': True,
+        }
+
+        p0_grid_base = [koff_init, koff_init, 0.5] + smax_init
+        low_grid_base = [max(koff_init / 1e3, 1e-8), max(koff_init / 1e3, 1e-8), 1e-6] + [max(x / 50, 1e-12) for x in smax_init]
+        high_grid_base = [min(koff_init * 1e3, 10.0), min(koff_init * 1e3, 10.0), 1.0] + [max(x * 25, 1e-12) for x in smax_init]
+
+        best_rss = np.inf
+        best_params = None
+        best_Kd1 = None
+        best_Kd2 = None
+        grid_rows = []
+
+        for Kd1_value, Kd2_value in candidate_pairs:
+            try:
+                params, _, fit_vals_assoc, fit_vals_disso = fit_two_site_heterogeneous_ligand_assoc_and_disso(
+                    **kwargs_grid,
+                    initial_parameters=p0_grid_base,
+                    low_bounds=low_grid_base,
+                    high_bounds=high_grid_base,
+                    fixed_Kd1=True,
+                    Kd1_value=Kd1_value,
+                    fixed_Kd2=True,
+                    Kd2_value=Kd2_value,
+                )
+
+                rss_assoc = np.sum([np.sum((y - fit_y) ** 2) for y, fit_y in zip(assoc_lst_subsampled, fit_vals_assoc)])
+                rss_disso = np.sum([np.sum((y - fit_y) ** 2) for y, fit_y in zip(disso_lst_subsampled, fit_vals_disso)])
+                rss = rss_assoc + rss_disso
+
+                grid_rows.append({'Kd1_value': Kd1_value, 'Kd2_value': Kd2_value, 'rss': rss})
+
+                if rss < best_rss:
+                    best_rss = rss
+                    best_params = np.array(params, dtype=float)
+                    best_Kd1 = float(Kd1_value)
+                    best_Kd2 = float(Kd2_value)
+
+            except Exception:
+                grid_rows.append({'Kd1_value': Kd1_value, 'Kd2_value': Kd2_value, 'rss': np.inf})
+                continue
+
+        if best_params is None:
+            raise RuntimeError("Grid search failed for all Kd1/Kd2 candidate pairs.")
+
+        self.heterogeneous_ligand_grid_search = pd.DataFrame(grid_rows)
+
+        best_koff1 = best_params[0]
+        best_koff2 = best_params[1]
+        best_fraction = best_params[2]
+        best_smax = best_params[3:].tolist()
+
+        kd_mid = np.sqrt(best_Kd1 * best_Kd2)
+
+        p0 = [best_Kd1, best_koff1, best_Kd2, best_koff2, best_fraction]
+        low_bounds = [best_Kd1 / 1e3, max(best_koff1 / 1e3, 1e-8), kd_mid, max(best_koff2 / 1e3, 1e-8), 1e-6]
+        high_bounds = [kd_mid, min(best_koff1 * 1e3, 10.0), best_Kd2 * 1e3, min(best_koff2 * 1e3, 10.0), 1.0]
+
+        n_unq_smax = len(np.unique(self.smax_id))
+        if not fixed_t0:
+            p0 += [0.0 for _ in range(n_unq_smax)]
+            low_bounds += [-0.01 for _ in range(n_unq_smax)]
+            high_bounds += [0.1 for _ in range(n_unq_smax)]
+
+        p0 += best_smax
+        low_bounds += [max(x / 50, 1e-12) for x in best_smax]
+        high_bounds += [max(x * 25, 1e-12) for x in best_smax]
+
+        kwargs = {
+            'assoc_signal_lst': self.assoc_lst,
+            'assoc_time_lst': self.time_assoc_lst,
+            'analyte_conc_lst': self.lig_conc_lst,
+            'disso_signal_lst': self.disso_lst,
+            'disso_time_lst': self.time_disso_lst,
+            'shared_smax': shared_smax,
+            'smax_idx': self.smax_id,
+            'fixed_t0': fixed_t0,
+        }
+
+        fit, cov, fit_vals_assoc, fit_vals_disso = fit_two_site_heterogeneous_ligand_assoc_and_disso(
+            **kwargs,
+            initial_parameters=p0,
+            low_bounds=low_bounds,
+            high_bounds=high_bounds,
+        )
+
+        self.signal_assoc_fit = fit_vals_assoc
+        self.signal_disso_fit = fit_vals_disso
+
+        fit = np.array(fit, dtype=float)
+        self.Kd1 = fit[0]
+        self.k_off1 = fit[1]
+        self.Kd2 = fit[2]
+        self.k_off2 = fit[3]
+        self.fraction_site1 = fit[4]
+
+        idx = 5
+        t0_vals = None
+        if not fixed_t0:
+            t0_vals = fit[idx:idx + n_unq_smax]
+            idx += n_unq_smax
+
+        self.Smax = fit[idx:]
+
+        rows = len(self.Smax)
+        if self.names is None:
+            names = [f"group_{i}" for i in range(rows)]
+        elif len(self.names) == rows:
+            names = self.names
+        else:
+            names = [self.names[0] for _ in range(rows)]
+
+        df_fit = pd.DataFrame(
+            {
+                'Kd1 [µM]': [self.Kd1] * rows,
+                'k_off1 [1/s]': [self.k_off1] * rows,
+                'Kd2 [µM]': [self.Kd2] * rows,
+                'k_off2 [1/s]': [self.k_off2] * rows,
+                'fraction_site1': [self.fraction_site1] * rows,
+                'Rmax': self.Smax,
+                'Name': names,
+            }
+        )
+        df_fit['(Derived) k_on1 [1/µM/s]'] = df_fit['k_off1 [1/s]'] / df_fit['Kd1 [µM]']
+        df_fit['(Derived) k_on2 [1/µM/s]'] = df_fit['k_off2 [1/s]'] / df_fit['Kd2 [µM]']
+
+        error = np.sqrt(np.diag(cov))
+        with np.errstate(divide='ignore', invalid='ignore'):
+            rel_error = error / fit * 100
+
+        idx_err = 5
+        t0_err_vals = None
+        if not fixed_t0:
+            t0_err_vals = rel_error[idx_err:idx_err + n_unq_smax]
+            idx_err += n_unq_smax
+
+        smax_error = rel_error[idx_err:]
+        df_error = pd.DataFrame(
+            {
+                'Kd1 [µM]': [rel_error[0]] * rows,
+                'k_off1 [1/s]': [rel_error[1]] * rows,
+                'Kd2 [µM]': [rel_error[2]] * rows,
+                'k_off2 [1/s]': [rel_error[3]] * rows,
+                'fraction_site1': [rel_error[4]] * rows,
+                'Rmax': smax_error,
+                'Name': names,
+            }
+        )
+
+        if not fixed_t0:
+            if not shared_smax:
+                t0_all = expand_parameter_list(t0_vals, self.smax_id)
+                t0_err_all = expand_parameter_list(t0_err_vals, self.smax_id)
+                df_fit['t0'] = t0_all
+                df_error['t0'] = t0_err_all
+            else:
+                df_fit['t0'] = t0_vals
+                df_error['t0'] = t0_err_vals
+
+        self.fit_params_kinetics = df_fit
+        self.fit_params_kinetics_error = df_error
+
+        self.params = fit
+        self.p0 = p0
+        self.low_bounds = low_bounds
+        self.high_bounds = high_bounds
+        self.best_Kd1_grid = best_Kd1
+        self.best_Kd2_grid = best_Kd2
+
+        return None
+
     def calculate_ci95(self, shared_smax=True, fixed_t0=True, fit_ktr=False):
         """
         Calculate 95% confidence intervals for the fitted parameters.
@@ -1170,7 +1513,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
             try:
 
-                params, cov, fit_vals_assoc, fit_vals_disso = fit_induced_fit_sites_assoc_and_disso(
+                params, _, fit_vals_assoc, fit_vals_disso = fit_induced_fit_sites_assoc_and_disso(
                     assoc_lst_subsampled,time_assoc_lst_subsampled,self.lig_conc_lst,
                     disso_lst_subsampled,time_disso_lst_subsampled,
                     p0,low_bounds,high_bounds,
@@ -1329,4 +1672,3 @@ class KineticsFitter(KineticsFitterGeneral):
         df = pd.concat(df_list, ignore_index=True)
 
         return df
-

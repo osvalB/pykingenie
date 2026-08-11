@@ -29,6 +29,9 @@ __all__ = [
     'solve_ode_mixture_analyte_association',
     'ode_mixture_analyte_dissociation',
     'solve_ode_mixture_analyte_dissociation',
+    'steady_state_two_site_heterogeneous_ligand',
+    'solve_two_site_heterogeneous_ligand_association',
+    'solve_two_site_heterogeneous_ligand_dissociation',
     'steady_state_two_site',
     'steady_state_two_site_cooperative',
     'differential_matrix_association_two_site',
@@ -844,6 +847,167 @@ def solve_ode_mixture_analyte_dissociation(t, Ris0, koffs, t0=0):
     return out.y
 
 
+def _validate_fraction_site1(fraction_site1):
+    if fraction_site1 < 0 or fraction_site1 > 1:
+        raise ValueError("fraction_site1 must be between 0 and 1.")
+
+
+def steady_state_two_site_heterogeneous_ligand(C, Rmax, Kd1, Kd2, fraction_site1):
+    """
+    Steady state signal for a 2:1 heterogeneous ligand model.
+
+    The model is the weighted sum of two independent 1:1 binding signals.
+    ``fraction_site1`` is the fraction of the total binding response
+    contributed by interaction 1; interaction 2 contributes
+    ``1 - fraction_site1``.
+
+    Parameters
+    ----------
+    C : np.ndarray
+        Concentration of the analyte.
+    Rmax : float
+        Total maximum response from both ligand interactions.
+    Kd1 : float
+        Equilibrium dissociation constant for interaction 1.
+    Kd2 : float
+        Equilibrium dissociation constant for interaction 2.
+    fraction_site1 : float
+        Fractional contribution of interaction 1, from 0 to 1.
+
+    Returns
+    -------
+    np.ndarray
+        Steady state signal.
+    """
+    _validate_fraction_site1(fraction_site1)
+
+    Rmax1 = Rmax * fraction_site1
+    Rmax2 = Rmax * (1 - fraction_site1)
+    signal1 = steady_state_one_site(C, Rmax1, Kd1)
+    signal2 = steady_state_one_site(C, Rmax2, Kd2)
+    return signal1 + signal2
+
+
+def solve_two_site_heterogeneous_ligand_association(
+    time,
+    a_conc,
+    Kd1,
+    koff1,
+    Kd2,
+    koff2,
+    Rmax=0,
+    fraction_site1=0.5,
+    s1_0=0,
+    s2_0=0,
+    t0=0,
+):
+    """
+    Association signal for a 2:1 heterogeneous ligand model.
+
+    The association trace is computed as two independent 1:1 association
+    curves added together. The total response is split into two component
+    responses using ``fraction_site1``.
+
+    Parameters
+    ----------
+    time : np.ndarray
+        Time array.
+    a_conc : float
+        Analyte concentration.
+    Kd1 : float
+        Equilibrium dissociation constant for interaction 1.
+    koff1 : float
+        Dissociation rate constant for interaction 1.
+    Kd2 : float
+        Equilibrium dissociation constant for interaction 2.
+    koff2 : float
+        Dissociation rate constant for interaction 2.
+    Rmax : float, optional
+        Total maximum response from both ligand interactions, default is 0.
+    fraction_site1 : float, optional
+        Fractional contribution of interaction 1, from 0 to 1, default is 0.5.
+    s1_0 : float, optional
+        Initial signal from interaction 1, default is 0.
+    s2_0 : float, optional
+        Initial signal from interaction 2, default is 0.
+    t0 : float, optional
+        Initial time offset, default is 0.
+
+    Returns
+    -------
+    np.ndarray
+        Array with columns [total_signal, signal_site1, signal_site2].
+    """
+    _validate_fraction_site1(fraction_site1)
+
+    time = np.array(time)
+    Rmax1 = Rmax * fraction_site1
+    Rmax2 = Rmax * (1 - fraction_site1)
+
+    signal1 = one_site_association_analytical(time, s1_0, Rmax1, koff1, Kd1, a_conc, t0)
+    signal2 = one_site_association_analytical(time, s2_0, Rmax2, koff2, Kd2, a_conc, t0)
+    total_signal = signal1 + signal2
+
+    return np.column_stack((total_signal, signal1, signal2))
+
+
+def solve_two_site_heterogeneous_ligand_dissociation(
+    time,
+    koff1,
+    koff2,
+    s0=0,
+    fraction_site1=0.5,
+    s1_0=None,
+    s2_0=None,
+    t0=0,
+):
+    """
+    Dissociation signal for a 2:1 heterogeneous ligand model.
+
+    The dissociation trace is computed as two independent 1:1 dissociation
+    curves added together. If component initial signals are not provided,
+    ``s0`` is split using ``fraction_site1``.
+
+    Parameters
+    ----------
+    time : np.ndarray
+        Time array.
+    koff1 : float
+        Dissociation rate constant for interaction 1.
+    koff2 : float
+        Dissociation rate constant for interaction 2.
+    s0 : float, optional
+        Initial total signal, default is 0.
+    fraction_site1 : float, optional
+        Fractional contribution of interaction 1, from 0 to 1, default is 0.5.
+    s1_0 : float, optional
+        Initial signal from interaction 1. If None, use s0 * fraction_site1.
+    s2_0 : float, optional
+        Initial signal from interaction 2. If None, use s0 * (1 - fraction_site1).
+    t0 : float, optional
+        Initial time offset, default is 0.
+
+    Returns
+    -------
+    np.ndarray
+        Array with columns [total_signal, signal_site1, signal_site2].
+    """
+    _validate_fraction_site1(fraction_site1)
+
+    time = np.array(time)
+
+    if s1_0 is None:
+        s1_0 = s0 * fraction_site1
+    if s2_0 is None:
+        s2_0 = s0 * (1 - fraction_site1)
+
+    signal1 = one_site_dissociation_analytical(time, s1_0, koff1, t0)
+    signal2 = one_site_dissociation_analytical(time, s2_0, koff2, t0)
+    total_signal = signal1 + signal2
+
+    return np.column_stack((total_signal, signal1, signal2))
+
+
 def steady_state_two_site(C, Rmax_PL, Rmax_LPL, Kd):
     """
     Steady state signal for a ligand with two identical, independent binding sites.
@@ -1274,4 +1438,3 @@ def solve_two_site_cooperative_dissociation(time, koff, sigma, Rmax_PL=0, Rmax_L
     total_signal = signal_PL + signal_LPL
 
     return np.column_stack((total_signal, signal_PL, signal_LPL))
-
