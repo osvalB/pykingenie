@@ -524,8 +524,9 @@ class KineticsAnalyzer:
         Parameters
         ----------
         fitting_model : str, optional
-            Steady-state model to fit for surface data.
-            Options: 'one_to_one', 'two_to_one'. Default is 'one_to_one'.
+            Steady-state model to fit for surface data. Options:
+            'one_to_one', 'two_to_one', 'two_to_one_heterogeneous_ligand',
+            'heterogeneous_ligand'. Default is 'one_to_one'.
         fit_sigma : bool, optional
             Only used when fitting_model='two_to_one'. If True, fit a shared
             cooperativity factor (sigma). Default is False.
@@ -534,15 +535,21 @@ class KineticsAnalyzer:
         -------
         None
         """
-        if fitting_model not in ['one_to_one', 'two_to_one']:
+        heterogeneous_ligand_models = [
+            'two_to_one_heterogeneous_ligand',
+            'heterogeneous_ligand',
+        ]
+        if fitting_model not in ['one_to_one', 'two_to_one'] + heterogeneous_ligand_models:
             raise ValueError("Unknown steady-state fitting model: " + fitting_model)
 
         for kf in self.fittings.values():
             if not kf.is_single_cycle:
                 if fitting_model == 'one_to_one':
                     kf.fit_steady_state_one_site()
-                else:
+                elif fitting_model == 'two_to_one':
                     kf.fit_steady_state_two_site(fit_sigma=fit_sigma)
+                elif fitting_model in heterogeneous_ligand_models:
+                    kf.fit_steady_state_two_site_heterogeneous_ligand()
 
                 kf.create_fitting_bounds_table()
             else:
@@ -593,14 +600,19 @@ class KineticsAnalyzer:
     def submit_kinetics_fitting(self, fitting_model='one_to_one',
                                 fitting_region='association_dissociation',
                                 shared_smax=False,
-                                fit_sigma=False):
+                                fit_sigma=False,
+                                fixed_t0=True,
+                                Kd1_values=None,
+                                Kd2_values=None):
         """
         Fit models to surface-based kinetics data.
 
         Parameters
         ----------
         fitting_model : str, optional
-            Model to fit. Options: 'one_to_one', 'one_to_one_mtl', 'one_to_one_if'. Default is 'one_to_one'.
+            Model to fit. Options: 'one_to_one', 'one_to_one_mtl',
+            'one_to_one_if', 'two_to_one', 'two_to_one_heterogeneous_ligand',
+            'heterogeneous_ligand'. Default is 'one_to_one'.
         fitting_region : str, optional
             Region to fit. Options: 'association_dissociation', 'association', 'dissociation'. Default is 'association_dissociation'.
         shared_smax : bool, optional
@@ -608,12 +620,23 @@ class KineticsAnalyzer:
         fit_sigma : bool, optional
             Whether to fit sigma (cooperativity) for the two_to_one model.
             Ignored for one_to_one and one_to_one_if models. Default is False.
+        fixed_t0 : bool, optional
+            Whether to fix t0 for association/dissociation fitting. Used by
+            the heterogeneous ligand model. Default is True.
+        Kd1_values : list, optional
+            Candidate Kd1 values for the heterogeneous ligand grid search.
+        Kd2_values : list, optional
+            Candidate Kd2 values for the heterogeneous ligand grid search.
 
         Returns
         -------
         None
         """
-        if fitting_model not in ['one_to_one', 'one_to_one_mtl', 'one_to_one_if','two_to_one']:
+        heterogeneous_ligand_models = [
+            'two_to_one_heterogeneous_ligand',
+            'heterogeneous_ligand',
+        ]
+        if fitting_model not in ['one_to_one', 'one_to_one_mtl', 'one_to_one_if','two_to_one'] + heterogeneous_ligand_models:
             raise ValueError("Unknown fitting model: " + fitting_model)
 
         for kf in self.fittings.values():
@@ -637,6 +660,14 @@ class KineticsAnalyzer:
 
             if fitting_model == 'two_to_one' and fitting_region == 'association_dissociation':
                 kf.fit_two_site_assoc_and_disso(shared_smax=shared_smax, fit_sigma=fit_sigma)
+
+            if fitting_model in heterogeneous_ligand_models and fitting_region == 'association_dissociation':
+                kf.fit_two_site_heterogeneous_ligand_assoc_and_disso(
+                    shared_smax=shared_smax,
+                    fixed_t0=fixed_t0,
+                    Kd1_values=Kd1_values,
+                    Kd2_values=Kd2_values,
+                )
 
             kf.create_fitting_bounds_table()
 

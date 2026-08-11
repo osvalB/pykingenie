@@ -7,7 +7,12 @@ from pykingenie.main  import KineticsAnalyzer
 from pykingenie.octet import OctetExperiment
 from pykingenie.kingenie_surface import KinGenieCsv
 from pykingenie.fitter_surface import KineticsFitter
-from pykingenie.utils.signal_surface import steady_state_two_site_cooperative
+from pykingenie.utils.signal_surface import (
+    steady_state_two_site_cooperative,
+    steady_state_two_site_heterogeneous_ligand,
+    solve_two_site_heterogeneous_ligand_association,
+    solve_two_site_heterogeneous_ligand_dissociation,
+)
 
 pyKinetics = KineticsAnalyzer()
 
@@ -163,6 +168,42 @@ def test_submit_steady_state_fitting_model_routing():
     assert fitter.fit_params_ss is not None
     assert 'sigma' in fitter.fit_params_ss.columns
     assert np.isclose(fitter.sigma_ss, sigma_true, rtol=0.25)
+
+
+def test_submit_steady_state_fitting_heterogeneous_ligand_model_routing():
+    C = np.logspace(-3, 2, 80)
+    Kd1_true = 0.1
+    Kd2_true = 5.0
+    fraction_true = 0.35
+    Rmax_true = 10.0
+    ss_signal = steady_state_two_site_heterogeneous_ligand(
+        C, Rmax_true, Kd1_true, Kd2_true, fraction_true
+    )
+
+    t = np.linspace(0, 100, 30)
+    assoc_lst = [np.full_like(t, s, dtype=float) for s in ss_signal]
+    time_assoc_lst = [t.copy() for _ in ss_signal]
+
+    fitter = KineticsFitter(
+        time_assoc_lst=time_assoc_lst,
+        association_signal_lst=assoc_lst,
+        lig_conc_lst=list(C),
+        smax_id=[0 for _ in ss_signal],
+        name_lst=["heterogeneous"],
+        is_single_cycle=False,
+    )
+
+    ka = KineticsAnalyzer()
+    ka.add_fitting(fitter, "heterogeneous")
+
+    ka.submit_steady_state_fitting(fitting_model='two_to_one_heterogeneous_ligand')
+
+    assert fitter.fit_params_ss is not None
+    for col in ["Kd1 [µM]", "Kd2 [µM]", "fraction_site1", "Rmax"]:
+        assert col in fitter.fit_params_ss.columns
+    assert np.isclose(fitter.fit_params_ss["Kd1 [µM]"].iloc[0], Kd1_true, rtol=0.05)
+    assert np.isclose(fitter.fit_params_ss["Kd2 [µM]"].iloc[0], Kd2_true, rtol=0.05)
+    assert np.isclose(fitter.fit_params_ss["fraction_site1"].iloc[0], fraction_true, rtol=0.05)
 
 
 def test_submit_steady_state_fitting_invalid_model_raises():
@@ -329,4 +370,72 @@ def test_submit_kinetics_fitting_two_to_one_parameter_recovery_from_kingenie_csv
     assert np.isclose(sigma_fit, sigma_true, rtol=0.1)
     assert np.isclose(rmax_pl_fit, rmax_pl_true, rtol=0.1)
     assert np.isclose(rmax_lpl_fit, rmax_lpl_true, rtol=0.1)
-    
+
+
+def test_submit_kinetics_fitting_heterogeneous_ligand_model_routing():
+    Kd1_true = 0.1
+    koff1_true = 0.03
+    Kd2_true = 5.0
+    koff2_true = 0.2
+    fraction_true = 0.35
+    Rmax_true = 10.0
+
+    time_assoc_lst = [np.linspace(0, 160, 80) for _ in range(3)]
+    time_disso_lst = [np.linspace(0, 160, 80) for _ in range(3)]
+    lig_conc_lst = [0.05, 0.5, 10.0]
+
+    assoc_lst = []
+    disso_lst = []
+    for t_assoc, t_disso, conc in zip(time_assoc_lst, time_disso_lst, lig_conc_lst):
+        assoc = solve_two_site_heterogeneous_ligand_association(
+            t_assoc,
+            conc,
+            Kd1_true,
+            koff1_true,
+            Kd2_true,
+            koff2_true,
+            Rmax=Rmax_true,
+            fraction_site1=fraction_true,
+        )
+        disso = solve_two_site_heterogeneous_ligand_dissociation(
+            t_disso,
+            koff1_true,
+            koff2_true,
+            fraction_site1=fraction_true,
+            s1_0=assoc[-1, 1],
+            s2_0=assoc[-1, 2],
+        )
+        assoc_lst.append(assoc[:, 0])
+        disso_lst.append(disso[:, 0])
+
+    fitter = KineticsFitter(
+        time_assoc_lst=time_assoc_lst,
+        association_signal_lst=assoc_lst,
+        lig_conc_lst=lig_conc_lst,
+        time_diss_lst=time_disso_lst,
+        dissociation_signal_lst=disso_lst,
+        smax_id=[0, 0, 0],
+        name_lst=["heterogeneous"],
+    )
+    fitter.Kd_ss = 1.0
+
+    ka = KineticsAnalyzer()
+    ka.add_fitting(fitter, "heterogeneous")
+    ka.submit_kinetics_fitting(
+        fitting_model="two_to_one_heterogeneous_ligand",
+        fitting_region="association_dissociation",
+        shared_smax=True,
+        Kd1_values=[Kd1_true],
+        Kd2_values=[Kd2_true],
+    )
+
+    df_fit = fitter.fit_params_kinetics
+    assert isinstance(df_fit, pd.DataFrame)
+    for col in ["Kd1 [µM]", "k_off1 [1/s]", "Kd2 [µM]", "k_off2 [1/s]", "fraction_site1", "Rmax"]:
+        assert col in df_fit.columns
+
+    assert np.isclose(df_fit["Kd1 [µM]"].iloc[0], Kd1_true, rtol=0.1)
+    assert np.isclose(df_fit["k_off1 [1/s]"].iloc[0], koff1_true, rtol=0.1)
+    assert np.isclose(df_fit["Kd2 [µM]"].iloc[0], Kd2_true, rtol=0.1)
+    assert np.isclose(df_fit["k_off2 [1/s]"].iloc[0], koff2_true, rtol=0.1)
+    assert np.isclose(df_fit["fraction_site1"].iloc[0], fraction_true, rtol=0.1)

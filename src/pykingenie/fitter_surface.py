@@ -5,6 +5,7 @@ import pandas as pd
 from .utils.fitting_surface import (
     fit_steady_state_one_site,
     fit_steady_state_two_site,
+    fit_steady_state_two_site_heterogeneous_ligand,
     fit_two_site_assoc_and_disso,
     steady_state_one_site_asymmetric_ci95,
     fit_one_site_association,
@@ -310,7 +311,8 @@ class KineticsFitter(KineticsFitterGeneral):
         Parameters
         ----------
         model : str, optional
-            Steady-state model to use. Options: 'one_site', 'two_site'.
+            Steady-state model to use. Options: 'one_site', 'two_site',
+            'two_site_heterogeneous_ligand'.
             Default is 'one_site'.
         fit_sigma : bool, optional
             Only used for model='two_site'. If True, fit cooperativity.
@@ -325,7 +327,105 @@ class KineticsFitter(KineticsFitterGeneral):
         if model == 'two_site':
             return self.fit_steady_state_two_site(fit_sigma=fit_sigma)
 
+        if model == 'two_site_heterogeneous_ligand':
+            return self.fit_steady_state_two_site_heterogeneous_ligand()
+
         raise ValueError("Unknown steady-state model: " + model)
+
+    def fit_steady_state_two_site_heterogeneous_ligand(self):
+        """
+        Fit the steady-state signal to a 2:1 heterogeneous ligand model.
+
+        The model is the weighted sum of two independent 1:1 interactions.
+        Kd1, Kd2, and fraction_site1 are shared across all Smax groups; each
+        group has its own total Rmax.
+
+        Returns
+        -------
+        None
+            Updates fitted steady-state signals, fitted parameters, and bounds.
+        """
+
+        self.clear_fittings()
+
+        self.get_steady_state()
+
+        ligand_values = np.array(self.lig_conc_lst_per_id[0], dtype=float)
+        Kd_init = np.median(ligand_values)
+        kd_min = np.min(ligand_values) / 1e3
+        kd_max = np.max(ligand_values) * 1e3
+        kd_mid = Kd_init
+
+        Kd1_init = max(kd_min * 10, Kd_init / 10)
+        Kd2_init = min(kd_max / 10, Kd_init * 10)
+
+        p0 = [Kd1_init, Kd2_init, 0.5]
+        low_bounds = [kd_min, kd_mid, 1e-6]
+        high_bounds = [kd_mid, kd_max, 1.0]
+
+        upper_bound = 1e3 if Kd_init >= 1 else 1e2
+        for signal in self.signal_ss:
+            ymax = np.max(signal)
+            p0.append(ymax)
+            low_bounds.append(max(ymax * 0.2, 1e-12))
+            high_bounds.append(max(ymax * upper_bound, 1e-12))
+
+        fit, cov, fit_vals = fit_steady_state_two_site_heterogeneous_ligand(
+            self.signal_ss,
+            self.lig_conc_lst_per_id,
+            p0,
+            low_bounds,
+            high_bounds,
+        )
+
+        kwargs = {
+            "signal_lst": self.signal_ss,
+            "ligand_lst": self.lig_conc_lst_per_id,
+        }
+
+        fit, cov, fit_vals, low_bounds, high_bounds = re_fit(
+            fit=fit,
+            cov=cov,
+            fit_vals=fit_vals,
+            fit_fx=fit_steady_state_two_site_heterogeneous_ligand,
+            low_bounds=low_bounds,
+            high_bounds=high_bounds,
+            times=3,
+            **kwargs,
+        )
+
+        self.Kd1_ss = fit[0]
+        self.Kd2_ss = fit[1]
+        self.fraction_site1_ss = fit[2]
+        self.Kd_ss = np.sqrt(self.Kd1_ss * self.Kd2_ss)
+        Rmax = fit[3:]
+
+        self.params = fit
+        self.p0 = p0
+        self.low_bounds = low_bounds
+        self.high_bounds = high_bounds
+        self.signal_ss_fit = fit_vals
+
+        n_groups = len(Rmax)
+        if self.names is None:
+            names = [f"group_{i}" for i in range(n_groups)]
+        elif len(self.names) == n_groups:
+            names = self.names
+        else:
+            names = [self.names[0] for _ in range(n_groups)]
+
+        self.fit_params_ss = pd.DataFrame(
+            {
+                'Kd1 [µM]': [self.Kd1_ss] * n_groups,
+                'Kd2 [µM]': [self.Kd2_ss] * n_groups,
+                'fraction_site1': [self.fraction_site1_ss] * n_groups,
+                'Rmax': Rmax,
+                'Name': names,
+            }
+        )
+        self.Smax_upper_bound_factor = get_smax_upper_bound_factor(self.Kd_ss)
+
+        return None
 
     def fit_steady_state_two_site(self, fit_sigma=False):
 

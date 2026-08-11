@@ -3,6 +3,7 @@ import numpy as np
 
 from pykingenie.fitter_surface import KineticsFitter
 from pykingenie.utils.signal_surface import (
+    steady_state_two_site_heterogeneous_ligand,
     solve_two_site_heterogeneous_ligand_association,
     solve_two_site_heterogeneous_ligand_dissociation,
 )
@@ -150,6 +151,79 @@ def test_fit_two_site_heterogeneous_ligand_assoc_and_disso_grid_search():
 
     df = fitter_surface.create_export_df(type="fit")
     assert set(df["Type"]) == {"Association", "Dissociation"}
+
+
+def test_fit_steady_state_two_site_heterogeneous_ligand_wrapper():
+    C = np.logspace(-3, 2, 80)
+    Kd1_true = 0.1
+    Kd2_true = 5.0
+    fraction_true = 0.35
+    Rmax_true = 10.0
+    ss_signal = (
+        Rmax_true
+        * (
+            fraction_true * C / (Kd1_true + C)
+            + (1 - fraction_true) * C / (Kd2_true + C)
+        )
+    )
+
+    time_assoc_lst = [np.linspace(0, 20, 20) for _ in C]
+    assoc_lst = [np.full(20, signal) for signal in ss_signal]
+    fitter_surface = KineticsFitter(
+        time_assoc_lst=time_assoc_lst,
+        association_signal_lst=assoc_lst,
+        lig_conc_lst=C,
+        smax_id=[0 for _ in C],
+        name_lst=None,
+    )
+
+    fitter_surface.fit_steady_state_two_site_heterogeneous_ligand()
+
+    assert np.isclose(fitter_surface.Kd1_ss, Kd1_true, rtol=0.05)
+    assert np.isclose(fitter_surface.Kd2_ss, Kd2_true, rtol=0.05)
+    assert np.isclose(fitter_surface.fraction_site1_ss, fraction_true, rtol=0.05)
+    assert np.isclose(fitter_surface.fit_params_ss["Rmax"].iloc[0], Rmax_true, rtol=0.05)
+    assert fitter_surface.fit_params_ss["Name"].tolist() == ["group_0"]
+
+
+def test_fit_steady_state_dispatch_heterogeneous_ligand_name_fallback():
+    C = np.logspace(-3, 2, 60)
+    Kd1_true = 0.1
+    Kd2_true = 5.0
+    fraction_true = 0.35
+    Rmax_values = [8.0, 12.0]
+
+    signal_groups = [
+        steady_state_two_site_heterogeneous_ligand(
+            C, Rmax, Kd1_true, Kd2_true, fraction_true
+        )
+        for Rmax in Rmax_values
+    ]
+
+    time_assoc_lst = []
+    assoc_lst = []
+    lig_conc_lst = []
+    smax_id = []
+    t = np.linspace(0, 20, 20)
+    for group_idx, signals in enumerate(signal_groups):
+        for conc, signal in zip(C, signals):
+            time_assoc_lst.append(t.copy())
+            assoc_lst.append(np.full_like(t, signal, dtype=float))
+            lig_conc_lst.append(conc)
+            smax_id.append(group_idx)
+
+    fitter_surface = KineticsFitter(
+        time_assoc_lst=time_assoc_lst,
+        association_signal_lst=assoc_lst,
+        lig_conc_lst=lig_conc_lst,
+        smax_id=smax_id,
+        name_lst=["fallback"],
+    )
+
+    fitter_surface.fit_steady_state(model="two_site_heterogeneous_ligand")
+
+    assert fitter_surface.fit_params_ss["Name"].tolist() == ["fallback", "fallback"]
+    assert np.allclose(fitter_surface.fit_params_ss["Rmax"], Rmax_values, rtol=0.05)
 
 
 def test_fit_two_site_heterogeneous_ligand_grid_requires_kd1_lower_than_kd2():
