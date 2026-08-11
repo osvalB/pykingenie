@@ -626,5 +626,3 @@ def test_fit_one_site_assoc_and_disso_if():
     assert 7 < fitter_surface.k_rev < 13, f"Expected k_rev to be between 7 and 13, got {fitter_surface.k_rev}."
 
     # Now fit with shared_smax=False
-
-
