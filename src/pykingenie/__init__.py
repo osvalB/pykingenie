@@ -51,7 +51,10 @@ from .utils.signal_surface import (
     ode_mixture_analyte_dissociation,
     solve_ode_mixture_analyte_dissociation,
     solve_two_site_cooperative_association,
-    solve_two_site_cooperative_dissociation
+    solve_two_site_cooperative_dissociation,
+    steady_state_two_site_heterogeneous_ligand,
+    solve_two_site_heterogeneous_ligand_association,
+    solve_two_site_heterogeneous_ligand_dissociation
 )
 
 from .utils.signal_solution  import (
