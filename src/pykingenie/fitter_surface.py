@@ -1169,9 +1169,9 @@ class KineticsFitter(KineticsFitterGeneral):
         smax_init = np.array(self.Smax, dtype=float).tolist()
 
         if Kd1_values is None:
-            Kd1_values = Kd_init * np.array([1e-2, 3e-2, 1e-1, 3e-1, 1.0])
+            Kd1_values = Kd_init * np.array([1e-2, 5e-2, 1e-1, 5e-1, 1.0])
         if Kd2_values is None:
-            Kd2_values = Kd_init * np.array([1.0, 3.0, 1e1, 3e1, 1e2])
+            Kd2_values = Kd_init * np.array([1e-1, 5e-1,1.0, 3.0, 1e1, 5e1, 1e2])
 
         Kd1_values = np.array(Kd1_values, dtype=float)
         Kd2_values = np.array(Kd2_values, dtype=float)
@@ -1246,11 +1246,18 @@ class KineticsFitter(KineticsFitterGeneral):
         best_fraction = best_params[2]
         best_smax = best_params[3:].tolist()
 
-        kd_mid = np.sqrt(best_Kd1 * best_Kd2)
-
         p0 = [best_Kd1, best_koff1, best_Kd2, best_koff2, best_fraction]
-        low_bounds = [best_Kd1 / 1e3, max(best_koff1 / 1e3, 1e-8), kd_mid, max(best_koff2 / 1e3, 1e-8), 1e-6]
-        high_bounds = [kd_mid, min(best_koff1 * 1e3, 10.0), best_Kd2 * 1e3, min(best_koff2 * 1e3, 10.0), 1.0]
+        min_kd = np.min([best_Kd1, best_Kd2, np.min(self.lig_conc_lst)/10])
+        max_kd = np.max([best_Kd1, best_Kd2, np.max(self.lig_conc_lst)*10])
+
+        min_koff = np.min([best_koff1, best_koff2, 1e-3])
+        max_koff = np.max([best_koff1, best_koff2, 10.0])
+
+        min_koff = np.max([min_koff, 1e-9])
+        max_koff = np.min([max_koff, 10.0])
+
+        low_bounds = [min_kd, min_koff, min_kd*10, min_koff, 0.01]
+        high_bounds = [max_kd, max_koff, max_kd*10, max_koff, 1.0]
 
         n_unq_smax = len(np.unique(self.smax_id))
         if not fixed_t0:
@@ -1260,7 +1267,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         p0 += best_smax
         low_bounds += [max(x / 50, 1e-12) for x in best_smax]
-        high_bounds += [max(x * 25, 1e-12) for x in best_smax]
+        high_bounds += [max(x * 50, 1e-12) for x in best_smax]
 
         kwargs = {
             'assoc_signal_lst': self.assoc_lst,
