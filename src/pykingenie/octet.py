@@ -253,13 +253,13 @@ class OctetExperiment(SurfaceBasedExperiment):
             step_type = row[1]['Type']
             if step_type == 'ASSOC':
                 # Find the previous loading step
-                for i in range(row[0],0,-1):
+                for i in range(row[0],-1,-1):
 
                     if self.df_steps.iloc[i]['Type'] == 'LOADING':
                         loading_location.append(self.df_steps.iloc[i]['Column_location'])
                         break
                     # If no loading step is found, append NaN
-                    if i == 1:
+                    if i == 0:
                         loading_location.append(np.nan)
 
             else:
@@ -314,7 +314,7 @@ class OctetExperiment(SurfaceBasedExperiment):
             if row['Type'] == 'ASSOC':
 
                 # Find the previous loading step
-                for j in range(i,0,-1):
+                for j in range(i,-1,-1):
 
                     if df_all.iloc[j]['Type'] == 'LOADING':
 
