@@ -425,7 +425,7 @@ class SurfaceBasedExperiment:
 
         return None
 
-    def subtract_experiment(self, other_experiment, inplace=True):
+    def subtract_experiment(self, other_experiment, inplace=True, only_interaction=False):
         
         """Subtract another SurfaceBasedExperiment from this one on a sensor-by-sensor basis.
         
@@ -436,15 +436,31 @@ class SurfaceBasedExperiment:
         inplace : bool, optional
             If True, the subtraction is done in place, otherwise new sensors
             are created, by default True.
+        only_interaction : bool, optional
+            If True, only the interaction part of the signal is subtracted,
+            that is, the association and dissociation phases.
+            by default False.
         """
 
         # Verify that both experiments have the same number of sensors
         if len(self.sensor_names) != len(other_experiment.sensor_names):
             raise RuntimeError("Experiments have different number of sensors")
-        
-        # Verify that both experiments x-data is the same
-        if not np.allclose(self.xs[0][0], other_experiment.xs[0][0],rtol=0.01):
-            raise RuntimeError("Experiments have different time data")
+
+        # Find the association indexes
+        assoc_ids = [i for i, step in enumerate(self.df_steps['Type']) if step == 'ASSOC']
+        dissoc_ids = [i for i, step in enumerate(self.df_steps['Type']) if step == 'DISSOC']
+
+        useful_ids = assoc_ids + dissoc_ids if only_interaction else range(len(self.xs[0]))
+
+        for id in useful_ids:
+            min_val_1 = np.min(self.xs[0][id]) if only_interaction else 0
+            min_val_2 = np.min(other_experiment.xs[0][id]) if only_interaction else 0
+            # We check exact time start only when the user is subtracting the whole experiment 
+    
+            if not np.allclose(self.xs[0][id]             - min_val_1, 
+                               other_experiment.xs[0][id] - min_val_2,
+                               rtol=0.01):
+                raise RuntimeError("Experiments have different time data")
 
         # Sort sensor names alphanumerically
         self_sensor_names_sorted = sorted(self.sensor_names)
@@ -464,15 +480,16 @@ class SurfaceBasedExperiment:
             # Subtract
             if inplace:
 
-                for i in range(len(self.xs[sensor1])):
+                for i in useful_ids:
                     self.ys[sensor1][i] -= other_experiment.ys[sensor2][i]
-                    self.sensor_names[sensor1] = new_sensor_name
+
+                self.sensor_names[sensor1] = new_sensor_name
 
                 self.ligand_conc_df['Sensor'] = self.ligand_conc_df['Sensor'].replace(sensor_name1,new_sensor_name)
 
             else:
                 ys = []
-                for i in range(len(self.xs[sensor1])):
+                for i in useful_ids:
                     ys.append(self.ys[sensor1][i] - other_experiment.ys[sensor2][i])
 
                 # Fill instance

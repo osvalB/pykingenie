@@ -177,6 +177,29 @@ def test_subtract_experiment_error_1():
     with pytest.raises(RuntimeError, match="Experiments have different number of sensors"):
         bli1.subtract_experiment(bli2)
 
+def test_subtract_only_interaction():
+
+# Create two instances of OctetExperiment
+    bli1 = OctetExperiment('test_octet_1')
+    bli2 = OctetExperiment('test_octet_2')
+
+    bli1.read_sensor_data(frd_files[:4])
+    bli2.read_sensor_data(frd_files[:4])  
+
+    # Modifying time data in a step that is not association or dissociation does not produce an error
+    bli2.xs[0][0] = bli2.xs[0][0] + 10  
+    bli2.xs[0][1][2] *= 100
+
+    bli1.subtract_experiment(bli2, only_interaction=True)
+
+    # assert equal to zero, for assoc and dissoc phase
+    interactions_ids = [i for i, step in enumerate(bli1.df_steps['Type']) if step in ['ASSOC', 'DISSOC']]
+
+    for sensor in range(4):
+        for step_id in interactions_ids:
+            sensor_data = bli1.ys[sensor][step_id]
+            assert all(sensor_data == 0), "The ys data should be zero for interaction phases after subtraction."
+
 def test_subtract_experiment_error_2():
     
     # Create two instances of OctetExperiment
