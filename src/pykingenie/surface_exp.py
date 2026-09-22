@@ -425,6 +425,60 @@ class SurfaceBasedExperiment:
 
         return None
 
+    def find_experiments_compatibility(self, other_experiment):
+
+        """
+        Find if the other experiment can be subtracted from the current one
+        
+        Parameters
+        ----------
+        other_experiment : SurfaceBasedExperiment
+            The experiment to check compatibility with.
+
+        Returns
+        -------
+        bool_status : bool
+            Boolean indicating if the experiments are compatible.
+        compatibility_type : str
+            Description of the compatibility type. Can be one of the following:
+           'all' if the x-data is exactly the same
+           'interaction' if the x-data is the same (start time is ignored) during the association and dissociation phases only
+           'none' if the x-data is different even during the interaction phases
+        """
+
+        # Verify that both experiments have the same number of sensors
+        if len(self.sensor_names) != len(other_experiment.sensor_names):
+            return False, 'none'
+
+        # Find the association indexes
+        assoc_ids  = [i for i, step in enumerate(self.df_steps['Type']) if step == 'ASSOC']
+        dissoc_ids = [i for i, step in enumerate(self.df_steps['Type']) if step == 'DISSOC']
+
+        useful_ids = assoc_ids + dissoc_ids
+
+        for id in useful_ids:
+
+            min_val_1 = np.min(self.xs[0][id])
+            min_val_2 = np.min(other_experiment.xs[0][id])
+
+            if not np.allclose(self.xs[0][id]             - min_val_1, 
+                               other_experiment.xs[0][id] - min_val_2,
+                               rtol=0.01):
+
+                return False, 'none'
+
+        all_ids = [x for x in range(len(self.xs[0])) if x not in useful_ids]
+        for id in all_ids:
+
+            if not np.allclose(self.xs[0][id], 
+                               other_experiment.xs[0][id],
+                               rtol=0.01):
+                
+                # If we reach this point, the current association/dissociation step is compatible
+                return True, 'interaction'      
+
+        return True, 'all'
+
     def subtract_experiment(self, other_experiment, inplace=True, only_interaction=False):
         
         """Subtract another SurfaceBasedExperiment from this one on a sensor-by-sensor basis.
