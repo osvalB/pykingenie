@@ -263,3 +263,12 @@ def test_guess_exp_compatibility():
 
     assert bool_status is False, "The experiments should not be compatible after modifying another interaction step."
     assert compatibility_type == 'none', "The compatibility type should be 'none' after modifying an interaction step."
+
+    # Remove one sensor from bli1 to trigger incompatibility
+    bli1.sensor_names.pop()
+
+    bool_status, compatibility_type = bli1.find_experiments_compatibility(bli2)
+
+    assert bool_status is False, "The experiments should not be compatible after removing a sensor."
+    assert compatibility_type == 'none', "The compatibility type should be 'none' after removing a sensor."
+
