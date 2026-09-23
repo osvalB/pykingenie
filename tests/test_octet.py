@@ -290,3 +290,30 @@ def test_subtract_experiment_error_different_steps():
 
     assert bool_status is False, "The experiments should not be compatible after changing the ASSOC steps type."
     assert compatibility_type == 'none', "The compatibility type should be 'none' after changing the ASSOC steps type."
+
+def test_error_different_time_lengths():
+
+    # Create two instances of OctetExperiment
+    bli1 = OctetExperiment('test_octet_1')
+    bli2 = OctetExperiment('test_octet_2')
+
+    bli1.read_sensor_data(frd_files[:4])
+    bli2.read_sensor_data(frd_files[:4])
+
+    # Modify the length of the x-data for one of the non-interaction steps
+    idx = 3
+    bli1.xs[0][idx] = bli1.xs[0][idx][:-1]  # Remove the last element
+    
+    bool_status, compatibility_type = bli1.find_experiments_compatibility(bli2)
+
+    assert bool_status is True, "The experiments should still be compatible after modifying the length of a non-interaction step."
+    assert compatibility_type == 'interaction', "The compatibility type should be 'interaction' after modifying the length of a non-interaction step."
+
+    # Modify the length of the x-data for one of the interaction steps to check that it affects compatibility differently
+    idx = 11
+    bli1.xs[0][idx] = bli1.xs[0][idx][:-1]  # Remove the last element
+
+    bool_status, compatibility_type = bli1.find_experiments_compatibility(bli2)
+
+    assert bool_status is False, "The experiments should not be compatible after modifying the length of an interaction step."
+    assert compatibility_type == 'none', "The compatibility type should be 'none' after modifying the length of an interaction step."
