@@ -470,6 +470,11 @@ class SurfaceBasedExperiment:
             min_val_1 = np.min(self.xs[0][id1])
             min_val_2 = np.min(other_experiment.xs[0][id2])
 
+            # Raise an error if the length of the x-data arrays for the current step is different
+            if len(self.xs[0][id1]) != len(other_experiment.xs[0][id2]):
+                raise RuntimeError("X-data arrays have different lengths for the current step")
+
+           
             if not np.allclose(self.xs[0][id1]             - min_val_1, 
                                other_experiment.xs[0][id2] - min_val_2,
                                rtol=0.01):
@@ -478,6 +483,10 @@ class SurfaceBasedExperiment:
 
         all_ids = [x for x in range(len(self.xs[0])) if x not in useful_ids_1]
         for id in all_ids:
+
+            # Return only interaction if the length is different
+            if len(self.xs[0][id]) != len(other_experiment.xs[0][id]):
+                return False, 'interaction'
 
             if not np.allclose(self.xs[0][id], 
                                other_experiment.xs[0][id],
