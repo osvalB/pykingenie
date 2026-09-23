@@ -200,7 +200,7 @@ def test_subtract_only_interaction():
             sensor_data = bli1.ys[sensor][step_id]
             assert all(sensor_data == 0), "The ys data should be zero for interaction phases after subtraction."
 
-def test_subtract_experiment_error_2():
+def test_subtract_experiment_compatibility():
     
     # Create two instances of OctetExperiment
     bli1 = OctetExperiment('test_octet_1')
@@ -209,10 +209,12 @@ def test_subtract_experiment_error_2():
     bli1.read_sensor_data(frd_files[:4])
     bli2.read_sensor_data(frd_files[:4])  
 
-    bli2.xs[0][0] = bli2.xs[0][0] + 10  # Modify time data to trigger error
+    bli2.xs[0][0] = bli2.xs[0][0] + 10  # Modify time data to trigger only interaction compatibility
 
-    with pytest.raises(RuntimeError, match="Experiments have different time data"):
-        bli1.subtract_experiment(bli2)
+    # verify compatiblity only interaction
+    are_compatible, status = bli1.find_experiments_compatibility(bli2)
+    assert are_compatible
+    assert status == "interaction"
 
 def test_convert_to_numbers():
 
@@ -272,3 +274,19 @@ def test_guess_exp_compatibility():
     assert bool_status is False, "The experiments should not be compatible after removing a sensor."
     assert compatibility_type == 'none', "The compatibility type should be 'none' after removing a sensor."
 
+def test_subtract_experiment_error_different_steps():
+
+    # Create two instances of OctetExperiment
+    bli1 = OctetExperiment('test_octet_1')
+    bli2 = OctetExperiment('test_octet_2')
+
+    bli1.read_sensor_data(frd_files[:4])
+    bli2.read_sensor_data(frd_files[:4])
+
+    # Change the ASSOC steps type of experiment 
+    bli1.df_steps.loc[bli1.df_steps['Type'] == 'ASSOC', 'Type'] = 'CUSTOM'
+
+    bool_status, compatibility_type = bli1.find_experiments_compatibility(bli2)
+
+    assert bool_status is False, "The experiments should not be compatible after changing the ASSOC steps type."
+    assert compatibility_type == 'none', "The compatibility type should be 'none' after changing the ASSOC steps type."

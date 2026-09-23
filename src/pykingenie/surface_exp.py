@@ -451,23 +451,32 @@ class SurfaceBasedExperiment:
             return False, 'none'
 
         # Find the association indexes
-        assoc_ids  = [i for i, step in enumerate(self.df_steps['Type']) if step == 'ASSOC']
-        dissoc_ids = [i for i, step in enumerate(self.df_steps['Type']) if step == 'DISSOC']
+        assoc_ids_1  = [i for i, step in enumerate(self.df_steps['Type']) if step == 'ASSOC']
+        dissoc_ids_1 = [i for i, step in enumerate(self.df_steps['Type']) if step == 'DISSOC']
 
-        useful_ids = assoc_ids + dissoc_ids
+        useful_ids_1 = assoc_ids_1 + dissoc_ids_1
 
-        for id in useful_ids:
+        assoc_ids_2  = [i for i, step in enumerate(other_experiment.df_steps['Type']) if step == 'ASSOC']
+        dissoc_ids_2 = [i for i, step in enumerate(other_experiment.df_steps['Type']) if step == 'DISSOC']
 
-            min_val_1 = np.min(self.xs[0][id])
-            min_val_2 = np.min(other_experiment.xs[0][id])
+        useful_ids_2 = assoc_ids_2 + dissoc_ids_2
 
-            if not np.allclose(self.xs[0][id]             - min_val_1, 
-                               other_experiment.xs[0][id] - min_val_2,
+        # Verify that the number of useful ids is the same for both experiments
+        if len(useful_ids_1) != len(useful_ids_2):
+            return False, 'none'
+
+        for id1, id2 in zip(useful_ids_1, useful_ids_2):
+
+            min_val_1 = np.min(self.xs[0][id1])
+            min_val_2 = np.min(other_experiment.xs[0][id2])
+
+            if not np.allclose(self.xs[0][id1]             - min_val_1, 
+                               other_experiment.xs[0][id2] - min_val_2,
                                rtol=0.01):
 
                 return False, 'none'
 
-        all_ids = [x for x in range(len(self.xs[0])) if x not in useful_ids]
+        all_ids = [x for x in range(len(self.xs[0])) if x not in useful_ids_1]
         for id in all_ids:
 
             if not np.allclose(self.xs[0][id], 
@@ -500,21 +509,36 @@ class SurfaceBasedExperiment:
         if len(self.sensor_names) != len(other_experiment.sensor_names):
             raise RuntimeError("Experiments have different number of sensors")
 
-        # Find the association indexes
-        assoc_ids = [i for i, step in enumerate(self.df_steps['Type']) if step == 'ASSOC']
-        dissoc_ids = [i for i, step in enumerate(self.df_steps['Type']) if step == 'DISSOC']
+        if only_interaction:
 
-        useful_ids = assoc_ids + dissoc_ids if only_interaction else range(len(self.xs[0]))
+            # Verify compatibility check
+            are_compatible, status = self.find_experiments_compatibility(other_experiment)
 
-        for id in useful_ids:
-            min_val_1 = np.min(self.xs[0][id]) if only_interaction else 0
-            min_val_2 = np.min(other_experiment.xs[0][id]) if only_interaction else 0
-            # We check exact time start only when the user is subtracting the whole experiment 
-    
-            if not np.allclose(self.xs[0][id]             - min_val_1, 
-                               other_experiment.xs[0][id] - min_val_2,
-                               rtol=0.01):
-                raise RuntimeError("Experiments have different time data")
+            assert are_compatible
+            assert status == "interaction"
+
+            # Find the association and dissociation step indexes
+            assoc_ids_1  = [i for i, step in enumerate(self.df_steps['Type']) if step == 'ASSOC']
+            dissoc_ids_1 = [i for i, step in enumerate(self.df_steps['Type']) if step == 'DISSOC']
+
+            useful_ids_1 = assoc_ids_1 + dissoc_ids_1
+
+            assoc_ids_2 = [i for i, step in enumerate(other_experiment.df_steps['Type']) if step == 'ASSOC']
+            dissoc_ids_2 = [i for i, step in enumerate(other_experiment.df_steps['Type']) if step == 'DISSOC']
+
+            useful_ids_2 = assoc_ids_2 + dissoc_ids_2
+
+        else:
+
+            # Verify compatibility check
+            are_compatible, status = self.find_experiments_compatibility(other_experiment)
+
+            assert are_compatible
+            assert status == "all"
+
+            # Exact time matching for the whole experiment
+            useful_ids_1 = [i for i in range(len(self.xs[0]))]
+            useful_ids_2 = [i for i in range(len(self.xs[0]))]
 
         # Sort sensor names alphanumerically
         self_sensor_names_sorted = sorted(self.sensor_names)
@@ -534,8 +558,8 @@ class SurfaceBasedExperiment:
             # Subtract
             if inplace:
 
-                for i in useful_ids:
-                    self.ys[sensor1][i] -= other_experiment.ys[sensor2][i]
+                for i,j in zip(useful_ids_1,useful_ids_2):
+                    self.ys[sensor1][i] -= other_experiment.ys[sensor2][j]
 
                 self.sensor_names[sensor1] = new_sensor_name
 
@@ -543,8 +567,8 @@ class SurfaceBasedExperiment:
 
             else:
                 ys = []
-                for i in useful_ids:
-                    ys.append(self.ys[sensor1][i] - other_experiment.ys[sensor2][i])
+                for i,j in zip(useful_ids_1,useful_ids_2):
+                    ys.append(self.ys[sensor1][i] - other_experiment.ys[sensor2][j])
 
                 # Fill instance
                 self.xs.append(self.xs[sensor1])
