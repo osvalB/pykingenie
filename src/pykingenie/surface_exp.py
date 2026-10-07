@@ -529,12 +529,16 @@ class SurfaceBasedExperiment:
             assoc_ids_1  = [i for i, step in enumerate(self.df_steps['Type']) if step == 'ASSOC']
             dissoc_ids_1 = [i for i, step in enumerate(self.df_steps['Type']) if step == 'DISSOC']
 
-            useful_ids_1 = assoc_ids_1 + dissoc_ids_1
+            baseline_ids_1 = [i - 1 for i in assoc_ids_1]
+
+            useful_ids_1 = baseline_ids_1 + assoc_ids_1 + dissoc_ids_1
 
             assoc_ids_2 = [i for i, step in enumerate(other_experiment.df_steps['Type']) if step == 'ASSOC']
             dissoc_ids_2 = [i for i, step in enumerate(other_experiment.df_steps['Type']) if step == 'DISSOC']
 
-            useful_ids_2 = assoc_ids_2 + dissoc_ids_2
+            baseline_ids_2 = [i - 1 for i in assoc_ids_2]
+
+            useful_ids_2 = baseline_ids_2 + assoc_ids_2 + dissoc_ids_2
 
         else:
 
