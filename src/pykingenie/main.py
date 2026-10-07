@@ -630,7 +630,7 @@ class KineticsAnalyzer:
 
         Returns
         -------
-        None
+        tuple
         """
         heterogeneous_ligand_models = [
             'two_to_one_heterogeneous_ligand',
@@ -639,39 +639,49 @@ class KineticsAnalyzer:
         if fitting_model not in ['one_to_one', 'one_to_one_mtl', 'one_to_one_if','two_to_one'] + heterogeneous_ligand_models:
             raise ValueError("Unknown fitting model: " + fitting_model)
 
+        successful_fits = []
+        failed_fits = []
+
         for kf in self.fittings.values():
 
-            if fitting_model == 'one_to_one' and fitting_region == 'association_dissociation':
-                kf.fit_one_site_assoc_and_disso(shared_smax=shared_smax)
-                kf.fit_single_exponentials()
+            try:
 
-            if fitting_model == 'one_to_one_mtl' and fitting_region == 'association_dissociation':
-                kf.fit_one_site_assoc_and_disso(shared_smax=shared_smax, fit_ktr=True)
+                if fitting_model == 'one_to_one' and fitting_region == 'association_dissociation':
+                    kf.fit_one_site_assoc_and_disso(shared_smax=shared_smax)
+                    kf.fit_single_exponentials()
 
-            if fitting_model == 'one_to_one' and fitting_region == 'association':
-                kf.fit_one_site_association(shared_smax=shared_smax)
-                kf.fit_single_exponentials()
+                if fitting_model == 'one_to_one_mtl' and fitting_region == 'association_dissociation':
+                    kf.fit_one_site_assoc_and_disso(shared_smax=shared_smax, fit_ktr=True)
 
-            if fitting_model == 'one_to_one' and fitting_region == 'dissociation':
-                kf.fit_one_site_dissociation()
+                if fitting_model == 'one_to_one' and fitting_region == 'association':
+                    kf.fit_one_site_association(shared_smax=shared_smax)
+                    kf.fit_single_exponentials()
 
-            if fitting_model == 'one_to_one_if' and fitting_region == 'association_dissociation':
-                kf.fit_one_site_if_assoc_and_disso(shared_smax=shared_smax)
+                if fitting_model == 'one_to_one' and fitting_region == 'dissociation':
+                    kf.fit_one_site_dissociation()
 
-            if fitting_model == 'two_to_one' and fitting_region == 'association_dissociation':
-                kf.fit_two_site_assoc_and_disso(shared_smax=shared_smax, fit_sigma=fit_sigma)
+                if fitting_model == 'one_to_one_if' and fitting_region == 'association_dissociation':
+                    kf.fit_one_site_if_assoc_and_disso(shared_smax=shared_smax)
 
-            if fitting_model in heterogeneous_ligand_models and fitting_region == 'association_dissociation':
-                kf.fit_two_site_heterogeneous_ligand_assoc_and_disso(
-                    shared_smax=shared_smax,
-                    fixed_t0=fixed_t0,
-                    Kd1_values=Kd1_values,
-                    Kd2_values=Kd2_values,
-                )
+                if fitting_model == 'two_to_one' and fitting_region == 'association_dissociation':
+                    kf.fit_two_site_assoc_and_disso(shared_smax=shared_smax, fit_sigma=fit_sigma)
 
-            kf.create_fitting_bounds_table()
+                if fitting_model in heterogeneous_ligand_models and fitting_region == 'association_dissociation':
+                    kf.fit_two_site_heterogeneous_ligand_assoc_and_disso(
+                        shared_smax=shared_smax,
+                        fixed_t0=fixed_t0,
+                        Kd1_values=Kd1_values,
+                        Kd2_values=Kd2_values,
+                    )
 
-        return None
+                kf.create_fitting_bounds_table()
+                successful_fits.append(kf)
+
+            except Exception as e:
+
+                failed_fits.append(kf)
+
+        return successful_fits, failed_fits
 
     def calculate_asymmetric_error(self, shared_smax=True, fixed_t0=True, fit_ktr=False):
         """
