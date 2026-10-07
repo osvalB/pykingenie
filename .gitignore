@@ -6,6 +6,7 @@ __pycache__/
 *.egg-info/
 submit_package.bash
 test.py
+test.ipynb
 *png
 !docs/_build/html/_images/*.png
 .coverage
