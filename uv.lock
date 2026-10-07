@@ -1994,7 +1994,7 @@ wheels = [
 
 [[package]]
 name = "pykingenie"
-version = "1.0.4"
+version = "1.0.7"
 source = { editable = "." }
 dependencies = [
     { name = "kaleido" },
