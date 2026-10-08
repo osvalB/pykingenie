@@ -452,12 +452,12 @@ class SurfaceBasedExperiment:
 
         # Find the association indexes
         assoc_ids_1  = [i for i, step in enumerate(self.df_steps['Type']) if step == 'ASSOC']
-        dissoc_ids_1 = [i for i, step in enumerate(self.df_steps['Type']) if step == 'DISASSOC']
+        dissoc_ids_1 = [i for i, step in enumerate(self.df_steps['Type']) if step == 'DISSOC']
 
         useful_ids_1 = assoc_ids_1 + dissoc_ids_1
 
         assoc_ids_2  = [i for i, step in enumerate(other_experiment.df_steps['Type']) if step == 'ASSOC']
-        dissoc_ids_2 = [i for i, step in enumerate(other_experiment.df_steps['Type']) if step == 'DISASSOC']
+        dissoc_ids_2 = [i for i, step in enumerate(other_experiment.df_steps['Type']) if step == 'DISSOC']
 
         useful_ids_2 = assoc_ids_2 + dissoc_ids_2
 
@@ -527,14 +527,14 @@ class SurfaceBasedExperiment:
 
             # Find the association and dissociation step indexes
             assoc_ids_1  = [i for i, step in enumerate(self.df_steps['Type']) if step == 'ASSOC']
-            dissoc_ids_1 = [i for i, step in enumerate(self.df_steps['Type']) if step == 'DISASSOC']
+            dissoc_ids_1 = [i for i, step in enumerate(self.df_steps['Type']) if step == 'DISSOC']
 
             baseline_ids_1 = [i - 1 for i in assoc_ids_1]
 
             useful_ids_1 = baseline_ids_1 + assoc_ids_1 + dissoc_ids_1
 
             assoc_ids_2 = [i for i, step in enumerate(other_experiment.df_steps['Type']) if step == 'ASSOC']
-            dissoc_ids_2 = [i for i, step in enumerate(other_experiment.df_steps['Type']) if step == 'DISASSOC']
+            dissoc_ids_2 = [i for i, step in enumerate(other_experiment.df_steps['Type']) if step == 'DISSOC']
 
             baseline_ids_2 = [i - 1 for i in assoc_ids_2]
 
@@ -572,8 +572,6 @@ class SurfaceBasedExperiment:
 
                 for i,j in zip(useful_ids_1,useful_ids_2):
                     self.ys[sensor1][i] -= other_experiment.ys[sensor2][j]
-
-                    print(i,j)
 
                 self.sensor_names[sensor1] = new_sensor_name
 
@@ -640,105 +638,6 @@ class SurfaceBasedExperiment:
 
         return return_strings
 
-    def inter_step_correction_association(self, sensor_names, inplace=True, new_names=False, npoints=10):
-        
-        """
-            Subtract from the association phase, the difference between the last points of the association
-            and first point of the dissociation phase.
-        
-        Parameters
-        ----------
-        sensor_names : str or list
-            Name of the sensor(s) to align. If a string is provided,
-            it will be converted to a list.
-        inplace : bool, optional
-            If True, the alignment is done in place, otherwise new sensors
-            are created, by default True.
-        new_names : bool, optional
-            If True, new sensor names are generated, otherwise the original
-            names are kept, by default False.
-        npoints : int, optional
-            Number of points to use for averaging at alignment positions,
-            by default 10.
-            
-        Returns
-        -------
-        None
-            The method modifies the instance attributes in-place.
-            
-        Notes
-        -----
-        This method modifies the following attributes:
-        - self.xs
-        - self.ys
-        - self.sensor_names
-        - self.ligand_conc_df
-        
-        The alignment is performed by smoothing the transition between association
-        and dissociation steps.
-        """
-        sensor_names = if_string_to_list(sensor_names)
-
-        # Find the index of the dissociation steps
-        dissociation_steps_indices = self.df_steps.index[self.df_steps['Type'] == 'DISASSOC'].to_numpy()
-
-        sensor_indices = [self.sensor_names.index(sensor_name) for sensor_name in sensor_names]
-
-        use_new_names = not inplace or (inplace and new_names)
-
-        for sensor in sensor_indices:
-
-            # Determine the new sensor name
-            new_sensor_name = self.sensor_names[sensor] + ' inter step corr.' if use_new_names else self.sensor_names[sensor]
-
-            if new_sensor_name in self.sensor_names and not inplace:
-                new_sensor_name += ' rep'
-
-            ys = copy.deepcopy(self.ys[sensor])
-
-            for diss_step_index in dissociation_steps_indices:
-
-                #  Subtract the difference between the steps
-                last_point = np.mean(self.ys[sensor][diss_step_index-1][-npoints:])
-                next_point = np.mean(self.ys[sensor][diss_step_index][:npoints])
-
-                diff = next_point - last_point
-
-                value = self.ys[sensor][diss_step_index-1] + diff
-
-                if inplace:
-
-                    self.ys[sensor][diss_step_index-1] = value
-
-                else:
-
-                    ys[sensor][diss_step_index-1] = value
-
-            if inplace:
-
-                #Replace in the ligand conc df the sensor name
-                self.ligand_conc_df['Sensor'] = self.ligand_conc_df['Sensor'].replace(self.sensor_names[sensor],new_sensor_name)
-
-                self.sensor_names[sensor] = new_sensor_name
-
-            else:
-
-                self.xs.append(self.xs[sensor])
-                self.ys.append(ys)
-                self.sensor_names.append(self.sensor_names[sensor] + ' inter step corr.')
-
-                # Add the new sensor name to the ligand conc df
-                previous_row        = self.ligand_conc_df[self.ligand_conc_df['Sensor'] == self.sensor_names[sensor]]
-                new_row             = previous_row.copy()
-                new_row['Sensor']   = new_sensor_name
-                new_row['SampleID'] = new_row['SampleID'] + ' inter step corr.'
-
-                self.ligand_conc_df = pd.concat([self.ligand_conc_df,new_row])
-
-        self.create_unique_sensor_names()
-
-        return None
-
     def align_dissociation(self, sensor_names, inplace=True, new_names=False, npoints=10):
         """Align BLI traces based on the signal before the dissociation step(s).
         
@@ -790,7 +689,7 @@ class SurfaceBasedExperiment:
             if new_sensor_name in self.sensor_names and not inplace:
                 new_sensor_name += ' rep'
 
-            ys = copy.deepcopy(self.ys[sensor])
+            ys = self.ys.copy()
 
             for diss_step_index in dissociation_steps_indices:
 
