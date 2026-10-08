@@ -145,6 +145,52 @@ def test_discard_steps():
     nan_count = sum(np.isnan(subarr).sum() for subarr in bli.ys[0] if isinstance(subarr, np.ndarray))
     assert nan_count > 0, "The ys list should contain NaN values after discarding steps."
 
+# Caution: this test should be done before the in-place test
+def test_inter_step_correction_not_in_place():
+
+    assoc_idx = bli.df_steps.index[bli.df_steps['Type'] == 'ASSOC'].to_numpy()[0]
+
+    assert assoc_idx == 11
+    non_assoc_idx = assoc_idx + 1
+
+    ys_ori = copy.deepcopy(bli.ys.copy())
+    
+    ys_ori_assoc = ys_ori[0][assoc_idx]
+    ys_ori_not_assoc = ys_ori[0][non_assoc_idx]
+
+    # verify it is a numpy array
+    assert isinstance(ys_ori_assoc, np.ndarray), "The original ys should be a numpy array."
+
+    # Find number of sensors before correction
+    num_sensors_before = len(bli.sensor_names)
+    assert num_sensors_before == 16
+
+    bli.assoc_inter_step_correction(
+        sensor_names=bli.sensor_names[0],
+        inplace=False,  # Change to False to test not in place
+        new_names=True, 
+        npoints=4)
+
+    # Find ASSOC step, which should have been corrected by the inter-step correction.
+
+    # Find number of sensors after correction
+    num_sensors_after = len(bli.sensor_names)
+    assert num_sensors_after == num_sensors_before + 1
+
+    assert bli.sensor_names[0] == "A1 - H1"
+
+    ys_new= copy.deepcopy(bli.ys.copy())
+    ys_new_assoc = ys_new[-1][assoc_idx]
+
+    # Verify both are numpy arrays
+    assert isinstance(ys_new_assoc, np.ndarray), "The new ys should be a numpy array."
+
+    assert not np.array_equal(ys_ori_assoc, ys_new_assoc), "The ASSOC step should have been corrected by the inter-step correction."
+    
+    ys_new_not_assoc = ys_new[-1][non_assoc_idx]
+    assert np.array_equal(ys_ori_not_assoc, ys_new_not_assoc), "The non-ASSOC step should not have been modified by the inter-step correction."
+    
+
 def test_inter_step_correction():
 
     assoc_idx = bli.df_steps.index[bli.df_steps['Type'] == 'ASSOC'].to_numpy()[0]
@@ -178,49 +224,6 @@ def test_inter_step_correction():
     
     ys_new_not_assoc = ys_new[0][non_assoc_idx]
     assert np.array_equal(ys_ori_not_assoc, ys_new_not_assoc), "The non-ASSOC step should not have been modified by the inter-step correction."
-
-def test_inter_step_correction_not_in_place():
-
-    assoc_idx = bli.df_steps.index[bli.df_steps['Type'] == 'ASSOC'].to_numpy()[0]
-
-    assert assoc_idx == 11
-    non_assoc_idx = assoc_idx + 1
-
-    ys_ori = copy.deepcopy(bli.ys.copy())
-    
-    ys_ori_assoc = ys_ori[0][assoc_idx]
-    ys_ori_not_assoc = ys_ori[0][non_assoc_idx]
-
-    # verify it is a numpy array
-    assert isinstance(ys_ori_assoc, np.ndarray), "The original ys should be a numpy array."
-
-    # Find number of sensors before correction
-    num_sensors_before = len(bli.sensor_names)
-    assert num_sensors_before == 16
-
-    bli.assoc_inter_step_correction(
-        sensor_names=bli.sensor_names[0],
-        inplace=False,  # Change to False to test not in place
-        new_names=True, 
-        npoints=4)
-
-    # Find ASSOC step, which should have been corrected by the inter-step correction.
-
-    # Find number of sensors after correction
-    num_sensors_after = len(bli.sensor_names)
-    assert num_sensors_after == num_sensors_before + 1
-
-    ys_new= bli.ys.copy()
-    ys_new_assoc = ys_new[-1][assoc_idx]
-
-    # Verify both are numpy arrays
-    assert isinstance(ys_new_assoc, np.ndarray), "The new ys should be a numpy array."
-
-    #assert not np.array_equal(ys_ori_assoc, ys_new_assoc), "The ASSOC step should have been corrected by the inter-step correction."
-    
-    #ys_new_not_assoc = ys_new[-1][non_assoc_idx]
-    #assert np.array_equal(ys_ori_not_assoc, ys_new_not_assoc), "The non-ASSOC step should not have been modified by the inter-step correction."
-    
 
     
 def test_get_step_xy():
