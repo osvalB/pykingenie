@@ -156,7 +156,7 @@ def plot_traces(xs, ys, legends, colors, show,
     
     fig = go.Figure()
     total_traces = sum(show)
-    max_points_per_trace = int(10000 / total_traces) if total_traces else 10000
+    max_points_per_trace = int(100000 / total_traces) if total_traces else 100000
 
     for x, y, legend, color, s in zip(xs, ys, legends, colors, show):
         if not s:
