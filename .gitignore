@@ -16,3 +16,4 @@ htmlcov
 view_docs.sh
 .venv
 .DS_Store
+traces*html
