@@ -216,6 +216,22 @@ def test_subtract_experiment_compatibility():
     assert are_compatible
     assert status == "interaction"
 
+def test_subtract_experiment_compatibility_many_to_one():
+    
+    # Create two instances of OctetExperiment
+    bli1 = OctetExperiment('test_octet_1')
+    bli2 = OctetExperiment('test_octet_2')
+
+    bli1.read_sensor_data(frd_files[:4])
+    bli2.read_sensor_data(frd_files[0])  
+
+    bli2.xs[0][0] = bli2.xs[0][0] + 10  # Modify time data to trigger only interaction compatibility
+
+    # verify compatiblity only interaction
+    are_compatible, status = bli1.find_experiments_compatibility(bli2)
+    assert are_compatible
+    assert status == "interaction"
+
 def test_convert_to_numbers():
 
     # Create an instance of OctetExperiment
@@ -273,6 +289,39 @@ def test_guess_exp_compatibility():
 
     assert bool_status is False, "The experiments should not be compatible after removing a sensor."
     assert compatibility_type == 'none', "The compatibility type should be 'none' after removing a sensor."
+
+def test_guess_exp_compatibility_many_to_one():
+
+    # Create two instances of OctetExperiment
+    bli1 = OctetExperiment('test_octet_1')
+    bli2 = OctetExperiment('test_octet_2')
+
+    bli1.read_sensor_data(frd_files[:4])
+    bli2.read_sensor_data(frd_files[0])
+
+    bool_status, compatibility_type = bli1.find_experiments_compatibility(bli2)
+
+    assert bool_status is True, "The experiments should be compatible."
+    assert compatibility_type == 'all', "The compatibility type should be 'all'."
+
+    bli1.xs[0][0] *= 100
+
+    bool_status, compatibility_type = bli1.find_experiments_compatibility(bli2)
+
+    assert bool_status is True, "The experiments should be compatible after modifying the time data."
+    assert compatibility_type == 'interaction', "The compatibility type should be 'interaction' after modifying the time data."
+
+    # Modifying an interaction step (assoc or dissoc)
+    idx = 11
+    bli1.xs[0][idx] /= 100  
+
+    assert bli1.df_steps['Type'].iloc[idx] == 'ASSOC'
+
+    bool_status, compatibility_type = bli1.find_experiments_compatibility(bli2)
+
+    assert bool_status is False, "The experiments should not be compatible after modifying another interaction step."
+    assert compatibility_type == 'none', "The compatibility type should be 'none' after modifying an interaction step."
+
 
 def test_subtract_experiment_error_different_steps():
 
