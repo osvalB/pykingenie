@@ -447,7 +447,11 @@ class SurfaceBasedExperiment:
         """
 
         # Verify that both experiments have the same number of sensors
-        if len(self.sensor_names) != len(other_experiment.sensor_names):
+        # Or that the reference (other_experiment) has only one sensor
+        c1 = len(self.sensor_names) != len(other_experiment.sensor_names)
+        c2 = len(other_experiment.sensor_names) > 1
+
+        if c1 and c2:
             return False, 'none'
 
         # Find the association indexes
@@ -514,7 +518,10 @@ class SurfaceBasedExperiment:
         """
 
         # Verify that both experiments have the same number of sensors
-        if len(self.sensor_names) != len(other_experiment.sensor_names):
+        c1 = len(self.sensor_names) != len(other_experiment.sensor_names)
+        c2 = len(other_experiment.sensor_names) > 1
+        
+        if c1 and c2:
             raise RuntimeError("Experiments have different number of sensors")
 
         if only_interaction:
@@ -558,7 +565,9 @@ class SurfaceBasedExperiment:
 
         for j,sensor_name1 in enumerate(self_sensor_names_sorted):
 
-            sensor_name2 = other_sensor_names_sorted[j]
+            # we will use the first sensor of the other experiment if it has only one sensor
+            idx2 = j if c2 else 0
+            sensor_name2 = other_sensor_names_sorted[idx2]
 
             new_sensor_name = sensor_name1 + ' - ' + sensor_name2
 
@@ -570,8 +579,8 @@ class SurfaceBasedExperiment:
             # Subtract
             if inplace:
 
-                for i,j in zip(useful_ids_1,useful_ids_2):
-                    self.ys[sensor1][i] -= other_experiment.ys[sensor2][j]
+                for i,ii in zip(useful_ids_1,useful_ids_2):
+                    self.ys[sensor1][i] -= other_experiment.ys[sensor2][ii]
 
                 self.sensor_names[sensor1] = new_sensor_name
 
@@ -579,8 +588,8 @@ class SurfaceBasedExperiment:
 
             else:
                 ys = []
-                for i,j in zip(useful_ids_1,useful_ids_2):
-                    ys.append(self.ys[sensor1][i] - other_experiment.ys[sensor2][j])
+                for i,ii in zip(useful_ids_1,useful_ids_2):
+                    ys.append(self.ys[sensor1][i] - other_experiment.ys[sensor2][ii])
 
                 # Fill instance
                 self.xs.append(self.xs[sensor1])
