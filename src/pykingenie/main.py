@@ -210,7 +210,7 @@ class KineticsAnalyzer:
                 df = df[[c for c in df.columns if c != col] + [col]]
 
         # Rename the column 'Concentration_micromolar' to '[Analyte] (μM)'
-        df.rename(columns={'Concentration_micromolar': '[Analyte] (μM)'}, inplace=True)
+        df = df.rename(columns={'Concentration_micromolar': '[Analyte] (μM)'})
 
         # Delete columns if they have only one unique value
         for col in ['Experiment', 'Replicate', 'Analyte_location', 'Loading_location']:
@@ -254,9 +254,9 @@ class KineticsAnalyzer:
                 df = df[[c for c in df.columns if c != col] + [col]]
 
         # Rename the column 'Protein_concentration_micromolar' to '[Protein] (μM)'
-        df.rename(columns={'Protein_concentration_micromolar': '[Protein] (μM)'}, inplace=True)
+        df = df.rename(columns={'Protein_concentration_micromolar': '[Protein] (μM)'})
         # Rename the column 'Ligand_concentration_micromolar' to '[Ligand] (μM)'
-        df.rename(columns={'Ligand_concentration_micromolar': '[Ligand] (μM)'}, inplace=True)
+        df = df.rename(columns={'Ligand_concentration_micromolar': '[Ligand] (μM)'})
 
         self.combined_conc_df = df.copy()
 
@@ -307,7 +307,7 @@ class KineticsAnalyzer:
         # Find which column has the analyte concentration, with the word '[Analyte]' and rename it to 'Concentration_micromolar'
         for column in df.columns:
             if '[Analyte]' in column:
-                df.rename(columns={column: 'Concentration_micromolar'}, inplace=True)
+                df = df.rename(columns={column: 'Concentration_micromolar'})
 
         for row in range(len(df)):
             if have_exp_column:
@@ -452,9 +452,9 @@ class KineticsAnalyzer:
         # Find which column has the ligand concentration, with the word '[Ligand]' and rename it to 'Ligand_concentration_micromolar'
         for column in df.columns:
             if '[Protein]' in column:
-                df.rename(columns={column: 'Protein_concentration_micromolar'}, inplace=True)
+                df = df.rename(columns={column: 'Protein_concentration_micromolar'})
             if '[Ligand]' in column:
-                df.rename(columns={column: 'Ligand_concentration_micromolar'}, inplace=True)
+                df = df.rename(columns={column: 'Ligand_concentration_micromolar'})
 
         for row in range(len(df)):
             if have_exp_column:

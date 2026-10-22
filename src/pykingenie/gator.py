@@ -161,7 +161,7 @@ class GatorExperiment(SurfaceBasedExperiment):
         df.insert(0, 'StepNumber', np.arange(len(df)))
 
         # Change column name 'Location' to 'Column'
-        df.rename(columns={'Location': 'Column'}, inplace=True)
+        df = df.rename(columns={'Location': 'Column'})
 
         # Subtract 11 from it - beacuse the plate with the sample usually starts at index 12 to 24
         df['Column'] = df['Column'] - nr_max_columns + 1
@@ -174,7 +174,7 @@ class GatorExperiment(SurfaceBasedExperiment):
         df['kst'] = df['kst'].replace({2: 'ASSOC', 3: 'DISASSOC', 1: 'LOADING', 0: 'OTHER'})
 
         # Change column name 'kst' to 'Type'
-        df.rename(columns={'kst': 'Type'}, inplace=True)
+        df = df.rename(columns={'kst': 'Type'})
 
         # Update the 'Type' column to 'BASELINE' for rows preceding 'ASSOC'
         df.loc[df['Type'].shift(-1) == 'ASSOC', 'Type'] = 'BASELINE'
@@ -442,7 +442,7 @@ class GatorExperiment(SurfaceBasedExperiment):
         self.df_steps = self.df_steps.reset_index(drop=True)
 
         # Rename the column 'Column' to 'Column_location' in df_steps
-        self.df_steps.rename(columns={'Column': 'Column_location'}, inplace=True)
+        self.df_steps = self.df_steps.rename(columns={'Column': 'Column_location'})
 
         # Move the column StepNumber to the first position
         column_to_move = self.df_steps.pop('StepNumber')
