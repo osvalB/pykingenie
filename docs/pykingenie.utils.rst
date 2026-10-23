@@ -57,6 +57,14 @@ pykingenie.utils.plotting module
    :show-inheritance:
    :undoc-members:
 
+pykingenie.utils.plotting\_xy module
+------------------------------------
+
+.. automodule:: pykingenie.utils.plotting_xy
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 pykingenie.utils.processing module
 ----------------------------------
 
