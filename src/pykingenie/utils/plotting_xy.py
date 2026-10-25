@@ -12,6 +12,7 @@ All dimensions are in pixels.
 
 from copy import copy
 from dataclasses import dataclass, fields, replace
+from functools import lru_cache
 
 import numpy as np
 
@@ -543,7 +544,6 @@ def config_fig(
         panel_height = max(
             1, (height - (fig.rows - 1) * fig.gap - (24 if title else 0)) // fig.rows
         )
-        panel_width = max(120, (width - (fig.cols - 1) * fig.gap) // fig.cols)
         panels = [copy(panel) for panel in fig.figures]
         for panel in panels:
             panel.axis_options = {
@@ -552,9 +552,9 @@ def config_fig(
             panel.chrome_styles = {
                 name: dict(style) for name, style in panel.chrome_styles.items()
             }
-            panel.width, panel.height = panel_width, panel_height
+            panel.height = panel_height
             _configure_engine(panel, replace(config, title=None))
-        fig = FacetGrid(
+        fig = _panel_grid(
             panels,
             fig.labels,
             cols=fig.cols,
@@ -569,6 +569,157 @@ def config_fig(
         except Exception as exc:
             raise RuntimeError(f"Error saving image: {exc}") from exc
     return fig
+
+
+# Plot width XY reserves beside a vertical colorbar with a title (its fixed
+# 86 + 18 px right gutter), measured to be independent of the font size.
+_COLORBAR_ROOM = 104
+
+
+def _panel_widths(width, cols, gap, extra=0):
+    """Width of an ordinary panel, and of the one panel holding ``extra``."""
+    base = max(120, (width - (cols - 1) * gap - extra) // cols)
+    return base, base + extra
+
+
+@lru_cache(maxsize=None)
+def _colorbar_grid_class():
+    from xy import _raster, _svg, export
+    from xy.facets import FacetGrid, render_raster
+
+    class ColorbarGrid(FacetGrid):
+        """FacetGrid whose colorbar panel is wider than the others.
+
+        XY grids give every column the same width, so the colorbar would
+        shrink one panel's plot. Here the colorbar panel's column is
+        ``extra`` pixels wider; the other columns share the remaining width
+        and the remaining panels in the wide column keep the ordinary width.
+        """
+
+        def __init__(self, figures, labels, *, wide_panel, extra, **kwargs):
+            super().__init__(figures, labels, **kwargs)
+            self.wide_panel = wide_panel
+            self.extra = extra
+
+        @property
+        def panel_width(self):
+            return _panel_widths(self.width, self.cols, self.gap, self.extra)[0]
+
+        def _x(self, col):
+            wide_col = self.wide_panel % self.cols
+            return col * (self.panel_width + self.gap) + (
+                self.extra if col > wide_col else 0
+            )
+
+        def to_svg(self, path=None, *, background=None):
+            panel_svgs = [
+                _svg.to_svg(fig, id_prefix=f"xy{i}-", background=background)
+                for i, fig in enumerate(self.figures)
+            ]
+            total_h = self.grid_height + self._title_height
+            body = []
+            for i, (fig, svg) in enumerate(zip(self.figures, panel_svgs)):
+                row, col = divmod(i, self.cols)
+                y = row * (self.panel_height + self.gap) + self._title_height
+                inner = svg[svg.find(">") + 1 : svg.rfind("</svg>")]
+                body.append(
+                    f'<svg x="{self._x(col)}" y="{y}" width="{fig.width}" '
+                    f'height="{self.panel_height}" '
+                    f'viewBox="0 0 {fig.width} {self.panel_height}">{inner}</svg>'
+                )
+            backdrop = (
+                f'<rect width="{self.width}" height="{total_h}" '
+                f'fill="{export._html.escape(background)}"/>'
+                if background and background not in ("transparent", "none")
+                else ""
+            )
+            title = (
+                f'<text x="{self.width / 2:g}" y="16" text-anchor="middle" '
+                f'font-size="14">{export._html.escape(self.title)}</text>'
+                if self.title
+                else ""
+            )
+            doc = (
+                f'<svg xmlns="http://www.w3.org/2000/svg" width="{self.width}" '
+                f'height="{total_h}" viewBox="0 0 {self.width} {total_h}">'
+                f'{backdrop}{title}{"".join(body)}</svg>'
+            )
+            if path is not None:
+                export._atomic_write_text(path, doc)
+            return doc
+
+        def _compose_rgba(self, scale, background=None):
+            if scale <= 0 or not np.isfinite(scale):
+                raise ValueError("facet export scale must be finite and positive")
+            width = int(round(self.width * scale))
+            height = int(round(self.grid_height * scale))
+            gap_fill = (
+                (255, 255, 255, 255)
+                if background is None
+                else _raster._parse_color(background)
+            )
+            canvas = np.empty((height, width, 4), dtype=np.uint8)
+            canvas[:] = np.asarray(gap_fill, dtype=np.uint8)
+            for i, fig in enumerate(self.figures):
+                spec, blob, borrowed = _raster._export_payload(
+                    fig, None, None, background
+                )
+                image = render_raster(spec, blob, scale=scale, borrowed=borrowed)
+                row, col = divmod(i, self.cols)
+                x = int(round(self._x(col) * scale))
+                y = int(round(row * (self.panel_height + self.gap) * scale))
+                h = min(image.shape[0], height - y)
+                w = min(image.shape[1], width - x)
+                if h > 0 and w > 0:
+                    canvas[y : y + h, x : x + w] = image[:h, :w]
+            return canvas
+
+        def to_html(self, path=None, *, custom_css=None):
+            base, wide = _panel_widths(self.width, self.cols, self.gap, self.extra)
+            wide_col = self.wide_panel % self.cols
+            columns = " ".join(
+                f"minmax(0, {wide if col == wide_col else base}fr)"
+                for col in range(self.cols)
+            )
+            # Panels sharing the wide column keep the ordinary width.
+            narrow = "".join(
+                f"#xy-facet-{i}{{width:{100 * base / wide:.4f}%;}}"
+                for i in range(len(self.figures))
+                if i % self.cols == wide_col and i != self.wide_panel
+            )
+            css = (
+                ".xy-facet-document .xy-facet-grid"
+                f"{{grid-template-columns:{columns};}}{narrow}"
+            )
+            return super().to_html(path, custom_css=css + (custom_css or ""))
+
+    return ColorbarGrid
+
+
+def _panel_grid(panels, labels, *, cols, width, height, gap, title):
+    """Compose engine panels into a grid, widening the colorbar panel."""
+    from xy.facets import FacetGrid
+
+    wide = [i for i, panel in enumerate(panels) if panel.colorbar_options]
+    extra = _COLORBAR_ROOM if wide else 0
+    base, wide_width = _panel_widths(width, cols, gap, extra)
+    for i, panel in enumerate(panels):
+        panel.width = wide_width if wide and i == wide[0] else base
+    if not wide:
+        return FacetGrid(
+            panels, labels, cols=cols, width=width, height=height, gap=gap, title=title
+        )
+    return _colorbar_grid_class()(
+        panels,
+        labels,
+        wide_panel=wide[0],
+        extra=extra,
+        cols=cols,
+        width=width,
+        height=height,
+        gap=gap,
+        title=title,
+    )
 
 
 def _grid(
@@ -620,7 +771,10 @@ def _grid(
     panel_height = max(
         1, (height - (nrows - 1) * gap - (24 if plot.title else 0)) // nrows
     )
-    panel_width = max(120, (width - (ncols - 1) * gap) // ncols)
+    colorbar_panel = min(ncols, len(charts)) - 1
+    panel_width, colorbar_width = _panel_widths(
+        width, ncols, gap, _COLORBAR_ROOM if colorbar is not None else 0
+    )
     linear_x = _linear_x(axis)
     x_tick_count = _x_tick_count(panel_width, plot.font_size) if linear_x else None
     domains = [None] * len(charts)
@@ -629,7 +783,6 @@ def _grid(
             _legend_room_domain(chart.children, legend, plot.font_size, panel_width)
             for chart in charts
         ]
-    colorbar_panel = min(ncols, len(charts)) - 1
     panels = []
     for i, chart in enumerate(charts):
         row, col = divmod(i, ncols)
@@ -674,7 +827,11 @@ def _grid(
             _legend(legend, plot.font_size, toggle=legend_toggle),
             xy.export_config(formats=[plot.plot_type]),
             title=chart.title if layout.show_subplot_titles else None,
-            width=panel_width,
+            width=(
+                colorbar_width
+                if colorbar is not None and i == colorbar_panel
+                else panel_width
+            ),
             height=panel_height,
             styles=_styles(plot.font_size, legend.font_size),
         )
@@ -699,7 +856,7 @@ def _grid(
             )
             for panel in panels:
                 panel.axis_options[axis_id]["domain"] = domain
-    return FacetGrid(
+    return _panel_grid(
         panels,
         [chart.title or "" for chart in charts],
         cols=ncols,
@@ -708,6 +865,13 @@ def _grid(
         gap=gap,
         title=plot.title,
     )
+
+
+def _smax_label(name):
+    # Fitting names end in "_id_<Smax ID>"; the panel title already names the
+    # sample, so the legend only needs the ID and stays short in small panels.
+    sample, sep, smax_id = str(name).rpartition("_id_")
+    return f"Smax ID {smax_id}" if sep and sample else str(name)
 
 
 def _array(values):
@@ -1001,7 +1165,7 @@ def plot_steady_state(
                     xy.scatter(
                         x,
                         fit.signal_ss[i],
-                        name=fit.names[i],
+                        name=_smax_label(fit.names[i]),
                         color=colors[i],
                         size=trace.marker_size,
                         opacity=trace.opacity,

@@ -726,15 +726,15 @@ def test_sensorgram_legend_room_respects_explicit_settings():
     assert x_range(legend_config=plotting.LegendConfig(show=False))[1] < 700
 
 
-def _nine_panel_kinetics(**configs):
+def _nine_panel_kinetics(n_panels=9, **configs):
     times = np.linspace(0, 300, 31)
     fit = SimpleNamespace(
-        names=[f"sample_{i}" for i in range(9)],
-        lig_conc_lst_per_id=[[0.13, 0.0056]] * 9,
-        time_assoc_lst=[times] * 18,
-        time_disso_lst=[times + 300] * 18,
-        assoc_lst=[times / 300] * 18,
-        disso_lst=[1 - times / 300] * 18,
+        names=[f"sample_{i}" for i in range(n_panels)],
+        lig_conc_lst_per_id=[[0.13, 0.0056]] * n_panels,
+        time_assoc_lst=[times] * (2 * n_panels),
+        time_disso_lst=[times + 300] * (2 * n_panels),
+        assoc_lst=[times / 300] * (2 * n_panels),
+        disso_lst=[1 - times / 300] * (2 * n_panels),
         signal_assoc_fit=None,
         signal_disso_fit=None,
     )
@@ -807,6 +807,80 @@ def test_concentration_colorbar_picks_a_short_unit(low, high, unit, labels):
     assert colorbar["title"] == f"[Ligand] ({unit})"
     assert colorbar["labels"] == labels
     assert colorbar["domain"][0] < colorbar["domain"][1]
+
+
+def _plot_rect(engine):
+    import re
+
+    rect = re.search(
+        r'<rect x="([\d.]+)" y="[\d.]+" width="([\d.]+)" height="[\d.]+"/>',
+        engine.to_svg(),
+    )
+    return float(rect.group(1)), float(rect.group(2))
+
+
+@pytest.mark.parametrize("n_panels, cols", [(9, 3), (18, 6)])
+def test_colorbar_panel_keeps_the_same_plot_width(n_panels, cols):
+    import re
+
+    grid = _nine_panel_kinetics(n_panels)
+    assert grid.cols == cols
+    # Column 0 also holds the y title; compare the other columns.
+    widths = {
+        round(_plot_rect(panel)[1])
+        for i, panel in enumerate(grid.figures)
+        if i % cols
+    }
+    assert len(widths) == 1
+    # Ordinary panels in the colorbar's column keep the ordinary width and
+    # leave the room under the colorbar empty.
+    assert {panel.width for i, panel in enumerate(grid.figures) if i != cols - 1} == {
+        grid.panel_width
+    }
+    assert grid.figures[cols - 1].width == grid.panel_width + 104
+
+    svg = grid.to_svg()
+    panels = re.findall(r'<svg x="(\d+)" y="(\d+)" width="(\d+)"', svg)
+    assert len(panels) == n_panels
+    right_edges = [int(x) + int(w) for x, _y, w in panels]
+    assert max(right_edges) <= grid.width
+    first_row = sorted(int(x) for x, y, _w in panels if y == panels[0][1])
+    assert all(b - a >= grid.panel_width for a, b in zip(first_row, first_row[1:]))
+
+    png = grid.to_png(scale=1)
+    assert struct.unpack(">II", png[16:24])[0] == grid.width
+    html = grid.to_html()
+    assert f"minmax(0, {grid.panel_width + 104}fr)" in html
+    assert f"#xy-facet-{2 * cols - 1}{{width:" in html
+
+
+def test_config_fig_keeps_the_wide_colorbar_panel():
+    grid = _nine_panel_kinetics()
+    resized = plotting.config_fig(
+        grid, "unused", plot_config=plotting.PlotConfig(plot_width=900)
+    )
+    assert type(resized) is type(grid) and resized.width == 900
+    assert resized.figures[2].width == resized.panel_width + 104
+    widths = [
+        _plot_rect(panel)[1]
+        for i, panel in enumerate(resized.figures)
+        if i % resized.cols
+    ]
+    # XY may widen an ordinary panel's right margin by a few pixels for an
+    # overhanging x tick label; the colorbar panel's margin already covers it.
+    assert max(widths) - min(widths) <= 6
+
+
+def test_steady_state_legend_names_only_the_smax_id():
+    fit = SimpleNamespace(
+        names=["wt dtt 2.5 mM - reg (b)_id_7", "wt dtt 2.5 mM - reg (b)_id_8"],
+        lig_conc_lst_per_id=[[0.001, 0.13]] * 2,
+        signal_ss=[[0.1, 0.3]] * 2,
+        signal_ss_fit=None,
+    )
+    grid = plotting.plot_steady_state(SimpleNamespace(fittings={"sample": fit}))
+    assert [t.name for t in grid.figures[0].traces] == ["Smax ID 7", "Smax ID 8"]
+    assert plotting._smax_label("custom name") == "custom name"
 
 
 def test_steady_state_pads_axes_labels_decades_and_puts_legend_upper_left():
