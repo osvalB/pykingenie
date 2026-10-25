@@ -142,12 +142,13 @@ class LayoutConfig:
 class LegendConfig:
     """Legend visibility, placement, typography, and interaction.
 
-    Unset show/toggle/highlight settings keep the helper's defaults. Enabling
+    Unset show/loc/toggle/highlight settings keep the helper's defaults
+    (``"upper right"``, or ``"upper left"`` for steady-state curves). Enabling
     toggles for a composed line/marker trace toggles its named mark only.
     """
 
     show: bool | None = None
-    loc: str = "upper right"
+    loc: str | None = None
     ncols: int = 1
     title: str | None = None
     font_size: float | None = None
@@ -288,7 +289,19 @@ def _legend_style(font_size):
     return {"fontSize": f"{font_size}px"}
 
 
-def _axes(plot, axes, label_offset=None):
+def _axes(
+    plot,
+    axes,
+    label_offset=None,
+    *,
+    x_domain=None,
+    x_tick_count=None,
+    x_tick_values=None,
+    margin=None,
+):
+    """XY axes; ``x_domain``, ``x_tick_count`` and ``x_tick_values`` are helper
+    defaults that ``PlotConfig.x_range`` and ``AxisConfig.n_x_axis_ticks``
+    override."""
     xy = _xy()
     style = {
         "tick_length": axes.tick_length,
@@ -297,14 +310,22 @@ def _axes(plot, axes, label_offset=None):
         "grid_width": axes.axis_gridwidth,
         **_axis_font_style(plot.font_size),
     }
+    if plot.x_range is not None:
+        x_domain = None
+    x_bounds = axes.x_bounds
+    if x_bounds == "data" and x_domain is not None:
+        # Let navigation reach the legend room as well as the observations.
+        x_bounds = x_domain
     return [
         xy.x_axis(
             label=axes.x_label,
             type_=axes.x_scale,
-            domain=plot.x_range,
-            bounds=axes.x_bounds,
+            domain=plot.x_range if plot.x_range is not None else x_domain,
+            margin=margin,
+            bounds=x_bounds,
             reverse=bool(axes.reverse_x),
-            tick_count=axes.n_x_axis_ticks,
+            tick_count=axes.n_x_axis_ticks or x_tick_count,
+            tick_values=None if axes.n_x_axis_ticks else x_tick_values,
             grid=axes.showgrid_x,
             label_offset=_x_label_offset(plot.font_size, axes.tick_length),
             line=True,
@@ -315,6 +336,7 @@ def _axes(plot, axes, label_offset=None):
             label=axes.y_label,
             type_=axes.y_scale,
             domain=plot.y_range,
+            margin=margin,
             bounds=axes.y_bounds,
             reverse=bool(axes.reverse_y),
             tick_count=axes.n_y_axis_ticks,
@@ -327,10 +349,63 @@ def _axes(plot, axes, label_offset=None):
     ]
 
 
+def _plot_area_width(chart_width, font_size):
+    # Chart width minus a conservative estimate of the y tick labels and title.
+    return max(60.0, chart_width - 5.2 * font_size - 22)
+
+
+def _x_tick_count(chart_width, font_size):
+    # One count for every panel, so equal domains get equal ticks even though
+    # the first column is narrower (it holds the y title).
+    return max(3, min(8, int(_plot_area_width(chart_width, font_size) / (4.5 * font_size))))
+
+
+def _linear_x(axis):
+    return axis.x_scale in (None, "linear") and not axis.reverse_x
+
+
+def _legend_room_domain(marks, legend, font_size, chart_width):
+    """x domain whose right side leaves room for an upper/center/lower right legend.
+
+    XY can only draw legends inside the plot, so sensorgrams extend the x axis
+    instead. Returns None when no right-side legend is drawn.
+    """
+    labels = [str(mark.name) for mark in marks if getattr(mark, "name", None)]
+    if not (legend.show and labels and "right" in legend.loc):
+        return None
+    xs = [
+        np.asarray(getattr(mark.x, "values", mark.x), dtype=float)
+        for mark in marks
+        if isinstance(getattr(mark, "x", None), (list, tuple, np.ndarray))
+        or hasattr(getattr(mark, "x", None), "values")
+    ]
+    xs = np.concatenate([x[np.isfinite(x)] for x in xs]) if xs else np.array([])
+    if not xs.size or xs.max() <= xs.min():
+        return None
+    # Legend width in pixels: handle (2 em), handle gap (0.8 em) and text
+    # (~0.62 em per DejaVu character) per column, 2 em between columns,
+    # 0.8 em of padding, and 1 em of inset/gap to the data.
+    size = legend.font_size or font_size
+    ncols = min(legend.ncols, len(labels))
+    column = 2.8 * size + 0.62 * size * max(len(label) for label in labels)
+    width = ncols * column + (ncols - 1) * 2 * size + 0.8 * size
+    if legend.title:
+        width = max(width, 0.62 * size * len(legend.title) + 0.8 * size)
+    fraction = min(0.6, (width + size) / _plot_area_width(chart_width, font_size))
+    low, high = float(xs.min()), float(xs.max())
+    low -= 0.02 * (high - low)
+    return low, low + (high - low) / (1 - fraction)
+
+
 def _legend(config, font_size, *, show=True, toggle=True):
     xy = _xy()
     legend = _resolve_config(
-        config, LegendConfig, show=show, toggle=toggle, highlight=toggle
+        config,
+        LegendConfig,
+        show=show,
+        loc="upper right",
+        toggle=toggle,
+        highlight=toggle,
     )
     return xy.legend(
         show=legend.show,
@@ -451,13 +526,33 @@ def config_fig(
     return fig
 
 
-def _grid(charts, plot, axis, layout, legend_config, *, legend_toggle=True):
+def _grid(
+    charts,
+    plot,
+    axis,
+    layout,
+    legend_config,
+    *,
+    legend_toggle=True,
+    legend_loc="upper right",
+    legend_room=None,
+    margin=None,
+    x_tick_values=None,
+):
+    """Arrange charts in a FacetGrid.
+
+    ``legend_room`` extends linear x axes so a right-side legend clears the
+    data: ``"panel"`` sizes each panel on its own data, ``"shared"`` gives all
+    panels one domain. ``margin`` pads both automatic axis domains.
+    """
     xy = _xy()
     from xy.facets import FacetGrid
 
     if not charts:
         raise ValueError("No experiments or fittings available to plot")
-    legend = _resolve_config(legend_config, LegendConfig)
+    legend = _resolve_config(
+        legend_config, LegendConfig, show=True, loc=legend_loc, toggle=legend_toggle
+    )
     if layout.stacked or layout.ncols is not None:
         ncols = min(1 if layout.stacked else layout.ncols, len(charts))
     else:
@@ -476,6 +571,19 @@ def _grid(charts, plot, axis, layout, legend_config, *, legend_toggle=True):
         1, (height - (nrows - 1) * gap - (24 if plot.title else 0)) // nrows
     )
     panel_width = max(120, (width - (ncols - 1) * gap) // ncols)
+    linear_x = _linear_x(axis)
+    x_tick_count = _x_tick_count(panel_width, plot.font_size) if linear_x else None
+    domains = [None] * len(charts)
+    if legend_room and linear_x:
+        if legend_room == "shared":
+            marks = [mark for chart in charts for mark in chart.children]
+            domains = [_legend_room_domain(marks, legend, plot.font_size, panel_width)]
+            domains *= len(charts)
+        else:
+            domains = [
+                _legend_room_domain(chart.children, legend, plot.font_size, panel_width)
+                for chart in charts
+            ]
     panels = []
     for i, chart in enumerate(charts):
         row, col = divmod(i, ncols)
@@ -486,7 +594,15 @@ def _grid(charts, plot, axis, layout, legend_config, *, legend_toggle=True):
         )
         panel = xy.chart(
             *chart.children,
-            *_axes(plot, panel_axis, layout.extra_padding_y_label),
+            *_axes(
+                plot,
+                panel_axis,
+                layout.extra_padding_y_label,
+                x_domain=domains[i],
+                x_tick_count=x_tick_count,
+                x_tick_values=x_tick_values,
+                margin=margin,
+            ),
             _legend(legend, plot.font_size, toggle=legend_toggle),
             xy.export_config(formats=[plot.plot_type]),
             title=chart.title if layout.show_subplot_titles else None,
@@ -525,13 +641,31 @@ def _array(values):
 
 
 def _single_chart(
-    marks, plot, axis, legend_config=None, *, show_legend=True, legend_toggle=True
+    marks,
+    plot,
+    axis,
+    legend_config=None,
+    *,
+    show_legend=True,
+    legend_toggle=True,
+    legend_room=False,
 ):
     xy = _xy()
-    legend = _resolve_config(legend_config, LegendConfig)
+    legend = _resolve_config(
+        legend_config,
+        LegendConfig,
+        show=show_legend,
+        loc="upper right",
+        toggle=legend_toggle,
+    )
+    x_domain = (
+        _legend_room_domain(marks, legend, plot.font_size, plot.plot_width)
+        if legend_room and _linear_x(axis)
+        else None
+    )
     return xy.chart(
         *marks,
-        *_axes(plot, axis),
+        *_axes(plot, axis, x_domain=x_domain),
         _legend(legend, plot.font_size, show=show_legend, toggle=legend_toggle),
         xy.export_config(formats=[plot.plot_type]),
         title=plot.title,
@@ -686,7 +820,9 @@ def plot_traces(
             )
     # XY toggles individual marks, so a line + scatter legend is informational.
     toggle = not (trace.line_width > 0 and trace.marker_size > 0)
-    return _single_chart(marks, plot, axis, legend_config, legend_toggle=toggle)
+    return _single_chart(
+        marks, plot, axis, legend_config, legend_toggle=toggle, legend_room=True
+    )
 
 
 def plot_traces_all(
@@ -738,6 +874,7 @@ def plot_traces_all(
         layout,
         legend_config,
         legend_toggle=trace.marker_size <= 0 or trace.line_width <= 0,
+        legend_room="panel",
     )
 
 
@@ -805,7 +942,39 @@ def plot_steady_state(
                     )
                 )
         charts.append(xy.chart(*marks, title=fit.names[0].rsplit("_", 1)[0]))
-    return _grid(charts, plot, axis, layout, legend_config)
+    # Pad both axes so markers at the extremes are not cut by the frame; XY's
+    # automatic log domain leaves almost no room above the highest point.
+    margin = 0.05
+    decades = None
+    concentrations = np.asarray(
+        [
+            value
+            for fit in pyKinetics.fittings.values()
+            for group in fit.lig_conc_lst_per_id
+            for value in np.ravel(group)
+        ],
+        dtype=float,
+    )
+    concentrations = concentrations[np.isfinite(concentrations) & (concentrations > 0)]
+    if axis.x_scale == "log" and concentrations.size:
+        # XY labels only every other decade in narrow panels, which can leave
+        # a single label, so list the decades explicitly.
+        low, high = np.log10(concentrations.min()), np.log10(concentrations.max())
+        pad = margin * (high - low)
+        decades = 10.0 ** np.arange(np.ceil(low - pad), np.floor(high + pad) + 1)
+        if len(decades) < 2:
+            decades = None
+    # Binding curves rise to the right, so the upper left corner is empty.
+    return _grid(
+        charts,
+        plot,
+        axis,
+        layout,
+        legend_config,
+        legend_loc="upper left",
+        margin=margin,
+        x_tick_values=None if decades is None else decades.tolist(),
+    )
 
 
 def plot_association_dissociation(
@@ -922,4 +1091,12 @@ def plot_association_dissociation(
                 labeled_concentrations = set()
         if not layout.split_by_smax_id:
             charts.append(xy.chart(*marks, title=fit.names[0].rsplit("_", 1)[0]))
-    return _grid(charts, plot, axis, layout, legend_config, legend_toggle=False)
+    return _grid(
+        charts,
+        plot,
+        axis,
+        layout,
+        legend_config,
+        legend_toggle=False,
+        legend_room="shared",
+    )

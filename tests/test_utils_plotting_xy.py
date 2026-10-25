@@ -662,6 +662,112 @@ def test_axis_titles_and_legend_fit_at_large_font_sizes(analyzer, grid_plot):
     assert label_right <= box_right
 
 
+def _legend_left_and_data_right(engine, x_max):
+    """Pixel x of the legend box's left edge and of the last observation."""
+    import re
+
+    svg = engine.to_svg()
+    plot = re.search(
+        r'<rect x="([\d.]+)" y="[\d.]+" width="([\d.]+)" height="[\d.]+"/>', svg
+    )
+    legend = re.search(
+        r'<rect x="([\d.]+)" y="[\d.]+" width="[\d.]+"[^>]*'
+        r'fill="rgba\(128,128,128,0\.08\)"',
+        svg,
+    )
+    low, high = engine.build_payload()[0]["x_axis"]["range"]
+    plot_x, plot_w = float(plot.group(1)), float(plot.group(2))
+    return float(legend.group(1)), plot_x + (x_max - low) / (high - low) * plot_w
+
+
+@pytest.mark.parametrize("font_size", [12, 18])
+@pytest.mark.parametrize("width", [450, 900])
+def test_sensorgram_legend_sits_right_of_the_data(font_size, width):
+    times = np.linspace(0, 650, 60)
+    chart = plotting.plot_traces(
+        [times] * 2,
+        [np.linspace(0, 1, 60)] * 2,
+        ["0.0056 µM", "0.13 µM"],
+        ["red", "blue"],
+        [True, True],
+        plot_config=plotting.PlotConfig(plot_width=width, font_size=font_size),
+    )
+    legend_left, data_right = _legend_left_and_data_right(chart.figure(), 650)
+    assert data_right < legend_left
+
+
+def test_sensorgram_legend_room_respects_explicit_settings():
+    def x_range(**configs):
+        chart = plotting.plot_traces(
+            [np.linspace(0, 650, 60)], [np.linspace(0, 1, 60)], ["A"], ["red"], [True],
+            **configs,
+        )
+        return chart.figure().build_payload()[0]["x_axis"]["range"]
+
+    assert x_range()[1] > 700
+    assert x_range(plot_config=plotting.PlotConfig(x_range=(0, 650))) == [0, 650]
+    # Left-side or hidden legends need no room.
+    assert x_range(legend_config=plotting.LegendConfig(loc="upper left"))[1] < 700
+    assert x_range(legend_config=plotting.LegendConfig(show=False))[1] < 700
+
+
+def test_kinetics_panels_share_legend_room_and_ticks():
+    import re
+
+    times = np.linspace(0, 300, 31)
+    fit = SimpleNamespace(
+        names=[f"sample_{i}" for i in range(9)],
+        lig_conc_lst_per_id=[[0.13, 0.0056]] * 9,
+        time_assoc_lst=[times] * 18,
+        time_disso_lst=[times + 300] * 18,
+        assoc_lst=[times / 300] * 18,
+        disso_lst=[1 - times / 300] * 18,
+        signal_assoc_fit=None,
+        signal_disso_fit=None,
+    )
+    grid = plotting.plot_association_dissociation(
+        SimpleNamespace(fittings={"sample": fit})
+    )
+    ranges = {tuple(p.build_payload()[0]["x_axis"]["range"]) for p in grid.figures}
+    assert len(ranges) == 1
+    ticks = {
+        tuple(re.findall(r'text-anchor="middle">([\d.]+)</text>', p.to_svg()))
+        for p in grid.figures
+    }
+    assert len(ticks) == 1
+    for panel in grid.figures:
+        legend_left, data_right = _legend_left_and_data_right(panel, 600)
+        assert data_right < legend_left
+
+
+def test_steady_state_pads_axes_labels_decades_and_puts_legend_upper_left():
+    import re
+
+    fit = SimpleNamespace(
+        names=[f"sample_{i}" for i in range(6)],
+        lig_conc_lst_per_id=[[0.001, 0.0056, 0.03, 0.13]] * 6,
+        signal_ss=[[0.02, 0.1, 0.25, 0.38]] * 6,
+        signal_ss_fit=None,
+    )
+    grid = plotting.plot_steady_state(
+        SimpleNamespace(fittings={"sample": fit}),
+        plot_config=plotting.PlotConfig(plot_width=1340, font_size=18),
+    )
+    for panel in grid.figures:
+        spec = panel.build_payload()[0]
+        (x_low, x_high), (y_low, y_high) = spec["x_axis"]["range"], spec["y_axis"]["range"]
+        assert np.log10(0.13 / x_high) < -0.05 and np.log10(x_low / 0.001) < -0.05
+        assert y_high - 0.38 > 0.01 and 0.02 - y_low > 0.01
+        assert spec["legend"]["loc"] == "upper left"
+        labels = re.findall(r'text-anchor="middle">([\d.]+)</text>', panel.to_svg())
+        assert labels == ["0.001", "0.01", "0.1"]
+    custom = plotting.plot_steady_state(
+        SimpleNamespace(fittings={"sample": fit}),
+        legend_config=plotting.LegendConfig(loc="lower right"),
+    )
+    assert custom.figures[0].build_payload()[0]["legend"]["loc"] == "lower right"
+
+
 def test_empty_and_invalid_inputs(analyzer):
     with pytest.raises(ValueError, match="No experiments or fittings"):
         plotting.plot_steady_state(SimpleNamespace(fittings={}))
