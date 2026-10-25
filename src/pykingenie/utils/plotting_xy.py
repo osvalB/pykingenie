@@ -262,11 +262,16 @@ def _plot_settings(config, *, width=900, height=420, font_size=14, title=None):
 
 
 def _styles(font_size, legend_font_size=None):
+    # XY places a colorbar title a fixed 38 px from the bar, so larger
+    # colorbar text would run into the tick labels.
+    colorbar_font_size = min(font_size, 12)
     return {
         "title": {"font_size": font_size + 2},
         "axis_title": {"font_size": font_size},
         "tick_label": {"font_size": font_size},
         "legend_label": {"font_size": legend_font_size or font_size},
+        "colorbar_title": {"font_size": colorbar_font_size},
+        "colorbar_tick": {"font_size": colorbar_font_size},
     }
 
 
@@ -287,6 +292,45 @@ def _legend_style(font_size):
     # XY's static legend layout only reads the CSS-style font size, so without
     # it the box is sized for 11 px text and clips larger labels.
     return {"fontSize": f"{font_size}px"}
+
+
+def _concentration_colorbar(low, high):
+    """Colorbar settings for ligand concentrations in μM, colored on log10.
+
+    XY has no log color scale for scatter marks, so colors use log10 values and
+    the ticks are relabelled with concentrations, in the unit (mM, μM, nM or
+    pM) whose labels stay short enough to clear XY's fixed title position.
+    """
+    log_low, log_high = np.log10(low), np.log10(high)
+    domain = (
+        (log_low - 0.5, log_high + 0.5) if log_high == log_low else (log_low, log_high)
+    )
+    factor, unit = next(
+        ((f, u) for f, u in ((1e-3, "mM"), (1, "μM"), (1e3, "nM")) if high * f >= 1),
+        (1e6, "pM"),
+    )
+    ticks = sorted({log_low, (log_low + log_high) / 2, log_high})
+    labels = [
+        np.format_float_positional(
+            10**tick * factor, precision=2, unique=False, fractional=False, trim="-"
+        )
+        for tick in ticks
+    ]
+    return {
+        "title": f"[Ligand] ({unit})",
+        "domain": domain,
+        "ticks": ticks,
+        "labels": labels,
+    }
+
+
+def _first_point(marks):
+    for mark in marks:
+        x = np.asarray(getattr(getattr(mark, "x", None), "values", getattr(mark, "x", [])), dtype=float)
+        y = np.asarray(getattr(getattr(mark, "y", None), "values", getattr(mark, "y", [])), dtype=float)
+        if x.size and y.size:
+            return float(x[0]), float(y[0])
+    return 0.0, 0.0
 
 
 def _axes(
@@ -535,15 +579,17 @@ def _grid(
     *,
     legend_toggle=True,
     legend_loc="upper right",
-    legend_room=None,
+    legend_room=False,
     margin=None,
     x_tick_values=None,
+    colorbar=None,
 ):
     """Arrange charts in a FacetGrid.
 
-    ``legend_room`` extends linear x axes so a right-side legend clears the
-    data: ``"panel"`` sizes each panel on its own data, ``"shared"`` gives all
-    panels one domain. ``margin`` pads both automatic axis domains.
+    ``legend_room`` extends each panel's linear x axis so a right-side legend
+    clears its data. ``margin`` pads both automatic axis domains.
+    ``colorbar`` (from ``_concentration_colorbar``) is drawn once, beside the
+    top-right panel; XY would otherwise infer one in every panel.
     """
     xy = _xy()
     from xy.facets import FacetGrid
@@ -575,18 +621,35 @@ def _grid(
     x_tick_count = _x_tick_count(panel_width, plot.font_size) if linear_x else None
     domains = [None] * len(charts)
     if legend_room and linear_x:
-        if legend_room == "shared":
-            marks = [mark for chart in charts for mark in chart.children]
-            domains = [_legend_room_domain(marks, legend, plot.font_size, panel_width)]
-            domains *= len(charts)
-        else:
-            domains = [
-                _legend_room_domain(chart.children, legend, plot.font_size, panel_width)
-                for chart in charts
-            ]
+        domains = [
+            _legend_room_domain(chart.children, legend, plot.font_size, panel_width)
+            for chart in charts
+        ]
+    colorbar_panel = min(ncols, len(charts)) - 1
     panels = []
     for i, chart in enumerate(charts):
         row, col = divmod(i, ncols)
+        extra = []
+        if colorbar is not None and i == colorbar_panel:
+            extra = [xy.colorbar(title=colorbar["title"], ticks=colorbar["ticks"])]
+            if colorbar.get("needs_color_mark"):
+                # Constant-color lines carry no color scale, so an invisible
+                # mark with the full range lets XY draw the colorbar.
+                x0, y0 = _first_point(chart.children)
+                extra.insert(
+                    0,
+                    xy.scatter(
+                        [x0, x0],
+                        [y0, y0],
+                        color=list(colorbar["domain"]),
+                        colormap="viridis",
+                        color_domain=colorbar["domain"],
+                        opacity=0,
+                        density=False,
+                    ),
+                )
+        elif colorbar is not None:
+            extra = [xy.colorbar(show=False)]
         panel_axis = replace(
             axis,
             x_label=axis.x_label if not layout.outer_labels or row == nrows - 1 else "",
@@ -594,6 +657,7 @@ def _grid(
         )
         panel = xy.chart(
             *chart.children,
+            *extra,
             *_axes(
                 plot,
                 panel_axis,
@@ -610,7 +674,16 @@ def _grid(
             height=panel_height,
             styles=_styles(plot.font_size, legend.font_size),
         )
-        panels.append(panel.figure())
+        engine = panel.figure()
+        if colorbar is not None and engine.colorbar_options:
+            # xy.colorbar() takes tick positions only; the renderers also read
+            # paired tick labels from the compiled colorbar options.
+            engine.colorbar_options = dict(
+                engine.colorbar_options,
+                ticks=list(colorbar["ticks"]),
+                tick_labels=list(colorbar["labels"]),
+            )
+        panels.append(engine)
     for axis_id, shared in (("x", layout.shared_xaxes), ("y", layout.shared_yaxes)):
         if shared:
             ranges = [
@@ -874,7 +947,7 @@ def plot_traces_all(
         layout,
         legend_config,
         legend_toggle=trace.marker_size <= 0 or trace.line_width <= 0,
-        legend_room="panel",
+        legend_room=True,
     )
 
 
@@ -986,10 +1059,12 @@ def plot_association_dissociation(
     legend_config: LegendConfig | None = None,
     trace_config: TraceConfig | None = None,
 ):
-    """Plot kinetics observations and fitted curves, with concentration legends.
+    """Plot kinetics observations and fitted curves, colored by concentration.
 
-    LayoutConfig controls splitting by Smax ID. TraceConfig controls fitted
-    overlays, median smoothing and the sampling budget per Smax group.
+    One colorbar beside the top-right panel shows the ligand concentration
+    (log-scaled Viridis), shared by all panels. LayoutConfig controls
+    splitting by Smax ID. TraceConfig controls fitted overlays, median
+    smoothing and the sampling budget per Smax group.
     """
     xy = _xy()
     plot = _plot_settings(
@@ -1027,9 +1102,11 @@ def plot_association_dissociation(
     if np.any(~np.isfinite(concentrations)) or np.any(concentrations <= 0):
         raise ValueError("Ligand concentrations must be finite and positive")
     low, high = concentrations.min(), concentrations.max()
+    colorbar = _concentration_colorbar(low, high)
+    colorbar["needs_color_mark"] = trace.smooth_curves or trace.marker_size <= 0
     charts = []
     for fit in fits:
-        marks, counter, labeled_concentrations = [], 0, set()
+        marks, counter = [], 0
         for i, group in enumerate(fit.lig_conc_lst_per_id):
             limit = max(1, int(np.ceil(trace.max_points / len(group))))
             for concentration in group:
@@ -1042,16 +1119,12 @@ def plot_association_dissociation(
                     if trace.smooth_curves:
                         y = median_filter(y, x, trace.rolling_window)
                     x, y = subset_data(x, limit), subset_data(y, limit)
-                    name = None
-                    if phase == "Assoc" and concentration not in labeled_concentrations:
-                        name = f"{concentration:.2g} μM"
-                        labeled_concentrations.add(concentration)
                     if trace.smooth_curves and trace.line_width > 0:
+                        # Lines take one constant color, the closest Viridis step.
                         marks.append(
                             xy.line(
                                 x,
                                 y,
-                                name=name,
                                 color=color,
                                 width=trace.line_width,
                                 opacity=trace.opacity,
@@ -1062,8 +1135,9 @@ def plot_association_dissociation(
                             xy.scatter(
                                 x,
                                 y,
-                                name=name,
-                                color=color,
+                                color=np.full(len(x), np.log10(concentration)),
+                                colormap="viridis",
+                                color_domain=colorbar["domain"],
                                 size=trace.marker_size,
                                 opacity=trace.opacity,
                                 density=False,
@@ -1088,7 +1162,6 @@ def plot_association_dissociation(
             if layout.split_by_smax_id:
                 charts.append(xy.chart(*marks, title=fit.names[i]))
                 marks = []
-                labeled_concentrations = set()
         if not layout.split_by_smax_id:
             charts.append(xy.chart(*marks, title=fit.names[0].rsplit("_", 1)[0]))
     return _grid(
@@ -1098,5 +1171,5 @@ def plot_association_dissociation(
         layout,
         legend_config,
         legend_toggle=False,
-        legend_room="shared",
+        colorbar=colorbar,
     )

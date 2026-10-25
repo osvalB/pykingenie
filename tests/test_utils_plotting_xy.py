@@ -473,14 +473,17 @@ def test_kinetics_grouping_fits_sampling_and_smoothing(
     assert len(grid.figures) == (2 if split else 1)
     assert all((panel.legend_options["toggle"] is False for panel in grid.figures))
     traces = [trace for panel in grid.figures for trace in panel.traces]
+    # Smoothed lines need an invisible mark to carry the colorbar's range.
+    color_marks = [t for t in traces if t.style.get("opacity") == 0]
+    assert len(color_marks) == (1 if smooth else 0)
+    traces = [t for t in traces if t not in color_marks]
     assert len(traces) == (12 if with_fit else 6)
     for trace in traces:
         assert len(trace.x.values) == len(trace.y.values) <= 10
+        assert trace.name is None
         if trace.kind == "line" and trace.style["color"] == "black":
             assert with_fit
         else:
-            if trace.name is not None:
-                assert "μM" in trace.name
             assert trace.kind == ("line" if smooth else "scatter")
     for before, after in zip(original, fit.assoc_lst):
         np.testing.assert_equal(before, after)
@@ -711,9 +714,7 @@ def test_sensorgram_legend_room_respects_explicit_settings():
     assert x_range(legend_config=plotting.LegendConfig(show=False))[1] < 700
 
 
-def test_kinetics_panels_share_legend_room_and_ticks():
-    import re
-
+def _nine_panel_kinetics(**configs):
     times = np.linspace(0, 300, 31)
     fit = SimpleNamespace(
         names=[f"sample_{i}" for i in range(9)],
@@ -725,9 +726,15 @@ def test_kinetics_panels_share_legend_room_and_ticks():
         signal_assoc_fit=None,
         signal_disso_fit=None,
     )
-    grid = plotting.plot_association_dissociation(
-        SimpleNamespace(fittings={"sample": fit})
+    return plotting.plot_association_dissociation(
+        SimpleNamespace(fittings={"sample": fit}), **configs
     )
+
+
+def test_kinetics_panels_share_ticks():
+    import re
+
+    grid = _nine_panel_kinetics()
     ranges = {tuple(p.build_payload()[0]["x_axis"]["range"]) for p in grid.figures}
     assert len(ranges) == 1
     ticks = {
@@ -735,9 +742,59 @@ def test_kinetics_panels_share_legend_room_and_ticks():
         for p in grid.figures
     }
     assert len(ticks) == 1
-    for panel in grid.figures:
-        legend_left, data_right = _legend_left_and_data_right(panel, 600)
-        assert data_right < legend_left
+
+
+@pytest.mark.parametrize("smooth", [False, True])
+@pytest.mark.parametrize("font_size", [14, 18])
+def test_kinetics_colorbar_is_shown_once_with_concentration_labels(smooth, font_size):
+    import re
+
+    from xy import _textblock
+
+    grid = _nine_panel_kinetics(
+        plot_config=plotting.PlotConfig(font_size=font_size),
+        trace_config=plotting.TraceConfig(smooth_curves=smooth),
+    )
+    # 3 columns: only the top-right panel draws the shared colorbar.
+    with_colorbar = [i for i, p in enumerate(grid.figures) if p.colorbar_options]
+    assert with_colorbar == [2]
+    options = grid.figures[2].colorbar_options
+    assert options["domain"] == pytest.approx([np.log10(0.0056), np.log10(0.13)])
+    assert options["tick_labels"] == ["5.6", "27", "130"]
+    assert options["label"] == "[Ligand] (nM)"
+    assert all(not p.show_legend or not any(t.name for t in p.traces) for p in grid.figures)
+
+    svg = grid.figures[2].to_svg()
+    title = re.search(
+        r'<text x="([\d.]+)"[^>]*font-size="([\d.]+)"[^>]*>\[Ligand\] \(nM\)</text>',
+        svg,
+    )
+    title_left = float(title.group(1)) - _textblock.measure("[", float(title.group(2))).ascent
+    for label in options["tick_labels"]:
+        tick = re.search(
+            rf'<text x="([\d.]+)"[^>]*font-size="([\d.]+)"[^>]*>{re.escape(label)}</text>',
+            svg,
+        )
+        assert tick, label
+        right = float(tick.group(1)) + _text_width(label, tick.group(2))
+        assert right < title_left
+
+
+@pytest.mark.parametrize(
+    "low, high, unit, labels",
+    [
+        (0.0056, 0.13, "nM", ["5.6", "27", "130"]),
+        (0.5, 20.0, "μM", ["0.5", "3.2", "20"]),
+        (2000.0, 5000.0, "mM", ["2", "3.2", "5"]),
+        (1e-6, 1e-4, "pM", ["1", "10", "100"]),
+        (0.05, 0.05, "nM", ["50"]),
+    ],
+)
+def test_concentration_colorbar_picks_a_short_unit(low, high, unit, labels):
+    colorbar = plotting._concentration_colorbar(low, high)
+    assert colorbar["title"] == f"[Ligand] ({unit})"
+    assert colorbar["labels"] == labels
+    assert colorbar["domain"][0] < colorbar["domain"][1]
 
 
 def test_steady_state_pads_axes_labels_decades_and_puts_legend_upper_left():
