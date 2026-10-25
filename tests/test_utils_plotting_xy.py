@@ -1,3 +1,5 @@
+# Note: this file contains AI-generated code, written with AI coding assistants.
+
 """Exercise the real XY renderer as well as the kinetics-to-chart mapping."""
 
 import builtins

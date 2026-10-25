@@ -1,3 +1,5 @@
+# Note: this file contains AI-generated code, written with AI coding assistants.
+
 """XY plotting helpers with reusable dataclass configurations.
 
 XY is installed with ``pykingenie`` on Python 3.11+. Single-panel helpers return an
