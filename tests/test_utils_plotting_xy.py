@@ -429,6 +429,18 @@ def test_stacked_spacing_depends_on_rows_and_pixel_gap_overrides_it(analyzer):
     assert grid.rows == 3 and grid.cols == 1 and grid.gap == 8
 
 
+@pytest.mark.parametrize("font_size, expected", [(10, 8), (14, 8), (18, 11), (30, 18)])
+def test_default_panel_gap_follows_font_size(font_size, expected):
+    grid = _nine_panel_kinetics(plot_config=plotting.PlotConfig(font_size=font_size))
+    assert grid.gap == expected
+    # Explicit settings still win: a fraction of the height, or pixels.
+    spaced = _nine_panel_kinetics(
+        layout_config=plotting.LayoutConfig(vertical_spacing=0.08)
+    )
+    assert spaced.gap == 80
+    assert _nine_panel_kinetics(layout_config=plotting.LayoutConfig(gap=0)).gap == 0
+
+
 @pytest.mark.parametrize("groups", [[], [[]], [[10], []]])
 def test_kinetics_rejects_empty_smax_groups(analyzer, groups):
     analyzer.fittings["experiment"].lig_conc_lst_per_id = groups

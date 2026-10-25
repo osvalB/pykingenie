@@ -112,7 +112,8 @@ class LayoutConfig:
     """Subplot arrangement, spacing, titles, and shared axis domains.
 
     ``ncols`` chooses the number of columns; ``stacked=True`` uses one column.
-    ``gap`` is in pixels and overrides fractional ``vertical_spacing``.
+    ``gap`` is in pixels and overrides fractional ``vertical_spacing``; with
+    neither set, panels are 0.6 em (at least 8 px) apart.
     Shared axes start with a common domain; their interactions are independent.
     ``split_by_smax_id`` groups kinetics panels by response amplitude ID.
     """
@@ -606,13 +607,16 @@ def _grid(
         ncols = int(np.ceil(len(charts) / rows))
     nrows = int(np.ceil(len(charts) / ncols))
     width, height = plot.plot_width, plot.plot_height
-    if layout.gap is None and not 0 <= layout.vertical_spacing < 1 / max(1, nrows - 1):
-        raise ValueError("vertical_spacing is too large for the subplot rows")
-    gap = (
-        layout.gap
-        if layout.gap is not None
-        else (int(height * layout.vertical_spacing) if nrows > 1 else 0)
-    )
+    if layout.gap is not None:
+        gap = layout.gap
+    elif layout.vertical_spacing is not None:
+        if not layout.vertical_spacing < 1 / max(1, nrows - 1):
+            raise ValueError("vertical_spacing is too large for the subplot rows")
+        gap = int(height * layout.vertical_spacing) if nrows > 1 else 0
+    else:
+        # Each panel already reserves room for its title and tick labels, so
+        # a small font-relative gap is enough between rows and columns.
+        gap = max(8, round(0.6 * plot.font_size))
     panel_height = max(
         1, (height - (nrows - 1) * gap - (24 if plot.title else 0)) // nrows
     )
@@ -921,7 +925,7 @@ def plot_traces_all(
         showgrid_y=False,
     )
     layout = _resolve_config(
-        layout_config, LayoutConfig, vertical_spacing=0.08, outer_labels=False
+        layout_config, LayoutConfig, outer_labels=False
     )
     trace = _resolve_config(trace_config, TraceConfig, marker_size=1, line_width=2)
     charts, offset = [], 0
@@ -978,7 +982,7 @@ def plot_steady_state(
         showgrid_y=True,
     )
     layout = _resolve_config(
-        layout_config, LayoutConfig, vertical_spacing=0.08, outer_labels=True
+        layout_config, LayoutConfig, outer_labels=True
     )
     trace = _resolve_config(
         trace_config, TraceConfig, marker_size=5, line_width=2, show_fit=False
@@ -1079,7 +1083,7 @@ def plot_association_dissociation(
         showgrid_y=False,
     )
     layout = _resolve_config(
-        layout_config, LayoutConfig, vertical_spacing=0.08, outer_labels=True
+        layout_config, LayoutConfig, outer_labels=True
     )
     trace = _resolve_config(
         trace_config,
