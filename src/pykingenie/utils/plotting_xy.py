@@ -269,6 +269,25 @@ def _styles(font_size, legend_font_size=None):
     }
 
 
+def _axis_font_style(font_size):
+    # XY sizes the axis gutters from the axis style, not from the chart styles
+    # used to draw the text, so both must carry the font size.
+    return {"tick_label_size": font_size, "label_size": font_size}
+
+
+def _x_label_offset(font_size, tick_length):
+    # XY places the x title a fixed 24 px below the plot, while the tick labels
+    # above it end tick_length + 4 px padding + 0.8 em (baseline) + 0.24 em
+    # (descent) below the plot. Move the title past them with a 0.4 em gap.
+    return max(0.0, tick_length + 4 + 1.44 * font_size - 24)
+
+
+def _legend_style(font_size):
+    # XY's static legend layout only reads the CSS-style font size, so without
+    # it the box is sized for 11 px text and clips larger labels.
+    return {"fontSize": f"{font_size}px"}
+
+
 def _axes(plot, axes, label_offset=None):
     xy = _xy()
     style = {
@@ -276,6 +295,7 @@ def _axes(plot, axes, label_offset=None):
         "tick_width": axes.axis_tickwidth,
         "axis_width": axes.axis_linewidth,
         "grid_width": axes.axis_gridwidth,
+        **_axis_font_style(plot.font_size),
     }
     return [
         xy.x_axis(
@@ -286,6 +306,7 @@ def _axes(plot, axes, label_offset=None):
             reverse=bool(axes.reverse_x),
             tick_count=axes.n_x_axis_ticks,
             grid=axes.showgrid_x,
+            label_offset=_x_label_offset(plot.font_size, axes.tick_length),
             line=True,
             ticks=True,
             style=style,
@@ -306,7 +327,7 @@ def _axes(plot, axes, label_offset=None):
     ]
 
 
-def _legend(config, *, show=True, toggle=True):
+def _legend(config, font_size, *, show=True, toggle=True):
     xy = _xy()
     legend = _resolve_config(
         config, LegendConfig, show=show, toggle=toggle, highlight=toggle
@@ -318,7 +339,7 @@ def _legend(config, *, show=True, toggle=True):
         title=legend.title,
         toggle=legend.toggle,
         highlight=legend.highlight,
-        style={"font_size": legend.font_size} if legend.font_size else None,
+        style=_legend_style(legend.font_size or font_size),
     )
 
 
@@ -331,6 +352,23 @@ def _configure_engine(engine, config):
         engine.title = config.title
     if config.font_size is not None:
         engine.chrome_styles.update(_styles(config.font_size))
+        # New dicts keep grids copied by config_fig from sharing styles.
+        for options in engine.axis_options.values():
+            options["style"] = dict(
+                options.get("style") or {}, **_axis_font_style(config.font_size)
+            )
+        x_options = engine.axis_options.get("x")
+        if x_options is not None:
+            x_options["label_offset"] = _x_label_offset(
+                config.font_size, x_options["style"].get("tick_length", 0)
+            )
+        engine.legend_options = dict(
+            engine.legend_options or {},
+            style=dict(
+                (engine.legend_options or {}).get("style") or {},
+                **_legend_style(config.font_size),
+            ),
+        )
     for axis, domain in (("x", config.x_range), ("y", config.y_range)):
         if domain is not None:
             if (
@@ -449,7 +487,7 @@ def _grid(charts, plot, axis, layout, legend_config, *, legend_toggle=True):
         panel = xy.chart(
             *chart.children,
             *_axes(plot, panel_axis, layout.extra_padding_y_label),
-            _legend(legend, toggle=legend_toggle),
+            _legend(legend, plot.font_size, toggle=legend_toggle),
             xy.export_config(formats=[plot.plot_type]),
             title=chart.title if layout.show_subplot_titles else None,
             width=panel_width,
@@ -494,7 +532,7 @@ def _single_chart(
     return xy.chart(
         *marks,
         *_axes(plot, axis),
-        _legend(legend, show=show_legend, toggle=legend_toggle),
+        _legend(legend, plot.font_size, show=show_legend, toggle=legend_toggle),
         xy.export_config(formats=[plot.plot_type]),
         title=plot.title,
         width=plot.plot_width,

@@ -544,6 +544,124 @@ def test_config_and_real_exports(analyzer, tmp_path, grid_plot, format):
         )
 
 
+_NUMBER = r"(-?[\d.]+)"
+
+
+def _text_width(text, size):
+    from xy import _textblock
+
+    return _textblock.measure(text, float(size)).width
+
+
+def _y_title_and_tick_label_extents(svg):
+    """Horizontal extents of the rotated y-axis title and its tick labels."""
+    import re
+
+    from xy import _textblock
+
+    title = re.search(
+        r'<text x="([\d.]+)"[^>]*font-size="([\d.]+)"[^>]*rotate\(-90[^>]*>', svg
+    )
+    block = _textblock.measure("Signal (a.u.)", float(title.group(2)))
+    # A -90 degree title grows to the left of its baseline.
+    title_right = float(title.group(1)) + block.descent
+    tick_lefts = [
+        float(x) - _text_width(text, size)
+        for x, size, text in re.findall(
+            r'<text x="([\d.]+)"[^>]*font-size="([\d.]+)" text-anchor="end">'
+            + _NUMBER
+            + "</text>",
+            svg,
+        )
+    ]
+    return title_right, min(tick_lefts)
+
+
+def _x_title_and_tick_label_extents(svg):
+    """Vertical extents of the x-axis title and the x tick labels above it."""
+    import re
+
+    from xy import _textblock
+
+    title = re.search(
+        r'<text x="[\d.]+" y="([\d.]+)"[^>]*font-size="([\d.]+)"[^>]*>Time \(s\)</text>',
+        svg,
+    )
+    title_top = (
+        float(title.group(1))
+        - _textblock.measure("Time (s)", float(title.group(2))).ascent
+    )
+    tick_bottoms = [
+        float(y) + _textblock.measure(text, float(size)).descent
+        for y, size, text in re.findall(
+            r'<text x="[\d.]+" y="([\d.]+)"[^>]*font-size="([\d.]+)" '
+            r'text-anchor="middle">' + _NUMBER + "</text>",
+            svg,
+        )
+    ]
+    return title_top, max(tick_bottoms)
+
+
+def _legend_box_and_label_right_edges(svg, label):
+    """Right edges of the legend background and of its widest label."""
+    import re
+
+    box = re.search(
+        r'<rect x="([\d.]+)" y="[\d.]+" width="([\d.]+)"[^>]*'
+        r'fill="rgba\(128,128,128,0\.08\)"',
+        svg,
+    )
+    text = re.search(
+        r'<text x="([\d.]+)"[^>]*font-size="([\d.]+)"[^>]*>' + re.escape(label),
+        svg,
+    )
+    return (
+        float(box.group(1)) + float(box.group(2)),
+        float(text.group(1)) + _text_width(label, text.group(2)),
+    )
+
+
+@pytest.mark.parametrize("grid_plot", [False, True])
+def test_axis_titles_and_legend_fit_at_large_font_sizes(analyzer, grid_plot):
+    """XY sizes gutters and legends from its own styles, which must hold the font."""
+    axis_config = plotting.AxisConfig(x_label="Time (s)", y_label="Signal (a.u.)")
+    if grid_plot:
+        label = "experiment_sensor_1"
+        figure = plotting.config_fig(
+            plotting.plot_steady_state(analyzer, axis_config=axis_config),
+            "unused",
+            plot_config=plotting.PlotConfig(font_size=20),
+        )
+        engines = figure.figures
+    else:
+        label = "0.0056 µM"
+        figure = plotting.plot_traces(
+            [np.linspace(0, 10000, 50)],
+            [np.linspace(0, 0.4, 50)],
+            [label],
+            ["red"],
+            [True],
+            plot_config=plotting.PlotConfig(plot_height=1000, font_size=18),
+            axis_config=axis_config,
+        )
+        engines = [figure.figure()]
+
+    expected = 20 if grid_plot else 18
+    for engine in engines:
+        style = engine.axis_options["y"]["style"]
+        assert style["tick_label_size"] == expected
+        assert style["label_size"] == expected
+        assert engine.legend_options["style"] == {"fontSize": f"{expected}px"}
+
+    svg = figure.to_svg()
+    title_right, tick_left = _y_title_and_tick_label_extents(svg)
+    assert title_right < tick_left
+    title_top, tick_bottom = _x_title_and_tick_label_extents(svg)
+    assert title_top > tick_bottom
+    box_right, label_right = _legend_box_and_label_right_edges(svg, label)
+    assert label_right <= box_right
+
+
 def test_empty_and_invalid_inputs(analyzer):
     with pytest.raises(ValueError, match="No experiments or fittings"):
         plotting.plot_steady_state(SimpleNamespace(fittings={}))
