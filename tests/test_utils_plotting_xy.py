@@ -871,15 +871,26 @@ def test_config_fig_keeps_the_wide_colorbar_panel():
     assert max(widths) - min(widths) <= 6
 
 
-def test_steady_state_legend_names_only_the_smax_id():
+def test_steady_state_legend_names_only_the_smax_id_when_there_are_several():
     fit = SimpleNamespace(
         names=["wt dtt 2.5 mM - reg (b)_id_7", "wt dtt 2.5 mM - reg (b)_id_8"],
         lig_conc_lst_per_id=[[0.001, 0.13]] * 2,
         signal_ss=[[0.1, 0.3]] * 2,
         signal_ss_fit=None,
     )
-    grid = plotting.plot_steady_state(SimpleNamespace(fittings={"sample": fit}))
+    single = SimpleNamespace(
+        names=["wt dtt 2.5 mM - imd_id_6"],
+        lig_conc_lst_per_id=[[0.001, 0.13]],
+        signal_ss=[[0.1, 0.3]],
+        signal_ss_fit=None,
+    )
+    grid = plotting.plot_steady_state(
+        SimpleNamespace(fittings={"sample": fit, "single": single})
+    )
     assert [t.name for t in grid.figures[0].traces] == ["Smax ID 7", "Smax ID 8"]
+    # A single Smax ID gets no legend entry.
+    assert [t.name for t in grid.figures[1].traces] == [None]
+    assert '>Smax ID' not in grid.figures[1].to_svg()
     assert plotting._smax_label("custom name") == "custom name"
 
 

@@ -1165,7 +1165,10 @@ def plot_steady_state(
                     xy.scatter(
                         x,
                         fit.signal_ss[i],
-                        name=_smax_label(fit.names[i]),
+                        # One Smax ID needs no legend: the title names it.
+                        name=(
+                            _smax_label(fit.names[i]) if len(fit.names) > 1 else None
+                        ),
                         color=colors[i],
                         size=trace.marker_size,
                         opacity=trace.opacity,
