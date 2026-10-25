@@ -987,3 +987,50 @@ def test_octet_data_end_to_end():
         ).to_svg()
     )
     assert "xy-facet-grid" in plotting.plot_association_dissociation(analyzer).to_html()
+
+
+def test_legend_room_needs_spread_x_data_and_fits_the_legend_title():
+    def x_high(xs, legend_config=None):
+        chart = plotting.plot_traces(
+            [xs], [np.linspace(0, 1, len(xs))], ["A"], ["red"], [True],
+            legend_config=legend_config,
+        )
+        return chart.figure().build_payload()[0]["x_axis"]["range"][1]
+
+    # A single time point leaves no span to extend.
+    assert plotting._legend_room_domain(
+        [xy.scatter([5.0, 5.0], [0.0, 1.0], name="A")],
+        plotting.LegendConfig(show=True, loc="upper right"),
+        14,
+        900,
+    ) is None
+    times = np.linspace(0, 650, 60)
+    title = plotting.LegendConfig(title="Sensors on the octet plate")
+    assert x_high(times, title) > x_high(times)
+
+
+def test_first_point_falls_back_to_the_origin_without_data():
+    assert plotting._first_point([]) == (0.0, 0.0)
+    assert plotting._first_point([xy.scatter([2.0], [3.0])]) == (2.0, 3.0)
+
+
+def test_colorbar_grid_writes_svg_and_rejects_bad_scales(tmp_path):
+    grid = _nine_panel_kinetics()
+    path = tmp_path / "grid.svg"
+    assert grid.to_svg(path) == path.read_text()
+    with pytest.raises(ValueError, match="scale"):
+        grid._compose_rgba(0)
+
+
+def test_steady_state_keeps_automatic_ticks_within_one_decade():
+    import re
+
+    fit = SimpleNamespace(
+        names=["sample_id_0"],
+        lig_conc_lst_per_id=[[0.02, 0.03, 0.05]],
+        signal_ss=[[0.1, 0.2, 0.3]],
+        signal_ss_fit=None,
+    )
+    panel = plotting.plot_steady_state(SimpleNamespace(fittings={"s": fit})).figures[0]
+    assert panel.axis_options["x"]["tick_values"] is None
+    assert re.findall(r'text-anchor="middle">([\d.]+)</text>', panel.to_svg())
