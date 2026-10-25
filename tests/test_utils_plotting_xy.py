@@ -458,7 +458,7 @@ def test_steady_state_log_axes_and_sorted_fit(analyzer, plot_fit):
     panel = grid.figures[0]
     spec, _ = panel.build_payload()
     assert spec["x_axis"]["scale"] == "log"
-    assert panel.title == "experiment_sensor"
+    assert panel.title == "experiment"
     lines = [trace for trace in panel.traces if trace.kind == "line"]
     assert len(lines) == (2 if plot_fit else 0)
     if plot_fit:
@@ -1034,3 +1034,43 @@ def test_steady_state_keeps_automatic_ticks_within_one_decade():
     panel = plotting.plot_steady_state(SimpleNamespace(fittings={"s": fit})).figures[0]
     assert panel.axis_options["x"]["tick_values"] is None
     assert re.findall(r'text-anchor="middle">([\d.]+)</text>', panel.to_svg())
+
+
+def _kinetics_fit(names):
+    times = np.linspace(0, 300, 11)
+    n = len(names)
+    return SimpleNamespace(
+        names=names,
+        lig_conc_lst_per_id=[[0.1]] * n,
+        signal_ss=[[0.5]] * n,
+        signal_ss_fit=None,
+        time_assoc_lst=[times] * n,
+        time_disso_lst=[times + 300] * n,
+        assoc_lst=[times / 300] * n,
+        disso_lst=[1 - times / 300] * n,
+        signal_assoc_fit=None,
+        signal_disso_fit=None,
+    )
+
+
+def test_panel_titles_use_sample_names_and_smax_ids_only_when_needed():
+    analyzer = SimpleNamespace(
+        fittings={
+            "wt - reg": _kinetics_fit(["wt - reg_id_1", "wt - reg_id_2"]),
+            "wt - imd": _kinetics_fit(["wt - imd_id_0"]),
+        }
+    )
+
+    def titles(grid):
+        return [panel.title for panel in grid.figures]
+
+    assert titles(plotting.plot_association_dissociation(analyzer)) == [
+        "wt - reg (Smax ID 1)",
+        "wt - reg (Smax ID 2)",
+        "wt - imd",
+    ]
+    grouped = plotting.LayoutConfig(split_by_smax_id=False)
+    assert titles(
+        plotting.plot_association_dissociation(analyzer, layout_config=grouped)
+    ) == ["wt - reg", "wt - imd"]
+    assert titles(plotting.plot_steady_state(analyzer)) == ["wt - reg", "wt - imd"]

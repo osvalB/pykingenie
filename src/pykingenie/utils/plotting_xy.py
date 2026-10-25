@@ -874,6 +874,15 @@ def _smax_label(name):
     return f"Smax ID {smax_id}" if sep and sample else str(name)
 
 
+def _dataset_title(sample, fit, index):
+    """Panel title for one Smax group: the sample, plus its ID if it has several."""
+    if len(fit.names) == 1:
+        return str(sample)
+    if "_id_" not in str(fit.names[index]):
+        return str(fit.names[index])
+    return f"{sample} ({_smax_label(fit.names[index])})"
+
+
 def _array(values):
     # Each sensor may contain several acquisition steps, or a flat list.
     if isinstance(values, (list, tuple)) and values and np.ndim(values[0]) > 0:
@@ -1155,7 +1164,8 @@ def plot_steady_state(
         trace.line_width if trace.fit_line_width is None else trace.fit_line_width
     )
     charts = []
-    for fit in pyKinetics.fittings.values():
+    # Fittings are keyed by sample name; their own names add "_id_<Smax ID>".
+    for sample, fit in pyKinetics.fittings.items():
         marks = []
         colors = get_palette(len(fit.names))
         for i, concentrations in enumerate(fit.lig_conc_lst_per_id):
@@ -1185,7 +1195,7 @@ def plot_steady_state(
                         width=fit_width,
                     )
                 )
-        charts.append(xy.chart(*marks, title=fit.names[0].rsplit("_", 1)[0]))
+        charts.append(xy.chart(*marks, title=str(sample)))
     # Pad both axes so markers at the extremes are not cut by the frame; XY's
     # automatic log domain leaves almost no room above the highest point.
     margin = 0.05
@@ -1276,7 +1286,7 @@ def plot_association_dissociation(
     colorbar = _concentration_colorbar(low, high)
     colorbar["needs_color_mark"] = trace.smooth_curves or trace.marker_size <= 0
     charts = []
-    for fit in fits:
+    for sample, fit in pyKinetics.fittings.items():
         marks, counter = [], 0
         for i, group in enumerate(fit.lig_conc_lst_per_id):
             limit = max(1, int(np.ceil(trace.max_points / len(group))))
@@ -1331,10 +1341,10 @@ def plot_association_dissociation(
                         )
                 counter += 1
             if layout.split_by_smax_id:
-                charts.append(xy.chart(*marks, title=fit.names[i]))
+                charts.append(xy.chart(*marks, title=_dataset_title(sample, fit, i)))
                 marks = []
         if not layout.split_by_smax_id:
-            charts.append(xy.chart(*marks, title=fit.names[0].rsplit("_", 1)[0]))
+            charts.append(xy.chart(*marks, title=str(sample)))
     return _grid(
         charts,
         plot,
