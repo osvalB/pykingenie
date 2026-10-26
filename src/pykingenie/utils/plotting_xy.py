@@ -1,3 +1,5 @@
+# Note: this file contains AI-generated code, written with AI coding assistants.
+
 """XY plotting helpers with reusable dataclass configurations.
 
 XY is installed with ``pykingenie`` on Python 3.11+. Single-panel helpers return an
@@ -12,6 +14,7 @@ All dimensions are in pixels.
 
 from copy import copy
 from dataclasses import dataclass, fields, replace
+from functools import lru_cache
 
 import numpy as np
 
@@ -34,7 +37,9 @@ __all__ = [
     "plot_traces",
     "plot_traces_all",
     "plot_steady_state",
+    "plot_steady_state_residuals",
     "plot_association_dissociation",
+    "plot_association_dissociation_residuals",
 ]
 
 
@@ -112,7 +117,8 @@ class LayoutConfig:
     """Subplot arrangement, spacing, titles, and shared axis domains.
 
     ``ncols`` chooses the number of columns; ``stacked=True`` uses one column.
-    ``gap`` is in pixels and overrides fractional ``vertical_spacing``.
+    ``gap`` is in pixels and overrides fractional ``vertical_spacing``; with
+    neither set, panels are 0.6 em (at least 8 px) apart.
     Shared axes start with a common domain; their interactions are independent.
     ``split_by_smax_id`` groups kinetics panels by response amplitude ID.
     """
@@ -142,12 +148,13 @@ class LayoutConfig:
 class LegendConfig:
     """Legend visibility, placement, typography, and interaction.
 
-    Unset show/toggle/highlight settings keep the helper's defaults. Enabling
+    Unset show/loc/toggle/highlight settings keep the helper's defaults
+    (``"upper right"``, or ``"upper left"`` for steady-state curves). Enabling
     toggles for a composed line/marker trace toggles its named mark only.
     """
 
     show: bool | None = None
-    loc: str = "upper right"
+    loc: str | None = None
     ncols: int = 1
     title: str | None = None
     font_size: float | None = None
@@ -261,31 +268,124 @@ def _plot_settings(config, *, width=900, height=420, font_size=14, title=None):
 
 
 def _styles(font_size, legend_font_size=None):
+    # XY places a colorbar title a fixed 38 px from the bar, so larger
+    # colorbar text would run into the tick labels.
+    colorbar_font_size = min(font_size, 12)
     return {
         "title": {"font_size": font_size + 2},
         "axis_title": {"font_size": font_size},
         "tick_label": {"font_size": font_size},
         "legend_label": {"font_size": legend_font_size or font_size},
+        "colorbar_title": {"font_size": colorbar_font_size},
+        "colorbar_tick": {"font_size": colorbar_font_size},
     }
 
 
-def _axes(plot, axes, label_offset=None):
+def _axis_font_style(font_size):
+    # XY sizes the axis gutters from the axis style, not from the chart styles
+    # used to draw the text, so both must carry the font size.
+    return {"tick_label_size": font_size, "label_size": font_size}
+
+
+def _x_label_offset(font_size, tick_length):
+    # XY places the x title a fixed 24 px below the plot, while the tick labels
+    # above it end tick_length + 4 px padding + 0.8 em (baseline) + 0.24 em
+    # (descent) below the plot. Move the title past them with a 0.4 em gap.
+    return max(0.0, tick_length + 4 + 1.44 * font_size - 24)
+
+
+def _legend_style(font_size):
+    # XY's static legend layout only reads the CSS-style font size, so without
+    # it the box is sized for 11 px text and clips larger labels.
+    return {"fontSize": f"{font_size}px"}
+
+
+def _concentration_colorbar(low, high):
+    """Colorbar settings for ligand concentrations in μM, colored on log10.
+
+    XY has no log color scale for scatter marks, so colors use log10 values and
+    the ticks are relabelled with concentrations, in the unit (mM, μM, nM or
+    pM) whose labels stay short enough to clear XY's fixed title position.
+    """
+    log_low, log_high = np.log10(low), np.log10(high)
+    domain = (
+        (log_low - 0.5, log_high + 0.5) if log_high == log_low else (log_low, log_high)
+    )
+    factor, unit = next(
+        ((f, u) for f, u in ((1e-3, "mM"), (1, "μM"), (1e3, "nM")) if high * f >= 1),
+        (1e6, "pM"),
+    )
+    ticks = sorted({log_low, (log_low + log_high) / 2, log_high})
+    labels = [
+        np.format_float_positional(
+            10**tick * factor, precision=2, unique=False, fractional=False, trim="-"
+        )
+        for tick in ticks
+    ]
+    return {
+        "title": f"[Ligand] ({unit})",
+        "domain": domain,
+        "ticks": ticks,
+        "labels": labels,
+    }
+
+
+def _first_point(marks):
+    """First finite data point of the marks; annotations carry none."""
+    for mark in marks:
+        values = []
+        for axis in ("x", "y"):
+            data = getattr(mark, axis, None)
+            data = getattr(data, "values", data)
+            data = [] if data is None else data
+            values.append(np.ravel(np.asarray(data, dtype=float)))
+        x, y = values
+        finite = np.isfinite(x[: len(y)]) & np.isfinite(y[: len(x)])
+        if finite.any():
+            index = int(np.argmax(finite))
+            return float(x[index]), float(y[index])
+    return 0.0, 0.0
+
+
+def _axes(
+    plot,
+    axes,
+    label_offset=None,
+    *,
+    x_domain=None,
+    x_tick_count=None,
+    x_tick_values=None,
+    margin=None,
+):
+    """XY axes; ``x_domain``, ``x_tick_count`` and ``x_tick_values`` are helper
+    defaults that ``PlotConfig.x_range`` and ``AxisConfig.n_x_axis_ticks``
+    override."""
     xy = _xy()
     style = {
         "tick_length": axes.tick_length,
         "tick_width": axes.axis_tickwidth,
         "axis_width": axes.axis_linewidth,
         "grid_width": axes.axis_gridwidth,
+        **_axis_font_style(plot.font_size),
     }
+    if plot.x_range is not None:
+        x_domain = None
+    x_bounds = axes.x_bounds
+    if x_bounds == "data" and x_domain is not None:
+        # Let navigation reach the legend room as well as the observations.
+        x_bounds = x_domain
     return [
         xy.x_axis(
             label=axes.x_label,
             type_=axes.x_scale,
-            domain=plot.x_range,
-            bounds=axes.x_bounds,
+            domain=plot.x_range if plot.x_range is not None else x_domain,
+            margin=margin,
+            bounds=x_bounds,
             reverse=bool(axes.reverse_x),
-            tick_count=axes.n_x_axis_ticks,
+            tick_count=axes.n_x_axis_ticks or x_tick_count,
+            tick_values=None if axes.n_x_axis_ticks else x_tick_values,
             grid=axes.showgrid_x,
+            label_offset=_x_label_offset(plot.font_size, axes.tick_length),
             line=True,
             ticks=True,
             style=style,
@@ -294,6 +394,7 @@ def _axes(plot, axes, label_offset=None):
             label=axes.y_label,
             type_=axes.y_scale,
             domain=plot.y_range,
+            margin=margin,
             bounds=axes.y_bounds,
             reverse=bool(axes.reverse_y),
             tick_count=axes.n_y_axis_ticks,
@@ -306,10 +407,63 @@ def _axes(plot, axes, label_offset=None):
     ]
 
 
-def _legend(config, *, show=True, toggle=True):
+def _plot_area_width(chart_width, font_size):
+    # Chart width minus a conservative estimate of the y tick labels and title.
+    return max(60.0, chart_width - 5.2 * font_size - 22)
+
+
+def _x_tick_count(chart_width, font_size):
+    # One count for every panel, so equal domains get equal ticks even though
+    # the first column is narrower (it holds the y title).
+    return max(3, min(8, int(_plot_area_width(chart_width, font_size) / (4.5 * font_size))))
+
+
+def _linear_x(axis):
+    return axis.x_scale in (None, "linear") and not axis.reverse_x
+
+
+def _legend_room_domain(marks, legend, font_size, chart_width):
+    """x domain whose right side leaves room for an upper/center/lower right legend.
+
+    XY can only draw legends inside the plot, so sensorgrams extend the x axis
+    instead. Returns None when no right-side legend is drawn.
+    """
+    labels = [str(mark.name) for mark in marks if getattr(mark, "name", None)]
+    if not (legend.show and labels and "right" in legend.loc):
+        return None
+    xs = [
+        np.asarray(getattr(mark.x, "values", mark.x), dtype=float)
+        for mark in marks
+        if isinstance(getattr(mark, "x", None), (list, tuple, np.ndarray))
+        or hasattr(getattr(mark, "x", None), "values")
+    ]
+    xs = np.concatenate([x[np.isfinite(x)] for x in xs]) if xs else np.array([])
+    if not xs.size or xs.max() <= xs.min():
+        return None
+    # Legend width in pixels: handle (2 em), handle gap (0.8 em) and text
+    # (~0.62 em per DejaVu character) per column, 2 em between columns,
+    # 0.8 em of padding, and 1 em of inset/gap to the data.
+    size = legend.font_size or font_size
+    ncols = min(legend.ncols, len(labels))
+    column = 2.8 * size + 0.62 * size * max(len(label) for label in labels)
+    width = ncols * column + (ncols - 1) * 2 * size + 0.8 * size
+    if legend.title:
+        width = max(width, 0.62 * size * len(legend.title) + 0.8 * size)
+    fraction = min(0.6, (width + size) / _plot_area_width(chart_width, font_size))
+    low, high = float(xs.min()), float(xs.max())
+    low -= 0.02 * (high - low)
+    return low, low + (high - low) / (1 - fraction)
+
+
+def _legend(config, font_size, *, show=True, toggle=True, background=None):
     xy = _xy()
     legend = _resolve_config(
-        config, LegendConfig, show=show, toggle=toggle, highlight=toggle
+        config,
+        LegendConfig,
+        show=show,
+        loc="upper right",
+        toggle=toggle,
+        highlight=toggle,
     )
     return xy.legend(
         show=legend.show,
@@ -318,7 +472,10 @@ def _legend(config, *, show=True, toggle=True):
         title=legend.title,
         toggle=legend.toggle,
         highlight=legend.highlight,
-        style={"font_size": legend.font_size} if legend.font_size else None,
+        style=dict(
+            _legend_style(legend.font_size or font_size),
+            **({"background": background} if background else {}),
+        ),
     )
 
 
@@ -331,6 +488,23 @@ def _configure_engine(engine, config):
         engine.title = config.title
     if config.font_size is not None:
         engine.chrome_styles.update(_styles(config.font_size))
+        # New dicts keep grids copied by config_fig from sharing styles.
+        for options in engine.axis_options.values():
+            options["style"] = dict(
+                options.get("style") or {}, **_axis_font_style(config.font_size)
+            )
+        x_options = engine.axis_options.get("x")
+        if x_options is not None:
+            x_options["label_offset"] = _x_label_offset(
+                config.font_size, x_options["style"].get("tick_length", 0)
+            )
+        engine.legend_options = dict(
+            engine.legend_options or {},
+            style=dict(
+                (engine.legend_options or {}).get("style") or {},
+                **_legend_style(config.font_size),
+            ),
+        )
     for axis, domain in (("x", config.x_range), ("y", config.y_range)):
         if domain is not None:
             if (
@@ -385,7 +559,6 @@ def config_fig(
         panel_height = max(
             1, (height - (fig.rows - 1) * fig.gap - (24 if title else 0)) // fig.rows
         )
-        panel_width = max(120, (width - (fig.cols - 1) * fig.gap) // fig.cols)
         panels = [copy(panel) for panel in fig.figures]
         for panel in panels:
             panel.axis_options = {
@@ -394,9 +567,9 @@ def config_fig(
             panel.chrome_styles = {
                 name: dict(style) for name, style in panel.chrome_styles.items()
             }
-            panel.width, panel.height = panel_width, panel_height
+            panel.height = panel_height
             _configure_engine(panel, replace(config, title=None))
-        fig = FacetGrid(
+        fig = _panel_grid(
             panels,
             fig.labels,
             cols=fig.cols,
@@ -413,13 +586,189 @@ def config_fig(
     return fig
 
 
-def _grid(charts, plot, axis, layout, legend_config, *, legend_toggle=True):
+# Plot width XY reserves beside a vertical colorbar with a title (its fixed
+# 86 + 18 px right gutter), measured to be independent of the font size.
+_COLORBAR_ROOM = 104
+
+
+def _panel_widths(width, cols, gap, extra=0):
+    """Width of an ordinary panel, and of the one panel holding ``extra``."""
+    base = max(120, (width - (cols - 1) * gap - extra) // cols)
+    return base, base + extra
+
+
+@lru_cache(maxsize=None)
+def _colorbar_grid_class():
+    from xy import _raster, _svg, export
+    from xy.facets import FacetGrid, render_raster
+
+    class ColorbarGrid(FacetGrid):
+        """FacetGrid whose colorbar panel is wider than the others.
+
+        XY grids give every column the same width, so the colorbar would
+        shrink one panel's plot. Here the colorbar panel's column is
+        ``extra`` pixels wider; the other columns share the remaining width
+        and the remaining panels in the wide column keep the ordinary width.
+        """
+
+        def __init__(self, figures, labels, *, wide_panel, extra, **kwargs):
+            super().__init__(figures, labels, **kwargs)
+            self.wide_panel = wide_panel
+            self.extra = extra
+
+        @property
+        def panel_width(self):
+            return _panel_widths(self.width, self.cols, self.gap, self.extra)[0]
+
+        def _x(self, col):
+            wide_col = self.wide_panel % self.cols
+            return col * (self.panel_width + self.gap) + (
+                self.extra if col > wide_col else 0
+            )
+
+        def to_svg(self, path=None, *, background=None):
+            panel_svgs = [
+                _svg.to_svg(fig, id_prefix=f"xy{i}-", background=background)
+                for i, fig in enumerate(self.figures)
+            ]
+            total_h = self.grid_height + self._title_height
+            body = []
+            for i, (fig, svg) in enumerate(zip(self.figures, panel_svgs)):
+                row, col = divmod(i, self.cols)
+                y = row * (self.panel_height + self.gap) + self._title_height
+                inner = svg[svg.find(">") + 1 : svg.rfind("</svg>")]
+                body.append(
+                    f'<svg x="{self._x(col)}" y="{y}" width="{fig.width}" '
+                    f'height="{self.panel_height}" '
+                    f'viewBox="0 0 {fig.width} {self.panel_height}">{inner}</svg>'
+                )
+            backdrop = (
+                f'<rect width="{self.width}" height="{total_h}" '
+                f'fill="{export._html.escape(background)}"/>'
+                if background and background not in ("transparent", "none")
+                else ""
+            )
+            title = (
+                f'<text x="{self.width / 2:g}" y="16" text-anchor="middle" '
+                f'font-size="14">{export._html.escape(self.title)}</text>'
+                if self.title
+                else ""
+            )
+            doc = (
+                f'<svg xmlns="http://www.w3.org/2000/svg" width="{self.width}" '
+                f'height="{total_h}" viewBox="0 0 {self.width} {total_h}">'
+                f'{backdrop}{title}{"".join(body)}</svg>'
+            )
+            if path is not None:
+                export._atomic_write_text(path, doc)
+            return doc
+
+        def _compose_rgba(self, scale, background=None):
+            if scale <= 0 or not np.isfinite(scale):
+                raise ValueError("facet export scale must be finite and positive")
+            width = int(round(self.width * scale))
+            height = int(round(self.grid_height * scale))
+            gap_fill = (
+                (255, 255, 255, 255)
+                if background is None
+                else _raster._parse_color(background)
+            )
+            canvas = np.empty((height, width, 4), dtype=np.uint8)
+            canvas[:] = np.asarray(gap_fill, dtype=np.uint8)
+            for i, fig in enumerate(self.figures):
+                spec, blob, borrowed = _raster._export_payload(
+                    fig, None, None, background
+                )
+                image = render_raster(spec, blob, scale=scale, borrowed=borrowed)
+                row, col = divmod(i, self.cols)
+                x = int(round(self._x(col) * scale))
+                y = int(round(row * (self.panel_height + self.gap) * scale))
+                h = min(image.shape[0], height - y)
+                w = min(image.shape[1], width - x)
+                if h > 0 and w > 0:
+                    canvas[y : y + h, x : x + w] = image[:h, :w]
+            return canvas
+
+        def to_html(self, path=None, *, custom_css=None):
+            base, wide = _panel_widths(self.width, self.cols, self.gap, self.extra)
+            wide_col = self.wide_panel % self.cols
+            columns = " ".join(
+                f"minmax(0, {wide if col == wide_col else base}fr)"
+                for col in range(self.cols)
+            )
+            # Panels sharing the wide column keep the ordinary width.
+            narrow = "".join(
+                f"#xy-facet-{i}{{width:{100 * base / wide:.4f}%;}}"
+                for i in range(len(self.figures))
+                if i % self.cols == wide_col and i != self.wide_panel
+            )
+            css = (
+                ".xy-facet-document .xy-facet-grid"
+                f"{{grid-template-columns:{columns};}}{narrow}"
+            )
+            return super().to_html(path, custom_css=css + (custom_css or ""))
+
+    return ColorbarGrid
+
+
+def _panel_grid(panels, labels, *, cols, width, height, gap, title):
+    """Compose engine panels into a grid, widening the colorbar panel."""
+    from xy.facets import FacetGrid
+
+    wide = [i for i, panel in enumerate(panels) if panel.colorbar_options]
+    extra = _COLORBAR_ROOM if wide else 0
+    base, wide_width = _panel_widths(width, cols, gap, extra)
+    for i, panel in enumerate(panels):
+        panel.width = wide_width if wide and i == wide[0] else base
+    if not wide:
+        return FacetGrid(
+            panels, labels, cols=cols, width=width, height=height, gap=gap, title=title
+        )
+    return _colorbar_grid_class()(
+        panels,
+        labels,
+        wide_panel=wide[0],
+        extra=extra,
+        cols=cols,
+        width=width,
+        height=height,
+        gap=gap,
+        title=title,
+    )
+
+
+def _grid(
+    charts,
+    plot,
+    axis,
+    layout,
+    legend_config,
+    *,
+    legend_toggle=True,
+    legend_loc="upper right",
+    legend_background=None,
+    legend_room=False,
+    margin=None,
+    x_tick_values=None,
+    colorbar=None,
+):
+    """Arrange charts in a FacetGrid.
+
+    ``legend_room`` extends each panel's linear x axis so a right-side legend
+    clears its data. ``margin`` pads both automatic axis domains.
+    ``legend_background`` is a CSS background for the legend box, e.g.
+    ``"transparent"`` to drop XY's grey frame.
+    ``colorbar`` (from ``_concentration_colorbar``) is drawn once, beside the
+    top-right panel; XY would otherwise infer one in every panel.
+    """
     xy = _xy()
     from xy.facets import FacetGrid
 
     if not charts:
         raise ValueError("No experiments or fittings available to plot")
-    legend = _resolve_config(legend_config, LegendConfig)
+    legend = _resolve_config(
+        legend_config, LegendConfig, show=True, loc=legend_loc, toggle=legend_toggle
+    )
     if layout.stacked or layout.ncols is not None:
         ncols = min(1 if layout.stacked else layout.ncols, len(charts))
     else:
@@ -427,20 +776,55 @@ def _grid(charts, plot, axis, layout, legend_config, *, legend_toggle=True):
         ncols = int(np.ceil(len(charts) / rows))
     nrows = int(np.ceil(len(charts) / ncols))
     width, height = plot.plot_width, plot.plot_height
-    if layout.gap is None and not 0 <= layout.vertical_spacing < 1 / max(1, nrows - 1):
-        raise ValueError("vertical_spacing is too large for the subplot rows")
-    gap = (
-        layout.gap
-        if layout.gap is not None
-        else (int(height * layout.vertical_spacing) if nrows > 1 else 0)
-    )
+    if layout.gap is not None:
+        gap = layout.gap
+    elif layout.vertical_spacing is not None:
+        if not layout.vertical_spacing < 1 / max(1, nrows - 1):
+            raise ValueError("vertical_spacing is too large for the subplot rows")
+        gap = int(height * layout.vertical_spacing) if nrows > 1 else 0
+    else:
+        # Each panel already reserves room for its title and tick labels, so
+        # a small font-relative gap is enough between rows and columns.
+        gap = max(8, round(0.6 * plot.font_size))
     panel_height = max(
         1, (height - (nrows - 1) * gap - (24 if plot.title else 0)) // nrows
     )
-    panel_width = max(120, (width - (ncols - 1) * gap) // ncols)
+    colorbar_panel = min(ncols, len(charts)) - 1
+    panel_width, colorbar_width = _panel_widths(
+        width, ncols, gap, _COLORBAR_ROOM if colorbar is not None else 0
+    )
+    linear_x = _linear_x(axis)
+    x_tick_count = _x_tick_count(panel_width, plot.font_size) if linear_x else None
+    domains = [None] * len(charts)
+    if legend_room and linear_x:
+        domains = [
+            _legend_room_domain(chart.children, legend, plot.font_size, panel_width)
+            for chart in charts
+        ]
     panels = []
     for i, chart in enumerate(charts):
         row, col = divmod(i, ncols)
+        extra = []
+        if colorbar is not None and i == colorbar_panel:
+            extra = [xy.colorbar(title=colorbar["title"], ticks=colorbar["ticks"])]
+            if colorbar.get("needs_color_mark"):
+                # Constant-color lines carry no color scale, so an invisible
+                # mark with the full range lets XY draw the colorbar.
+                x0, y0 = _first_point(chart.children)
+                extra.insert(
+                    0,
+                    xy.scatter(
+                        [x0, x0],
+                        [y0, y0],
+                        color=list(colorbar["domain"]),
+                        colormap="viridis",
+                        color_domain=colorbar["domain"],
+                        opacity=0,
+                        density=False,
+                    ),
+                )
+        elif colorbar is not None:
+            extra = [xy.colorbar(show=False)]
         panel_axis = replace(
             axis,
             x_label=axis.x_label if not layout.outer_labels or row == nrows - 1 else "",
@@ -448,15 +832,42 @@ def _grid(charts, plot, axis, layout, legend_config, *, legend_toggle=True):
         )
         panel = xy.chart(
             *chart.children,
-            *_axes(plot, panel_axis, layout.extra_padding_y_label),
-            _legend(legend, toggle=legend_toggle),
+            *extra,
+            *_axes(
+                plot,
+                panel_axis,
+                layout.extra_padding_y_label,
+                x_domain=domains[i],
+                x_tick_count=x_tick_count,
+                x_tick_values=x_tick_values,
+                margin=margin,
+            ),
+            _legend(
+                legend,
+                plot.font_size,
+                toggle=legend_toggle,
+                background=legend_background,
+            ),
             xy.export_config(formats=[plot.plot_type]),
             title=chart.title if layout.show_subplot_titles else None,
-            width=panel_width,
+            width=(
+                colorbar_width
+                if colorbar is not None and i == colorbar_panel
+                else panel_width
+            ),
             height=panel_height,
             styles=_styles(plot.font_size, legend.font_size),
         )
-        panels.append(panel.figure())
+        engine = panel.figure()
+        if colorbar is not None and engine.colorbar_options:
+            # xy.colorbar() takes tick positions only; the renderers also read
+            # paired tick labels from the compiled colorbar options.
+            engine.colorbar_options = dict(
+                engine.colorbar_options,
+                ticks=list(colorbar["ticks"]),
+                tick_labels=list(colorbar["labels"]),
+            )
+        panels.append(engine)
     for axis_id, shared in (("x", layout.shared_xaxes), ("y", layout.shared_yaxes)):
         if shared:
             ranges = [
@@ -468,7 +879,7 @@ def _grid(charts, plot, axis, layout, legend_config, *, legend_toggle=True):
             )
             for panel in panels:
                 panel.axis_options[axis_id]["domain"] = domain
-    return FacetGrid(
+    return _panel_grid(
         panels,
         [chart.title or "" for chart in charts],
         cols=ncols,
@@ -479,6 +890,22 @@ def _grid(charts, plot, axis, layout, legend_config, *, legend_toggle=True):
     )
 
 
+def _smax_label(name):
+    # Fitting names end in "_id_<Smax ID>"; the panel title already names the
+    # sample, so the legend only needs the ID and stays short in small panels.
+    sample, sep, smax_id = str(name).rpartition("_id_")
+    return f"Smax ID {smax_id}" if sep and sample else str(name)
+
+
+def _dataset_title(sample, fit, index):
+    """Panel title for one Smax group: the sample, plus its ID if it has several."""
+    if len(fit.names) == 1:
+        return str(sample)
+    if "_id_" not in str(fit.names[index]):
+        return str(fit.names[index])
+    return f"{sample} ({_smax_label(fit.names[index])})"
+
+
 def _array(values):
     # Each sensor may contain several acquisition steps, or a flat list.
     if isinstance(values, (list, tuple)) and values and np.ndim(values[0]) > 0:
@@ -487,14 +914,32 @@ def _array(values):
 
 
 def _single_chart(
-    marks, plot, axis, legend_config=None, *, show_legend=True, legend_toggle=True
+    marks,
+    plot,
+    axis,
+    legend_config=None,
+    *,
+    show_legend=True,
+    legend_toggle=True,
+    legend_room=False,
 ):
     xy = _xy()
-    legend = _resolve_config(legend_config, LegendConfig)
+    legend = _resolve_config(
+        legend_config,
+        LegendConfig,
+        show=show_legend,
+        loc="upper right",
+        toggle=legend_toggle,
+    )
+    x_domain = (
+        _legend_room_domain(marks, legend, plot.font_size, plot.plot_width)
+        if legend_room and _linear_x(axis)
+        else None
+    )
     return xy.chart(
         *marks,
-        *_axes(plot, axis),
-        _legend(legend, show=show_legend, toggle=legend_toggle),
+        *_axes(plot, axis, x_domain=x_domain),
+        _legend(legend, plot.font_size, show=show_legend, toggle=legend_toggle),
         xy.export_config(formats=[plot.plot_type]),
         title=plot.title,
         width=plot.plot_width,
@@ -648,7 +1093,9 @@ def plot_traces(
             )
     # XY toggles individual marks, so a line + scatter legend is informational.
     toggle = not (trace.line_width > 0 and trace.marker_size > 0)
-    return _single_chart(marks, plot, axis, legend_config, legend_toggle=toggle)
+    return _single_chart(
+        marks, plot, axis, legend_config, legend_toggle=toggle, legend_room=True
+    )
 
 
 def plot_traces_all(
@@ -674,7 +1121,7 @@ def plot_traces_all(
         showgrid_y=False,
     )
     layout = _resolve_config(
-        layout_config, LayoutConfig, vertical_spacing=0.08, outer_labels=False
+        layout_config, LayoutConfig, outer_labels=False
     )
     trace = _resolve_config(trace_config, TraceConfig, marker_size=1, line_width=2)
     charts, offset = [], 0
@@ -700,7 +1147,41 @@ def plot_traces_all(
         layout,
         legend_config,
         legend_toggle=trace.marker_size <= 0 or trace.line_width <= 0,
+        legend_room=True,
     )
+
+
+# Padding of steady-state axes, so markers at the extremes are not cut by the
+# frame; XY's automatic log domain leaves almost no room above the highest point.
+_STEADY_STATE_MARGIN = 0.05
+
+
+def _concentration_decades(fits, axis):
+    """Decade ticks for a log concentration axis, or None for automatic ticks.
+
+    XY labels only every other decade in narrow panels, which can leave a
+    single label, so the decades within the padded range are listed.
+    """
+    concentrations = np.asarray(
+        [
+            value
+            for fit in fits
+            for group in fit.lig_conc_lst_per_id
+            for value in np.ravel(group)
+        ],
+        dtype=float,
+    )
+    concentrations = concentrations[np.isfinite(concentrations) & (concentrations > 0)]
+    if axis.x_scale != "log" or not concentrations.size:
+        return None
+    low, high = np.log10(concentrations.min()), np.log10(concentrations.max())
+    pad = _STEADY_STATE_MARGIN * (high - low)
+    decades = 10.0 ** np.arange(np.ceil(low - pad), np.floor(high + pad) + 1)
+    return decades.tolist() if len(decades) >= 2 else None
+
+
+def _zero_line():
+    return _xy().hline(0, color="#667085", width=1)
 
 
 def plot_steady_state(
@@ -730,7 +1211,7 @@ def plot_steady_state(
         showgrid_y=True,
     )
     layout = _resolve_config(
-        layout_config, LayoutConfig, vertical_spacing=0.08, outer_labels=True
+        layout_config, LayoutConfig, outer_labels=True
     )
     trace = _resolve_config(
         trace_config, TraceConfig, marker_size=5, line_width=2, show_fit=False
@@ -739,7 +1220,8 @@ def plot_steady_state(
         trace.line_width if trace.fit_line_width is None else trace.fit_line_width
     )
     charts = []
-    for fit in pyKinetics.fittings.values():
+    # Fittings are keyed by sample name; their own names add "_id_<Smax ID>".
+    for sample, fit in pyKinetics.fittings.items():
         marks = []
         colors = get_palette(len(fit.names))
         for i, concentrations in enumerate(fit.lig_conc_lst_per_id):
@@ -749,7 +1231,10 @@ def plot_steady_state(
                     xy.scatter(
                         x,
                         fit.signal_ss[i],
-                        name=fit.names[i],
+                        # One Smax ID needs no legend: the title names it.
+                        name=(
+                            _smax_label(fit.names[i]) if len(fit.names) > 1 else None
+                        ),
                         color=colors[i],
                         size=trace.marker_size,
                         opacity=trace.opacity,
@@ -766,8 +1251,34 @@ def plot_steady_state(
                         width=fit_width,
                     )
                 )
-        charts.append(xy.chart(*marks, title=fit.names[0].rsplit("_", 1)[0]))
-    return _grid(charts, plot, axis, layout, legend_config)
+        charts.append(xy.chart(*marks, title=str(sample)))
+    # Binding curves rise to the right, so the upper left corner is empty.
+    return _grid(
+        charts,
+        plot,
+        axis,
+        layout,
+        legend_config,
+        legend_loc="upper left",
+        # Without a background box the legend hides no data points.
+        legend_background="transparent",
+        margin=_STEADY_STATE_MARGIN,
+        x_tick_values=_concentration_decades(pyKinetics.fittings.values(), axis),
+    )
+
+
+def _kinetics_concentration_range(pyKinetics):
+    """Lowest and highest ligand concentration, after validating the groups."""
+    fits = list(pyKinetics.fittings.values())
+    if not fits:
+        raise ValueError("No experiments or fittings available to plot")
+    groups = [np.asarray(group) for fit in fits for group in fit.lig_conc_lst_per_id]
+    if not groups or any(not group.size for group in groups):
+        raise ValueError("Each Smax group must contain at least one trace")
+    concentrations = np.concatenate(groups)
+    if np.any(~np.isfinite(concentrations)) or np.any(concentrations <= 0):
+        raise ValueError("Ligand concentrations must be finite and positive")
+    return concentrations.min(), concentrations.max()
 
 
 def plot_association_dissociation(
@@ -779,10 +1290,12 @@ def plot_association_dissociation(
     legend_config: LegendConfig | None = None,
     trace_config: TraceConfig | None = None,
 ):
-    """Plot kinetics observations and fitted curves, with concentration legends.
+    """Plot kinetics observations and fitted curves, colored by concentration.
 
-    LayoutConfig controls splitting by Smax ID. TraceConfig controls fitted
-    overlays, median smoothing and the sampling budget per Smax group.
+    One colorbar beside the top-right panel shows the ligand concentration
+    (log-scaled Viridis), shared by all panels. LayoutConfig controls
+    splitting by Smax ID. TraceConfig controls fitted overlays, median
+    smoothing and the sampling budget per Smax group.
     """
     xy = _xy()
     plot = _plot_settings(
@@ -797,7 +1310,7 @@ def plot_association_dissociation(
         showgrid_y=False,
     )
     layout = _resolve_config(
-        layout_config, LayoutConfig, vertical_spacing=0.08, outer_labels=True
+        layout_config, LayoutConfig, outer_labels=True
     )
     trace = _resolve_config(
         trace_config,
@@ -810,19 +1323,12 @@ def plot_association_dissociation(
     fit_width = (
         trace.line_width if trace.fit_line_width is None else trace.fit_line_width
     )
-    fits = list(pyKinetics.fittings.values())
-    if not fits:
-        raise ValueError("No experiments or fittings available to plot")
-    groups = [np.asarray(group) for fit in fits for group in fit.lig_conc_lst_per_id]
-    if not groups or any(not group.size for group in groups):
-        raise ValueError("Each Smax group must contain at least one trace")
-    concentrations = np.concatenate(groups)
-    if np.any(~np.isfinite(concentrations)) or np.any(concentrations <= 0):
-        raise ValueError("Ligand concentrations must be finite and positive")
-    low, high = concentrations.min(), concentrations.max()
+    low, high = _kinetics_concentration_range(pyKinetics)
+    colorbar = _concentration_colorbar(low, high)
+    colorbar["needs_color_mark"] = trace.smooth_curves or trace.marker_size <= 0
     charts = []
-    for fit in fits:
-        marks, counter, labeled_concentrations = [], 0, set()
+    for sample, fit in pyKinetics.fittings.items():
+        marks, counter = [], 0
         for i, group in enumerate(fit.lig_conc_lst_per_id):
             limit = max(1, int(np.ceil(trace.max_points / len(group))))
             for concentration in group:
@@ -835,16 +1341,12 @@ def plot_association_dissociation(
                     if trace.smooth_curves:
                         y = median_filter(y, x, trace.rolling_window)
                     x, y = subset_data(x, limit), subset_data(y, limit)
-                    name = None
-                    if phase == "Assoc" and concentration not in labeled_concentrations:
-                        name = f"{concentration:.2g} μM"
-                        labeled_concentrations.add(concentration)
                     if trace.smooth_curves and trace.line_width > 0:
+                        # Lines take one constant color, the closest Viridis step.
                         marks.append(
                             xy.line(
                                 x,
                                 y,
-                                name=name,
                                 color=color,
                                 width=trace.line_width,
                                 opacity=trace.opacity,
@@ -855,8 +1357,9 @@ def plot_association_dissociation(
                             xy.scatter(
                                 x,
                                 y,
-                                name=name,
-                                color=color,
+                                color=np.full(len(x), np.log10(concentration)),
+                                colormap="viridis",
+                                color_domain=colorbar["domain"],
                                 size=trace.marker_size,
                                 opacity=trace.opacity,
                                 density=False,
@@ -879,9 +1382,195 @@ def plot_association_dissociation(
                         )
                 counter += 1
             if layout.split_by_smax_id:
-                charts.append(xy.chart(*marks, title=fit.names[i]))
+                charts.append(xy.chart(*marks, title=_dataset_title(sample, fit, i)))
                 marks = []
-                labeled_concentrations = set()
         if not layout.split_by_smax_id:
-            charts.append(xy.chart(*marks, title=fit.names[0].rsplit("_", 1)[0]))
-    return _grid(charts, plot, axis, layout, legend_config, legend_toggle=False)
+            charts.append(xy.chart(*marks, title=str(sample)))
+    return _grid(
+        charts,
+        plot,
+        axis,
+        layout,
+        legend_config,
+        legend_toggle=False,
+        colorbar=colorbar,
+    )
+
+
+def plot_steady_state_residuals(
+    pyKinetics,
+    *,
+    plot_config: PlotConfig | None = None,
+    axis_config: AxisConfig | None = None,
+    layout_config: LayoutConfig | None = None,
+    legend_config: LegendConfig | None = None,
+    trace_config: TraceConfig | None = None,
+):
+    """Plot steady-state residuals (observed minus fitted) on log concentration axes.
+
+    Panels match ``plot_steady_state``; samples without a steady-state fit are
+    left out. A horizontal line at zero marks a perfect fit.
+    """
+    xy = _xy()
+    plot = _plot_settings(
+        plot_config,
+        width=1500,
+        height=1000,
+        font_size=18,
+        title="Steady-state residuals",
+    )
+    axis = _resolve_config(
+        axis_config,
+        AxisConfig,
+        x_label="Ligand concentration (μM)",
+        y_label="Residual (a.u.)",
+        x_scale="log",
+        showgrid_x=True,
+        showgrid_y=True,
+    )
+    layout = _resolve_config(layout_config, LayoutConfig, outer_labels=True)
+    trace = _resolve_config(trace_config, TraceConfig, marker_size=5)
+    charts, fitted = [], []
+    for sample, fit in pyKinetics.fittings.items():
+        if fit.signal_ss_fit is None:
+            continue
+        fitted.append(fit)
+        marks = []
+        colors = get_palette(len(fit.names))
+        for i, concentrations in enumerate(fit.lig_conc_lst_per_id):
+            residuals = np.asarray(fit.signal_ss[i], dtype=float) - np.asarray(
+                fit.signal_ss_fit[i], dtype=float
+            )
+            marks.append(
+                xy.scatter(
+                    np.asarray(concentrations),
+                    residuals,
+                    name=_smax_label(fit.names[i]) if len(fit.names) > 1 else None,
+                    color=colors[i],
+                    size=trace.marker_size,
+                    opacity=trace.opacity,
+                    density=False,
+                )
+            )
+        charts.append(xy.chart(*marks, _zero_line(), title=str(sample)))
+    if not charts:
+        raise ValueError("No steady-state fits available; run the fitting first")
+    return _grid(
+        charts,
+        plot,
+        axis,
+        layout,
+        legend_config,
+        legend_loc="upper left",
+        # Without a background box the legend hides no data points.
+        legend_background="transparent",
+        margin=_STEADY_STATE_MARGIN,
+        x_tick_values=_concentration_decades(fitted, axis),
+    )
+
+
+def plot_association_dissociation_residuals(
+    pyKinetics,
+    *,
+    plot_config: PlotConfig | None = None,
+    axis_config: AxisConfig | None = None,
+    layout_config: LayoutConfig | None = None,
+    legend_config: LegendConfig | None = None,
+    trace_config: TraceConfig | None = None,
+):
+    """Plot kinetics residuals (observed minus fitted) over time.
+
+    Panels, colors and the shared concentration colorbar match
+    ``plot_association_dissociation``. Traces without a fitted curve are left
+    out, and a horizontal line at zero marks a perfect fit.
+    ``TraceConfig(smooth_curves=True)`` median-smooths the residuals.
+    """
+    xy = _xy()
+    plot = _plot_settings(
+        plot_config,
+        width=1300,
+        height=1000,
+        title="Association-dissociation residuals",
+    )
+    axis = _resolve_config(
+        axis_config,
+        AxisConfig,
+        x_label="Time (s)",
+        y_label="Residual (a.u.)",
+        showgrid_x=False,
+        showgrid_y=False,
+    )
+    layout = _resolve_config(layout_config, LayoutConfig, outer_labels=True)
+    trace = _resolve_config(
+        trace_config, TraceConfig, marker_size=4, line_width=2, max_points=2000
+    )
+    low, high = _kinetics_concentration_range(pyKinetics)
+    colorbar = _concentration_colorbar(low, high)
+    colorbar["needs_color_mark"] = trace.smooth_curves or trace.marker_size <= 0
+    charts = []
+    for sample, fit in pyKinetics.fittings.items():
+        # A panel is shown when it has any fitted curve, even if nothing is
+        # drawn (e.g. marker_size=0), so its zero line and title remain.
+        marks, counter, has_fit = [], 0, False
+        for i, group in enumerate(fit.lig_conc_lst_per_id):
+            limit = max(1, int(np.ceil(trace.max_points / len(group))))
+            for concentration in group:
+                for times, raw, fitted in (
+                    (fit.time_assoc_lst, fit.assoc_lst, fit.signal_assoc_fit),
+                    (fit.time_disso_lst, fit.disso_lst, fit.signal_disso_fit),
+                ):
+                    if fitted is None or not len(fitted) or fitted[counter] is None:
+                        continue
+                    has_fit = True
+                    x = np.asarray(times[counter], dtype=float)
+                    y = np.asarray(raw[counter], dtype=float) - np.asarray(
+                        fitted[counter], dtype=float
+                    )
+                    if trace.smooth_curves:
+                        y = median_filter(y, x, trace.rolling_window)
+                    x, y = subset_data(x, limit), subset_data(y, limit)
+                    if trace.smooth_curves and trace.line_width > 0:
+                        marks.append(
+                            xy.line(
+                                x,
+                                y,
+                                color=get_colors_from_numeric_values(
+                                    [concentration], low, high
+                                )[0],
+                                width=trace.line_width,
+                                opacity=trace.opacity,
+                            )
+                        )
+                    elif not trace.smooth_curves and trace.marker_size > 0:
+                        marks.append(
+                            xy.scatter(
+                                x,
+                                y,
+                                color=np.full(len(x), np.log10(concentration)),
+                                colormap="viridis",
+                                color_domain=colorbar["domain"],
+                                size=trace.marker_size,
+                                opacity=trace.opacity,
+                                density=False,
+                            )
+                        )
+                counter += 1
+            if layout.split_by_smax_id and has_fit:
+                charts.append(
+                    xy.chart(*marks, _zero_line(), title=_dataset_title(sample, fit, i))
+                )
+            if layout.split_by_smax_id:
+                marks, has_fit = [], False
+        if not layout.split_by_smax_id and has_fit:
+            charts.append(xy.chart(*marks, _zero_line(), title=str(sample)))
+    if not charts:
+        raise ValueError("No kinetics fits available; run the fitting first")
+    return _grid(
+        charts,
+        plot,
+        axis,
+        layout,
+        legend_config,
+        legend_toggle=False,
+        colorbar=colorbar,
+    )
