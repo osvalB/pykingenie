@@ -619,11 +619,11 @@ def _x_title_and_tick_label_extents(svg):
     return title_top, max(tick_bottoms)
 
 
-def _legend_box_and_label_right_edges(svg, label):
-    """Right edges of the legend background and of its widest label."""
+def _legend_box_and_label_right_edges(svg, label, box=True):
+    """Right edges of the legend background (None without one) and its label."""
     import re
 
-    box = re.search(
+    rect = re.search(
         r'<rect x="([\d.]+)" y="[\d.]+" width="([\d.]+)"[^>]*'
         r'fill="rgba\(128,128,128,0\.08\)"',
         svg,
@@ -633,7 +633,7 @@ def _legend_box_and_label_right_edges(svg, label):
         svg,
     )
     return (
-        float(box.group(1)) + float(box.group(2)),
+        float(rect.group(1)) + float(rect.group(2)) if box else None,
         float(text.group(1)) + _text_width(label, text.group(2)),
     )
 
@@ -668,15 +668,26 @@ def test_axis_titles_and_legend_fit_at_large_font_sizes(analyzer, grid_plot):
         style = engine.axis_options["y"]["style"]
         assert style["tick_label_size"] == expected
         assert style["label_size"] == expected
-        assert engine.legend_options["style"] == {"fontSize": f"{expected}px"}
+        assert engine.legend_options["style"]["fontSize"] == f"{expected}px"
 
     svg = figure.to_svg()
     title_right, tick_left = _y_title_and_tick_label_extents(svg)
     assert title_right < tick_left
     title_top, tick_bottom = _x_title_and_tick_label_extents(svg)
     assert title_top > tick_bottom
-    box_right, label_right = _legend_box_and_label_right_edges(svg, label)
-    assert label_right <= box_right
+    if grid_plot:
+        # Steady-state legends have no background box; the label must still
+        # end inside its panel.
+        assert engine.legend_options["style"]["background"] == "transparent"
+        assert "rgba(128,128,128,0.08)" not in svg
+        panel_svg = engines[0].to_svg()
+        _box_right, label_right = _legend_box_and_label_right_edges(
+            panel_svg, label, box=False
+        )
+        assert label_right <= engines[0].width
+    else:
+        box_right, label_right = _legend_box_and_label_right_edges(svg, label)
+        assert label_right <= box_right
 
 
 def _legend_left_and_data_right(engine, x_max):
@@ -1156,3 +1167,17 @@ def test_kinetics_residuals_smooth_skip_unfitted_traces_and_need_a_fit(analyzer)
     fit.signal_disso_fit = None
     with pytest.raises(ValueError, match="No kinetics fits available"):
         plotting.plot_association_dissociation_residuals(analyzer)
+
+
+def test_steady_state_legends_have_no_background_box(analyzer):
+    for helper in (plotting.plot_steady_state, plotting.plot_steady_state_residuals):
+        grid = helper(analyzer)
+        assert grid.figures[0].legend_options["style"]["background"] == "transparent"
+        assert "rgba(128,128,128,0.08)" not in grid.to_svg()
+        resized = plotting.config_fig(
+            grid, "unused", plot_config=plotting.PlotConfig(font_size=10)
+        )
+        assert resized.figures[0].legend_options["style"]["background"] == "transparent"
+    chart = plotting.plot_traces([[1, 2]], [[3, 4]], ["A"], ["red"], [True])
+    assert "background" not in chart.figure().legend_options["style"]
+    assert "rgba(128,128,128,0.08)" in chart.to_svg()
