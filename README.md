@@ -207,6 +207,34 @@ GitHub. https://github.com/osvalB/pykingenie
   url = {https://github.com/osvalB/pykingenie}
 }
 ```
+## Acceptable usage of AI assistants
+
+AI coding assistants may be used for code that does not affect
+numerical results, for example:
+
+- plotting and figure styling,
+- import and export helpers, file handling and formatting,
+- documentation, examples and boilerplate tests.
+
+Files containing AI-generated code start with a note saying so
+(e.g. `src/pykingenie/utils/plotting_xy.py`).
+
+Code that affects the results needs human oversight: a person must write it,
+or review, understand and validate it before it is merged. This covers:
+
+- mathematical models, rate equations and signal simulations,
+- fitting routines, initial guesses, constraints and error estimates,
+- data processing that changes signal values (alignment, reference
+  subtraction, baseline and inter-step corrections),
+- the interpretation of fitted parameters such as kon, koff and KD.
+
+Changes to these parts must be checked against known results, such as
+simulated data with known parameters or previously validated datasets,
+before they are accepted.
+
+The same applies when an AI assistant runs analyses for you (for example
+through the pyKinGenie MCP server): check the processing steps it chose and
+inspect the fits yourself before you report any parameters. 
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
