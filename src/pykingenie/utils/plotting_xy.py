@@ -296,8 +296,9 @@ def _x_label_offset(font_size, tick_length):
 
 def _legend_style(font_size):
     # XY's static legend layout only reads the CSS-style font size, so without
-    # it the box is sized for 11 px text and clips larger labels.
-    return {"fontSize": f"{font_size}px"}
+    # it the box is sized for 11 px text and clips larger labels. Without XY's
+    # grey background box the legend hides no data points.
+    return {"fontSize": f"{font_size}px", "background": "transparent"}
 
 
 def _concentration_colorbar(low, high):
@@ -455,7 +456,7 @@ def _legend_room_domain(marks, legend, font_size, chart_width):
     return low, low + (high - low) / (1 - fraction)
 
 
-def _legend(config, font_size, *, show=True, toggle=True, background=None):
+def _legend(config, font_size, *, show=True, toggle=True):
     xy = _xy()
     legend = _resolve_config(
         config,
@@ -472,10 +473,7 @@ def _legend(config, font_size, *, show=True, toggle=True, background=None):
         title=legend.title,
         toggle=legend.toggle,
         highlight=legend.highlight,
-        style=dict(
-            _legend_style(legend.font_size or font_size),
-            **({"background": background} if background else {}),
-        ),
+        style=_legend_style(legend.font_size or font_size),
     )
 
 
@@ -746,7 +744,6 @@ def _grid(
     *,
     legend_toggle=True,
     legend_loc="upper right",
-    legend_background=None,
     legend_room=False,
     margin=None,
     x_tick_values=None,
@@ -756,8 +753,6 @@ def _grid(
 
     ``legend_room`` extends each panel's linear x axis so a right-side legend
     clears its data. ``margin`` pads both automatic axis domains.
-    ``legend_background`` is a CSS background for the legend box, e.g.
-    ``"transparent"`` to drop XY's grey frame.
     ``colorbar`` (from ``_concentration_colorbar``) is drawn once, beside the
     top-right panel; XY would otherwise infer one in every panel.
     """
@@ -846,7 +841,6 @@ def _grid(
                 legend,
                 plot.font_size,
                 toggle=legend_toggle,
-                background=legend_background,
             ),
             xy.export_config(formats=[plot.plot_type]),
             title=chart.title if layout.show_subplot_titles else None,
@@ -1260,8 +1254,6 @@ def plot_steady_state(
         layout,
         legend_config,
         legend_loc="upper left",
-        # Without a background box the legend hides no data points.
-        legend_background="transparent",
         margin=_STEADY_STATE_MARGIN,
         x_tick_values=_concentration_decades(pyKinetics.fittings.values(), axis),
     )
@@ -1462,8 +1454,6 @@ def plot_steady_state_residuals(
         layout,
         legend_config,
         legend_loc="upper left",
-        # Without a background box the legend hides no data points.
-        legend_background="transparent",
         margin=_STEADY_STATE_MARGIN,
         x_tick_values=_concentration_decades(fitted, axis),
     )

@@ -619,23 +619,15 @@ def _x_title_and_tick_label_extents(svg):
     return title_top, max(tick_bottoms)
 
 
-def _legend_box_and_label_right_edges(svg, label, box=True):
-    """Right edges of the legend background (None without one) and its label."""
+def _legend_label_right_edge(svg, label):
+    """Right edge of a legend label."""
     import re
 
-    rect = re.search(
-        r'<rect x="([\d.]+)" y="[\d.]+" width="([\d.]+)"[^>]*'
-        r'fill="rgba\(128,128,128,0\.08\)"',
-        svg,
-    )
     text = re.search(
         r'<text x="([\d.]+)"[^>]*font-size="([\d.]+)"[^>]*>' + re.escape(label),
         svg,
     )
-    return (
-        float(rect.group(1)) + float(rect.group(2)) if box else None,
-        float(text.group(1)) + _text_width(label, text.group(2)),
-    )
+    return float(text.group(1)) + _text_width(label, text.group(2))
 
 
 @pytest.mark.parametrize("grid_plot", [False, True])
@@ -675,37 +667,29 @@ def test_axis_titles_and_legend_fit_at_large_font_sizes(analyzer, grid_plot):
     assert title_right < tick_left
     title_top, tick_bottom = _x_title_and_tick_label_extents(svg)
     assert title_top > tick_bottom
-    if grid_plot:
-        # Steady-state legends have no background box; the label must still
-        # end inside its panel.
+    # Legends have no background box; the label must still end inside its panel.
+    assert "rgba(128,128,128,0.08)" not in svg
+    for engine in engines:
         assert engine.legend_options["style"]["background"] == "transparent"
-        assert "rgba(128,128,128,0.08)" not in svg
-        panel_svg = engines[0].to_svg()
-        _box_right, label_right = _legend_box_and_label_right_edges(
-            panel_svg, label, box=False
-        )
-        assert label_right <= engines[0].width
-    else:
-        box_right, label_right = _legend_box_and_label_right_edges(svg, label)
-        assert label_right <= box_right
+    assert _legend_label_right_edge(engines[0].to_svg(), label) <= engines[0].width
 
 
 def _legend_left_and_data_right(engine, x_max):
-    """Pixel x of the legend box's left edge and of the last observation."""
+    """Pixel x of the legend swatches' left edge and of the last observation."""
     import re
 
     svg = engine.to_svg()
     plot = re.search(
         r'<rect x="([\d.]+)" y="[\d.]+" width="([\d.]+)" height="[\d.]+"/>', svg
     )
-    legend = re.search(
-        r'<rect x="([\d.]+)" y="[\d.]+" width="[\d.]+"[^>]*'
-        r'fill="rgba\(128,128,128,0\.08\)"',
-        svg,
+    # Legend swatches are the markers directly followed by their label.
+    swatches = re.findall(
+        r'<circle cx="([\d.]+)" cy="[\d.]+" r="([\d.]+)"[^>]*/><text', svg
     )
+    legend_left = min(float(cx) - float(r) for cx, r in swatches)
     low, high = engine.build_payload()[0]["x_axis"]["range"]
     plot_x, plot_w = float(plot.group(1)), float(plot.group(2))
-    return float(legend.group(1)), plot_x + (x_max - low) / (high - low) * plot_w
+    return legend_left, plot_x + (x_max - low) / (high - low) * plot_w
 
 
 @pytest.mark.parametrize("font_size", [12, 18])
@@ -1169,15 +1153,26 @@ def test_kinetics_residuals_smooth_skip_unfitted_traces_and_need_a_fit(analyzer)
         plotting.plot_association_dissociation_residuals(analyzer)
 
 
-def test_steady_state_legends_have_no_background_box(analyzer):
-    for helper in (plotting.plot_steady_state, plotting.plot_steady_state_residuals):
-        grid = helper(analyzer)
-        assert grid.figures[0].legend_options["style"]["background"] == "transparent"
-        assert "rgba(128,128,128,0.08)" not in grid.to_svg()
+def test_legends_have_no_background_box(analyzer):
+    figures = [
+        plotting.plot_traces([[1, 2]], [[3, 4]], ["A"], ["red"], [True]),
+        plotting.plot_traces_all(
+            SimpleNamespace(
+                get_experiment_properties={"xs": [[[1, 2]]], "ys": [[[3, 4]]]}.get
+            ),
+            pd.DataFrame({"Legend": ["A"], "Color": ["red"], "Show": [True]}),
+        ),
+        plotting.plot_steady_state(analyzer),
+        plotting.plot_steady_state_residuals(analyzer),
+        plotting.plot_association_dissociation(analyzer),
+        plotting.plot_association_dissociation_residuals(analyzer),
+    ]
+    for figure in figures:
         resized = plotting.config_fig(
-            grid, "unused", plot_config=plotting.PlotConfig(font_size=10)
+            figure, "unused", plot_config=plotting.PlotConfig(font_size=10)
         )
-        assert resized.figures[0].legend_options["style"]["background"] == "transparent"
-    chart = plotting.plot_traces([[1, 2]], [[3, 4]], ["A"], ["red"], [True])
-    assert "background" not in chart.figure().legend_options["style"]
-    assert "rgba(128,128,128,0.08)" in chart.to_svg()
+        for fig in (figure, resized):
+            engines = getattr(fig, "figures", None) or [fig.figure()]
+            for engine in engines:
+                assert engine.legend_options["style"]["background"] == "transparent"
+            assert "rgba(128,128,128,0.08)" not in fig.to_svg()
