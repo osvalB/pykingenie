@@ -37,7 +37,9 @@ __all__ = [
     "plot_traces",
     "plot_traces_all",
     "plot_steady_state",
+    "plot_steady_state_residuals",
     "plot_association_dissociation",
+    "plot_association_dissociation_residuals",
 ]
 
 
@@ -329,11 +331,19 @@ def _concentration_colorbar(low, high):
 
 
 def _first_point(marks):
+    """First finite data point of the marks; annotations carry none."""
     for mark in marks:
-        x = np.asarray(getattr(getattr(mark, "x", None), "values", getattr(mark, "x", [])), dtype=float)
-        y = np.asarray(getattr(getattr(mark, "y", None), "values", getattr(mark, "y", [])), dtype=float)
-        if x.size and y.size:
-            return float(x[0]), float(y[0])
+        values = []
+        for axis in ("x", "y"):
+            data = getattr(mark, axis, None)
+            data = getattr(data, "values", data)
+            data = [] if data is None else data
+            values.append(np.ravel(np.asarray(data, dtype=float)))
+        x, y = values
+        finite = np.isfinite(x[: len(y)]) & np.isfinite(y[: len(x)])
+        if finite.any():
+            index = int(np.argmax(finite))
+            return float(x[index]), float(y[index])
     return 0.0, 0.0
 
 
@@ -1130,6 +1140,39 @@ def plot_traces_all(
     )
 
 
+# Padding of steady-state axes, so markers at the extremes are not cut by the
+# frame; XY's automatic log domain leaves almost no room above the highest point.
+_STEADY_STATE_MARGIN = 0.05
+
+
+def _concentration_decades(fits, axis):
+    """Decade ticks for a log concentration axis, or None for automatic ticks.
+
+    XY labels only every other decade in narrow panels, which can leave a
+    single label, so the decades within the padded range are listed.
+    """
+    concentrations = np.asarray(
+        [
+            value
+            for fit in fits
+            for group in fit.lig_conc_lst_per_id
+            for value in np.ravel(group)
+        ],
+        dtype=float,
+    )
+    concentrations = concentrations[np.isfinite(concentrations) & (concentrations > 0)]
+    if axis.x_scale != "log" or not concentrations.size:
+        return None
+    low, high = np.log10(concentrations.min()), np.log10(concentrations.max())
+    pad = _STEADY_STATE_MARGIN * (high - low)
+    decades = 10.0 ** np.arange(np.ceil(low - pad), np.floor(high + pad) + 1)
+    return decades.tolist() if len(decades) >= 2 else None
+
+
+def _zero_line():
+    return _xy().hline(0, color="#667085", width=1)
+
+
 def plot_steady_state(
     pyKinetics,
     *,
@@ -1198,28 +1241,6 @@ def plot_steady_state(
                     )
                 )
         charts.append(xy.chart(*marks, title=str(sample)))
-    # Pad both axes so markers at the extremes are not cut by the frame; XY's
-    # automatic log domain leaves almost no room above the highest point.
-    margin = 0.05
-    decades = None
-    concentrations = np.asarray(
-        [
-            value
-            for fit in pyKinetics.fittings.values()
-            for group in fit.lig_conc_lst_per_id
-            for value in np.ravel(group)
-        ],
-        dtype=float,
-    )
-    concentrations = concentrations[np.isfinite(concentrations) & (concentrations > 0)]
-    if axis.x_scale == "log" and concentrations.size:
-        # XY labels only every other decade in narrow panels, which can leave
-        # a single label, so list the decades explicitly.
-        low, high = np.log10(concentrations.min()), np.log10(concentrations.max())
-        pad = margin * (high - low)
-        decades = 10.0 ** np.arange(np.ceil(low - pad), np.floor(high + pad) + 1)
-        if len(decades) < 2:
-            decades = None
     # Binding curves rise to the right, so the upper left corner is empty.
     return _grid(
         charts,
@@ -1228,9 +1249,23 @@ def plot_steady_state(
         layout,
         legend_config,
         legend_loc="upper left",
-        margin=margin,
-        x_tick_values=None if decades is None else decades.tolist(),
+        margin=_STEADY_STATE_MARGIN,
+        x_tick_values=_concentration_decades(pyKinetics.fittings.values(), axis),
     )
+
+
+def _kinetics_concentration_range(pyKinetics):
+    """Lowest and highest ligand concentration, after validating the groups."""
+    fits = list(pyKinetics.fittings.values())
+    if not fits:
+        raise ValueError("No experiments or fittings available to plot")
+    groups = [np.asarray(group) for fit in fits for group in fit.lig_conc_lst_per_id]
+    if not groups or any(not group.size for group in groups):
+        raise ValueError("Each Smax group must contain at least one trace")
+    concentrations = np.concatenate(groups)
+    if np.any(~np.isfinite(concentrations)) or np.any(concentrations <= 0):
+        raise ValueError("Ligand concentrations must be finite and positive")
+    return concentrations.min(), concentrations.max()
 
 
 def plot_association_dissociation(
@@ -1275,16 +1310,7 @@ def plot_association_dissociation(
     fit_width = (
         trace.line_width if trace.fit_line_width is None else trace.fit_line_width
     )
-    fits = list(pyKinetics.fittings.values())
-    if not fits:
-        raise ValueError("No experiments or fittings available to plot")
-    groups = [np.asarray(group) for fit in fits for group in fit.lig_conc_lst_per_id]
-    if not groups or any(not group.size for group in groups):
-        raise ValueError("Each Smax group must contain at least one trace")
-    concentrations = np.concatenate(groups)
-    if np.any(~np.isfinite(concentrations)) or np.any(concentrations <= 0):
-        raise ValueError("Ligand concentrations must be finite and positive")
-    low, high = concentrations.min(), concentrations.max()
+    low, high = _kinetics_concentration_range(pyKinetics)
     colorbar = _concentration_colorbar(low, high)
     colorbar["needs_color_mark"] = trace.smooth_curves or trace.marker_size <= 0
     charts = []
@@ -1347,6 +1373,183 @@ def plot_association_dissociation(
                 marks = []
         if not layout.split_by_smax_id:
             charts.append(xy.chart(*marks, title=str(sample)))
+    return _grid(
+        charts,
+        plot,
+        axis,
+        layout,
+        legend_config,
+        legend_toggle=False,
+        colorbar=colorbar,
+    )
+
+
+def plot_steady_state_residuals(
+    pyKinetics,
+    *,
+    plot_config: PlotConfig | None = None,
+    axis_config: AxisConfig | None = None,
+    layout_config: LayoutConfig | None = None,
+    legend_config: LegendConfig | None = None,
+    trace_config: TraceConfig | None = None,
+):
+    """Plot steady-state residuals (observed minus fitted) on log concentration axes.
+
+    Panels match ``plot_steady_state``; samples without a steady-state fit are
+    left out. A horizontal line at zero marks a perfect fit.
+    """
+    xy = _xy()
+    plot = _plot_settings(
+        plot_config,
+        width=1500,
+        height=1000,
+        font_size=18,
+        title="Steady-state residuals",
+    )
+    axis = _resolve_config(
+        axis_config,
+        AxisConfig,
+        x_label="Ligand concentration (μM)",
+        y_label="Residual (a.u.)",
+        x_scale="log",
+        showgrid_x=True,
+        showgrid_y=True,
+    )
+    layout = _resolve_config(layout_config, LayoutConfig, outer_labels=True)
+    trace = _resolve_config(trace_config, TraceConfig, marker_size=5)
+    charts, fitted = [], []
+    for sample, fit in pyKinetics.fittings.items():
+        if fit.signal_ss_fit is None:
+            continue
+        fitted.append(fit)
+        marks = []
+        colors = get_palette(len(fit.names))
+        for i, concentrations in enumerate(fit.lig_conc_lst_per_id):
+            residuals = np.asarray(fit.signal_ss[i], dtype=float) - np.asarray(
+                fit.signal_ss_fit[i], dtype=float
+            )
+            marks.append(
+                xy.scatter(
+                    np.asarray(concentrations),
+                    residuals,
+                    name=_smax_label(fit.names[i]) if len(fit.names) > 1 else None,
+                    color=colors[i],
+                    size=trace.marker_size,
+                    opacity=trace.opacity,
+                    density=False,
+                )
+            )
+        charts.append(xy.chart(*marks, _zero_line(), title=str(sample)))
+    if not charts:
+        raise ValueError("No steady-state fits available; run the fitting first")
+    return _grid(
+        charts,
+        plot,
+        axis,
+        layout,
+        legend_config,
+        legend_loc="upper left",
+        margin=_STEADY_STATE_MARGIN,
+        x_tick_values=_concentration_decades(fitted, axis),
+    )
+
+
+def plot_association_dissociation_residuals(
+    pyKinetics,
+    *,
+    plot_config: PlotConfig | None = None,
+    axis_config: AxisConfig | None = None,
+    layout_config: LayoutConfig | None = None,
+    legend_config: LegendConfig | None = None,
+    trace_config: TraceConfig | None = None,
+):
+    """Plot kinetics residuals (observed minus fitted) over time.
+
+    Panels, colors and the shared concentration colorbar match
+    ``plot_association_dissociation``. Traces without a fitted curve are left
+    out, and a horizontal line at zero marks a perfect fit.
+    ``TraceConfig(smooth_curves=True)`` median-smooths the residuals.
+    """
+    xy = _xy()
+    plot = _plot_settings(
+        plot_config,
+        width=1300,
+        height=1000,
+        title="Association-dissociation residuals",
+    )
+    axis = _resolve_config(
+        axis_config,
+        AxisConfig,
+        x_label="Time (s)",
+        y_label="Residual (a.u.)",
+        showgrid_x=False,
+        showgrid_y=False,
+    )
+    layout = _resolve_config(layout_config, LayoutConfig, outer_labels=True)
+    trace = _resolve_config(
+        trace_config, TraceConfig, marker_size=4, line_width=2, max_points=2000
+    )
+    low, high = _kinetics_concentration_range(pyKinetics)
+    colorbar = _concentration_colorbar(low, high)
+    colorbar["needs_color_mark"] = trace.smooth_curves or trace.marker_size <= 0
+    charts = []
+    for sample, fit in pyKinetics.fittings.items():
+        # A panel is shown when it has any fitted curve, even if nothing is
+        # drawn (e.g. marker_size=0), so its zero line and title remain.
+        marks, counter, has_fit = [], 0, False
+        for i, group in enumerate(fit.lig_conc_lst_per_id):
+            limit = max(1, int(np.ceil(trace.max_points / len(group))))
+            for concentration in group:
+                for times, raw, fitted in (
+                    (fit.time_assoc_lst, fit.assoc_lst, fit.signal_assoc_fit),
+                    (fit.time_disso_lst, fit.disso_lst, fit.signal_disso_fit),
+                ):
+                    if fitted is None or not len(fitted) or fitted[counter] is None:
+                        continue
+                    has_fit = True
+                    x = np.asarray(times[counter], dtype=float)
+                    y = np.asarray(raw[counter], dtype=float) - np.asarray(
+                        fitted[counter], dtype=float
+                    )
+                    if trace.smooth_curves:
+                        y = median_filter(y, x, trace.rolling_window)
+                    x, y = subset_data(x, limit), subset_data(y, limit)
+                    if trace.smooth_curves and trace.line_width > 0:
+                        marks.append(
+                            xy.line(
+                                x,
+                                y,
+                                color=get_colors_from_numeric_values(
+                                    [concentration], low, high
+                                )[0],
+                                width=trace.line_width,
+                                opacity=trace.opacity,
+                            )
+                        )
+                    elif not trace.smooth_curves and trace.marker_size > 0:
+                        marks.append(
+                            xy.scatter(
+                                x,
+                                y,
+                                color=np.full(len(x), np.log10(concentration)),
+                                colormap="viridis",
+                                color_domain=colorbar["domain"],
+                                size=trace.marker_size,
+                                opacity=trace.opacity,
+                                density=False,
+                            )
+                        )
+                counter += 1
+            if layout.split_by_smax_id and has_fit:
+                charts.append(
+                    xy.chart(*marks, _zero_line(), title=_dataset_title(sample, fit, i))
+                )
+            if layout.split_by_smax_id:
+                marks, has_fit = [], False
+        if not layout.split_by_smax_id and has_fit:
+            charts.append(xy.chart(*marks, _zero_line(), title=str(sample)))
+    if not charts:
+        raise ValueError("No kinetics fits available; run the fitting first")
     return _grid(
         charts,
         plot,

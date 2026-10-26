@@ -1014,6 +1014,8 @@ def test_legend_room_needs_spread_x_data_and_fits_the_legend_title():
 def test_first_point_falls_back_to_the_origin_without_data():
     assert plotting._first_point([]) == (0.0, 0.0)
     assert plotting._first_point([xy.scatter([2.0], [3.0])]) == (2.0, 3.0)
+    # Annotations such as the residual zero line carry no data points.
+    assert plotting._first_point([xy.hline(0), xy.scatter([2.0], [3.0])]) == (2.0, 3.0)
 
 
 def test_colorbar_grid_writes_svg_and_rejects_bad_scales(tmp_path):
@@ -1076,3 +1078,81 @@ def test_panel_titles_use_sample_names_and_smax_ids_only_when_needed():
         plotting.plot_association_dissociation(analyzer, layout_config=grouped)
     ) == ["wt - reg", "wt - imd"]
     assert titles(plotting.plot_steady_state(analyzer)) == ["wt - reg", "wt - imd"]
+
+
+def _has_zero_line(panel):
+    return {"kind": "rule", "axis": "y", "value": 0.0}.items() <= next(
+        a for a in panel.build_payload()[0]["annotations"]
+    ).items()
+
+
+def test_steady_state_residuals_subtract_the_fit_and_skip_unfitted_samples(analyzer):
+    unfitted = deepcopy(analyzer.fittings["experiment"])
+    unfitted.signal_ss_fit = None
+    analyzer.fittings["unfitted"] = unfitted
+    grid = plotting.plot_steady_state_residuals(analyzer)
+
+    assert [panel.title for panel in grid.figures] == ["experiment"]
+    panel = grid.figures[0]
+    traces = [t for t in panel.traces if t.kind == "scatter"]
+    # Observed [[8, 2], [5]] minus fitted [[7, 3], [4]].
+    np.testing.assert_allclose(traces[0].y.values, [1, -1])
+    np.testing.assert_allclose(traces[1].y.values, [1])
+    assert [t.name for t in traces] == ["experiment_sensor_1", "experiment_sensor_2"]
+    assert _has_zero_line(panel)
+    assert panel.axis_options["x"]["type"] == "log"
+    assert panel.axis_options["y"]["label"] == "Residual (a.u.)"
+    assert panel.build_payload()[0]["legend"]["loc"] == "upper left"
+    assert "<svg" in grid.to_svg()
+
+    analyzer.fittings = {"unfitted": unfitted}
+    with pytest.raises(ValueError, match="No steady-state fits available"):
+        plotting.plot_steady_state_residuals(analyzer)
+
+
+@pytest.mark.parametrize("split", [False, True])
+def test_kinetics_residuals_subtract_the_fit_with_a_shared_colorbar(analyzer, split):
+    fit = analyzer.fittings["experiment"]
+    grid = plotting.plot_association_dissociation_residuals(
+        analyzer,
+        layout_config=plotting.LayoutConfig(split_by_smax_id=split),
+        trace_config=plotting.TraceConfig(max_points=1000),
+    )
+    assert len(grid.figures) == (2 if split else 1)
+    # The colorbar sits beside the top-right panel.
+    assert [i for i, p in enumerate(grid.figures) if p.colorbar_options] == [
+        min(grid.cols, len(grid.figures)) - 1
+    ]
+    traces = [t for panel in grid.figures for t in panel.traces]
+    # Observed x**2 minus fitted x**2 + 0.1, for both phases of three traces.
+    assert len(traces) == 6
+    for trace in traces:
+        assert trace.kind == "scatter"
+        np.testing.assert_allclose(trace.y.values, -0.1, atol=1e-12)
+    assert all(_has_zero_line(panel) for panel in grid.figures)
+    assert grid.figures[0].axis_options["y"]["label"] == "Residual (a.u.)"
+    assert len(fit.assoc_lst) == 3
+
+
+def test_kinetics_residuals_smooth_skip_unfitted_traces_and_need_a_fit(analyzer):
+    fit = analyzer.fittings["experiment"]
+    fit.signal_disso_fit = [None] * 3
+    grid = plotting.plot_association_dissociation_residuals(
+        analyzer, trace_config=plotting.TraceConfig(smooth_curves=True)
+    )
+    traces = [t for panel in grid.figures for t in panel.traces]
+    lines = [t for t in traces if t.kind == "line"]
+    # Association only, as lines; one invisible mark carries the colorbar.
+    assert len(lines) == 3
+    assert [t.style.get("opacity") for t in traces if t.kind == "scatter"] == [0]
+    # Hidden markers still give one panel per fitted Smax group.
+    hidden = plotting.plot_association_dissociation_residuals(
+        analyzer, trace_config=plotting.TraceConfig(marker_size=0)
+    )
+    assert len(hidden.figures) == 2
+    assert not [t for p in hidden.figures for t in p.traces if t.style.get("opacity")]
+
+    fit.signal_assoc_fit = None
+    fit.signal_disso_fit = None
+    with pytest.raises(ValueError, match="No kinetics fits available"):
+        plotting.plot_association_dissociation_residuals(analyzer)
