@@ -389,7 +389,7 @@ def test_fit_one_site_association():
         fitter_surface.fit_one_site_association(shared_smax=True)
 
     fitter_surface.fit_steady_state()
-    fitter_surface.fit_one_site_association(shared_smax=True)
+    fitter_surface.fit_one_site_association(shared_smax=True, calc_loo=True)
     # Check if the fitting was successful - Kd should be between 9 and 11
     assert 9 < fitter_surface.Kd < 11, f"Expected Kd to be between 9 and 11, got {fitter_surface.Kd}."
 
@@ -404,18 +404,36 @@ def test_fit_one_site_association():
     assert "Dissociation" not in np.unique(df["Type"])
 
     fitter_surface.fit_steady_state()
-    fitter_surface.fit_one_site_association(shared_smax=False)
+    fitter_surface.fit_one_site_association(shared_smax=False,calc_loo = True)
 
     # Check if the fitting was successful - Kd should be between 9 and 11
     assert 9 < fitter_surface.Kd < 11, f"Expected Kd to be between 9 and 11, got {fitter_surface.Kd}."
 
+    fs = fitter_surface
+            
+    # verify the fitted values - Kd-10_koff-0.01
+    
+    assert (fs.Kd_loo_mean - fs.Kd_loo_std*2) < 10 * 1.05 # 5 % tolerance error for Kd
+    assert (fs.Kd_loo_mean + fs.Kd_loo_std*2) > 10 * 0.95 # 5 % tolerance error for Kd
+    
+    assert (fs.k_off_loo_mean - fs.k_off_loo_std*2) < 0.01 * 1.05 # 5 % tolerance error for k_off
+    assert (fs.k_off_loo_mean + fs.k_off_loo_std*2) > 0.01 * 0.95 # 5 % tolerance error for k_off
+    
+
+
 def test_fit_one_site_dissociation_with_timelimit():
 
     fitter_surface = create_fitter(test_file_1)
-    fitter_surface.fit_one_site_dissociation(time_limit=60)
+    fitter_surface.fit_one_site_dissociation(time_limit=60,calc_loo=True)
 
     # Check if the fitting was successful - k_off should be between 0.009 and 0.011
     assert 0.009 < fitter_surface.k_off < 0.011, f"Expected k_off to be between 0.009 and 0.011, got {fitter_surface.k_off}."
+
+    fs = fitter_surface
+                
+    assert (fs.k_off_loo_mean - fs.k_off_loo_std*2) < 0.01 * 1.05 # 5 % tolerance error for k_off
+    assert (fs.k_off_loo_mean + fs.k_off_loo_std*2) > 0.01 * 0.95 # 5 % tolerance error for k_off
+
 
 def test_fit_single_exponentials():
 
@@ -478,7 +496,7 @@ def test_fit_one_site_assoc_and_disso_0():
            f"Expected 3 + {len(fitter_surface.lig_conc_lst)} t0 parameters, got {n_fitted_params}."
 
 
-def test_fit_two_site_assoc_and_disso_dataframe_shapes_kingenie_csv():
+def test_fit_two_site_assoc_and_disso_df_shapes_kingenie_csv():
     """
     Regression test based on test.py workflow and
     simulation_KinGenie_kon-0.5_koff-0.005_sigma-1_plRmax-3.5_pl2_Rmax-7.csv.
@@ -515,7 +533,8 @@ def test_fit_two_site_assoc_and_disso_dataframe_shapes_kingenie_csv():
         fitter_surface.fit_two_site_assoc_and_disso(
             shared_smax=shared_smax,
             fit_sigma=fit_sigma,
-            fixed_t0=fixed_t0
+            fixed_t0=fixed_t0,
+            calc_loo=True
         )
 
         df_fit = fitter_surface.fit_params_kinetics
@@ -558,6 +577,18 @@ def test_fit_two_site_assoc_and_disso_dataframe_shapes_kingenie_csv():
         assert '(Derived) k_on [1/µM/s]' in df_fit.columns
         assert np.isclose(float(df_fit['(Derived) k_on [1/µM/s]'].median()), kon_true, rtol=0.8)
 
+        fs = fitter_surface
+        
+        # verify the fitted values - kon-0.5_koff-0.005_sigma-1_plRmax-3.5_pl2_Rmax-7
+        Kd_true = 0.005 / 0.5
+
+        assert (fs.Kd_loo_mean - fs.Kd_loo_std*2) < Kd_true * 1.05 # 5 % tolerance error for Kd
+        assert (fs.Kd_loo_mean + fs.Kd_loo_std*2) > Kd_true * 0.95 # 5 % tolerance error for Kd
+
+        assert (fs.k_off_loo_mean - fs.k_off_loo_std*2) < 0.005 * 1.05 # 5 % tolerance error for k_off
+        assert (fs.k_off_loo_mean + fs.k_off_loo_std*2) > 0.005 * 0.95 # 5 % tolerance error for k_off
+
+
 def test_fit_one_site_assoc_and_disso_1():
 
     fitter_surface = create_fitter(test_file_2)
@@ -569,12 +600,26 @@ def test_fit_one_site_assoc_and_disso_1():
     fitter_surface.Kd_ss = 0.5
     fitter_surface.Smax_upper_bound_factor = 50
 
-    fitter_surface.fit_one_site_assoc_and_disso(shared_smax=True, fixed_t0=True, fit_ktr=True)
+    fitter_surface.fit_one_site_assoc_and_disso(shared_smax=True, fixed_t0=True, fit_ktr=True, calc_loo=True)
 
     # Check if ktr is between 0.004 and 0.006
     ktr_fitted = fitter_surface.fit_params_kinetics['Ktr'].iloc[0]
 
     assert 0.004 < ktr_fitted < 0.006, f"Expected ktr to be between 0.004 and 0.006, got {ktr_fitted}."
+
+    fs = fitter_surface
+    
+    # verify the fitted values - Kd-0.5_koff-0.01_Ktr-0.005
+    # We check betw
+    assert (fs.Kd_loo_mean - fs.Kd_loo_std*2) < 0.5 * 1.05 # 5 % tolerance error for Kd
+    assert (fs.Kd_loo_mean + fs.Kd_loo_std*2) > 0.5 * 0.95 # 5 % tolerance error for Kd
+
+    assert (fs.k_off_loo_mean - fs.k_off_loo_std*2) < 0.01 * 1.05 # 5 % tolerance error for k_off
+    assert (fs.k_off_loo_mean + fs.k_off_loo_std*2) > 0.01 * 0.95 # 5 % tolerance error for k_off
+
+    assert (fs.ktr_loo_means[0] - fs.ktr_loo_stds[0]*2) < 0.005 * 1.3 # 30 % tolerance error for Ktr
+    assert (fs.ktr_loo_means[0] + fs.ktr_loo_stds[0]*2) > 0.005 * 0.7 # 30 % tolerance error for Ktr
+
 
 def test_fit_one_site_assoc_and_disso_2():
 
@@ -583,12 +628,26 @@ def test_fit_one_site_assoc_and_disso_2():
     fitter_surface.Smax_upper_bound_factor = 50
 
     # Now we test the fitting with not shared Smax
-    fitter_surface.fit_one_site_assoc_and_disso(shared_smax=False, fixed_t0=True, fit_ktr=True)
+    fitter_surface.fit_one_site_assoc_and_disso(shared_smax=False, fixed_t0=True, fit_ktr=True, calc_loo=True)
 
     # Check if ktr is between 0.004 and 0.006
     ktr_fitted = fitter_surface.fit_params_kinetics['Ktr'].iloc[0]
 
     assert 0.004 < ktr_fitted < 0.006, f"Expected ktr to be between 0.004 and 0.006, got {ktr_fitted}."
+
+    fs = fitter_surface
+    
+    # verify the fitted values - Kd-0.5_koff-0.01_Ktr-0.005
+    # We check betw
+    assert (fs.Kd_loo_mean - fs.Kd_loo_std*2) < 0.5 * 1.05 # 5 % tolerance error for Kd
+    assert (fs.Kd_loo_mean + fs.Kd_loo_std*2) > 0.5 * 0.95 # 5 % tolerance error for Kd
+
+    assert (fs.k_off_loo_mean - fs.k_off_loo_std*2) < 0.01 * 1.05 # 5 % tolerance error for k_off
+    assert (fs.k_off_loo_mean + fs.k_off_loo_std*2) > 0.01 * 0.95 # 5 % tolerance error for k_off
+
+    assert (fs.ktr_loo_means[0] - fs.ktr_loo_stds[0]*2) < 0.005 * 1.3 # 30 % tolerance error for Ktr
+    assert (fs.ktr_loo_means[0] + fs.ktr_loo_stds[0]*2) > 0.005 * 0.7 # 30 % tolerance error for Ktr
+
 
 def test_fit_one_site_assoc_and_disso_3():
 
@@ -596,25 +655,42 @@ def test_fit_one_site_assoc_and_disso_3():
     fitter_surface.Kd_ss = 0.5
     fitter_surface.Smax_upper_bound_factor = 50
     # Now we test the fitting with shared_smax=False and fixed_t0=False
-    fitter_surface.fit_one_site_assoc_and_disso(shared_smax=True, fixed_t0=False, fit_ktr=True)
+    fitter_surface.fit_one_site_assoc_and_disso(shared_smax=True, fixed_t0=False, fit_ktr=True, calc_loo=True)
 
     # Check if ktr is between 0.004 and 0.006
     ktr_fitted = fitter_surface.fit_params_kinetics['Ktr'].iloc[0]
 
     assert 0.004 < ktr_fitted < 0.006, f"Expected ktr to be between 0.004 and 0.006, got {ktr_fitted}."
 
-    # check that the number of fitted parameters is correct: we expect smax, Kd, koff, ktr plus one t0 per curve
+    # check that the number of fitted parameters is correct: we expect smax, Kd, koff, ktr plus one t0 per Smax group
     n_fitted_params = len(fitter_surface.params)
 
     assert n_fitted_params == 4 + len(fitter_surface.lig_conc_lst_per_id), \
            f"Expected 4 + {len(fitter_surface.lig_conc_lst_per_id)} t0 parameters, got {n_fitted_params}."
+
+    # Check the loo dataframe is created and has the correct shape
+    assert isinstance(fitter_surface.df_fit_loo, pd.DataFrame), "The loo dataframe should be a pandas DataFrame."
+
+    fs = fitter_surface
+    
+    # verify the fitted values - Kd-0.5_koff-0.01_Ktr-0.005
+    # We check betw
+    assert (fs.Kd_loo_mean - fs.Kd_loo_std*2) < 0.5 * 1.05 # 5 % tolerance error for Kd
+    assert (fs.Kd_loo_mean + fs.Kd_loo_std*2) > 0.5 * 0.95 # 5 % tolerance error for Kd
+
+    assert (fs.k_off_loo_mean - fs.k_off_loo_std*2) < 0.01 * 1.05 # 5 % tolerance error for k_off
+    assert (fs.k_off_loo_mean + fs.k_off_loo_std*2) > 0.01 * 0.95 # 5 % tolerance error for k_off
+
+    assert (fs.ktr_loo_means[0] - fs.ktr_loo_stds[0]*2) < 0.005 * 1.3 # 30 % tolerance error for Ktr
+    assert (fs.ktr_loo_means[0] + fs.ktr_loo_stds[0]*2) > 0.005 * 0.7 # 30 % tolerance error for Ktr
+
 
 def test_fit_one_site_assoc_and_disso_if():
 
     fitter_surface = create_fitter(test_file_3)
     fitter_surface.fit_steady_state()
 
-    fitter_surface.fit_one_site_if_assoc_and_disso(shared_smax=True)
+    fitter_surface.fit_one_site_if_assoc_and_disso(shared_smax=True,calc_loo=True)
 
     # Asses if self.k_on, self.k_off, self.k_c, self.k_rev are correctly fitted
     assert 0.08 < fitter_surface.k_on < 0.12, f"Expected k_on to be between 0.08 and 0.12, got {fitter_surface.k_on}."
@@ -625,4 +701,56 @@ def test_fit_one_site_assoc_and_disso_if():
 
     assert 7 < fitter_surface.k_rev < 13, f"Expected k_rev to be between 7 and 13, got {fitter_surface.k_rev}."
 
-    # Now fit with shared_smax=False
+    # Check the loo dataframe is created and has the correct shape
+    assert isinstance(fitter_surface.df_fit_loo, pd.DataFrame), "The loo dataframe should be a pandas DataFrame."
+
+    fs = fitter_surface
+
+    # verify the fitted values - kon-0.1_koff-0.01_kc-1_krev-10
+    # We check betw
+    assert (fs.k_on_loo_mean - fs.k_on_loo_std*2) < 0.1 * 1.05 # 5 % tolerance error for k_on
+    assert (fs.k_on_loo_mean + fs.k_on_loo_std*2) > 0.1 * 0.95 # 5 % tolerance error for k_on
+
+    assert (fs.k_off_loo_mean - fs.k_off_loo_std*2) < 0.01 * 1.05 # 5 % tolerance error for k_off
+    assert (fs.k_off_loo_mean + fs.k_off_loo_std*2) > 0.01 * 0.95 # 5 % tolerance error for k_off
+
+    assert (fs.k_c_loo_mean - fs.k_c_loo_std*2) < 1 * 1.3 # 30 % tolerance error for k_c
+    assert (fs.k_c_loo_mean + fs.k_c_loo_std*2) > 1 * 0.7 # 30 % tolerance error for k_c
+
+    assert (fs.k_rev_loo_mean - fs.k_rev_loo_std*2) < 10 * 1.3 # 30 % tolerance error for k_rev
+    assert (fs.k_rev_loo_mean + fs.k_rev_loo_std*2) > 10 * 0.7 # 30 % tolerance error for k_rev
+
+def test_fit_one_site_assoc_and_disso_if_non_shared_smax():
+
+    fitter_surface = create_fitter(test_file_3)
+    fitter_surface.fit_steady_state()
+
+    fitter_surface.fit_one_site_if_assoc_and_disso(shared_smax=False,calc_loo=True)
+
+    # Asses if self.k_on, self.k_off, self.k_c, self.k_rev are correctly fitted
+    assert 0.08 < fitter_surface.k_on < 0.12, f"Expected k_on to be between 0.08 and 0.12, got {fitter_surface.k_on}."
+
+    assert 0.008 < fitter_surface.k_off < 0.012, f"Expected k_off to be between 0.008 and 0.012, got {fitter_surface.k_off}."
+
+    assert 0.7 < fitter_surface.k_c < 1.3, f"Expected k_c to be between 0.7 and 1.3, got {fitter_surface.k_c}."
+
+    assert 7 < fitter_surface.k_rev < 13, f"Expected k_rev to be between 7 and 13, got {fitter_surface.k_rev}."
+
+    # Check the loo dataframe is created and has the correct shape
+    assert isinstance(fitter_surface.df_fit_loo, pd.DataFrame), "The loo dataframe should be a pandas DataFrame."
+
+    fs = fitter_surface
+
+    # verify the fitted values - kon-0.1_koff-0.01_kc-1_krev-10
+    # We check betw
+    assert (fs.k_on_loo_mean - fs.k_on_loo_std*2) < 0.1 * 1.05 # 5 % tolerance error for k_on
+    assert (fs.k_on_loo_mean + fs.k_on_loo_std*2) > 0.1 * 0.95 # 5 % tolerance error for k_on
+
+    assert (fs.k_off_loo_mean - fs.k_off_loo_std*2) < 0.01 * 1.05 # 5 % tolerance error for k_off
+    assert (fs.k_off_loo_mean + fs.k_off_loo_std*2) > 0.01 * 0.95 # 5 % tolerance error for k_off
+
+    assert (fs.k_c_loo_mean - fs.k_c_loo_std*2) < 1 * 1.3 # 30 % tolerance error for k_c
+    assert (fs.k_c_loo_mean + fs.k_c_loo_std*2) > 1 * 0.7 # 30 % tolerance error for k_c
+
+    assert (fs.k_rev_loo_mean - fs.k_rev_loo_std*2) < 10 * 1.3 # 30 % tolerance error for k_rev
+    assert (fs.k_rev_loo_mean + fs.k_rev_loo_std*2) > 10 * 0.7 # 30 % tolerance error for k_rev

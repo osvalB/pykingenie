@@ -121,6 +121,7 @@ def test_fit_two_site_heterogeneous_ligand_assoc_and_disso_grid_search():
         fixed_t0=True,
         Kd1_values=[0.1, 0.5, 10.0],
         Kd2_values=[0.05, 1.0, 5.0],
+        calc_loo = True
     )
 
     assert fitter_surface.best_Kd1_grid < fitter_surface.best_Kd2_grid
@@ -152,6 +153,19 @@ def test_fit_two_site_heterogeneous_ligand_assoc_and_disso_grid_search():
     df = fitter_surface.create_export_df(type="fit")
     assert set(df["Type"]) == {"Association", "Dissociation"}
 
+    fs = fitter_surface
+
+    assert fs.Kd1_loo_mean - fs.Kd1_loo_std * 2 <  truth["Kd1"] * 1.01
+    assert fs.Kd1_loo_mean + fs.Kd1_loo_std * 2 >  truth["Kd1"] * 0.99
+
+    assert fs.Kd2_loo_mean - fs.Kd2_loo_std * 2 <  truth["Kd2"] * 1.01
+    assert fs.Kd2_loo_mean + fs.Kd2_loo_std * 2 >  truth["Kd2"] * 0.99
+
+    assert fs.k_off1_loo_mean - fs.k_off1_loo_std * 2 <  truth["koff1"] * 1.01
+    assert fs.k_off1_loo_mean + fs.k_off1_loo_std * 2 >  truth["koff1"] * 0.99
+
+    assert fs.k_off2_loo_mean - fs.k_off2_loo_std * 2 <  truth["koff2"] * 1.01
+    assert fs.k_off2_loo_mean + fs.k_off2_loo_std * 2 >  truth["koff2"] * 0.99
 
 def test_fit_steady_state_two_site_heterogeneous_ligand_wrapper():
     C = np.logspace(-3, 2, 80)
@@ -258,10 +272,10 @@ def test_fit_two_site_heterogeneous_ligand_uses_defaults_and_shared_t0():
 
 def test_fit_two_site_heterogeneous_ligand_unshared_t0_expands_single_name():
     fitter_surface, truth = _create_heterogeneous_ligand_kinetic_fitter(
-        smax_id=[0, 1],
+        smax_id=[0,0, 1,1],
         name_lst=["sample"],
-        rmax_values=[8.0, 12.0],
-        t0_values=[0.01, 0.02],
+        rmax_values=[8.0,8.0, 12.0,12.0],
+        t0_values=[0.01,0.02],
     )
 
     fitter_surface.fit_two_site_heterogeneous_ligand_assoc_and_disso(
@@ -269,14 +283,29 @@ def test_fit_two_site_heterogeneous_ligand_unshared_t0_expands_single_name():
         fixed_t0=False,
         Kd1_values=[0.1],
         Kd2_values=[5.0],
+        calc_loo = True
     )
 
-    assert fitter_surface.fit_params_kinetics["Name"].tolist() == ["sample", "sample"]
-    assert "t0" in fitter_surface.fit_params_kinetics.columns
-    assert np.allclose(fitter_surface.fit_params_kinetics["t0"], truth["t0"], atol=0.03)
-    assert fitter_surface.fit_params_kinetics_error["t0"].notna().all()
+    fit_params = fitter_surface.fit_params_kinetics
+
+    assert fit_params["Name"].tolist() == ["sample", "sample","sample", "sample"]
+    assert "t0" in fit_params.columns
+    assert np.allclose(fit_params["t0"].iloc[0], truth["t0"][0], rtol=0.03)
+    assert np.allclose(fit_params["t0"].iloc[-1], truth["t0"][1], rtol=0.03)
+    assert fit_params["t0"].notna().all()
     assert np.allclose(fitter_surface.Smax, truth["Rmax"], rtol=0.1)
 
+    assert fitter_surface.Kd1_loo_mean - fitter_surface.Kd1_loo_std * 2 <  truth["Kd1"] * 1.01
+    assert fitter_surface.Kd1_loo_mean + fitter_surface.Kd1_loo_std * 2 >  truth["Kd1"] * 0.99
+
+    assert fitter_surface.Kd2_loo_mean - fitter_surface.Kd2_loo_std * 2 <  truth["Kd2"] * 1.01
+    assert fitter_surface.Kd2_loo_mean + fitter_surface.Kd2_loo_std * 2 >  truth["Kd2"] * 0.99
+
+    assert fitter_surface.k_off1_loo_mean - fitter_surface.k_off1_loo_std * 2 <  truth["koff1"] * 1.01
+    assert fitter_surface.k_off1_loo_mean + fitter_surface.k_off1_loo_std * 2 >  truth["koff1"] * 0.99
+
+    assert fitter_surface.k_off2_loo_mean - fitter_surface.k_off2_loo_std * 2 <  truth["koff2"] * 1.01
+    assert fitter_surface.k_off2_loo_mean + fitter_surface.k_off2_loo_std * 2 >  truth["koff2"] * 0.99
 
 def test_fit_two_site_heterogeneous_ligand_raises_when_grid_fits_all_fail():
     fitter_surface = _create_invalid_signal_fitter_for_grid_failure()

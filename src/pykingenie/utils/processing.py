@@ -10,7 +10,7 @@ import matplotlib.colors as mcolors
 from .palettes import set1_colors, set3_colors, VIRIDIS
 
 __all__ = [
-    'guess_experiment_name', 'etree_to_dict', 'combine_dicts','guess_experiment_type',
+    'guess_experiment_name','remove_at', 'etree_to_dict', 'combine_dicts','guess_experiment_type',
     'detect_time_list_continuos', 'find_loading_column', 'concat_signal_lst',
     'expand_parameter_list', 'combine_sequences', 'get_palette', 'get_plotting_df',
     'subset_data', 'sample_type_to_letter', 'get_colors_from_numeric_values',
@@ -41,6 +41,30 @@ def if_string_to_list(string_or_list):
         return string_or_list
     else:
         raise TypeError("Input must be a string or a list of strings.")
+
+
+def remove_at(arr, i):
+
+    """
+    Remove the element at index i from an array or list.
+    
+    Parameters
+    ----------
+    arr : list or np.ndarray
+        Input array or list.
+    i : int
+        Index of the element to remove.
+    
+    Returns
+    -------
+    list or np.ndarray
+        Array or list with the element at index i removed.
+    
+    """
+
+    if isinstance(arr, np.ndarray):
+        return np.delete(arr, i)
+    return arr[:i] + arr[i+1:]
 
 def guess_experiment_name(frd_file):
     """
