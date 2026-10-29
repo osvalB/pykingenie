@@ -372,6 +372,61 @@ def test_submit_kinetics_fitting_two_to_one_parameter_recovery_from_kingenie_csv
     assert np.isclose(rmax_lpl_fit, rmax_lpl_true, rtol=0.1)
 
 
+def test_calculate_leave_one_out_errors():
+    kingenie = KinGenieCsv("two_site_sim")
+    kingenie.read_csv(two_site_sim_file)
+
+    ka = KineticsAnalyzer()
+    ka.add_experiment(kingenie, "two_site_sim")
+    ka.merge_ligand_conc_df()
+    ka.generate_fittings(ka.combined_ligand_conc_df.copy())
+
+    fitted_fitter = list(ka.fittings.values())[0]
+
+    # Add gaussian error...
+    rng = np.random.default_rng(42)
+    fitted_fitter.assoc_lst = [
+        ys + rng.normal(0, 0.1, size=ys.shape) for ys in fitted_fitter.assoc_lst
+    ]
+    fitted_fitter.disso_lst = [
+        ys + rng.normal(0, 0.1, size=ys.shape) for ys in fitted_fitter.disso_lst
+    ]
+
+    fitted_fitter.fit_steady_state()
+    fitted_fitter.fit_two_site_assoc_and_disso(
+        shared_smax=True,
+        fit_sigma=True,
+    )
+
+    unfitted_fitter = KineticsFitter(
+        time_assoc_lst=[],
+        association_signal_lst=[],
+        lig_conc_lst=[],
+    )
+    ka.add_fitting(unfitted_fitter, "unfitted")
+
+    successful_fits, failed_fits = ka.calculate_leave_one_out_errors()
+
+    assert successful_fits == [fitted_fitter]
+    assert failed_fits == [unfitted_fitter]
+    assert fitted_fitter.Kd_loo
+    assert fitted_fitter.k_off_loo
+    assert hasattr(fitted_fitter, "df_fit_loo")
+
+    df_fit_loo = fitted_fitter.df_fit_loo
+    assert list(df_fit_loo.columns) == ["Kd [µM]", "k_off [1/s]", "sigma"]
+    assert len(df_fit_loo) == 1
+
+    loo_parameters = {
+        "Kd [µM]": (fitted_fitter.Kd_loo_mean, fitted_fitter.Kd_loo_std, 0.05),
+        "k_off [1/s]": (fitted_fitter.k_off_loo_mean, fitted_fitter.k_off_loo_std, 0.1),
+        "sigma": (fitted_fitter.sigma_loo_mean, fitted_fitter.sigma_loo_std, 2.0),
+    }
+    for parameter, (mean, std, expected) in loo_parameters.items():
+        assert df_fit_loo[parameter].iloc[0] == f"{mean:.2e} ± {std:.2e}"
+        assert np.isclose(mean, expected, rtol=0.1)
+
+
 def test_submit_kinetics_fitting_heterogeneous_ligand_model_routing():
     Kd1_true = 0.1
     koff1_true = 0.03

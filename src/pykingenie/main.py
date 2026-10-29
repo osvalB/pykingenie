@@ -686,6 +686,38 @@ class KineticsAnalyzer:
 
         return successful_fits, failed_fits
 
+    def calculate_leave_one_out_errors(
+            self):
+        """
+        Find the fitted parameters (only the thermodynamic ones) 
+        errors using the leave-one-out method.
+
+        We leave one curve at a time for a given Sample ID.
+
+        Notes
+        ----
+
+            - This function must be called after running 'submit_kinetics_fitting'
+            - This function will create 'df_fit_loo' attribute with the mean and std of the leave-one-out method
+
+        """
+
+        successful_fits = []
+        failed_fits = []
+        
+        for kf in self.fittings.values():
+
+            try:
+
+                kf.calc_leave_one_out_errors()
+                successful_fits.append(kf)
+
+            except Exception as e:
+
+                failed_fits.append(kf)
+
+        return successful_fits, failed_fits
+
     def calculate_asymmetric_error(self, shared_smax=True, fixed_t0=True, fit_ktr=False):
         """
         Calculate asymmetric error (confidence intervals) for all fitting objects.
