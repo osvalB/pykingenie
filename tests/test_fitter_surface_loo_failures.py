@@ -33,6 +33,13 @@ def _create_loo_fitter():
     ("method_name", "fit_function_name", "fit_values", "output_count", "expected"),
     [
         (
+            "one_site_association_loo",
+            "fit_one_site_association",
+            [4.0, 5.0],
+            3,
+            {"Kd_loo": [4.0], "k_off_loo": [5.0]},
+        ),
+        (
             "one_site_dissociation_loo",
             "fit_one_site_dissociation",
             [0.25, 1.0],
