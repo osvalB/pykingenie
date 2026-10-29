@@ -29,6 +29,18 @@ def _create_loo_fitter():
     return fitter
 
 
+@pytest.mark.parametrize("model", [None, "unsupported_model"])
+def test_calc_leave_one_out_errors_rejects_unavailable_model(model):
+    fitter = _create_loo_fitter()
+    if model is not None:
+        fitter.model = model
+
+    with pytest.raises(ValueError) as exc_info:
+        fitter.calc_leave_one_out_errors()
+
+    assert str(exc_info.value) == f"No LOO calculation is available for model: {model!r}"
+
+
 @pytest.mark.parametrize(
     ("method_name", "fit_function_name", "fit_values", "output_count", "expected"),
     [

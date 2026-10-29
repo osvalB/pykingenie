@@ -640,6 +640,7 @@ class KineticsFitter(KineticsFitterGeneral):
         self.shared_smax = shared_smax
 
         p0, low_bounds, high_bounds = self.get_k_off_initial_guess()
+        self.model = "one_site_association"
 
         smax_guesses = self.smax_guesses_unq if shared_smax else self.smax_guesses_shared
 
@@ -682,7 +683,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         if calc_loo:
 
-            self.one_site_association_loo()
+            self.calc_leave_one_out_errors()
 
         return  None
 
@@ -815,6 +816,7 @@ class KineticsFitter(KineticsFitterGeneral):
             - fit_params_kinetics_error: DataFrame with the relative errors
         """
 
+        self.model = "one_site_dissociation"
         self.clear_fittings()
 
         disso_lst     = self.disso_lst
@@ -864,7 +866,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         if calc_loo:
 
-           self.one_site_dissociation_loo()
+            self.calc_leave_one_out_errors()
 
         return  None
 
@@ -992,6 +994,7 @@ class KineticsFitter(KineticsFitterGeneral):
         self.fixed_t0 = fixed_t0
 
         p0, low_bounds, high_bounds = self.get_k_off_initial_guess()
+        self.model = "one_site_association_and_dissociation"
 
         # Extend the lower bound for Kd_ss
         low_bounds[0] = np.min([self.Kd_ss/1e3] + self.lig_conc_lst)  # Kd lower bound
@@ -1137,7 +1140,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         if calc_loo:
 
-            self.one_site_assoc_and_disso_loo()
+            self.calc_leave_one_out_errors()
 
         return  None
 
@@ -1305,6 +1308,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         # Obtain initial guesses and bounds for Kd and k_off
         self.fit_one_site_assoc_and_disso(shared_smax=shared_smax, fixed_t0=True, fit_ktr=False)
+        self.model = "two_site_association_and_dissociation"
 
         k_off_init = self.k_off
         Kd_init  = self.Kd
@@ -1488,7 +1492,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         if calc_loo:
 
-            self.two_site_assoc_and_disso_loo()
+            self.calc_leave_one_out_errors()
 
         return None
 
@@ -1660,6 +1664,7 @@ class KineticsFitter(KineticsFitterGeneral):
         None
             Updates fitted signal, parameter, bounds, and grid-search attributes.
         """
+
         self.clear_fittings()
 
         if self.Kd_ss is None and not self.is_single_cycle:
@@ -1669,6 +1674,7 @@ class KineticsFitter(KineticsFitterGeneral):
             self.get_steady_state()
 
         self.fit_one_site_assoc_and_disso(shared_smax=shared_smax, fixed_t0=True, fit_ktr=False)
+        self.model = "two_site_heterogeneous_ligand_association_and_dissociation"
 
         Kd_init = float(self.Kd)
         koff_init = float(self.k_off)
@@ -1881,7 +1887,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         if calc_loo:
 
-            self.two_site_heterogeneous_ligand_assoc_and_disso_loo()
+            self.calc_leave_one_out_errors()
 
         return None
 
@@ -2125,6 +2131,7 @@ class KineticsFitter(KineticsFitterGeneral):
         # Fit first a model without induced-fit
 
         self.fit_one_site_assoc_and_disso(shared_smax=shared_smax)
+        self.model = "one_site_if_assoc_and_disso"
 
         # Get the initial parameters from the single site fit
         p0          = self.p0
@@ -2247,7 +2254,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         if calc_loo:
             
-            self.one_site_if_assoc_and_disso_loo()
+            self.calc_leave_one_out_errors()
 
         return None
 
@@ -2352,6 +2359,26 @@ class KineticsFitter(KineticsFitterGeneral):
         self.df_fit_loo = df_fit_loo
 
         return None
+
+    def calc_leave_one_out_errors(self):
+        """Calculate leave-one-out estimates for the currently fitted model."""
+        loo_methods = {
+            "one_site_association": self.one_site_association_loo,
+            "one_site_dissociation": self.one_site_dissociation_loo,
+            "one_site_association_and_dissociation": self.one_site_assoc_and_disso_loo,
+            "two_site_association_and_dissociation": self.two_site_assoc_and_disso_loo,
+            "two_site_heterogeneous_ligand_association_and_dissociation": (
+                self.two_site_heterogeneous_ligand_assoc_and_disso_loo
+            ),
+            "one_site_if_assoc_and_disso": self.one_site_if_assoc_and_disso_loo,
+        }
+
+        model = getattr(self, "model", None)
+        if model not in loo_methods:
+            raise ValueError(f"No LOO calculation is available for model: {model!r}")
+
+        return loo_methods[model]()
+
 
     def create_export_df(self,type='raw'):
 
