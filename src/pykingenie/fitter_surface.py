@@ -1256,6 +1256,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         self.df_fit_loo = df_fit_loo
 
+        return None
 
     def fit_two_site_assoc_and_disso(self, shared_smax=True, fixed_t0=True, fit_sigma=False, calc_loo=False):
 
