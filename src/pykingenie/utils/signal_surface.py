@@ -850,6 +850,7 @@ def solve_ode_mixture_analyte_dissociation(t, Ris0, koffs, t0=0):
 
 
 def _validate_fraction_site1(fraction_site1):
+    """Validate that a site-1 population fraction lies between zero and one."""
     if fraction_site1 < 0 or fraction_site1 > 1:
         raise ValueError("fraction_site1 must be between 0 and 1.")
 

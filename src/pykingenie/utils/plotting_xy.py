@@ -423,17 +423,20 @@ def _axes(
 
 
 def _plot_area_width(chart_width, font_size):
+    """Estimate the drawable chart width after reserving the y-axis gutter."""
     # Chart width minus a conservative estimate of the y tick labels and title.
     return max(60.0, chart_width - 5.2 * font_size - 22)
 
 
 def _x_tick_count(chart_width, font_size):
+    """Choose an x tick count based on the drawable width and font size."""
     # One count for every panel, so equal domains get equal ticks even though
     # the first column is narrower (it holds the y title).
     return max(3, min(8, int(_plot_area_width(chart_width, font_size) / (4.5 * font_size))))
 
 
 def _linear_x(axis):
+    """Return whether the x axis is linear and runs in its normal direction."""
     return axis.x_scale in (None, "linear") and not axis.reverse_x
 
 
@@ -471,6 +474,7 @@ def _legend_room_domain(marks, legend, font_size, chart_width):
 
 
 def _legend(config, font_size, *, show=True, toggle=True):
+    """Create an XY legend from user settings and helper defaults."""
     xy = _xy()
     legend = _resolve_config(
         config,
@@ -492,6 +496,7 @@ def _legend(config, font_size, *, show=True, toggle=True):
 
 
 def _configure_engine(engine, config):
+    """Apply resolved plot dimensions, title, typography, and axis ranges."""
     if config.plot_type is not None:
         engine.export_options = dict(
             engine.export_options or {}, formats=[config.plot_type]
@@ -611,6 +616,7 @@ def _panel_widths(width, cols, gap, extra=0):
 
 @lru_cache(maxsize=None)
 def _colorbar_grid_class():
+    """Return the cached FacetGrid subclass with a wider colorbar panel."""
     from xy import _raster, _svg, export
     from xy.facets import FacetGrid, render_raster
 
@@ -624,21 +630,25 @@ def _colorbar_grid_class():
         """
 
         def __init__(self, figures, labels, *, wide_panel, extra, **kwargs):
+            """Initialize a grid with the index and width of its colorbar panel."""
             super().__init__(figures, labels, **kwargs)
             self.wide_panel = wide_panel
             self.extra = extra
 
         @property
         def panel_width(self):
+            """Return the width of an ordinary panel in the grid."""
             return _panel_widths(self.width, self.cols, self.gap, self.extra)[0]
 
         def _x(self, col):
+            """Calculate a panel column's x position, accounting for extra width."""
             wide_col = self.wide_panel % self.cols
             return col * (self.panel_width + self.gap) + (
                 self.extra if col > wide_col else 0
             )
 
         def to_svg(self, path=None, *, background=None):
+            """Compose panel SVGs into one SVG string and optionally write it."""
             panel_svgs = [
                 _svg.to_svg(fig, id_prefix=f"xy{i}-", background=background)
                 for i, fig in enumerate(self.figures)
@@ -676,6 +686,7 @@ def _colorbar_grid_class():
             return doc
 
         def _compose_rgba(self, scale, background=None):
+            """Rasterize the grid panels into a single RGBA image array."""
             if scale <= 0 or not np.isfinite(scale):
                 raise ValueError("facet export scale must be finite and positive")
             width = int(round(self.width * scale))
@@ -702,6 +713,7 @@ def _colorbar_grid_class():
             return canvas
 
         def to_html(self, path=None, *, custom_css=None):
+            """Export the grid as HTML with a wider column for the colorbar panel."""
             base, wide = _panel_widths(self.width, self.cols, self.gap, self.extra)
             wide_col = self.wide_panel % self.cols
             columns = " ".join(
@@ -899,6 +911,7 @@ def _grid(
 
 
 def _smax_label(name):
+    """Format a fit name as a short response-amplitude legend label."""
     # Fitting names end in "_id_<Smax ID>"; the panel title already names the
     # sample, so the legend only needs the ID and stays short in small panels.
     sample, sep, smax_id = str(name).rpartition("_id_")
@@ -915,6 +928,7 @@ def _dataset_title(sample, fit, index):
 
 
 def _array(values):
+    """Flatten step-wise measurements or convert flat values to a NumPy array."""
     # Each sensor may contain several acquisition steps, or a flat list.
     if isinstance(values, (list, tuple)) and values and np.ndim(values[0]) > 0:
         return np.concatenate(values)
@@ -931,6 +945,7 @@ def _single_chart(
     legend_toggle=True,
     legend_room=False,
 ):
+    """Create a single XY chart with configured axes and legend behavior."""
     xy = _xy()
     legend = _resolve_config(
         legend_config,
@@ -1189,6 +1204,7 @@ def _concentration_decades(fits, axis):
 
 
 def _zero_line():
+    """Create the horizontal reference line at zero residual."""
     return _xy().hline(0, color="#667085", width=1)
 
 
