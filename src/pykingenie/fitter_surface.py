@@ -635,6 +635,7 @@ class KineticsFitter(KineticsFitterGeneral):
         """
 
         self.clear_fittings()
+        self.shared_smax = shared_smax
 
         p0, low_bounds, high_bounds = self.get_k_off_initial_guess()
 
@@ -677,76 +678,103 @@ class KineticsFitter(KineticsFitterGeneral):
         self.fit_params_kinetics       = df_fit
         self.fit_params_kinetics_error = df_error
 
+        if calc_loo:
+
+            self.one_site_association_loo()
+
+        return  None
+
+    def one_site_association_loo(self):
+        """
+        Calculate leave-one-out (LOO) estimates for Kd and k_off.
+        
+        This function calculates the LOO estimates for Kd and k_off by fitting
+        the association curves while leaving out one curve at a time.
+        
+        Returns
+        -------
+        None
+        
+        Notes
+        -----
+            Updates the following instance attributes:
+            - Kd_loo: List of LOO estimates for Kd
+            - k_off_loo: List of LOO estimates for k_off
+            - Kd_loo_mean: Mean of LOO estimates for Kd
+            - k_off_loo_mean: Mean of LOO estimates for k_off
+            - Kd_loo_std: Standard deviation of LOO estimates for Kd
+            - k_off_loo_std: Standard deviation of LOO estimates for k_off
+            - df_fit_loo: DataFrame with mean ± SD for Kd and k_off
+        """
+
         """
         Leave-one-out curve method for error estimation of the fitted parameters.
         """
 
-        if calc_loo:
+        Kd_loo = []
+        k_off_loo = []
 
-            Kd_loo = []
-            k_off_loo = []
+        # Iterate over replicates that may share Smax ID
+        for i in range(len(self.assoc_lst)):
 
-            # Iterate over replicates that may share Smax ID
-            for i in range(len(self.assoc_lst)):
+            temp_assoc_lst = copy.deepcopy(self.assoc_lst)
+            temp_time_assoc_lst = copy.deepcopy(self.time_assoc_lst)
 
-                temp_assoc_lst = copy.deepcopy(self.assoc_lst)
-                temp_time_assoc_lst = copy.deepcopy(self.time_assoc_lst)
+            # Remove element ii from replicate i 
+            temp_assoc_lst = remove_at(temp_assoc_lst, i)
+            temp_time_assoc_lst = remove_at(temp_time_assoc_lst, i)
 
-                # Remove element ii from replicate i 
-                temp_assoc_lst = remove_at(temp_assoc_lst, i)
-                temp_time_assoc_lst = remove_at(temp_time_assoc_lst, i)
+            temp_lig_conc_lst = copy.deepcopy(self.lig_conc_lst)
+            temp_lig_conc_lst = remove_at(temp_lig_conc_lst, i)
 
-                temp_lig_conc_lst = copy.deepcopy(self.lig_conc_lst)
-                temp_lig_conc_lst = remove_at(temp_lig_conc_lst, i)
+            temp_p0 = copy.deepcopy(self.params)
+            temp_low_bounds = copy.deepcopy(self.low_bounds)
+            temp_high_bounds = copy.deepcopy(self.high_bounds)
+
+            # Remove element from the initial guess and bounds corresponding to the removed measurement
+            
+            if not self.shared_smax:
+                idx = 2 + i # Kd + Koff + index of the Smax to remove
+                temp_p0 = remove_at(temp_p0, idx)
+                temp_low_bounds = remove_at(temp_low_bounds, idx)
+                temp_high_bounds = remove_at(temp_high_bounds, idx)
+
+            temp_smax_idx = copy.deepcopy(self.smax_id)
+
+            temp_smax_idx = remove_at(temp_smax_idx, i)
+
+            # run the fitting function on the modified lists
+            fit_loo, _, _ = fit_one_site_association(temp_assoc_lst,
+                                                            temp_time_assoc_lst,
+                                                            temp_lig_conc_lst,
+                                                            temp_p0,
+                                                            low_bounds=temp_low_bounds,
+                                                            high_bounds=temp_high_bounds,
+                                                            smax_idx=temp_smax_idx,
+                                                            shared_smax=self.shared_smax)
+
+            Kd_loo.append(fit_loo[0])
+            k_off_loo.append(fit_loo[1])
+
+        self.Kd_loo = Kd_loo
+        self.k_off_loo = k_off_loo
+
+        self.Kd_loo_mean = np.mean(Kd_loo)
+        self.k_off_loo_mean = np.mean(k_off_loo)
+
+        self.Kd_loo_std = np.std(Kd_loo)
+        self.k_off_loo_std = np.std(k_off_loo)
+
+        # Create a dataframe with mean ± SD
+        df_fit_loo = pd.DataFrame({
+            'Kd [µM]': [f'{self.Kd_loo_mean:.2e} ± {self.Kd_loo_std:.2e}'],
+            'k_off [1/s]': [f'{self.k_off_loo_mean:.2e} ± {self.k_off_loo_std:.2e}']
+        })
+
+        self.df_fit_loo = df_fit_loo
 
 
-                temp_p0 = copy.deepcopy(fit)
-                temp_low_bounds = copy.deepcopy(self.low_bounds)
-                temp_high_bounds = copy.deepcopy(self.high_bounds)
-
-                # Remove element from the initial guess and bounds corresponding to the removed measurement
-                
-                if not shared_smax:
-                    idx = 2 + i # Kd + Koff + index of the Smax to remove
-                    temp_p0 = remove_at(temp_p0, idx)
-                    temp_low_bounds = remove_at(temp_low_bounds, idx)
-                    temp_high_bounds = remove_at(temp_high_bounds, idx)
-
-                temp_smax_idx = copy.deepcopy(self.smax_id)
-
-                temp_smax_idx = remove_at(temp_smax_idx, i)
-
-                # run the fitting function on the modified lists
-                fit_loo, _, _ = fit_one_site_association(temp_assoc_lst,
-                                                                temp_time_assoc_lst,
-                                                                temp_lig_conc_lst,
-                                                                temp_p0,
-                                                                low_bounds=temp_low_bounds,
-                                                                high_bounds=temp_high_bounds,
-                                                                smax_idx=temp_smax_idx,
-                                                                shared_smax=shared_smax)
-
-                Kd_loo.append(fit_loo[0])
-                k_off_loo.append(fit_loo[1])
-
-            self.Kd_loo = Kd_loo
-            self.k_off_loo = k_off_loo
-
-            self.Kd_loo_mean = np.mean(Kd_loo)
-            self.k_off_loo_mean = np.mean(k_off_loo)
-
-            self.Kd_loo_std = np.std(Kd_loo)
-            self.k_off_loo_std = np.std(k_off_loo)
-
-            # Create a dataframe with mean ± SD
-            df_fit_loo = pd.DataFrame({
-                'Kd [µM]': [f'{self.Kd_loo_mean:.2e} ± {self.Kd_loo_std:.2e}'],
-                'k_off [1/s]': [f'{self.k_off_loo_mean:.2e} ± {self.k_off_loo_std:.2e}']
-            })
-
-            self.df_fit_loo = df_fit_loo
-
-        return  None
+        return None
 
     def fit_one_site_dissociation(self, time_limit=0, calc_loo=False):
         """
@@ -785,6 +813,10 @@ class KineticsFitter(KineticsFitterGeneral):
             disso_lst      = [x[t < (np.min(t)+time_limit)] for x,t in zip(disso_lst,time_disso_lst)]
             time_disso_lst = [t[t < (np.min(t)+time_limit)] for t in time_disso_lst]
 
+    
+        self.disso_lst_subset = disso_lst
+        self.time_disso_lst_subset = time_disso_lst
+
         p0 = [0.1] + [np.max(signal) for signal in disso_lst]
 
         low_bounds  = [1e-7] + [x/5 for x in p0[1:]]
@@ -819,51 +851,57 @@ class KineticsFitter(KineticsFitterGeneral):
 
         if calc_loo:
 
-            k_off_loo = []
-
-            # Iterate over replicates that may share Smax ID
-            for i in range(len(self.assoc_lst)):
-
-                temp_disso_lst = copy.deepcopy(disso_lst)
-                temp_time_disso_lst = copy.deepcopy(time_disso_lst)
-
-                # Remove element ii from replicate i 
-                temp_disso_lst = remove_at(temp_disso_lst, i)
-                temp_time_disso_lst = remove_at(temp_time_disso_lst, i)
-
-                temp_p0 = copy.deepcopy(fit)
-                temp_low_bounds = copy.deepcopy(self.low_bounds)
-                temp_high_bounds = copy.deepcopy(self.high_bounds)
-
-                # Remove element from the initial guess and bounds corresponding to the removed measurement
-                
-                idx = 1 + i #  Koff + index of the S0 to remove
-                temp_p0 = remove_at(temp_p0, idx)
-                temp_low_bounds = remove_at(temp_low_bounds, idx)
-                temp_high_bounds = remove_at(temp_high_bounds, idx)
-
-                # run the fitting function on the modified lists
-                fit_loo, _, _ = fit_one_site_dissociation(
-                    temp_disso_lst,
-                    temp_time_disso_lst,
-                    temp_p0,
-                    low_bounds=temp_low_bounds,
-                    high_bounds=temp_high_bounds)
-
-                k_off_loo.append(fit_loo[0])
-
-            self.k_off_loo = k_off_loo
-            self.k_off_loo_mean = np.mean(k_off_loo)
-            self.k_off_loo_std = np.std(k_off_loo)
-
-            # Create a dataframe with mean ± SD
-            df_fit_loo = pd.DataFrame({
-                'k_off [1/s]': [f'{self.k_off_loo_mean:.2e} ± {self.k_off_loo_std:.2e}']
-            })
-
-            self.df_fit_loo = df_fit_loo
+           self.one_site_dissociation_loo()
 
         return  None
+
+    def one_site_dissociation_loo(self):
+
+        k_off_loo = []
+
+        # Iterate over replicates that may share Smax ID
+        for i in range(len(self.disso_lst_subset)):
+
+            temp_disso_lst = copy.deepcopy(self.disso_lst_subset)
+            temp_time_disso_lst = copy.deepcopy(self.time_disso_lst_subset)
+
+            # Remove element ii from replicate i 
+            temp_disso_lst = remove_at(temp_disso_lst, i)
+            temp_time_disso_lst = remove_at(temp_time_disso_lst, i)
+
+            temp_p0 = copy.deepcopy(self.params)
+            temp_low_bounds = copy.deepcopy(self.low_bounds)
+            temp_high_bounds = copy.deepcopy(self.high_bounds)
+
+            # Remove element from the initial guess and bounds corresponding to the removed measurement
+            
+            idx = 1 + i #  Koff + index of the S0 to remove
+            temp_p0 = remove_at(temp_p0, idx)
+            temp_low_bounds = remove_at(temp_low_bounds, idx)
+            temp_high_bounds = remove_at(temp_high_bounds, idx)
+
+            # run the fitting function on the modified lists
+            fit_loo, _, _ = fit_one_site_dissociation(
+                temp_disso_lst,
+                temp_time_disso_lst,
+                temp_p0,
+                low_bounds=temp_low_bounds,
+                high_bounds=temp_high_bounds)
+
+            k_off_loo.append(fit_loo[0])
+
+        self.k_off_loo = k_off_loo
+        self.k_off_loo_mean = np.mean(k_off_loo)
+        self.k_off_loo_std = np.std(k_off_loo)
+
+        # Create a dataframe with mean ± SD
+        df_fit_loo = pd.DataFrame({
+            'k_off [1/s]': [f'{self.k_off_loo_mean:.2e} ± {self.k_off_loo_std:.2e}']
+        })
+
+        self.df_fit_loo = df_fit_loo
+
+        return None
 
     def fit_single_exponentials(self):
         """
@@ -917,6 +955,10 @@ class KineticsFitter(KineticsFitterGeneral):
         """
 
         self.clear_fittings()
+
+        self.shared_smax = shared_smax
+        self.fit_ktr = fit_ktr
+        self.fixed_t0 = fixed_t0
 
         p0, low_bounds, high_bounds = self.get_k_off_initial_guess()
 
@@ -994,6 +1036,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         self.signal_assoc_fit = fit_vals_assoc
         self.signal_disso_fit = fit_vals_disso
+        self.smax_param_start = smax_param_start
 
         self.Kd   = fit[0]
         self.k_off = fit[1]
@@ -1063,114 +1106,125 @@ class KineticsFitter(KineticsFitterGeneral):
 
         if calc_loo:
 
-            Kd_loo = []
-            k_off_loo = []
-
-            if fit_ktr:
-
-                # one ktr per Smax group - replicates with the same Smax ID share the same ktr
-                ktrs_loo = [[] for _ in range(n_ktr)]
-
-            # Iterate over replicates that may share Smax ID
-            for i in range(len(self.assoc_lst)):
-
-                temp_assoc_lst = copy.deepcopy(self.assoc_lst)
-                temp_time_assoc_lst = copy.deepcopy(self.time_assoc_lst)
-
-                temp_disso_lst = copy.deepcopy(self.disso_lst)
-                temp_time_disso_lst = copy.deepcopy(self.time_disso_lst)
-
-                # Remove element ii from replicate i 
-                temp_assoc_lst = remove_at(temp_assoc_lst, i)
-                temp_time_assoc_lst = remove_at(temp_time_assoc_lst, i)
-                temp_disso_lst = remove_at(temp_disso_lst, i)
-                temp_time_disso_lst = remove_at(temp_time_disso_lst, i)
-
-                temp_lig_conc_lst = copy.deepcopy(self.lig_conc_lst)
-                temp_lig_conc_lst = remove_at(temp_lig_conc_lst, i)
-
-                temp_p0 = copy.deepcopy(fit)
-                temp_low_bounds = copy.deepcopy(self.low_bounds)
-                temp_high_bounds = copy.deepcopy(self.high_bounds)
-
-                # Remove element from the initial guess and bounds corresponding to the removed measurement
-                
-                if not shared_smax:
-
-                    idx = smax_param_start + i
-                    temp_p0 = remove_at(temp_p0, idx)
-                    temp_low_bounds = remove_at(temp_low_bounds, idx)
-                    temp_high_bounds = remove_at(temp_high_bounds, idx)
-
-                temp_smax_idx = copy.deepcopy(self.smax_id)
-
-                temp_smax_idx = remove_at(temp_smax_idx, i)
-
-                kwargs = {
-                    'assoc_signal_lst' : temp_assoc_lst,
-                    'assoc_time_lst' : temp_time_assoc_lst,
-                    'analyte_conc_lst' : temp_lig_conc_lst,
-                    'disso_signal_lst' : temp_disso_lst,
-                    'disso_time_lst' : temp_time_disso_lst,
-                    'shared_smax' : shared_smax,
-                    'smax_idx' : temp_smax_idx,
-                    'fixed_t0' : fixed_t0,
-                    'initial_parameters' : temp_p0,
-                    'low_bounds' : temp_low_bounds,
-                    'high_bounds' : temp_high_bounds
-                }
-
-                fit_fx = fit_one_site_assoc_and_disso_ktr if fit_ktr else fit_one_site_assoc_and_disso
-
-                # run the fitting function on the modified lists
-                fit_loo, _, _, _ = fit_fx(**kwargs)
-
-                Kd_loo.append(fit_loo[0])
-                k_off_loo.append(fit_loo[1])
-
-                if fit_ktr:
-
-                    n_ktr      = len(np.unique(self.smax_id))
-                    idx_start  = 2+(not fixed_t0)*n_ktr
-                    ktrs       = fit[idx_start:smax_param_start]
-
-                    for j, ktr in enumerate(ktrs):
-                        ktrs_loo[j].append(ktr)
-
-            self.Kd_loo = Kd_loo
-            self.k_off_loo = k_off_loo
-
-            self.Kd_loo_mean = np.mean(Kd_loo)
-            self.k_off_loo_mean = np.mean(k_off_loo)
-
-            self.Kd_loo_std = np.std(Kd_loo)
-            self.k_off_loo_std = np.std(k_off_loo)
-
-            # Create a dataframe with mean ± SD
-            df_fit_loo = pd.DataFrame({
-                'Kd [µM]': [f'{self.Kd_loo_mean:.2e} ± {self.Kd_loo_std:.2e}'],
-                'k_off [1/s]': [f'{self.k_off_loo_mean:.2e} ± {self.k_off_loo_std:.2e}']
-            })
-
-            if fit_ktr:
-
-                ktr_loo_means = []
-                ktr_loo_stds = []
-
-                for j, ktr_loo in enumerate(ktrs_loo):
-
-                    ktr_loo_means.append(np.mean(ktr_loo))
-                    ktr_loo_stds.append(np.std(ktr_loo))
-
-                    df_fit_loo['Ktr [1/s] - Replicate ' + str(j)] = [
-                        f'{np.mean(ktr_loo):.2e} ± {np.std(ktr_loo):.2e}']
-
-                self.ktr_loo_means = ktr_loo_means
-                self.ktr_loo_stds = ktr_loo_stds
-
-            self.df_fit_loo = df_fit_loo
+            self.one_site_assoc_and_disso_loo()
 
         return  None
+
+    def one_site_assoc_and_disso_loo(self):
+
+        Kd_loo = []
+        k_off_loo = []
+
+        fit_ktr = self.fit_ktr
+        fixed_t0 = self.fixed_t0
+        shared_smax = self.shared_smax
+        smax_param_start = self.smax_param_start
+        n_ktr = len(np.unique(self.smax_id))
+
+        if fit_ktr:
+
+            # one ktr per Smax group - replicates with the same Smax ID share the same ktr
+            ktrs_loo = [[] for _ in range(n_ktr)]
+
+        # Iterate over replicates that may share Smax ID
+        for i in range(len(self.assoc_lst)):
+
+            temp_assoc_lst = copy.deepcopy(self.assoc_lst)
+            temp_time_assoc_lst = copy.deepcopy(self.time_assoc_lst)
+
+            temp_disso_lst = copy.deepcopy(self.disso_lst)
+            temp_time_disso_lst = copy.deepcopy(self.time_disso_lst)
+
+            # Remove element ii from replicate i 
+            temp_assoc_lst = remove_at(temp_assoc_lst, i)
+            temp_time_assoc_lst = remove_at(temp_time_assoc_lst, i)
+            temp_disso_lst = remove_at(temp_disso_lst, i)
+            temp_time_disso_lst = remove_at(temp_time_disso_lst, i)
+
+            temp_lig_conc_lst = copy.deepcopy(self.lig_conc_lst)
+            temp_lig_conc_lst = remove_at(temp_lig_conc_lst, i)
+
+            temp_p0 = copy.deepcopy(self.params)
+            temp_low_bounds = copy.deepcopy(self.low_bounds)
+            temp_high_bounds = copy.deepcopy(self.high_bounds)
+
+            # Remove element from the initial guess and bounds corresponding to the removed measurement
+            
+            if not shared_smax:
+
+                idx = smax_param_start + i
+                temp_p0 = remove_at(temp_p0, idx)
+                temp_low_bounds = remove_at(temp_low_bounds, idx)
+                temp_high_bounds = remove_at(temp_high_bounds, idx)
+
+            temp_smax_idx = copy.deepcopy(self.smax_id)
+
+            temp_smax_idx = remove_at(temp_smax_idx, i)
+
+            kwargs = {
+                'assoc_signal_lst' : temp_assoc_lst,
+                'assoc_time_lst' : temp_time_assoc_lst,
+                'analyte_conc_lst' : temp_lig_conc_lst,
+                'disso_signal_lst' : temp_disso_lst,
+                'disso_time_lst' : temp_time_disso_lst,
+                'shared_smax' : shared_smax,
+                'smax_idx' : temp_smax_idx,
+                'fixed_t0' : fixed_t0,
+                'initial_parameters' : temp_p0,
+                'low_bounds' : temp_low_bounds,
+                'high_bounds' : temp_high_bounds
+            }
+
+            fit_fx = fit_one_site_assoc_and_disso_ktr if fit_ktr else fit_one_site_assoc_and_disso
+
+            # run the fitting function on the modified lists
+            fit_loo, _, _, _ = fit_fx(**kwargs)
+
+            Kd_loo.append(fit_loo[0])
+            k_off_loo.append(fit_loo[1])
+
+            if fit_ktr:
+
+                n_ktr      = len(np.unique(self.smax_id))
+                idx_start  = 2+(not fixed_t0)*n_ktr
+                ktrs       = fit_loo[idx_start:smax_param_start]
+
+                for j, ktr in enumerate(ktrs):
+                    ktrs_loo[j].append(ktr)
+
+        self.Kd_loo = Kd_loo
+        self.k_off_loo = k_off_loo
+
+        self.Kd_loo_mean = np.mean(Kd_loo)
+        self.k_off_loo_mean = np.mean(k_off_loo)
+
+        self.Kd_loo_std = np.std(Kd_loo)
+        self.k_off_loo_std = np.std(k_off_loo)
+
+        # Create a dataframe with mean ± SD
+        df_fit_loo = pd.DataFrame({
+            'Kd [µM]': [f'{self.Kd_loo_mean:.2e} ± {self.Kd_loo_std:.2e}'],
+            'k_off [1/s]': [f'{self.k_off_loo_mean:.2e} ± {self.k_off_loo_std:.2e}']
+        })
+
+        if fit_ktr:
+
+            ktr_loo_means = []
+            ktr_loo_stds = []
+
+            for j, ktr_loo in enumerate(ktrs_loo):
+
+                ktr_loo_means.append(np.mean(ktr_loo))
+                ktr_loo_stds.append(np.std(ktr_loo))
+
+                df_fit_loo['Ktr [1/s] - Replicate ' + str(j)] = [
+                    f'{np.mean(ktr_loo):.2e} ± {np.std(ktr_loo):.2e}']
+
+            self.ktr_loo_means = ktr_loo_means
+            self.ktr_loo_stds = ktr_loo_stds
+
+        self.df_fit_loo = df_fit_loo
+
 
     def fit_two_site_assoc_and_disso(self, shared_smax=True, fixed_t0=True, fit_sigma=False, calc_loo=False):
 
@@ -1193,6 +1247,7 @@ class KineticsFitter(KineticsFitterGeneral):
         """
 
         self.clear_fittings()
+
 
         # Obtain initial guesses and bounds for Kd and k_off
         self.fit_one_site_assoc_and_disso(shared_smax=shared_smax, fixed_t0=True, fit_ktr=False)
@@ -1372,91 +1427,120 @@ class KineticsFitter(KineticsFitterGeneral):
         self.low_bounds = p0_low
         self.high_bounds = p0_high
 
+        # below and not on top because the first fitting with one site will overwrite fixed_t0 otherwise
+        self.shared_smax = shared_smax
+        self.fixed_t0 = fixed_t0
+        self.fit_sigma = fit_sigma
+
         if calc_loo:
 
-            Kd_loo = []
-            k_off_loo = []
+            self.two_site_assoc_and_disso_loo()
+
+        return None
+
+    def two_site_assoc_and_disso_loo(self):
+
+        shared_smax = self.shared_smax
+        fixed_t0 = self.fixed_t0
+        fit_sigma = self.fit_sigma
+        n_unq_smax = len(np.unique(self.smax_id))
+
+        Kd_loo = []
+        k_off_loo = []
+
+        if fit_sigma:
+            sigma_loo = []
+
+        # Iterate over replicates that may share Smax ID
+        for i in range(len(self.assoc_lst)):
+
+            temp_assoc_lst = copy.deepcopy(self.assoc_lst)
+            temp_time_assoc_lst = copy.deepcopy(self.time_assoc_lst)
+
+            temp_disso_lst = copy.deepcopy(self.disso_lst)
+            temp_time_disso_lst = copy.deepcopy(self.time_disso_lst)
+
+            # Remove element ii from replicate i 
+            temp_assoc_lst = remove_at(temp_assoc_lst, i)
+            temp_time_assoc_lst = remove_at(temp_time_assoc_lst, i)
+            temp_disso_lst = remove_at(temp_disso_lst, i)
+            temp_time_disso_lst = remove_at(temp_time_disso_lst, i)
+
+            temp_lig_conc_lst = copy.deepcopy(self.lig_conc_lst)
+            temp_lig_conc_lst = remove_at(temp_lig_conc_lst, i)
+
+            temp_p0 = copy.deepcopy(self.params)
+            temp_low_bounds = copy.deepcopy(self.low_bounds)
+            temp_high_bounds = copy.deepcopy(self.high_bounds)
+
+            # Remove element from the initial guess and bounds corresponding to the removed measurement
+            
+            if not shared_smax:
+
+                idx_start = 2 + fit_sigma + (not fixed_t0) * n_unq_smax
+
+                idx_rmax_pl = idx_start + 2 * i
+                idx_rmax_lpl = idx_rmax_pl + 1
+
+                temp_p0 = remove_at(temp_p0, idx_rmax_lpl)
+                temp_p0 = remove_at(temp_p0, idx_rmax_pl)
+
+                temp_low_bounds = remove_at(temp_low_bounds, idx_rmax_lpl)
+                temp_low_bounds = remove_at(temp_low_bounds, idx_rmax_pl)
+
+                temp_high_bounds = remove_at(temp_high_bounds, idx_rmax_lpl)
+                temp_high_bounds = remove_at(temp_high_bounds, idx_rmax_pl)
+
+            temp_smax_idx = copy.deepcopy(self.smax_id)
+            temp_smax_idx = remove_at(temp_smax_idx, i)
+
+            kwargs_loo = {
+                'assoc_signal_lst' : temp_assoc_lst,
+                'assoc_time_lst' : temp_time_assoc_lst,    
+                'analyte_conc_lst' : temp_lig_conc_lst,
+                'disso_signal_lst' : temp_disso_lst,
+                'disso_time_lst' : temp_time_disso_lst,
+                'initial_parameters' : temp_p0,
+                'low_bounds' : temp_low_bounds,
+                'high_bounds' : temp_high_bounds,
+                'shared_smax' : shared_smax,
+                'smax_idx' : temp_smax_idx,
+                'fixed_t0' : fixed_t0,
+                'fit_sigma' : fit_sigma,
+            }
+
+            fit_loo, _, _, _ = fit_two_site_assoc_and_disso(**kwargs_loo)
+
+            Kd_loo.append(fit_loo[0])
+            k_off_loo.append(fit_loo[1])
 
             if fit_sigma:
-                sigma_loo = []
+                sigma_loo.append(fit_loo[2])
 
-            # Iterate over replicates that may share Smax ID
-            for i in range(len(self.assoc_lst)):
+        self.Kd_loo = Kd_loo
+        self.k_off_loo = k_off_loo
 
-                temp_assoc_lst = copy.deepcopy(self.assoc_lst)
-                temp_time_assoc_lst = copy.deepcopy(self.time_assoc_lst)
+        self.Kd_loo_mean = np.mean(Kd_loo)
+        self.k_off_loo_mean = np.mean(k_off_loo)
+        self.Kd_loo_std = np.std(Kd_loo)
+        self.k_off_loo_std = np.std(k_off_loo)
 
-                temp_disso_lst = copy.deepcopy(self.disso_lst)
-                temp_time_disso_lst = copy.deepcopy(self.time_disso_lst)
 
-                # Remove element ii from replicate i 
-                temp_assoc_lst = remove_at(temp_assoc_lst, i)
-                temp_time_assoc_lst = remove_at(temp_time_assoc_lst, i)
-                temp_disso_lst = remove_at(temp_disso_lst, i)
-                temp_time_disso_lst = remove_at(temp_time_disso_lst, i)
+        df_fit_loo = pd.DataFrame({
+            'Kd [µM]': [f'{self.Kd_loo_mean:.2e} ± {self.Kd_loo_std:.2e}'],
+            'k_off [1/s]': [f'{self.k_off_loo_mean:.2e} ± {self.k_off_loo_std:.2e}']
+        })
 
-                temp_lig_conc_lst = copy.deepcopy(self.lig_conc_lst)
-                temp_lig_conc_lst = remove_at(temp_lig_conc_lst, i)
+        # Add sigma to the dataframe if it was fitted
+        if fit_sigma:
 
-                temp_p0 = copy.deepcopy(fit)
-                temp_low_bounds = copy.deepcopy(self.low_bounds)
-                temp_high_bounds = copy.deepcopy(self.high_bounds)
+            self.sigma_loo = sigma_loo
+            self.sigma_loo_mean = np.mean(sigma_loo) 
+            self.sigma_loo_std = np.std(sigma_loo) 
 
-                # Remove element from the initial guess and bounds corresponding to the removed measurement
-                
-                if not shared_smax:
+            df_fit_loo['sigma'] = [f'{self.sigma_loo_mean:.2e} ± {self.sigma_loo_std:.2e}']
 
-                    idx_start = 2 + fit_sigma + (not fixed_t0) * n_unq_smax
-
-                    idx_rmax_pl = idx_start + 2 * i
-                    idx_rmax_lpl = idx_rmax_pl + 1
-
-                    temp_p0 = remove_at(temp_p0, idx_rmax_lpl)
-                    temp_p0 = remove_at(temp_p0, idx_rmax_pl)
-
-                    temp_low_bounds = remove_at(temp_low_bounds, idx_rmax_lpl)
-                    temp_low_bounds = remove_at(temp_low_bounds, idx_rmax_pl)
-
-                    temp_high_bounds = remove_at(temp_high_bounds, idx_rmax_lpl)
-                    temp_high_bounds = remove_at(temp_high_bounds, idx_rmax_pl)
-
-                temp_smax_idx = copy.deepcopy(self.smax_id)
-                temp_smax_idx = remove_at(temp_smax_idx, i)
-
-                kwargs_loo = {
-                    'assoc_signal_lst' : temp_assoc_lst,
-                    'assoc_time_lst' : temp_time_assoc_lst,    
-                    'analyte_conc_lst' : temp_lig_conc_lst,
-                    'disso_signal_lst' : temp_disso_lst,
-                    'disso_time_lst' : temp_time_disso_lst,
-                    'initial_parameters' : temp_p0,
-                    'low_bounds' : temp_low_bounds,
-                    'high_bounds' : temp_high_bounds,
-                    'shared_smax' : shared_smax,
-                    'smax_idx' : temp_smax_idx,
-                    'fixed_t0' : fixed_t0,
-                    'fit_sigma' : fit_sigma,
-                }
-
-                fit_loo, _, _, _ = fit_two_site_assoc_and_disso(**kwargs_loo)
-
-                Kd_loo.append(fit_loo[0])
-                k_off_loo.append(fit_loo[1])
-
-            self.Kd_loo = Kd_loo
-            self.k_off_loo = k_off_loo
-
-            self.Kd_loo_mean = np.mean(Kd_loo)
-            self.k_off_loo_mean = np.mean(k_off_loo)
-            self.Kd_loo_std = np.std(Kd_loo)
-            self.k_off_loo_std = np.std(k_off_loo)
-
-            df_fit_loo = pd.DataFrame({
-                'Kd [µM]': [f'{self.Kd_loo_mean:.2e} ± {self.Kd_loo_std:.2e}'],
-                'k_off [1/s]': [f'{self.k_off_loo_mean:.2e} ± {self.k_off_loo_std:.2e}']
-            })
-
-            self.df_fit_loo = df_fit_loo
+        self.df_fit_loo = df_fit_loo
 
         return None
 
@@ -1710,91 +1794,105 @@ class KineticsFitter(KineticsFitterGeneral):
         self.best_Kd1_grid = best_Kd1
         self.best_Kd2_grid = best_Kd2
 
+        self.shared_smax = shared_smax
+        self.fixed_t0 = fixed_t0
+
         if calc_loo:
 
-            Kd1_loo = []
-            k_off1_loo = []
-            Kd2_loo = []
-            k_off2_loo = []
-            fraction_site1_loo = []
+            self.two_site_heterogeneous_ligand_assoc_and_disso_loo()
 
-            for i in range(len(self.assoc_lst)):
-                temp_assoc_lst = copy.deepcopy(self.assoc_lst)
-                temp_time_assoc_lst = copy.deepcopy(self.time_assoc_lst)
-                temp_disso_lst = copy.deepcopy(self.disso_lst)
-                temp_time_disso_lst = copy.deepcopy(self.time_disso_lst)
+        return None
 
-                temp_assoc_lst = remove_at(temp_assoc_lst, i)
-                temp_time_assoc_lst = remove_at(temp_time_assoc_lst, i)
-                temp_disso_lst = remove_at(temp_disso_lst, i)
-                temp_time_disso_lst = remove_at(temp_time_disso_lst, i)
+    def two_site_heterogeneous_ligand_assoc_and_disso_loo(self):
 
-                temp_lig_conc_lst = copy.deepcopy(self.lig_conc_lst)
-                temp_lig_conc_lst = remove_at(temp_lig_conc_lst, i)
+        shared_smax = self.shared_smax
+        fixed_t0 = self.fixed_t0
+        n_unq_smax = len(np.unique(self.smax_id))
 
-                temp_p0 = copy.deepcopy(fit)
-                temp_low_bounds = copy.deepcopy(low_bounds)
-                temp_high_bounds = copy.deepcopy(high_bounds)
+        Kd1_loo = []
+        k_off1_loo = []
+        Kd2_loo = []
+        k_off2_loo = []
+        fraction_site1_loo = []
 
-                if not shared_smax:
-                    idx_start = 5 + (not fixed_t0) * n_unq_smax
-                    idx_rmax = idx_start + i
-                    temp_p0 = remove_at(temp_p0, idx_rmax)
-                    temp_low_bounds = remove_at(temp_low_bounds, idx_rmax)
-                    temp_high_bounds = remove_at(temp_high_bounds, idx_rmax)
+        for i in range(len(self.assoc_lst)):
 
-                temp_smax_idx = copy.deepcopy(self.smax_id)
-                temp_smax_idx = remove_at(temp_smax_idx, i)
+            temp_assoc_lst = copy.deepcopy(self.assoc_lst)
+            temp_time_assoc_lst = copy.deepcopy(self.time_assoc_lst)
+            temp_disso_lst = copy.deepcopy(self.disso_lst)
+            temp_time_disso_lst = copy.deepcopy(self.time_disso_lst)
 
-                kwargs_loo = {
-                    'assoc_signal_lst': temp_assoc_lst,
-                    'assoc_time_lst': temp_time_assoc_lst,
-                    'analyte_conc_lst': temp_lig_conc_lst,
-                    'disso_signal_lst': temp_disso_lst,
-                    'disso_time_lst': temp_time_disso_lst,
-                    'initial_parameters': temp_p0,
-                    'low_bounds': temp_low_bounds,
-                    'high_bounds': temp_high_bounds,
-                    'shared_smax': shared_smax,
-                    'smax_idx': temp_smax_idx,
-                    'fixed_t0': fixed_t0,
-                }
+            temp_assoc_lst = remove_at(temp_assoc_lst, i)
+            temp_time_assoc_lst = remove_at(temp_time_assoc_lst, i)
+            temp_disso_lst = remove_at(temp_disso_lst, i)
+            temp_time_disso_lst = remove_at(temp_time_disso_lst, i)
 
-                fit_loo, _, _, _ = fit_two_site_heterogeneous_ligand_assoc_and_disso(**kwargs_loo)
+            temp_lig_conc_lst = copy.deepcopy(self.lig_conc_lst)
+            temp_lig_conc_lst = remove_at(temp_lig_conc_lst, i)
 
-                Kd1_loo.append(fit_loo[0])
-                k_off1_loo.append(fit_loo[1])
-                Kd2_loo.append(fit_loo[2])
-                k_off2_loo.append(fit_loo[3])
-                fraction_site1_loo.append(fit_loo[4])
+            temp_p0 = copy.deepcopy(self.params)
+            temp_low_bounds = copy.deepcopy(self.low_bounds)
+            temp_high_bounds = copy.deepcopy(self.high_bounds)
 
-            self.Kd1_loo = Kd1_loo
-            self.k_off1_loo = k_off1_loo
-            self.Kd2_loo = Kd2_loo
-            self.k_off2_loo = k_off2_loo
-            self.fraction_site1_loo = fraction_site1_loo
+            if not shared_smax:
+                idx_start = 5 + (not fixed_t0) * n_unq_smax
+                idx_rmax = idx_start + i
+                temp_p0 = remove_at(temp_p0, idx_rmax)
+                temp_low_bounds = remove_at(temp_low_bounds, idx_rmax)
+                temp_high_bounds = remove_at(temp_high_bounds, idx_rmax)
 
-            self.Kd1_loo_mean = np.mean(Kd1_loo)
-            self.k_off1_loo_mean = np.mean(k_off1_loo)
-            self.Kd2_loo_mean = np.mean(Kd2_loo)    
-            self.k_off2_loo_mean = np.mean(k_off2_loo)
-            self.fraction_site1_loo_mean = np.mean(fraction_site1_loo)
+            temp_smax_idx = copy.deepcopy(self.smax_id)
+            temp_smax_idx = remove_at(temp_smax_idx, i)
 
-            self.Kd1_loo_std = np.std(Kd1_loo)
-            self.k_off1_loo_std = np.std(k_off1_loo)
-            self.Kd2_loo_std = np.std(Kd2_loo)
-            self.k_off2_loo_std = np.std(k_off2_loo)
-            self.fraction_site1_loo_std = np.std(fraction_site1_loo)
+            kwargs_loo = {
+                'assoc_signal_lst': temp_assoc_lst,
+                'assoc_time_lst': temp_time_assoc_lst,
+                'analyte_conc_lst': temp_lig_conc_lst,
+                'disso_signal_lst': temp_disso_lst,
+                'disso_time_lst': temp_time_disso_lst,
+                'initial_parameters': temp_p0,
+                'low_bounds': temp_low_bounds,
+                'high_bounds': temp_high_bounds,
+                'shared_smax': shared_smax,
+                'smax_idx': temp_smax_idx,
+                'fixed_t0': fixed_t0,
+            }
 
-            df_fit_loo = pd.DataFrame({
-                'Kd1 [µM]': [f'{self.Kd1_loo_mean:.2e} ± {self.Kd1_loo_std:.2e}'],
-                'k_off1 [1/s]': [f'{self.k_off1_loo_mean:.2e} ± {self.k_off1_loo_std:.2e}'],
-                'Kd2 [µM]': [f'{self.Kd2_loo_mean:.2e} ± {self.Kd2_loo_std:.2e}'],
-                'k_off2 [1/s]': [f'{self.k_off2_loo_mean:.2e} ± {self.k_off2_loo_std:.2e}'],
-                'fraction_site1': [f'{self.fraction_site1_loo_mean:.2e} ± {self.fraction_site1_loo_std:.2e}']
-            })
+            fit_loo, _, _, _ = fit_two_site_heterogeneous_ligand_assoc_and_disso(**kwargs_loo)
 
-            self.df_fit_loo = df_fit_loo
+            Kd1_loo.append(fit_loo[0])
+            k_off1_loo.append(fit_loo[1])
+            Kd2_loo.append(fit_loo[2])
+            k_off2_loo.append(fit_loo[3])
+            fraction_site1_loo.append(fit_loo[4])
+
+        self.Kd1_loo = Kd1_loo
+        self.k_off1_loo = k_off1_loo
+        self.Kd2_loo = Kd2_loo
+        self.k_off2_loo = k_off2_loo
+        self.fraction_site1_loo = fraction_site1_loo
+
+        self.Kd1_loo_mean = np.mean(Kd1_loo)
+        self.k_off1_loo_mean = np.mean(k_off1_loo)
+        self.Kd2_loo_mean = np.mean(Kd2_loo)    
+        self.k_off2_loo_mean = np.mean(k_off2_loo)
+        self.fraction_site1_loo_mean = np.mean(fraction_site1_loo)
+
+        self.Kd1_loo_std = np.std(Kd1_loo)
+        self.k_off1_loo_std = np.std(k_off1_loo)
+        self.Kd2_loo_std = np.std(Kd2_loo)
+        self.k_off2_loo_std = np.std(k_off2_loo)
+        self.fraction_site1_loo_std = np.std(fraction_site1_loo)
+
+        df_fit_loo = pd.DataFrame({
+            'Kd1 [µM]': [f'{self.Kd1_loo_mean:.2e} ± {self.Kd1_loo_std:.2e}'],
+            'k_off1 [1/s]': [f'{self.k_off1_loo_mean:.2e} ± {self.k_off1_loo_std:.2e}'],
+            'Kd2 [µM]': [f'{self.Kd2_loo_mean:.2e} ± {self.Kd2_loo_std:.2e}'],
+            'k_off2 [1/s]': [f'{self.k_off2_loo_mean:.2e} ± {self.k_off2_loo_std:.2e}'],
+            'fraction_site1': [f'{self.fraction_site1_loo_mean:.2e} ± {self.fraction_site1_loo_std:.2e}']
+        })
+
+        self.df_fit_loo = df_fit_loo
 
         return None
 
@@ -2030,92 +2128,102 @@ class KineticsFitter(KineticsFitterGeneral):
         self.low_bounds  = low_bounds
         self.high_bounds = high_bounds
 
+        self.shared_smax = shared_smax
+
         if calc_loo:
             
-            k_on_loo = []
-            k_off_loo = []
-            k_c_loo = []
-            k_rev_loo = []
+            self.one_site_if_assoc_and_disso_loo()
 
-            for i in range(len(self.assoc_lst)):
+        return None
 
-                temp_assoc_lst = copy.deepcopy(self.assoc_lst)
-                temp_time_assoc_lst = copy.deepcopy(self.time_assoc_lst)
+    def one_site_if_assoc_and_disso_loo(self):
 
-                temp_disso_lst = copy.deepcopy(self.disso_lst)
-                temp_time_disso_lst = copy.deepcopy(self.time_disso_lst)
+        shared_smax = self.shared_smax
 
-                # Remove element ii from replicate i 
-                temp_assoc_lst = remove_at(temp_assoc_lst, i)
-                temp_time_assoc_lst = remove_at(temp_time_assoc_lst, i)
-                temp_disso_lst = remove_at(temp_disso_lst, i)
-                temp_time_disso_lst = remove_at(temp_time_disso_lst, i)
+        k_on_loo = []
+        k_off_loo = []
+        k_c_loo = []
+        k_rev_loo = []
 
-                temp_lig_conc_lst = copy.deepcopy(self.lig_conc_lst)
-                temp_lig_conc_lst = remove_at(temp_lig_conc_lst, i)
+        for i in range(len(self.assoc_lst)):
 
-                temp_p0 = copy.deepcopy(fit)
-                temp_low_bounds = copy.deepcopy(self.low_bounds)
-                temp_high_bounds = copy.deepcopy(self.high_bounds)
+            temp_assoc_lst = copy.deepcopy(self.assoc_lst)
+            temp_time_assoc_lst = copy.deepcopy(self.time_assoc_lst)
 
-                # Remove element from the initial guess and bounds corresponding to the removed measurement
-                if not shared_smax:
+            temp_disso_lst = copy.deepcopy(self.disso_lst)
+            temp_time_disso_lst = copy.deepcopy(self.time_disso_lst)
 
-                    idx_start = 4
+            # Remove element ii from replicate i 
+            temp_assoc_lst = remove_at(temp_assoc_lst, i)
+            temp_time_assoc_lst = remove_at(temp_time_assoc_lst, i)
+            temp_disso_lst = remove_at(temp_disso_lst, i)
+            temp_time_disso_lst = remove_at(temp_time_disso_lst, i)
 
-                    idx_rmax = idx_start +  i 
+            temp_lig_conc_lst = copy.deepcopy(self.lig_conc_lst)
+            temp_lig_conc_lst = remove_at(temp_lig_conc_lst, i)
 
-                    temp_p0 = remove_at(temp_p0, idx_rmax)
-                    temp_low_bounds = remove_at(temp_low_bounds, idx_rmax)
-                    temp_high_bounds = remove_at(temp_high_bounds, idx_rmax)
+            temp_p0 = copy.deepcopy(self.params)
+            temp_low_bounds = copy.deepcopy(self.low_bounds)
+            temp_high_bounds = copy.deepcopy(self.high_bounds)
 
-                temp_smax_idx = copy.deepcopy(self.smax_id)
-                temp_smax_idx = remove_at(temp_smax_idx, i)
+            # Remove element from the initial guess and bounds corresponding to the removed measurement
+            if not shared_smax:
 
-                kwargs_loo = {
-                    'assoc_signal_lst' : temp_assoc_lst,
-                    'assoc_time_lst' : temp_time_assoc_lst,    
-                    'analyte_conc_lst' : temp_lig_conc_lst,
-                    'disso_signal_lst' : temp_disso_lst,
-                    'disso_time_lst' : temp_time_disso_lst,
-                    'initial_parameters' : temp_p0,
-                    'low_bounds' : temp_low_bounds,
-                    'high_bounds' : temp_high_bounds,
-                    'shared_smax' : shared_smax,
-                    'smax_idx' : temp_smax_idx,
-                    'fixed_t0' : True
-                }
+                idx_start = 4
 
-                fit_loo, _, _, _ = fit_induced_fit_sites_assoc_and_disso(**kwargs_loo)
+                idx_rmax = idx_start +  i 
 
-                k_on_loo.append(fit_loo[0])
-                k_off_loo.append(fit_loo[1])
-                k_c_loo.append(fit_loo[2])
-                k_rev_loo.append(fit_loo[3])
+                temp_p0 = remove_at(temp_p0, idx_rmax)
+                temp_low_bounds = remove_at(temp_low_bounds, idx_rmax)
+                temp_high_bounds = remove_at(temp_high_bounds, idx_rmax)
 
-            self.k_on_loo = k_on_loo
-            self.k_off_loo = k_off_loo
-            self.k_c_loo = k_c_loo
-            self.k_rev_loo = k_rev_loo  
+            temp_smax_idx = copy.deepcopy(self.smax_id)
+            temp_smax_idx = remove_at(temp_smax_idx, i)
 
-            self.k_on_loo_mean = np.mean(k_on_loo)
-            self.k_off_loo_mean = np.mean(k_off_loo)
-            self.k_c_loo_mean = np.mean(k_c_loo)
-            self.k_rev_loo_mean = np.mean(k_rev_loo)
+            kwargs_loo = {
+                'assoc_signal_lst' : temp_assoc_lst,
+                'assoc_time_lst' : temp_time_assoc_lst,    
+                'analyte_conc_lst' : temp_lig_conc_lst,
+                'disso_signal_lst' : temp_disso_lst,
+                'disso_time_lst' : temp_time_disso_lst,
+                'initial_parameters' : temp_p0,
+                'low_bounds' : temp_low_bounds,
+                'high_bounds' : temp_high_bounds,
+                'shared_smax' : shared_smax,
+                'smax_idx' : temp_smax_idx,
+                'fixed_t0' : True
+            }
 
-            self.k_on_loo_std = np.std(k_on_loo)
-            self.k_off_loo_std = np.std(k_off_loo)
-            self.k_c_loo_std = np.std(k_c_loo)
-            self.k_rev_loo_std = np.std(k_rev_loo)
+            fit_loo, _, _, _ = fit_induced_fit_sites_assoc_and_disso(**kwargs_loo)
 
-            df_fit_loo = pd.DataFrame({
-                'k_on [1/(s*µM)]': [f'{self.k_on_loo_mean:.2e} ± {self.k_on_loo_std:.2e}'],
-                'k_off [1/s]': [f'{self.k_off_loo_mean:.2e} ± {self.k_off_loo_std:.2e}'],
-                'k_c [1/s]': [f'{self.k_c_loo_mean:.2e} ± {self.k_c_loo_std:.2e}'],
-                'k_rev [1/s]': [f'{self.k_rev_loo_mean:.2e} ± {self.k_rev_loo_std:.2e}']
-            })
+            k_on_loo.append(fit_loo[0])
+            k_off_loo.append(fit_loo[1])
+            k_c_loo.append(fit_loo[2])
+            k_rev_loo.append(fit_loo[3])
 
-            self.df_fit_loo = df_fit_loo
+        self.k_on_loo = k_on_loo
+        self.k_off_loo = k_off_loo
+        self.k_c_loo = k_c_loo
+        self.k_rev_loo = k_rev_loo  
+
+        self.k_on_loo_mean = np.mean(k_on_loo)
+        self.k_off_loo_mean = np.mean(k_off_loo)
+        self.k_c_loo_mean = np.mean(k_c_loo)
+        self.k_rev_loo_mean = np.mean(k_rev_loo)
+
+        self.k_on_loo_std = np.std(k_on_loo)
+        self.k_off_loo_std = np.std(k_off_loo)
+        self.k_c_loo_std = np.std(k_c_loo)
+        self.k_rev_loo_std = np.std(k_rev_loo)
+
+        df_fit_loo = pd.DataFrame({
+            'k_on [1/(s*µM)]': [f'{self.k_on_loo_mean:.2e} ± {self.k_on_loo_std:.2e}'],
+            'k_off [1/s]': [f'{self.k_off_loo_mean:.2e} ± {self.k_off_loo_std:.2e}'],
+            'k_c [1/s]': [f'{self.k_c_loo_mean:.2e} ± {self.k_c_loo_std:.2e}'],
+            'k_rev [1/s]': [f'{self.k_rev_loo_mean:.2e} ± {self.k_rev_loo_std:.2e}']
+        })
+
+        self.df_fit_loo = df_fit_loo
 
         return None
 
