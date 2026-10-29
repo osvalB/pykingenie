@@ -715,6 +715,8 @@ class KineticsFitter(KineticsFitterGeneral):
 
         Kd_loo = []
         k_off_loo = []
+        n_fits_loo_ok = 0
+        n_fits_loo_fail = 0
 
         # Iterate over replicates that may share Smax ID
         for i in range(len(self.assoc_lst)):
@@ -745,18 +747,28 @@ class KineticsFitter(KineticsFitterGeneral):
 
             temp_smax_idx = remove_at(temp_smax_idx, i)
 
-            # run the fitting function on the modified lists
-            fit_loo, _, _ = fit_one_site_association(temp_assoc_lst,
-                                                            temp_time_assoc_lst,
-                                                            temp_lig_conc_lst,
-                                                            temp_p0,
-                                                            low_bounds=temp_low_bounds,
-                                                            high_bounds=temp_high_bounds,
-                                                            smax_idx=temp_smax_idx,
-                                                            shared_smax=self.shared_smax)
+            try:
 
-            Kd_loo.append(fit_loo[0])
-            k_off_loo.append(fit_loo[1])
+                # run the fitting function on the modified lists
+                fit_loo, _, _ = fit_one_site_association(
+                    temp_assoc_lst,
+                    temp_time_assoc_lst,
+                    temp_lig_conc_lst,
+                    temp_p0,
+                    low_bounds=temp_low_bounds,
+                    high_bounds=temp_high_bounds,
+                    smax_idx=temp_smax_idx,
+                    shared_smax=self.shared_smax
+                )
+
+                Kd_loo.append(fit_loo[0])
+                k_off_loo.append(fit_loo[1])
+
+                n_fits_loo_ok += 1
+
+            except Exception as e:
+                n_fits_loo_fail += 1
+                pass  # If the fitting fails, we just skip this iteration
 
         self.Kd_loo = Kd_loo
         self.k_off_loo = k_off_loo
@@ -774,7 +786,6 @@ class KineticsFitter(KineticsFitterGeneral):
         })
 
         self.df_fit_loo = df_fit_loo
-
 
         return None
 
@@ -873,6 +884,8 @@ class KineticsFitter(KineticsFitterGeneral):
         """
 
         k_off_loo = []
+        n_fits_loo_ok = 0
+        n_fits_loo_fail = 0
 
         # Iterate over replicates that may share Smax ID
         for i in range(len(self.disso_lst_subset)):
@@ -895,15 +908,18 @@ class KineticsFitter(KineticsFitterGeneral):
             temp_low_bounds = remove_at(temp_low_bounds, idx)
             temp_high_bounds = remove_at(temp_high_bounds, idx)
 
-            # run the fitting function on the modified lists
-            fit_loo, _, _ = fit_one_site_dissociation(
-                temp_disso_lst,
-                temp_time_disso_lst,
-                temp_p0,
-                low_bounds=temp_low_bounds,
-                high_bounds=temp_high_bounds)
-
-            k_off_loo.append(fit_loo[0])
+            try:
+                # Run the fitting function on the modified lists.
+                fit_loo, _, _ = fit_one_site_dissociation(
+                    temp_disso_lst,
+                    temp_time_disso_lst,
+                    temp_p0,
+                    low_bounds=temp_low_bounds,
+                    high_bounds=temp_high_bounds)
+                k_off_loo.append(fit_loo[0])
+                n_fits_loo_ok += 1
+            except Exception:
+                n_fits_loo_fail += 1
 
         self.k_off_loo = k_off_loo
         self.k_off_loo_mean = np.mean(k_off_loo)
@@ -1151,6 +1167,8 @@ class KineticsFitter(KineticsFitterGeneral):
         shared_smax = self.shared_smax
         smax_param_start = self.smax_param_start
         n_ktr = len(np.unique(self.smax_id))
+        n_fits_loo_ok = 0
+        n_fits_loo_fail = 0
 
         if fit_ktr:
 
@@ -1208,20 +1226,24 @@ class KineticsFitter(KineticsFitterGeneral):
 
             fit_fx = fit_one_site_assoc_and_disso_ktr if fit_ktr else fit_one_site_assoc_and_disso
 
-            # run the fitting function on the modified lists
-            fit_loo, _, _, _ = fit_fx(**kwargs)
+            try:
+                # Run the fitting function on the modified lists.
+                fit_loo, _, _, _ = fit_fx(**kwargs)
+                ktrs = []
+                if fit_ktr:
+                    idx_start = 2 + (not fixed_t0) * n_ktr
+                    ktrs = fit_loo[idx_start:smax_param_start]
 
-            Kd_loo.append(fit_loo[0])
-            k_off_loo.append(fit_loo[1])
+                Kd_loo.append(fit_loo[0])
+                k_off_loo.append(fit_loo[1])
 
-            if fit_ktr:
+                if fit_ktr:
+                    for j, ktr in enumerate(ktrs):
+                        ktrs_loo[j].append(ktr)
 
-                n_ktr      = len(np.unique(self.smax_id))
-                idx_start  = 2+(not fixed_t0)*n_ktr
-                ktrs       = fit_loo[idx_start:smax_param_start]
-
-                for j, ktr in enumerate(ktrs):
-                    ktrs_loo[j].append(ktr)
+                n_fits_loo_ok += 1
+            except Exception:
+                n_fits_loo_fail += 1
 
         self.Kd_loo = Kd_loo
         self.k_off_loo = k_off_loo
@@ -1495,6 +1517,8 @@ class KineticsFitter(KineticsFitterGeneral):
         fixed_t0 = self.fixed_t0
         fit_sigma = self.fit_sigma
         n_unq_smax = len(np.unique(self.smax_id))
+        n_fits_loo_ok = 0
+        n_fits_loo_fail = 0
 
         Kd_loo = []
         k_off_loo = []
@@ -1560,13 +1584,20 @@ class KineticsFitter(KineticsFitterGeneral):
                 'fit_sigma' : fit_sigma,
             }
 
-            fit_loo, _, _, _ = fit_two_site_assoc_and_disso(**kwargs_loo)
+            try:
+                fit_loo, _, _, _ = fit_two_site_assoc_and_disso(**kwargs_loo)
+                Kd = fit_loo[0]
+                k_off = fit_loo[1]
+                sigma = fit_loo[2] if fit_sigma else None
 
-            Kd_loo.append(fit_loo[0])
-            k_off_loo.append(fit_loo[1])
+                Kd_loo.append(Kd)
+                k_off_loo.append(k_off)
+                if fit_sigma:
+                    sigma_loo.append(sigma)
 
-            if fit_sigma:
-                sigma_loo.append(fit_loo[2])
+                n_fits_loo_ok += 1
+            except Exception:
+                n_fits_loo_fail += 1
 
         self.Kd_loo = Kd_loo
         self.k_off_loo = k_off_loo
@@ -1884,6 +1915,8 @@ class KineticsFitter(KineticsFitterGeneral):
         shared_smax = self.shared_smax
         fixed_t0 = self.fixed_t0
         n_unq_smax = len(np.unique(self.smax_id))
+        n_fits_loo_ok = 0
+        n_fits_loo_fail = 0
 
         Kd1_loo = []
         k_off1_loo = []
@@ -1934,13 +1967,19 @@ class KineticsFitter(KineticsFitterGeneral):
                 'fixed_t0': fixed_t0,
             }
 
-            fit_loo, _, _, _ = fit_two_site_heterogeneous_ligand_assoc_and_disso(**kwargs_loo)
-
-            Kd1_loo.append(fit_loo[0])
-            k_off1_loo.append(fit_loo[1])
-            Kd2_loo.append(fit_loo[2])
-            k_off2_loo.append(fit_loo[3])
-            fraction_site1_loo.append(fit_loo[4])
+            try:
+                fit_loo, _, _, _ = fit_two_site_heterogeneous_ligand_assoc_and_disso(
+                    **kwargs_loo
+                )
+                Kd1, k_off1, Kd2, k_off2, fraction_site1 = fit_loo[:5]
+                Kd1_loo.append(Kd1)
+                k_off1_loo.append(k_off1)
+                Kd2_loo.append(Kd2)
+                k_off2_loo.append(k_off2)
+                fraction_site1_loo.append(fraction_site1)
+                n_fits_loo_ok += 1
+            except Exception:
+                n_fits_loo_fail += 1
 
         self.Kd1_loo = Kd1_loo
         self.k_off1_loo = k_off1_loo
@@ -2225,6 +2264,8 @@ class KineticsFitter(KineticsFitterGeneral):
         k_off_loo = []
         k_c_loo = []
         k_rev_loo = []
+        n_fits_loo_ok = 0
+        n_fits_loo_fail = 0
 
         for i in range(len(self.assoc_lst)):
 
@@ -2275,12 +2316,16 @@ class KineticsFitter(KineticsFitterGeneral):
                 'fixed_t0' : True
             }
 
-            fit_loo, _, _, _ = fit_induced_fit_sites_assoc_and_disso(**kwargs_loo)
-
-            k_on_loo.append(fit_loo[0])
-            k_off_loo.append(fit_loo[1])
-            k_c_loo.append(fit_loo[2])
-            k_rev_loo.append(fit_loo[3])
+            try:
+                fit_loo, _, _, _ = fit_induced_fit_sites_assoc_and_disso(**kwargs_loo)
+                k_on, k_off, k_c, k_rev = fit_loo[:4]
+                k_on_loo.append(k_on)
+                k_off_loo.append(k_off)
+                k_c_loo.append(k_c)
+                k_rev_loo.append(k_rev)
+                n_fits_loo_ok += 1
+            except Exception:
+                n_fits_loo_fail += 1
 
         self.k_on_loo = k_on_loo
         self.k_off_loo = k_off_loo
