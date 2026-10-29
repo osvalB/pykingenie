@@ -1,3 +1,5 @@
+"""Fit kinetic models for solution-based experiments."""
+
 import numpy as np
 import pandas as pd
 import itertools
@@ -99,6 +101,7 @@ def fit_one_site_solution(
             parameter_names.append(f't0_{i+1}')
 
     def fit_fx(_, *args):
+        """Evaluate the one-site solution binding model for optimizer parameters."""
         # Efficient argument unpacking
         idx = 0
 
@@ -286,6 +289,7 @@ def fit_induced_fit_solution(
             parameter_names.append(f'scale_factor_{i+1}')
 
     def fit_fx(_, *args):
+        """Evaluate the solution binding model with an induced-fit step."""
         # Efficient argument unpacking
         idx = 0
 
@@ -509,6 +513,7 @@ def fit_conformational_selection_solution(
             parameter_names.append(f'scale_factor_{i + 1}')
 
     def fit_fx(_, *args):
+        """Evaluate the solution binding model with conformational selection."""
         # Efficient argument unpacking
         idx = 0
 

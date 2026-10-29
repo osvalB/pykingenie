@@ -1,3 +1,5 @@
+"""Plotting helpers for kinetic experiments and fit results."""
+
 import numpy as np
 import pandas as pd
 

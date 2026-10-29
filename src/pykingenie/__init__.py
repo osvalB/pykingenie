@@ -1,3 +1,5 @@
+"""Public API for surface- and solution-based kinetic analysis."""
+
 from .main              import KineticsAnalyzer
 from .fitter_solution   import KineticsFitterSolution
 from .fitter_surface    import KineticsFitter

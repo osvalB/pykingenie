@@ -1,3 +1,5 @@
+"""General curve-fitting utilities for exponential signal models."""
+
 import itertools
 import numpy as np
 import pandas as pd
@@ -65,6 +67,8 @@ def fit_single_exponential(y, t, min_log_k=-5, max_log_k=5, log_k_points=50):
 
     # define a single exponential function reduced to fit only a0 and a1
     def single_exponential_reduced(t, a0, a1):
+        """Evaluate a single exponential with the current rate fixed."""
+
         return a0 + a1 * np.exp(-k_obs * t)
 
     rss         = np.inf
@@ -143,6 +147,9 @@ def fit_double_exponential(y, t, min_log_k=-4, max_log_k=4, log_k_points=24):
         k_obs2 = row['k_obs_2']
 
         def double_exponential_reduced(t, a0, a1, a2):
+
+
+            """Evaluate a double exponential with both rates fixed."""
 
             return a0 + a1 * np.exp(-k_obs1 * t) + a2 * np.exp(-k_obs2 * t)
 

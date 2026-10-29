@@ -1,3 +1,5 @@
+"""Load solution-based simulation data exported by KinGenie."""
+
 import pandas as pd
 import numpy  as np
 
@@ -35,6 +37,7 @@ class KinGenieCsvSolution(SolutionBasedExp):
     """
 
     def __init__(self, name):
+        """Initialize a solution-based KinGenie CSV experiment named ``name``."""
 
         super().__init__(name, 'kingenie_csv_solution')
         

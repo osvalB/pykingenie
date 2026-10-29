@@ -1,3 +1,5 @@
+"""Shared base class for kinetics fitting result state and utilities."""
+
 import pandas as pd
 
 class KineticsFitterGeneral:

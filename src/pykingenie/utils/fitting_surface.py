@@ -1,3 +1,5 @@
+"""Fit steady-state and kinetic models for surface-based experiments."""
+
 import numpy as np
 
 from .processing import concat_signal_lst, detect_time_list_continuos
@@ -163,6 +165,7 @@ def fit_steady_state_one_site(signal_lst, ligand_lst, initial_parameters,
         _offsets[_k + 1] = _offsets[_k] + _n
 
     def fit_fx(dummyVariable, *args):
+        """Evaluate the one-site steady-state binding model for the optimizer."""
 
         Kd = Kd_value if fixed_Kd else args[0]
 
@@ -255,6 +258,7 @@ def fit_steady_state_two_site(
         _start += 1
 
     def fit_fx(dummyVariable, *args):
+        """Evaluate the two-site steady-state binding model for the optimizer."""
         _ = dummyVariable
 
         idx = 0
@@ -370,6 +374,7 @@ def fit_steady_state_two_site_heterogeneous_ligand(
         _offsets[_k + 1] = _offsets[_k] + _n
 
     def fit_fx(dummyVariable, *args):
+        """Evaluate the heterogeneous-ligand steady-state model for the optimizer."""
         _ = dummyVariable
 
         idx = 0
@@ -442,6 +447,7 @@ def steady_state_one_site_asymmetric_ci95(kd_estimated, signal_lst, ligand_lst, 
     _all_signal_ref = concat_signal_lst(signal_lst)
 
     def f_to_optimize(Kd):
+        """Measure the fit's RSS difference from the confidence-limit target."""
 
         _, _, fit_vals = fit_steady_state_one_site(signal_lst, ligand_lst,
                                                   initial_parameters,
@@ -530,6 +536,7 @@ def fit_one_site_association(signal_lst, time_lst, analyte_conc_lst,
         _offsets[_k + 1] = _offsets[_k] + _n
 
     def fit_fx(dummyVariable, *args):
+        """Evaluate the global one-site association model for the optimizer."""
         Kd = Kd_value if fixed_Kd else args[0]
         Koff = koff_value if fixed_koff else args[1 - sum([fixed_Kd])]
         t0 = args[2 - sum([fixed_Kd, fixed_koff])] if not fixed_t0 else 0
@@ -612,6 +619,7 @@ def fit_one_site_dissociation(signal_lst, time_lst,
         _offsets[_k + 1] = _offsets[_k] + _n
 
     def fit_fx(dummyVariable, *args):
+        """Evaluate the global one-site dissociation model for the optimizer."""
         Koff = koff_value if fixed_koff else args[0]
         t0 = args[1 - sum([fixed_koff])] if not fixed_t0 else 0
 
@@ -731,6 +739,7 @@ def fit_one_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
         _d_offsets[_k + 1] = _d_offsets[_k] + _d_lengths[_k]
 
     def fit_fx(dummyVariable, *args):
+        """Evaluate the global one-site association and dissociation model."""
         Kd   = Kd_value if fixed_Kd else args[0]
         Koff = koff_value if fixed_koff else args[1 - sum([fixed_Kd])]
 
@@ -887,6 +896,7 @@ def fit_two_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
         _d_offsets[_k + 1] = _d_offsets[_k] + _d_lengths[_k]
 
     def fit_fx(dummyVariable, *args):
+        """Evaluate the global two-site association and dissociation model."""
         _ = dummyVariable
 
         idx = 0
@@ -1127,6 +1137,7 @@ def fit_two_site_heterogeneous_ligand_assoc_and_disso(
         _d_offsets[_k + 1] = _d_offsets[_k] + _d_lengths[_k]
 
     def fit_fx(dummyVariable, *args):
+        """Evaluate the global heterogeneous-ligand association and dissociation model."""
         _ = dummyVariable
 
         idx = 0
@@ -1339,6 +1350,7 @@ def fit_induced_fit_sites_assoc_and_disso(
     )
 
     def fit_fx(_, *args):
+        """Evaluate the induced-fit surface binding model for the optimizer."""
         # Efficient argument unpacking
         idx = 0
         kon1 = kon1_value if fixed_kon1 else args[idx]; idx += not fixed_kon1
@@ -1485,6 +1497,7 @@ def fit_one_site_assoc_and_disso_ktr(assoc_signal_lst, assoc_time_lst, analyte_c
         _d_offsets[_k + 1] = _d_offsets[_k] + _d_lengths[_k]
 
     def fit_fx(dummyVariable, *args):
+        """Evaluate the one-site kinetic model including mass transport."""
         Kd   = Kd_value if fixed_Kd else args[0]
         Koff = koff_value if fixed_koff else args[1 - sum([fixed_Kd])]
 
@@ -1644,6 +1657,7 @@ def one_site_assoc_and_disso_asymmetric_ci95(kd_estimated, rss_desired,
             break
 
     def f_to_optimize(Kd):
+        """Measure the global fit's RSS difference from the Kd limit target."""
 
         Kd = Kd / 1e3
 
@@ -1774,6 +1788,7 @@ def one_site_assoc_and_disso_asymmetric_ci95_koff(koff_estimated, rss_desired,
             break
 
     def f_to_optimize(Koff):
+        """Measure the global fit's RSS difference from the koff limit target."""
 
         Koff = Koff / 1e3
 

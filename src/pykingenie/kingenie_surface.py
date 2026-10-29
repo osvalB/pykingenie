@@ -1,3 +1,5 @@
+"""Load surface-based simulation data exported by KinGenie."""
+
 import pandas as pd
 import numpy  as np
 
@@ -48,6 +50,7 @@ class KinGenieCsv(SurfaceBasedExperiment):
     """
 
     def __init__(self, name='kingenie_csv'):
+        """Initialize a surface-based KinGenie CSV experiment named ``name``."""
 
         super().__init__(name, 'kingenie_csv')
 

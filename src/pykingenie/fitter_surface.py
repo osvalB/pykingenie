@@ -1,3 +1,5 @@
+"""Fit steady-state and kinetic models to surface-based experimental data."""
+
 import itertools
 import copy
 import numpy as np
@@ -856,6 +858,19 @@ class KineticsFitter(KineticsFitterGeneral):
         return  None
 
     def one_site_dissociation_loo(self):
+        """Estimate dissociation-rate uncertainty by doing n-fits and leaving out each curve at a time.
+
+        Stores the leave-one-out rate estimates and their mean and standard
+        deviation on the fitter.
+
+        Notes
+        -----
+        Updates the following instance attributes:
+        - k_off_loo: List of leave-one-out estimates for k_off
+        - k_off_loo_mean: Mean of leave-one-out estimates for k_off
+        - k_off_loo_std: Standard deviation of leave-one-out estimates for k_off
+        - df_fit_loo: DataFrame with mean ± SD for k_off
+        """
 
         k_off_loo = []
 
@@ -1111,6 +1126,22 @@ class KineticsFitter(KineticsFitterGeneral):
         return  None
 
     def one_site_assoc_and_disso_loo(self):
+        """Estimate one-site kinetic parameter uncertainty by leave-one-out fits.
+
+        Repeats the global association/dissociation fit after omitting each
+        curve and stores the resulting parameter distributions.
+
+        Notes
+        -----
+        Updates the following instance attributes:
+        - Kd_loo: List of leave-one-out estimates for Kd
+        - k_off_loo: List of leave-one-out estimates for k_off
+        - Kd_loo_mean: Mean of leave-one-out estimates for Kd
+        - k_off_loo_mean: Mean of leave-one-out estimates for k_off
+        - Kd_loo_std: Standard deviation of leave-one-out estimates for Kd
+        - k_off_loo_std: Standard deviation of leave-one-out estimates for k_off
+        - df_fit_loo: DataFrame with mean ± SD for Kd and k_off
+        """
 
         Kd_loo = []
         k_off_loo = []
@@ -1439,6 +1470,25 @@ class KineticsFitter(KineticsFitterGeneral):
         return None
 
     def two_site_assoc_and_disso_loo(self):
+        """Estimate two-site kinetic parameter uncertainty by leave-one-out fits.
+
+        Repeats the global association/dissociation fit after omitting each
+        curve and stores the resulting parameter distributions.
+
+        Notes
+        -----
+        Updates the following instance attributes:
+        - Kd_loo: List of leave-one-out estimates for Kd
+        - k_off_loo: List of leave-one-out estimates for k_off
+        - Kd_loo_mean: Mean of leave-one-out estimates for Kd
+        - k_off_loo_mean: Mean of leave-one-out estimates for k_off
+        - Kd_loo_std: Standard deviation of leave-one-out estimates for Kd
+        - k_off_loo_std: Standard deviation of leave-one-out estimates for k_off
+        - df_fit_loo: DataFrame with mean ± SD for Kd and k_off
+        - sigma_loo: List of leave-one-out estimates for sigma (if fitted)
+        - sigma_loo_mean: Mean of leave-one-out estimates for sigma (if fitted)
+        - sigma_loo_std: Standard deviation of leave-one-out estimates for sigma (if fitted
+        """
 
         shared_smax = self.shared_smax
         fixed_t0 = self.fixed_t0
@@ -1804,6 +1854,31 @@ class KineticsFitter(KineticsFitterGeneral):
         return None
 
     def two_site_heterogeneous_ligand_assoc_and_disso_loo(self):
+        """Estimate heterogeneous-ligand fit uncertainty by doing n-fits leaving out one curve at a time.
+
+        Repeats the global association/dissociation fit after omitting each
+        curve and stores the resulting parameter distributions.
+
+        Notes
+        -----
+        Updates the following instance attributes:
+        - Kd1_loo: List of leave-one-out estimates for Kd1
+        - k_off1_loo: List of leave-one-out estimates for k_off1
+        - Kd2_loo: List of leave-one-out estimates for Kd2
+        - k_off2_loo: List of leave-one-out estimates for k_off2
+        - fraction_site1_loo: List of leave-one-out estimates for fraction_site1
+        - Kd1_loo_mean: Mean of leave-one-out estimates for Kd1
+        - k_off1_loo_mean: Mean of leave-one-out estimates for k_off1
+        - Kd2_loo_mean: Mean of leave-one-out estimates for Kd2
+        - k_off2_loo_mean: Mean of leave-one-out estimates for k_off2
+        - fraction_site1_loo_mean: Mean of leave-one-out estimates for fraction_site1
+        - Kd1_loo_std: Standard deviation of leave-one-out estimates for Kd1
+        - k_off1_loo_std: Standard deviation of leave-one-out estimates for k_off1
+        - Kd2_loo_std: Standard deviation of leave-one-out estimates for Kd2
+        - k_off2_loo_std: Standard deviation of leave-one-out estimates for k_off2
+        - fraction_site1_loo_std: Standard deviation of leave-one-out estimates for fraction_site1
+        - df_fit_loo: DataFrame with mean ± SD for Kd1, k_off1, Kd2, k_off2, and fraction_site1
+        """
 
         shared_smax = self.shared_smax
         fixed_t0 = self.fixed_t0
@@ -2137,6 +2212,11 @@ class KineticsFitter(KineticsFitterGeneral):
         return None
 
     def one_site_if_assoc_and_disso_loo(self):
+        """Estimate induced-fit parameter uncertainty by leave-one-out refitting.
+
+        Repeats the global association/dissociation fit after omitting each
+        replicate and stores the resulting parameter distributions.
+        """
 
         shared_smax = self.shared_smax
 

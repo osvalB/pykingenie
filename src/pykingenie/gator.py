@@ -1,3 +1,5 @@
+"""Import and manage Gator bio-layer interferometry experiments."""
+
 from .surface_exp      import SurfaceBasedExperiment
 import os
 import json
@@ -23,6 +25,7 @@ class GatorExperiment(SurfaceBasedExperiment):
     """
 
     def __init__(self, name = 'Gator_experiment'):
+        """Initialize a Gator experiment with its default instrument type."""
 
         super().__init__(name, 'Gator_experiment')
 

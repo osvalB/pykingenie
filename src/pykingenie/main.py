@@ -1,3 +1,5 @@
+"""Manage experiments and kinetic analyses through the analyzer API."""
+
 import pandas as pd
 import numpy as np
 
@@ -9,6 +11,7 @@ from .utils.processing import get_plotting_df
 from .solution_exp import SolutionBasedExp
 
 class KineticsAnalyzer:
+    """Coordinate experiment storage, fitting, and result access."""
 
     def __init__(self):
         """

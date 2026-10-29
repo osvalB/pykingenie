@@ -1,4 +1,6 @@
 
+"""Base abstractions for solution-based kinetic experiments."""
+
 class SolutionBasedExp:
     """
     Base class for solution-based kinetics experiments.

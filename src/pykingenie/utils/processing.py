@@ -1,3 +1,5 @@
+"""Data processing and experiment metadata helpers."""
+
 import re
 import math
 import itertools

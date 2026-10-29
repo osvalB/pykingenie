@@ -1,3 +1,5 @@
+"""Import and manage Octet bio-layer interferometry experiments."""
+
 import re
 import base64
 import xml.etree.ElementTree as elementTree

@@ -1,3 +1,5 @@
+"""Calculate surface-based kinetic signals and numerical trajectories."""
+
 import numpy         as np
 import pandas        as pd
 

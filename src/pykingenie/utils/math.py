@@ -1,3 +1,5 @@
+"""Mathematical models and statistics used in kinetic analysis."""
+
 import numpy as np
 import pandas as pd
 

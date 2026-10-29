@@ -1,3 +1,5 @@
+"""Fit kinetic models to solution-based experimental data."""
+
 import numpy as np
 import pandas as pd
 

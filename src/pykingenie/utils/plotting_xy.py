@@ -60,6 +60,7 @@ class PlotConfig:
     y_range: tuple[float, float] | None = None
 
     def __post_init__(self):
+        """Validate dimensions, font size, and axis ranges after initialization."""
         for name in ("plot_width", "plot_height"):
             _validate_count(getattr(self, name), name)
         _validate_size(self.font_size, "font_size", positive=True)
@@ -93,6 +94,7 @@ class AxisConfig:
     y_bounds: tuple[float, float] | str | None = None
 
     def __post_init__(self):
+        """Validate tick counts, axis styles, scales, and navigation bounds."""
         for name in ("n_x_axis_ticks", "n_y_axis_ticks"):
             _validate_count(getattr(self, name), name)
         for name in (
@@ -135,6 +137,7 @@ class LayoutConfig:
     split_by_smax_id: bool = True
 
     def __post_init__(self):
+        """Validate subplot counts, spacing, and shared-layout options."""
         _validate_count(self.ncols, "ncols")
         _validate_count(self.gap, "gap", minimum=0)
         if self.stacked and self.ncols not in (None, 1):
@@ -162,6 +165,7 @@ class LegendConfig:
     highlight: bool | None = None
 
     def __post_init__(self):
+        """Validate the legend column count and optional font size."""
         _validate_count(self.ncols, "legend ncols")
         _validate_size(self.font_size, "legend font_size", positive=True)
 
@@ -190,6 +194,7 @@ class TraceConfig:
     rolling_window: float = 0.1
 
     def __post_init__(self):
+        """Validate trace dimensions, sampling options, and opacity."""
         for name in ("marker_size", "line_width", "fit_line_width"):
             _validate_size(getattr(self, name), name)
         _validate_count(self.max_points, "max_points")
@@ -199,6 +204,7 @@ class TraceConfig:
 
 
 def _validate_count(value, name, minimum=1):
+    """Require an optional count value to be an integer at least ``minimum``."""
     if value is not None and (
         isinstance(value, (bool, np.bool_))
         or not isinstance(value, (int, np.integer))
@@ -208,6 +214,7 @@ def _validate_count(value, name, minimum=1):
 
 
 def _validate_size(value, name, positive=False):
+    """Require an optional size to be finite and nonnegative or positive."""
     if value is not None and (
         not np.isfinite(value) or value < 0 or (positive and value == 0)
     ):
@@ -217,6 +224,7 @@ def _validate_size(value, name, positive=False):
 
 
 def _validate_range(value, name):
+    """Return a validated pair of finite, increasing range limits."""
     if value is None:
         return None
     values = np.asarray(value, dtype=float)
@@ -245,6 +253,7 @@ def _resolve_config(config, cls, **defaults):
 
 
 def _xy():
+    """Import and return XY, with an actionable error when it is unavailable."""
     try:
         import xy
     except ImportError as exc:
@@ -256,6 +265,7 @@ def _xy():
 
 
 def _plot_settings(config, *, width=900, height=420, font_size=14, title=None):
+    """Resolve plot configuration values against helper-specific defaults."""
     return _resolve_config(
         config,
         PlotConfig,
@@ -268,6 +278,7 @@ def _plot_settings(config, *, width=900, height=420, font_size=14, title=None):
 
 
 def _styles(font_size, legend_font_size=None):
+    """Build XY text styles from the requested chart and legend font sizes."""
     # XY places a colorbar title a fixed 38 px from the bar, so larger
     # colorbar text would run into the tick labels.
     colorbar_font_size = min(font_size, 12)
@@ -282,12 +293,14 @@ def _styles(font_size, legend_font_size=None):
 
 
 def _axis_font_style(font_size):
+    """Return the axis style values needed to size labels and tick gutters."""
     # XY sizes the axis gutters from the axis style, not from the chart styles
     # used to draw the text, so both must carry the font size.
     return {"tick_label_size": font_size, "label_size": font_size}
 
 
 def _x_label_offset(font_size, tick_length):
+    """Calculate an x-axis title offset that clears its tick labels."""
     # XY places the x title a fixed 24 px below the plot, while the tick labels
     # above it end tick_length + 4 px padding + 0.8 em (baseline) + 0.24 em
     # (descent) below the plot. Move the title past them with a 0.4 em gap.
@@ -295,6 +308,7 @@ def _x_label_offset(font_size, tick_length):
 
 
 def _legend_style(font_size):
+    """Return XY legend CSS settings for the requested font size."""
     # XY's static legend layout only reads the CSS-style font size, so without
     # it the box is sized for 11 px text and clips larger labels. Without XY's
     # grey background box the legend hides no data points.
