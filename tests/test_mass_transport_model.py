@@ -1,6 +1,8 @@
+# This code is AI generated and reviewed by a human.
 """
-Checks of the two-compartment mass-transport model (Svitel et al. 2007, Eq. 5)
-against limits with known answers, conservation, expected behaviour and fits.
+Checks of the two-compartment mass-transport model (Svitel et al. 2007, Eq. 5,
+https://doi.org/10.1529/biophysj.106.094615) against limits with known answers,
+conservation, expected behaviour and fits.
 
     dS/dt  = kon * cs * (Smax - S) - koff * S
     dcs/dt = ktr * (c0 - cs) - dS/dt
@@ -29,6 +31,8 @@ def eq8_ode(c0, Kd, koff, ktr, smax):
 # Limits with known answers
 
 def test_large_ktr_matches_one_site_analytical():
+    """With very fast transport (ktr = 1e4) there is no transport limit, so both
+    phases must match the analytical one-site (1:1) association and dissociation."""
     t = np.linspace(0, 300, 301)
     c0 = 1.0
     s, _ = assoc(t, 0.0, 0.0, c0, KD, KOFF, 1e4, SMAX, return_cs=True)
@@ -42,6 +46,8 @@ def test_large_ktr_matches_one_site_analytical():
 @pytest.mark.parametrize("ktr", [0.005, 0.05, 5.0])
 @pytest.mark.parametrize("c0", [0.1, 0.5, 5.0])
 def test_equilibrium_does_not_depend_on_ktr(ktr, c0):
+    """Transport changes how fast binding happens, never where it ends: after a long
+    association S reaches Smax * c0 / (Kd + c0) and cs reaches the bulk c0, for any ktr."""
     t = np.linspace(0, 2e5, 401)
     s, cs = assoc(t, 0.0, 0.0, c0, KD, KOFF, ktr, SMAX, return_cs=True)
     assert np.isclose(s[-1], SMAX * c0 / (KD + c0), rtol=1e-2)
@@ -49,6 +55,8 @@ def test_equilibrium_does_not_depend_on_ktr(ktr, c0):
 
 
 def test_fast_surface_layer_follows_eq8():
+    """When the surface layer settles much faster than S changes, the full model
+    reduces to the quasi-steady-state form (Eq. 8), in association and dissociation."""
     # Surface layer settles at >= ktr = 0.5 /s, while S changes at <= ~0.01 /s
     Kd, koff, ktr, smax, c0 = 0.01, 0.001, 0.5, 5.0, 0.02
     t = np.linspace(0, 2000, 2001)
@@ -63,6 +71,8 @@ def test_fast_surface_layer_follows_eq8():
 
 
 def test_transport_only_without_binding():
+    """With no binding (huge Kd), nothing binds and the surface layer fills from
+    the bulk as c0 * (1 - exp(-ktr * t))."""
     t = np.linspace(0, 200, 201)
     ktr, c0 = 0.05, 2.0
     s, cs = assoc(t, 0.0, 0.0, c0, 1e9, 1e-9, ktr, 1.0, return_cs=True)
@@ -74,7 +84,8 @@ def test_transport_only_without_binding():
 
 @pytest.mark.parametrize("phase", ["association", "dissociation"])
 def test_mass_balance(phase):
-    # d(S + cs)/dt = ktr * (c0 - cs): what enters the surface layer either binds or stays free
+    """Analyte that enters the surface layer either binds or stays free:
+    S + cs changes by exactly the integrated transport flux ktr * (c0 - cs)."""
     t = np.linspace(0, 300, 3001)
     if phase == "association":
         c0 = 1.0
@@ -93,6 +104,8 @@ def test_mass_balance(phase):
 @pytest.mark.parametrize("ktr", [1e-3, 1.0, 1e3])
 @pytest.mark.parametrize("c0", [0.1, 10.0])
 def test_signal_and_surface_concentration_stay_in_bounds(Kd, koff, ktr, c0):
+    """Across a grid of parameters, 0 <= S <= Smax and 0 <= cs <= c0 in association,
+    and cs never rises above its starting value in dissociation."""
     t = np.linspace(0, 600, 301)
     # The solvers use LSODA's default rtol of 1e-3
     tol = 1e-3 * max(SMAX, c0)
@@ -107,6 +120,8 @@ def test_signal_and_surface_concentration_stay_in_bounds(Kd, koff, ktr, c0):
 # Mass-transport behaviour
 
 def test_slower_transport_slows_binding_and_dissociation():
+    """A smaller ktr gives a lower signal at every association time and, through
+    more rebinding, a higher signal at every dissociation time."""
     t = np.linspace(0, 300, 301)
     ktrs = [0.5, 0.05, 0.005]
 
@@ -121,6 +136,8 @@ def test_slower_transport_slows_binding_and_dissociation():
 
 
 def test_binding_is_transport_limited_when_kon_smax_dominates():
+    """When kon * Smax >> ktr, every molecule that reaches the surface binds, so the
+    early binding rate equals the transport flux ktr * c0, not kon."""
     # kon * Smax = 10 /s >> ktr = 0.01 /s: every molecule that arrives binds
     Kd, koff, ktr, smax, c0 = 0.01, 0.01, 0.01, 10.0, 0.1
     t = np.linspace(0, 100, 1001)
@@ -131,7 +148,8 @@ def test_binding_is_transport_limited_when_kon_smax_dominates():
 
 
 def test_rebinding_lowers_apparent_off_rate():
-    # Late dissociation (S << Smax): apparent koff = koff / (1 + kon * Smax / ktr)
+    """Late in dissociation (S << Smax), rebinding slows the decay to an apparent
+    off-rate of koff / (1 + kon * (Smax - S) / ktr)."""
     Kd, koff, ktr, smax = 0.1, 0.01, 0.5, 10.0
     kon = koff / Kd
     t = np.linspace(0, 1500, 1501)
@@ -146,6 +164,8 @@ def test_rebinding_lowers_apparent_off_rate():
 # State carried between steps (single-cycle kinetics)
 
 def test_restarting_from_returned_state_matches_one_solve():
+    """Single-cycle kinetics: solving in two pieces, restarting from the returned
+    (S, cs), must give the same curve as one solve, in both phases."""
     t = np.linspace(0, 200, 401)
     half = t <= 100
 
@@ -205,7 +225,9 @@ def fit(data, ktr_guess=0.01, ktr_upper=10.0, with_errors=False):
 
 @pytest.mark.parametrize("seed", range(5))
 def test_fit_recovers_parameters_from_noisy_data(seed):
-    # Kd and Smax are correlated, so each value is checked against its own standard error
+    """On data with 1% noise, the fit recovers Kd, koff, ktr and Smax within
+    3 standard errors, and those errors stay small (under 25%)."""
+    # Kd and Smax are correlated, so a fixed tolerance would fail by chance
     p, err = fit(simulate(KTR, noise=0.01 * SMAX, seed=seed), with_errors=True)
     for name, true in [("Kd", KD), ("koff", KOFF), ("ktr", KTR), ("smax", SMAX)]:
         assert abs(p[name] - true) < 3 * err[name], (name, p[name], err[name])
@@ -213,6 +235,8 @@ def test_fit_recovers_parameters_from_noisy_data(seed):
 
 
 def test_fit_does_not_invent_transport_limit():
+    """On data with no transport limit, the fit still recovers Kd and koff and
+    the fitted ktr is too large to matter."""
     p = fit(simulate(ktr=1e3), ktr_guess=0.05, ktr_upper=1e4)
     assert np.isclose(p["Kd"], KD, rtol=0.05)
     assert np.isclose(p["koff"], KOFF, rtol=0.05)
@@ -221,6 +245,8 @@ def test_fit_does_not_invent_transport_limit():
 
 
 def test_single_and_multi_cycle_fits_agree():
+    """The same parameters fitted from multi-cycle and single-cycle runs agree
+    with each other and with the true values."""
     multi = fit(simulate(KTR))
     single = fit(simulate(KTR, single_cycle=True))
     for name, true in [("Kd", KD), ("koff", KOFF), ("ktr", KTR), ("smax", SMAX)]:
