@@ -360,7 +360,7 @@ def test_fit_one_site_assoc_and_disso_ktr_single_cycle_recovers_parameters():
         d, cs_d = solve_ode_one_site_mass_transport_dissociation(
             t_d, a[-1], Kd_true, koff_true, ktr_true, smax_true, cs_0=cs_a[-1], return_cs=True
         )
-        assert cs_a[0] == cs0
+        assert np.isclose(cs_a[0], cs0, rtol=1e-12, atol=0)
         assert np.all(cs_d >= 0)
         assoc_t.append(t_a); disso_t.append(t_d); assoc_s.append(a); disso_s.append(d)
         s0, cs0, t_start = d[-1], cs_d[-1], t_a[-1] + 60

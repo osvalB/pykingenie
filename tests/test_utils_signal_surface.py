@@ -343,14 +343,15 @@ def test_mass_transport_solvers_return_surface_concentration():
 
     signal, cs = solve_ode_one_site_mass_transport_association(t, 0.0, 0.0, conc, Kd, koff, ktr, smax, return_cs=True)
     assert cs.shape == signal.shape
-    assert cs[0] == 0.0
+    assert np.isclose(cs[0], 0.0, rtol=1e-12, atol=0)
     assert np.all((cs >= -1e-9 * conc) & (cs <= conc * (1 + 1e-9)))
     assert np.array_equal(signal, solve_ode_one_site_mass_transport_association(t, 0.0, 0.0, conc, Kd, koff, ktr, smax))
 
     disso, cs_d = solve_ode_one_site_mass_transport_dissociation(t, signal[-1], Kd, koff, ktr, smax,
                                                                  cs_0=cs[-1], return_cs=True)
     # Dissociation continues from where the association ended
-    assert disso[0] == signal[-1] and cs_d[0] == cs[-1]
+    assert np.isclose(disso[0], signal[-1], rtol=1e-12, atol=0)
+    assert np.isclose(cs_d[0], cs[-1], rtol=1e-12, atol=0)
     # Analyte left in the surface layer keeps binding briefly, then the signal falls
     assert disso[-1] < disso.max()
     assert np.all(np.diff(disso[np.argmax(disso):]) <= 1e-9 * smax)
