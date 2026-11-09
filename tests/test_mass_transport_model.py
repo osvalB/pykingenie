@@ -37,10 +37,10 @@ def test_large_ktr_matches_one_site_analytical():
     c0 = 1.0
     s, _ = assoc(t, 0.0, 0.0, c0, KD, KOFF, 1e4, SMAX, return_cs=True)
     expected = one_site_association_analytical(t, 0.0, SMAX, KOFF, KD, c0)
-    assert np.allclose(s, expected, atol=1e-2 * SMAX)
+    assert np.allclose(s, expected, rtol=1e-2, atol=0)
 
     d = disso(t, s[-1], KD, KOFF, 1e4, SMAX)
-    assert np.allclose(d, one_site_dissociation_analytical(t, s[-1], KOFF), atol=1e-2 * SMAX)
+    assert np.allclose(d, one_site_dissociation_analytical(t, s[-1], KOFF), rtol=1e-2, atol=0)
 
 
 @pytest.mark.parametrize("ktr", [0.005, 0.05, 5.0])
@@ -50,8 +50,8 @@ def test_equilibrium_does_not_depend_on_ktr(ktr, c0):
     association S reaches Smax * c0 / (Kd + c0) and cs reaches the bulk c0, for any ktr."""
     t = np.linspace(0, 2e5, 401)
     s, cs = assoc(t, 0.0, 0.0, c0, KD, KOFF, ktr, SMAX, return_cs=True)
-    assert np.isclose(s[-1], SMAX * c0 / (KD + c0), rtol=1e-2)
-    assert np.isclose(cs[-1], c0, rtol=1e-2)
+    assert np.isclose(s[-1], SMAX * c0 / (KD + c0), rtol=1e-2, atol=0)
+    assert np.isclose(cs[-1], c0, rtol=1e-2, atol=0)
 
 
 def test_fast_surface_layer_follows_eq8():
@@ -61,13 +61,16 @@ def test_fast_surface_layer_follows_eq8():
     Kd, koff, ktr, smax, c0 = 0.01, 0.001, 0.5, 5.0, 0.02
     t = np.linspace(0, 2000, 2001)
 
-    s = assoc(t, 0.0, 0.0, c0, Kd, koff, ktr, smax)
+    # Start the surface layer at its quasi-steady-state value, as Eq. 8 assumes
+    kon = koff / Kd
+    cs0 = ktr * c0 / (ktr + kon * smax)
+    s = assoc(t, 0.0, cs0, c0, Kd, koff, ktr, smax)
     ref = solve_ivp(eq8_ode(c0, Kd, koff, ktr, smax), (0, 2000), [0.0], t_eval=t, rtol=1e-10, atol=1e-12).y[0]
-    assert np.allclose(s, ref, atol=1e-2 * smax)
+    assert np.allclose(s, ref, rtol=1e-2, atol=0)
 
     d = disso(t, s[-1], Kd, koff, ktr, smax)
     ref = solve_ivp(eq8_ode(0.0, Kd, koff, ktr, smax), (0, 2000), [s[-1]], t_eval=t, rtol=1e-10, atol=1e-12).y[0]
-    assert np.allclose(d, ref, atol=1e-2 * smax)
+    assert np.allclose(d, ref, rtol=1e-2, atol=0)
 
 
 def test_transport_only_without_binding():
@@ -76,8 +79,9 @@ def test_transport_only_without_binding():
     t = np.linspace(0, 200, 201)
     ktr, c0 = 0.05, 2.0
     s, cs = assoc(t, 0.0, 0.0, c0, 1e9, 1e-9, ktr, 1.0, return_cs=True)
-    assert np.allclose(s, 0.0, atol=1e-9)
-    assert np.allclose(cs, c0 * (1 - np.exp(-ktr * t)), rtol=1e-2, atol=1e-4)
+    # Nothing binds: S stays a negligible fraction of Smax
+    assert np.all(np.abs(s) <= 1e-9 * 1.0)  # Smax = 1
+    assert np.allclose(cs, c0 * (1 - np.exp(-ktr * t)), rtol=1e-2, atol=0)
 
 
 # Conservation and bounds
@@ -94,9 +98,9 @@ def test_mass_balance(phase):
         c0 = 0.0
         s, cs = disso(t, 3.0, KD, KOFF, KTR, SMAX, cs_0=0.8, return_cs=True)
 
-    change = (s + cs) - (s[0] + cs[0])
+    total = s + cs
     inflow = np.concatenate([[0.0], np.cumsum(np.diff(t) * KTR * (c0 - (cs[1:] + cs[:-1]) / 2))])
-    assert np.allclose(change, inflow, atol=1e-2 * np.abs(change).max())
+    assert np.allclose(total, total[0] + inflow, rtol=1e-3, atol=0)
 
 
 @pytest.mark.parametrize("Kd", [0.01, 1.0, 100.0])
@@ -107,14 +111,14 @@ def test_signal_and_surface_concentration_stay_in_bounds(Kd, koff, ktr, c0):
     """Across a grid of parameters, 0 <= S <= Smax and 0 <= cs <= c0 in association,
     and cs never rises above its starting value in dissociation."""
     t = np.linspace(0, 600, 301)
-    # The solvers use LSODA's default rtol of 1e-3
-    tol = 1e-3 * max(SMAX, c0)
+    # Relative to each bound, at the solvers' LSODA default rtol of 1e-3
+    rtol = 1e-3
     s, cs = assoc(t, 0.0, 0.0, c0, Kd, koff, ktr, SMAX, return_cs=True)
     d, cs_d = disso(t, s[-1], Kd, koff, ktr, SMAX, cs_0=cs[-1], return_cs=True)
     for signal in (s, d):
-        assert np.all((signal >= -tol) & (signal <= SMAX + tol))
-    assert np.all((cs >= -tol) & (cs <= c0 + tol))
-    assert np.all((cs_d >= -tol) & (cs_d <= cs[-1] + tol))
+        assert np.all((signal >= -rtol * SMAX) & (signal <= SMAX * (1 + rtol)))
+    assert np.all((cs >= -rtol * c0) & (cs <= c0 * (1 + rtol)))
+    assert np.all((cs_d >= -rtol * cs[-1]) & (cs_d <= cs[-1] * (1 + rtol)))
 
 
 # Mass-transport behaviour
@@ -144,7 +148,7 @@ def test_binding_is_transport_limited_when_kon_smax_dominates():
     s = assoc(t, 0.0, 0.0, c0, Kd, koff, ktr, smax)
     early = t >= 10
     slope = np.polyfit(t[early], s[early], 1)[0]
-    assert np.isclose(slope, ktr * c0, rtol=0.05)
+    assert np.isclose(slope, ktr * c0, rtol=0.05, atol=0)
 
 
 def test_rebinding_lowers_apparent_off_rate():
@@ -157,7 +161,7 @@ def test_rebinding_lowers_apparent_off_rate():
     late = t >= 300
     slope = -np.polyfit(t[late], np.log(d[late]), 1)[0]
     expected = koff / (1 + kon * (smax - d[late].mean()) / ktr)
-    assert np.isclose(slope, expected, rtol=0.03)
+    assert np.isclose(slope, expected, rtol=0.03, atol=0)
     assert slope < koff / 2
 
 
@@ -172,13 +176,14 @@ def test_restarting_from_returned_state_matches_one_solve():
     s_full, cs_full = assoc(t, 0.0, 0.0, 1.0, KD, KOFF, KTR, SMAX, return_cs=True)
     s1, cs1 = assoc(t[half], 0.0, 0.0, 1.0, KD, KOFF, KTR, SMAX, return_cs=True)
     s2, cs2 = assoc(t[~half] - 100, s1[-1], cs1[-1], 1.0, KD, KOFF, KTR, SMAX, return_cs=True)
-    assert np.allclose(np.r_[s1, s2], np.r_[s_full[half], s_full[~half]], atol=1e-3 * SMAX)
-    assert np.allclose(np.r_[cs1, cs2], np.r_[cs_full[half], cs_full[~half]], atol=1e-3)
+    # Each solve has LSODA's default rtol of 1e-3, so the two paths differ by a few times that
+    assert np.allclose(np.r_[s1, s2], np.r_[s_full[half], s_full[~half]], rtol=1e-2, atol=0)
+    assert np.allclose(np.r_[cs1, cs2], np.r_[cs_full[half], cs_full[~half]], rtol=1e-2, atol=0)
 
     d_full, csd_full = disso(t, s_full[-1], KD, KOFF, KTR, SMAX, cs_0=cs_full[-1], return_cs=True)
     d1, csd1 = disso(t[half], s_full[-1], KD, KOFF, KTR, SMAX, cs_0=cs_full[-1], return_cs=True)
     d2 = disso(t[~half] - 100, d1[-1], KD, KOFF, KTR, SMAX, cs_0=csd1[-1])
-    assert np.allclose(np.r_[d1, d2], np.r_[d_full[half], d_full[~half]], atol=1e-3 * SMAX)
+    assert np.allclose(np.r_[d1, d2], np.r_[d_full[half], d_full[~half]], rtol=1e-2, atol=0)
 
 
 # Fits
@@ -238,8 +243,8 @@ def test_fit_does_not_invent_transport_limit():
     """On data with no transport limit, the fit still recovers Kd and koff and
     the fitted ktr is too large to matter."""
     p = fit(simulate(ktr=1e3), ktr_guess=0.05, ktr_upper=1e4)
-    assert np.isclose(p["Kd"], KD, rtol=0.05)
-    assert np.isclose(p["koff"], KOFF, rtol=0.05)
+    assert np.isclose(p["Kd"], KD, rtol=0.05, atol=0)
+    assert np.isclose(p["koff"], KOFF, rtol=0.05, atol=0)
     # kon * Smax / ktr << 1: the fitted transport limit is negligible
     assert (KOFF / KD) * SMAX / p["ktr"] < 0.05
 
@@ -250,6 +255,6 @@ def test_single_and_multi_cycle_fits_agree():
     multi = fit(simulate(KTR))
     single = fit(simulate(KTR, single_cycle=True))
     for name, true in [("Kd", KD), ("koff", KOFF), ("ktr", KTR), ("smax", SMAX)]:
-        assert np.isclose(multi[name], true, rtol=0.05), (name, multi[name])
-        assert np.isclose(single[name], true, rtol=0.05), (name, single[name])
-        assert np.isclose(single[name], multi[name], rtol=0.05)
+        assert np.isclose(multi[name], true, rtol=0.05, atol=0), (name, multi[name])
+        assert np.isclose(single[name], true, rtol=0.05, atol=0), (name, single[name])
+        assert np.isclose(single[name], multi[name], rtol=0.05, atol=0)

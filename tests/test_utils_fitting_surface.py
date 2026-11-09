@@ -380,8 +380,8 @@ def test_fit_one_site_assoc_and_disso_ktr_single_cycle_recovers_parameters():
     )
 
     Kd_fit, koff_fit, ktr_fit, smax_fit = fit
-    assert np.isclose(Kd_fit, Kd_true, rtol=0.05)
-    assert np.isclose(koff_fit, koff_true, rtol=0.05)
-    assert np.isclose(ktr_fit, ktr_true, rtol=0.05)
-    assert np.isclose(smax_fit, smax_true, rtol=0.05)
-    assert np.allclose(np.concatenate(fitted_assoc), np.concatenate(assoc_s), atol=1e-2)
+    assert np.isclose(Kd_fit, Kd_true, rtol=0.05, atol=0)
+    assert np.isclose(koff_fit, koff_true, rtol=0.05, atol=0)
+    assert np.isclose(ktr_fit, ktr_true, rtol=0.05, atol=0)
+    assert np.isclose(smax_fit, smax_true, rtol=0.05, atol=0)
+    assert np.allclose(np.concatenate(fitted_assoc), np.concatenate(assoc_s), rtol=1e-2, atol=0)

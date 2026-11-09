@@ -334,7 +334,7 @@ def test_surface_concentration_reaches_bulk_without_binding():
     params = [1e9, 1e-9, 1.0, 1.0]
     out = solve_ivp(lambda t, y: ode_one_site_mass_transport(t, y, params, 1.0),
                     [0, 50], [0, 0], rtol=1e-8, atol=1e-10)
-    assert np.isclose(out.y[1][-1], 1.0, atol=1e-6)
+    assert np.isclose(out.y[1][-1], 1.0, rtol=1e-6, atol=0)
 
 
 def test_mass_transport_solvers_return_surface_concentration():
@@ -344,7 +344,7 @@ def test_mass_transport_solvers_return_surface_concentration():
     signal, cs = solve_ode_one_site_mass_transport_association(t, 0.0, 0.0, conc, Kd, koff, ktr, smax, return_cs=True)
     assert cs.shape == signal.shape
     assert cs[0] == 0.0
-    assert np.all((cs >= -1e-9) & (cs <= conc + 1e-9))
+    assert np.all((cs >= -1e-9 * conc) & (cs <= conc * (1 + 1e-9)))
     assert np.array_equal(signal, solve_ode_one_site_mass_transport_association(t, 0.0, 0.0, conc, Kd, koff, ktr, smax))
 
     disso, cs_d = solve_ode_one_site_mass_transport_dissociation(t, signal[-1], Kd, koff, ktr, smax,
@@ -353,8 +353,8 @@ def test_mass_transport_solvers_return_surface_concentration():
     assert disso[0] == signal[-1] and cs_d[0] == cs[-1]
     # Analyte left in the surface layer keeps binding briefly, then the signal falls
     assert disso[-1] < disso.max()
-    assert np.all(np.diff(disso[np.argmax(disso):]) <= 1e-9)
-    assert np.all(cs_d >= -1e-9) and cs_d[-1] < cs_d[0]
+    assert np.all(np.diff(disso[np.argmax(disso):]) <= 1e-9 * smax)
+    assert np.all(cs_d >= -1e-9 * cs[-1]) and cs_d[-1] < cs_d[0]
 
 
 def test_mass_transport_dissociation_washes_out_free_analyte():
@@ -362,5 +362,5 @@ def test_mass_transport_dissociation_washes_out_free_analyte():
     t = np.linspace(0, 100, 101)
     signal, cs = solve_ode_one_site_mass_transport_dissociation(t, 0.0, 1e9, 1e-9, 0.05, 1.0,
                                                                 cs_0=1.0, return_cs=True)
-    assert np.allclose(signal, 0.0, atol=1e-9)
-    assert np.allclose(cs, np.exp(-0.05 * t), rtol=1e-2, atol=1e-4)
+    assert np.all(np.abs(signal) <= 1e-9 * 1.0)  # negligible fraction of Smax = 1
+    assert np.allclose(cs, np.exp(-0.05 * t), rtol=1e-2, atol=0)
