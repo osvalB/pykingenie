@@ -135,21 +135,27 @@ def one_site_dissociation_analytical(t, s0, k_off, t0=0):
 
     return s_t
 
-def ode_one_site_mass_transport(t, y, params, analyte_conc):
+def ode_one_site_mass_transport(t, s1, params, analyte_conc):
     """
-    Two-compartment ODE for mass transport-limited binding (Svitel et al. 2007, Eq. 5).
+    Quasi-steady-state ODE for mass transport-limited one-site binding.
 
-    Used for both phases: association with the injected analyte concentration,
-    dissociation with analyte_conc = 0.
+    The thin layer next to the surface is assumed to settle instantly (Svitel et al. 2007,
+    Eq. 8, https://doi.org/10.1529/biophysj.106.094615), which gives
 
-    See https://www.cell.com/AJHG/fulltext/S0006-3495(07)70982-7
+        dS/dt = (k_on * c0 * (s_max - S) - k_off * S) / (1 + k_on * (s_max - S) / k_tr)
+
+    Used for both phases: association with the injected concentration, dissociation with c0 = 0.
+
+    ``k_tr`` is a lumped transport coefficient in signal units (signal per µM per second),
+    the product of the physical transport rate and the signal produced per unit of bound analyte.
+    It is not the physical transport coefficient, and it scales with the signal units.
 
     Parameters
     ----------
     t : float
         Time variable.
-    y : list
-        List of the state variables [s1,cs].
+    s1 : float or list
+        Signal.
     params : list
         List of the parameters [K_d, k_off, k_tr, s_max].
     analyte_conc : float
@@ -157,23 +163,23 @@ def ode_one_site_mass_transport(t, y, params, analyte_conc):
 
     Returns
     -------
-    list
-        [ds1_dt, dcs_dt] representing the signal and analyte surface concentration derivatives.
+    float
+        The derivative of the signal over time.
     """
-    s1, cs = y
     K_d, k_off, k_tr, s_max = params
 
     k_on = k_off / K_d
+    # Free sites cannot be negative. Without this, a solver step past s_max can land where the
+    # denominator is negative and the signal grows without bound.
+    free = np.maximum(s_max - s1, 0.0)
 
-    ds1_dt = k_on * cs * (s_max - s1) - k_off * s1
-    # Transport is driven by the bulk-to-surface difference, c0 - cs.
-    dcs_dt = k_tr * (analyte_conc - cs) - ds1_dt
+    return (k_on * analyte_conc * free - k_off * s1) / (1 + k_on * free / k_tr)
 
-    return [ds1_dt, dcs_dt]
-
-def solve_ode_one_site_mass_transport_association(t, s1_0, cs_0, analyte_conc, K_d, k_off, k_tr, s_max, t0=0, return_cs=False):
+def solve_ode_one_site_mass_transport_association(t, s1_0, analyte_conc, K_d, k_off, k_tr, s_max, t0=0):
     """
     Solves the ODE for the one site mass transport model - association phase.
+
+    See ``ode_one_site_mass_transport``.
 
     Parameters
     ----------
@@ -181,8 +187,6 @@ def solve_ode_one_site_mass_transport_association(t, s1_0, cs_0, analyte_conc, K
         Time variable.
     s1_0 : float
         Initial signal.
-    cs_0 : float
-        Initial analyte surface concentration.
     analyte_conc : float
         Concentration of the analyte.
     K_d : float
@@ -190,37 +194,30 @@ def solve_ode_one_site_mass_transport_association(t, s1_0, cs_0, analyte_conc, K
     k_off : float
         Dissociation rate constant.
     k_tr : float
-        Mass transport rate constant.
+        Lumped mass transport coefficient (signal per µM per second).
     s_max : float
         Maximum signal.
     t0 : float, optional
         Initial time offset, default is 0.
-    return_cs : bool, optional
-        If True, also return the analyte surface concentration, default is False.
-        Use its last value as ``cs_0`` of the next step in single-cycle kinetics.
-        
+
     Returns
     -------
     np.ndarray
         Signal over time.
-    np.ndarray
-        Analyte surface concentration over time, only if return_cs is True.
     """
     t = t + t0
 
     out = solve_ivp(ode_one_site_mass_transport,t_span=[np.min(t), np.max(t)],
-                    t_eval=t,y0=[s1_0,cs_0],args=([K_d,k_off,k_tr,s_max],analyte_conc),method="LSODA")
+                    t_eval=t,y0=[s1_0],args=([K_d,k_off,k_tr,s_max],analyte_conc),method="LSODA",
+                    rtol=1e-8,atol=1e-10*s_max)
 
-    signal = out.y[0]
-    if return_cs:
-        return signal, out.y[1]
-    return signal
+    return out.y[0]
 
-def solve_ode_one_site_mass_transport_dissociation(t, s1_0, K_d, k_off, k_tr, s_max, t0=0, cs_0=None, return_cs=False):
+def solve_ode_one_site_mass_transport_dissociation(t, s1_0, K_d, k_off, k_tr, s_max, t0=0):
     """
     Solves the ODE for the one site mass transport model - dissociation phase.
 
-    Uses the same two-compartment model as the association, with no analyte in the bulk.
+    Same model as the association, with no analyte in the bulk. See ``ode_one_site_mass_transport``.
 
     Parameters
     ----------
@@ -233,39 +230,24 @@ def solve_ode_one_site_mass_transport_dissociation(t, s1_0, K_d, k_off, k_tr, s_
     k_off : float
         Dissociation rate constant.
     k_tr : float
-        Mass transport rate constant.
+        Lumped mass transport coefficient (signal per µM per second).
     s_max : float
         Maximum signal.
     t0 : float, optional
         Initial time offset, default is 0.
-    cs_0 : float, optional
-        Initial analyte surface concentration, normally the last value of the association.
-        If None, the quasi-steady-state value for s1_0 is used.
-    return_cs : bool, optional
-        If True, also return the analyte surface concentration, default is False.
-        Use its last value as ``cs_0`` of the next association in single-cycle kinetics.
-        
+
     Returns
     -------
     np.ndarray
         Signal over time.
-    np.ndarray
-        Analyte surface concentration over time, only if return_cs is True.
     """
     t = t + t0
 
-    if cs_0 is None:
-        # Quasi-steady state with no analyte in the bulk: k_tr * (0 - cs) = dS/dt
-        k_on = k_off / K_d
-        cs_0 = k_off * s1_0 / (k_tr + k_on * (s_max - s1_0))
-
     out = solve_ivp(ode_one_site_mass_transport,t_span=[np.min(t), np.max(t)],
-                    t_eval=t,y0=[s1_0,cs_0],args=([K_d,k_off,k_tr,s_max],0.0),method="LSODA")
+                    t_eval=t,y0=[s1_0],args=([K_d,k_off,k_tr,s_max],0.0),method="LSODA",
+                    rtol=1e-8,atol=1e-10*s_max)
 
-    signal = out.y[0]
-    if return_cs:
-        return signal, out.y[1]
-    return signal
+    return out.y[0]
 
 def differential_matrix_association_induced_fit(koff, kon, kc, krev, a):
     """

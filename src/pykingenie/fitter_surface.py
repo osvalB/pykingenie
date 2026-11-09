@@ -1010,10 +1010,14 @@ class KineticsFitter(KineticsFitterGeneral):
 
         if fit_ktr:
 
-            for _ in self.smax_guesses_unq:
-                p0.insert(2, 1e-4)
-                low_bounds.insert(2, 1e-7)
-                high_bounds.insert(2, 1)
+            # Ktr is in signal per µM per second. Start where transport is as fast as binding
+            # (Ktr = kon * Smax), so both Kd and koff shape the first fitted curves.
+            kon_guess = p0[1] / p0[0]
+            for smax_guess in reversed(self.smax_guesses_unq):
+                ktr_guess = kon_guess * smax_guess
+                p0.insert(2, ktr_guess)
+                low_bounds.insert(2, ktr_guess * 1e-4)
+                high_bounds.insert(2, ktr_guess * 1e4)
                 smax_param_start += 1
 
         if not fixed_t0:
@@ -1273,7 +1277,7 @@ class KineticsFitter(KineticsFitterGeneral):
                 ktr_loo_means.append(np.mean(ktr_loo))
                 ktr_loo_stds.append(np.std(ktr_loo))
 
-                df_fit_loo['Ktr [1/s] - Replicate ' + str(j)] = [
+                df_fit_loo['Ktr [signal/(µM·s)] - Replicate ' + str(j)] = [
                     f'{np.mean(ktr_loo):.2e} ± {np.std(ktr_loo):.2e}']
 
             self.ktr_loo_means = ktr_loo_means

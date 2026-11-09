@@ -1503,7 +1503,6 @@ def fit_one_site_assoc_and_disso_ktr(assoc_signal_lst, assoc_time_lst, analyte_c
 
         out = np.empty(_total)
         prev_disso_end = 0.0
-        prev_cs_end = 0.0
 
         for i in range(_n_traces):
             t_assoc  = time_lst_assoc[i]
@@ -1516,18 +1515,17 @@ def fit_one_site_assoc_and_disso_ktr(assoc_signal_lst, assoc_time_lst, analyte_c
 
             # New cycle: empty surface. Single-cycle: continue from the previous dissociation.
             if np.logical_or(i == 0, initial_signal_at_zero[i]):
-                s0, cs0 = 0.0, 0.0
+                s0 = 0.0
             else:
-                s0, cs0 = prev_disso_end, prev_cs_end
+                s0 = prev_disso_end
 
-            y_assoc, cs_assoc = solve_ode_one_site_mass_transport_association(t_assoc-t_assoc[0],s0,cs0,analyte_conc,Kd,Koff,k_tr,s_max,t0,return_cs=True)
+            y_assoc = solve_ode_one_site_mass_transport_association(t_assoc-t_assoc[0],s0,analyte_conc,Kd,Koff,k_tr,s_max,t0)
             out[_a_offsets[i]:_a_offsets[i + 1]] = y_assoc
 
-            y_disso, cs_disso = solve_ode_one_site_mass_transport_dissociation(t_dissoc,y_assoc[-1],Kd,Koff,k_tr,s_max,cs_0=cs_assoc[-1],return_cs=True)
+            y_disso = solve_ode_one_site_mass_transport_dissociation(t_dissoc,y_assoc[-1],Kd,Koff,k_tr,s_max)
             out[_d_offsets[i]:_d_offsets[i + 1]] = y_disso
 
             prev_disso_end = y_disso[-1]
-            prev_cs_end = cs_disso[-1]
 
         return out
 
