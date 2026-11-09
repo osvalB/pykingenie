@@ -347,8 +347,20 @@ def test_mass_transport_solvers_return_surface_concentration():
     assert np.all((cs >= -1e-9) & (cs <= conc + 1e-9))
     assert np.array_equal(signal, solve_ode_one_site_mass_transport_association(t, 0.0, 0.0, conc, Kd, koff, ktr, smax))
 
-    disso, cs_d = solve_ode_one_site_mass_transport_dissociation(t, signal[-1], Kd, koff, ktr, smax, return_cs=True)
-    # Quasi-steady state: transport out of the surface layer balances net release
-    ds_dt = np.gradient(disso, t)
-    assert np.allclose(ktr * cs_d, -ds_dt, rtol=0.05, atol=1e-4)
-    assert cs_d[-1] < cs_d[0]
+    disso, cs_d = solve_ode_one_site_mass_transport_dissociation(t, signal[-1], Kd, koff, ktr, smax,
+                                                                 cs_0=cs[-1], return_cs=True)
+    # Dissociation continues from where the association ended
+    assert disso[0] == signal[-1] and cs_d[0] == cs[-1]
+    # Analyte left in the surface layer keeps binding briefly, then the signal falls
+    assert disso[-1] < disso.max()
+    assert np.all(np.diff(disso[np.argmax(disso):]) <= 1e-9)
+    assert np.all(cs_d >= -1e-9) and cs_d[-1] < cs_d[0]
+
+
+def test_mass_transport_dissociation_washes_out_free_analyte():
+    # Nothing bound: surface analyte is carried away as exp(-k_tr * t)
+    t = np.linspace(0, 100, 101)
+    signal, cs = solve_ode_one_site_mass_transport_dissociation(t, 0.0, 1e9, 1e-9, 0.05, 1.0,
+                                                                cs_0=1.0, return_cs=True)
+    assert np.allclose(signal, 0.0, atol=1e-9)
+    assert np.allclose(cs, np.exp(-0.05 * t), rtol=1e-2, atol=1e-4)

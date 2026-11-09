@@ -242,9 +242,11 @@ def solve_ode_one_site_mass_transport_association(t, s1_0, cs_0, analyte_conc, K
         return signal, out.y[1]
     return signal
 
-def solve_ode_one_site_mass_transport_dissociation(t, s1_0, K_d, k_off, k_tr, s_max, t0=0, return_cs=False):
+def solve_ode_one_site_mass_transport_dissociation(t, s1_0, K_d, k_off, k_tr, s_max, t0=0, cs_0=None, return_cs=False):
     """
     Solves the ODE for the one site mass transport model - dissociation phase.
+
+    Uses the same two-compartment model as the association, with no analyte in the bulk.
 
     Parameters
     ----------
@@ -262,6 +264,9 @@ def solve_ode_one_site_mass_transport_dissociation(t, s1_0, K_d, k_off, k_tr, s_
         Maximum signal.
     t0 : float, optional
         Initial time offset, default is 0.
+    cs_0 : float, optional
+        Initial analyte surface concentration, normally the last value of the association.
+        If None, the quasi-steady-state value for s1_0 is used.
     return_cs : bool, optional
         If True, also return the analyte surface concentration, default is False.
         Use its last value as ``cs_0`` of the next association in single-cycle kinetics.
@@ -275,15 +280,17 @@ def solve_ode_one_site_mass_transport_dissociation(t, s1_0, K_d, k_off, k_tr, s_
     """
     t = t + t0
 
-    out = solve_ivp(ode_one_site_mass_transport_dissociation,t_span=[np.min(t), np.max(t)],
-                    t_eval=t,y0=[s1_0],args=([K_d,k_off,k_tr,s_max],),method="LSODA")
+    if cs_0 is None:
+        # Quasi-steady state with no analyte in the bulk: k_tr * (0 - cs) = dS/dt
+        k_on = k_off / K_d
+        cs_0 = k_off * s1_0 / (k_tr + k_on * (s_max - s1_0))
+
+    out = solve_ivp(ode_one_site_mass_transport_association,t_span=[np.min(t), np.max(t)],
+                    t_eval=t,y0=[s1_0,cs_0],args=([K_d,k_off,k_tr,s_max],0.0),method="LSODA")
 
     signal = out.y[0]
     if return_cs:
-        # Quasi-steady state with no analyte in the bulk: k_tr * (0 - cs) = dS/dt
-        k_on = k_off / K_d
-        cs = k_off * signal / (k_tr + k_on * (s_max - signal))
-        return signal, cs
+        return signal, out.y[1]
     return signal
 
 def differential_matrix_association_induced_fit(koff, kon, kc, krev, a):

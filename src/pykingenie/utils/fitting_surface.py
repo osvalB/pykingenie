@@ -1520,11 +1520,10 @@ def fit_one_site_assoc_and_disso_ktr(assoc_signal_lst, assoc_time_lst, analyte_c
             else:
                 s0, cs0 = prev_disso_end, prev_cs_end
 
-            y_assoc = solve_ode_one_site_mass_transport_association(t_assoc-t_assoc[0],s0,cs0,analyte_conc,Kd,Koff,k_tr,s_max,t0)
+            y_assoc, cs_assoc = solve_ode_one_site_mass_transport_association(t_assoc-t_assoc[0],s0,cs0,analyte_conc,Kd,Koff,k_tr,s_max,t0,return_cs=True)
             out[_a_offsets[i]:_a_offsets[i + 1]] = y_assoc
 
-            s0_d = y_assoc[-1]
-            y_disso, cs_disso = solve_ode_one_site_mass_transport_dissociation(t_dissoc,s0_d,Kd,Koff,k_tr,s_max,return_cs=True)
+            y_disso, cs_disso = solve_ode_one_site_mass_transport_dissociation(t_dissoc,y_assoc[-1],Kd,Koff,k_tr,s_max,cs_0=cs_assoc[-1],return_cs=True)
             out[_d_offsets[i]:_d_offsets[i + 1]] = y_disso
 
             prev_disso_end = y_disso[-1]
