@@ -11,8 +11,7 @@ __all__ = [
     'steady_state_one_site',
     'one_site_association_analytical',
     'one_site_dissociation_analytical',
-    'ode_one_site_mass_transport_association',
-    'ode_one_site_mass_transport_dissociation',
+    'ode_one_site_mass_transport',
     'solve_ode_one_site_mass_transport_association',
     'solve_ode_one_site_mass_transport_dissociation',
     'differential_matrix_association_induced_fit',
@@ -136,10 +135,13 @@ def one_site_dissociation_analytical(t, s0, k_off, t0=0):
 
     return s_t
 
-def ode_one_site_mass_transport_association(t, y, params, analyte_conc):
+def ode_one_site_mass_transport(t, y, params, analyte_conc):
     """
-    ODE for Mass Transport-limited binding.
-    
+    Two-compartment ODE for mass transport-limited binding (Svitel et al. 2007, Eq. 5).
+
+    Used for both phases: association with the injected analyte concentration,
+    dissociation with analyte_conc = 0.
+
     See https://www.cell.com/AJHG/fulltext/S0006-3495(07)70982-7
 
     Parameters
@@ -151,7 +153,7 @@ def ode_one_site_mass_transport_association(t, y, params, analyte_conc):
     params : list
         List of the parameters [K_d, k_off, k_tr, s_max].
     analyte_conc : float
-        Concentration of the analyte.
+        Concentration of the analyte in the bulk, 0 during dissociation.
 
     Returns
     -------
@@ -168,34 +170,6 @@ def ode_one_site_mass_transport_association(t, y, params, analyte_conc):
     dcs_dt = k_tr * (analyte_conc - cs) - ds1_dt
 
     return [ds1_dt, dcs_dt]
-
-def ode_one_site_mass_transport_dissociation(t, s1, params):
-    """
-    ODE for Mass Transport-limited binding - dissociation phase.
-    
-    See Equation 7 from https://pmc.ncbi.nlm.nih.gov/articles/PMC4134667/
-
-    Parameters
-    ----------
-    t : float
-        Time variable.
-    s1 : float
-        The state variable representing the signal.
-    params : list
-        List of the parameters [K_d, k_off, k_tr, s_max].
-
-    Returns
-    -------
-    float
-        The derivative of signal over time.
-    """
-    K_d, k_off, k_tr, s_max = params
-
-    k_on = k_off / K_d
-
-    ds_dt = (-k_off * s1) / (1 + (k_on / k_tr) * (s_max - s1))
-
-    return ds_dt
 
 def solve_ode_one_site_mass_transport_association(t, s1_0, cs_0, analyte_conc, K_d, k_off, k_tr, s_max, t0=0, return_cs=False):
     """
@@ -234,7 +208,7 @@ def solve_ode_one_site_mass_transport_association(t, s1_0, cs_0, analyte_conc, K
     """
     t = t + t0
 
-    out = solve_ivp(ode_one_site_mass_transport_association,t_span=[np.min(t), np.max(t)],
+    out = solve_ivp(ode_one_site_mass_transport,t_span=[np.min(t), np.max(t)],
                     t_eval=t,y0=[s1_0,cs_0],args=([K_d,k_off,k_tr,s_max],analyte_conc),method="LSODA")
 
     signal = out.y[0]
@@ -285,7 +259,7 @@ def solve_ode_one_site_mass_transport_dissociation(t, s1_0, K_d, k_off, k_tr, s_
         k_on = k_off / K_d
         cs_0 = k_off * s1_0 / (k_tr + k_on * (s_max - s1_0))
 
-    out = solve_ivp(ode_one_site_mass_transport_association,t_span=[np.min(t), np.max(t)],
+    out = solve_ivp(ode_one_site_mass_transport,t_span=[np.min(t), np.max(t)],
                     t_eval=t,y0=[s1_0,cs_0],args=([K_d,k_off,k_tr,s_max],0.0),method="LSODA")
 
     signal = out.y[0]

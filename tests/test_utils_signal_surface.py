@@ -7,7 +7,7 @@ from pykingenie.utils.signal_surface import (
     steady_state_one_site,
     one_site_association_analytical,
     one_site_dissociation_analytical,
-    ode_one_site_mass_transport_association,
+    ode_one_site_mass_transport,
     solve_ode_one_site_mass_transport_association,
     solve_ode_one_site_mass_transport_dissociation,
     solve_induced_fit_association,
@@ -86,7 +86,7 @@ def test_one_site_dissociation_analytical():
     # Check decreasing behavior
     assert np.all(np.diff(result) <= 0), "The result should be non-increasing with increasing time."
 
-def test_ode_one_site_mass_transport_association():
+def test_solve_ode_one_site_mass_transport_association():
 
     # Parameters
     t = np.linspace(0, 100, 50)  # time points
@@ -113,7 +113,7 @@ def test_ode_one_site_mass_transport_association():
     # Check saturation at high concentration (should approach s_max)
     assert np.isclose(signal[-1], s_max, atol=1e-2), "Signal at high t and high analyte concentration should approach s_max."
 
-def test_ode_one_site_mass_transport_dissociation():
+def test_solve_ode_one_site_mass_transport_dissociation():
 
     # Parameters
     t = np.linspace(0, 100, 50)  # time points
@@ -332,7 +332,7 @@ def test_solve_ode_mixture_analyte_dissociation():
 def test_surface_concentration_reaches_bulk_without_binding():
     # Kd huge and koff tiny, so almost nothing binds.
     params = [1e9, 1e-9, 1.0, 1.0]
-    out = solve_ivp(lambda t, y: ode_one_site_mass_transport_association(t, y, params, 1.0),
+    out = solve_ivp(lambda t, y: ode_one_site_mass_transport(t, y, params, 1.0),
                     [0, 50], [0, 0], rtol=1e-8, atol=1e-10)
     assert np.isclose(out.y[1][-1], 1.0, atol=1e-6)
 
