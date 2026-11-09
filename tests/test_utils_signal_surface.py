@@ -1,10 +1,13 @@
 import pytest
 import numpy as np
 
+from scipy.integrate import solve_ivp
+
 from pykingenie.utils.signal_surface import (
     steady_state_one_site,
     one_site_association_analytical,
     one_site_dissociation_analytical,
+    ode_one_site_mass_transport,
     solve_ode_one_site_mass_transport_association,
     solve_ode_one_site_mass_transport_dissociation,
     solve_induced_fit_association,
@@ -83,7 +86,7 @@ def test_one_site_dissociation_analytical():
     # Check decreasing behavior
     assert np.all(np.diff(result) <= 0), "The result should be non-increasing with increasing time."
 
-def test_ode_one_site_mass_transport_association():
+def test_solve_ode_one_site_mass_transport_association():
 
     # Parameters
     t = np.linspace(0, 100, 50)  # time points
@@ -110,7 +113,7 @@ def test_ode_one_site_mass_transport_association():
     # Check saturation at high concentration (should approach s_max)
     assert np.isclose(signal[-1], s_max, atol=1e-2), "Signal at high t and high analyte concentration should approach s_max."
 
-def test_ode_one_site_mass_transport_dissociation():
+def test_solve_ode_one_site_mass_transport_dissociation():
 
     # Parameters
     t = np.linspace(0, 100, 50)  # time points
@@ -324,3 +327,41 @@ def test_solve_ode_mixture_analyte_dissociation():
     total_response = np.sum(result, axis=0)
 
     assert np.isclose(total_response[-1], 0, atol=1e-2), "The last value of the response should approach zero."
+
+
+def test_surface_concentration_reaches_bulk_without_binding():
+    # Kd huge and koff tiny, so almost nothing binds.
+    params = [1e9, 1e-9, 1.0, 1.0]
+    out = solve_ivp(lambda t, y: ode_one_site_mass_transport(t, y, params, 1.0),
+                    [0, 50], [0, 0], rtol=1e-8, atol=1e-10)
+    assert np.isclose(out.y[1][-1], 1.0, rtol=1e-6, atol=0)
+
+
+def test_mass_transport_solvers_return_surface_concentration():
+    t = np.linspace(0, 200, 201)
+    Kd, koff, ktr, smax, conc = 0.5, 0.01, 0.005, 5.0, 1.0
+
+    signal, cs = solve_ode_one_site_mass_transport_association(t, 0.0, 0.0, conc, Kd, koff, ktr, smax, return_cs=True)
+    assert cs.shape == signal.shape
+    assert np.isclose(cs[0], 0.0, rtol=1e-12, atol=0)
+    assert np.all((cs >= -1e-9 * conc) & (cs <= conc * (1 + 1e-9)))
+    assert np.array_equal(signal, solve_ode_one_site_mass_transport_association(t, 0.0, 0.0, conc, Kd, koff, ktr, smax))
+
+    disso, cs_d = solve_ode_one_site_mass_transport_dissociation(t, signal[-1], Kd, koff, ktr, smax,
+                                                                 cs_0=cs[-1], return_cs=True)
+    # Dissociation continues from where the association ended
+    assert np.isclose(disso[0], signal[-1], rtol=1e-12, atol=0)
+    assert np.isclose(cs_d[0], cs[-1], rtol=1e-12, atol=0)
+    # Analyte left in the surface layer keeps binding briefly, then the signal falls
+    assert disso[-1] < disso.max()
+    assert np.all(np.diff(disso[np.argmax(disso):]) <= 1e-9 * smax)
+    assert np.all(cs_d >= -1e-9 * cs[-1]) and cs_d[-1] < cs_d[0]
+
+
+def test_mass_transport_dissociation_washes_out_free_analyte():
+    # Nothing bound: surface analyte is carried away as exp(-k_tr * t)
+    t = np.linspace(0, 100, 101)
+    signal, cs = solve_ode_one_site_mass_transport_dissociation(t, 0.0, 1e9, 1e-9, 0.05, 1.0,
+                                                                cs_0=1.0, return_cs=True)
+    assert np.all(np.abs(signal) <= 1e-9 * 1.0)  # negligible fraction of Smax = 1
+    assert np.allclose(cs, np.exp(-0.05 * t), rtol=1e-2, atol=0)
