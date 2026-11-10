@@ -490,6 +490,7 @@ def solve_induced_fit_association(time, a_conc, kon, koff, kc, krev, sP1L=0, sP2
     np.ndarray
         Signal over time.
     """
+    # Edited with AI assistance and reviewed by a human in PR #16: added t0 so a fitted t0 shifts the association.
     time = time - np.min(time) - t0
 
     b_col = constant_vector_induced_fit(koff, smax, kc)
@@ -544,6 +545,7 @@ def solve_all_states_fast(time, A, initial_conditions, steady_state_value):
         Array of shape (len(time), len(initial_conditions)) containing the
         state of the system at each time point.
     """
+    # Edited with AI assistance and reviewed by a human in PR #16: closed-form exp(A·t) for 2x2 matrices that cannot be diagonalised.
     time = np.asarray(time, dtype=float)
     A = np.asarray(A, dtype=float)
     v = np.asarray(initial_conditions, dtype=float) - steady_state_value
@@ -807,6 +809,7 @@ def solve_ode_mixture_analyte_association(t, Ris0, C_TOT, Fis, Ris_max, koffs, K
     np.ndarray
         Response of EACH ANALYTE over time.
     """
+    # Edited with AI assistance and reviewed by a human in PR #16: tighter solver tolerances.
 
     t = t + t0
 
@@ -867,6 +870,7 @@ def solve_ode_mixture_analyte_dissociation(t, Ris0, koffs, t0=0):
     np.ndarray
         Response of EACH ANALYTE over time.
     """
+    # Edited with AI assistance and reviewed by a human in PR #16: tighter solver tolerances.
 
     t = t + t0
 
@@ -1311,6 +1315,7 @@ def solve_two_site_association(time, a_conc, kon, koff, Rmax_PL=0, Rmax_LPL=0, f
     np.ndarray
         Array with columns [total_signal, signal_PL, signal_LPL].
     """
+    # Edited with AI assistance and reviewed by a human in PR #16: added t0 so a fitted t0 shifts the association.
     time = time - np.min(time) - t0
 
     A = differential_matrix_association_two_site(kon, koff, a_conc)
@@ -1368,6 +1373,7 @@ def solve_two_site_cooperative_association(time, a_conc, kon, koff, sigma, Rmax_
     np.ndarray
         Array with columns [total_signal, signal_PL, signal_LPL].
     """
+    # Edited with AI assistance and reviewed by a human in PR #16: added t0 so a fitted t0 shifts the association.
     time = time - np.min(time) - t0
 
     A = differential_matrix_association_two_site_cooperative(kon, koff, sigma, a_conc)

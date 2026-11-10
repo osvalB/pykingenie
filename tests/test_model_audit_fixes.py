@@ -1,4 +1,4 @@
-# This code is AI generated and reviewed by a human.
+# This code is AI generated and reviewed by a human (PR #16).
 """
 Checks for fixes found by comparing the surface and solution models with their
 reaction equations solved directly.

@@ -395,6 +395,7 @@ def get_kobs_induced_fit(tot_lig, tot_prot, kr, ke, kon, koff, dominant=True):
     float
         Observed rate constant (in 1/s).
     """
+    # Edited with AI assistance and reviewed by a human in PR #16: dominant=False returns the fast rate, not the mean.
     kd_app = koff * ke / (kon * (ke + kr))
     delta  = np.sqrt((tot_lig - tot_prot + kd_app) ** 2 + 4 * tot_prot * kd_app)
     gamma  = -ke - kr + koff + kon * (delta - kd_app)
@@ -430,6 +431,7 @@ def get_kobs_conformational_selection(tot_lig, tot_prot, kr, ke, kon, koff, domi
     float
         Observed rate constant (in 1/s).
     """
+    # Edited with AI assistance and reviewed by a human in PR #16: dominant=False returns the fast rate, not the mean.
     kd_app = koff * (ke + kr) / (kon * ke)
     delta = np.sqrt((tot_lig - tot_prot + kd_app)**2 + 4 * tot_prot * kd_app)
     beta = 2 * kr * (2 * ke - koff - koff * (delta - tot_lig + tot_prot) / kd_app)

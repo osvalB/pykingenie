@@ -860,6 +860,7 @@ def fit_two_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
         Fitted values for each dissociation signal, same dimensions as disso_signal_lst.
 
     """
+    # Edited with AI assistance and reviewed by a human in PR #16: t0 is passed to the solver instead of being cancelled.
     if smax_idx is None:
         smax_idx = list(range(len(assoc_signal_lst)))
 
@@ -1314,6 +1315,7 @@ def fit_induced_fit_sites_assoc_and_disso(
     list
         Fitted values for each dissociation signal, same dimensions as disso_signal_lst.
     """
+    # Edited with AI assistance and reviewed by a human in PR #16: carry-over only for single-cycle steps, and t0 is passed to the model.
     # Set a flag for the association that was done after a dissociation step
     initial_signal_at_zero = [time[0] < 2 for time in assoc_time_lst]
 
