@@ -1477,7 +1477,7 @@ def fit_one_site_assoc_and_disso_ktr(assoc_signal_lst, assoc_time_lst, analyte_c
     list
         Fitted values for each dissociation signal, same dimensions as disso_signal_lst.
     """
-    # Edited with AI assistance and reviewed by a human in PR #XX: carry-over only for single-cycle steps, and a second fit from the best start candidate.
+    # Edited with AI assistance and reviewed by a human in PR #18: carry-over only for single-cycle steps, and a second fit from the best start candidate.
     all_signal_assoc = concat_signal_lst(assoc_signal_lst)
     all_signal_disso = concat_signal_lst(disso_signal_lst)
 

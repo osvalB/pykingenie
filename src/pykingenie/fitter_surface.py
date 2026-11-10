@@ -1018,7 +1018,7 @@ class KineticsFitter(KineticsFitterGeneral):
         list of list
             One starting point per grid point.
         """
-        # This function is AI generated and reviewed by a human (PR #XX).
+        # This function is AI generated and reviewed by a human (PR #18).
         n_groups = len(self.smax_guesses_unq)
         ktr_start = 2 + (0 if fixed_t0 else n_groups)
         candidates = []
@@ -1049,7 +1049,7 @@ class KineticsFitter(KineticsFitterGeneral):
             Whether to calculate leave-one-out cross-validation, default is False.
 
         """
-        # Edited with AI assistance and reviewed by a human in PR #XX: grid of starting points for the mass-transport fit.
+        # Edited with AI assistance and reviewed by a human in PR #18: grid of starting points for the mass-transport fit.
 
         self.clear_fittings()
 

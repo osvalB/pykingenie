@@ -686,7 +686,7 @@ def test_fit_one_site_assoc_and_disso_3():
 
 
 def test_fit_one_site_assoc_and_disso_if():
-    # Edited with AI assistance and reviewed by a human in PR #XX: check the apparent Kd, not kc and krev.
+    # Edited with AI assistance and reviewed by a human in PR #18: check the apparent Kd, not kc and krev.
 
     fitter_surface = create_fitter(test_file_3)
     fitter_surface.fit_steady_state()
@@ -713,7 +713,7 @@ def test_fit_one_site_assoc_and_disso_if():
     assert (fs.k_off_loo_mean + fs.k_off_loo_std*2) > 0.01 * 0.95 # 5 % tolerance error for k_off
 
 def test_fit_one_site_assoc_and_disso_if_non_shared_smax():
-    # Edited with AI assistance and reviewed by a human in PR #XX: check the apparent Kd, not kc and krev.
+    # Edited with AI assistance and reviewed by a human in PR #18: check the apparent Kd, not kc and krev.
 
     fitter_surface = create_fitter(test_file_3)
     fitter_surface.fit_steady_state()

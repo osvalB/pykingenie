@@ -344,7 +344,7 @@ def test_fit_one_site_assoc_and_disso_ktr_uses_previous_disso_end_branch():
 
 
 def test_fit_one_site_assoc_and_disso_ktr_single_cycle_recovers_parameters():
-    # Edited with AI assistance and reviewed by a human in PR #XX: absolute dissociation times.
+    # Edited with AI assistance and reviewed by a human in PR #18: absolute dissociation times.
 
     Kd_true, koff_true, ktr_true, smax_true = 0.5, 0.01, 0.005, 5.0
     concs = [0.25, 0.5, 1.0, 2.0]
