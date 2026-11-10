@@ -312,18 +312,18 @@ def test_fit_one_site_assoc_and_disso_ktr_uses_previous_disso_end_branch():
     t_assoc_2 = np.linspace(45, 85, 60)
     t_disso_2 = np.linspace(0, 40, 60)
 
-    assoc_1, cs_a1 = solve_ode_one_site_mass_transport_association(
-        t_assoc_1 - t_assoc_1[0], 0.0, 0.0, 1.0, Kd_true, koff_true, ktr1, smax1, return_cs=True
+    assoc_1 = solve_ode_one_site_mass_transport_association(
+        t_assoc_1 - t_assoc_1[0], 0.0, 1.0, Kd_true, koff_true, ktr1, smax1
     )
-    disso_1, cs_1 = solve_ode_one_site_mass_transport_dissociation(
-        t_disso_1, assoc_1[-1], Kd_true, koff_true, ktr1, smax1, cs_0=cs_a1[-1], return_cs=True
+    disso_1 = solve_ode_one_site_mass_transport_dissociation(
+        t_disso_1, assoc_1[-1], Kd_true, koff_true, ktr1, smax1
     )
 
-    assoc_2, cs_a2 = solve_ode_one_site_mass_transport_association(
-        t_assoc_2 - t_assoc_2[0], disso_1[-1], cs_1[-1], 1.0, Kd_true, koff_true, ktr2, smax2, return_cs=True
+    assoc_2 = solve_ode_one_site_mass_transport_association(
+        t_assoc_2 - t_assoc_2[0], disso_1[-1], 1.0, Kd_true, koff_true, ktr2, smax2
     )
     disso_2 = solve_ode_one_site_mass_transport_dissociation(
-        t_disso_2, assoc_2[-1], Kd_true, koff_true, ktr2, smax2, cs_0=cs_a2[-1]
+        t_disso_2, assoc_2[-1], Kd_true, koff_true, ktr2, smax2
     )
 
     fit, _, _, _ = fit_one_site_assoc_and_disso_ktr(
@@ -350,20 +350,18 @@ def test_fit_one_site_assoc_and_disso_ktr_single_cycle_recovers_parameters():
 
     # Single-cycle kinetics: each association starts where the previous dissociation ended
     assoc_t, disso_t, assoc_s, disso_s = [], [], [], []
-    s0, cs0, t_start = 0.0, 0.0, 0.0
+    s0, t_start = 0.0, 0.0
     for conc in concs:
         t_a = np.linspace(t_start, t_start + 120, 121)
         t_d = np.linspace(0, 60, 61)
-        a, cs_a = solve_ode_one_site_mass_transport_association(
-            t_a - t_a[0], s0, cs0, conc, Kd_true, koff_true, ktr_true, smax_true, return_cs=True
+        a = solve_ode_one_site_mass_transport_association(
+            t_a - t_a[0], s0, conc, Kd_true, koff_true, ktr_true, smax_true
         )
-        d, cs_d = solve_ode_one_site_mass_transport_dissociation(
-            t_d, a[-1], Kd_true, koff_true, ktr_true, smax_true, cs_0=cs_a[-1], return_cs=True
+        d = solve_ode_one_site_mass_transport_dissociation(
+            t_d, a[-1], Kd_true, koff_true, ktr_true, smax_true
         )
-        assert np.isclose(cs_a[0], cs0, rtol=1e-12, atol=0)
-        assert np.all(cs_d >= 0)
         assoc_t.append(t_a); disso_t.append(t_d); assoc_s.append(a); disso_s.append(d)
-        s0, cs0, t_start = d[-1], cs_d[-1], t_a[-1] + 60
+        s0, t_start = d[-1], t_a[-1] + 60
 
     fit, _, fitted_assoc, _ = fit_one_site_assoc_and_disso_ktr(
         assoc_signal_lst=assoc_s,
