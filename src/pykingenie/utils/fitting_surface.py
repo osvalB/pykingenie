@@ -861,6 +861,7 @@ def fit_two_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
         Fitted values for each dissociation signal, same dimensions as disso_signal_lst.
 
     """
+    # Edited with AI assistance and reviewed by a human in PR #16: t0 is passed to the solver instead of being cancelled.
     if smax_idx is None:
         smax_idx = list(range(len(assoc_signal_lst)))
 
@@ -938,7 +939,7 @@ def fit_two_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
             rmax_lpl = args[rmax_base + 1]
 
             t0 = t0_vals[sidx] if (t0_vals is not None) else 0.0
-            t_assoc_rel = t_assoc - t_assoc[0] - t0
+            t_assoc_rel = t_assoc - t_assoc[0]
 
             if np.logical_or(i == 0, initial_signal_at_zero[i]) and continuos_time[i]:
                 fpl0, flpl0 = 0.0, 0.0
@@ -951,13 +952,13 @@ def fit_two_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
                 y_assoc = solve_two_site_cooperative_association(
                     t_assoc_rel, analyte_conc, k_off / Kd, k_off, sigma,
                     Rmax_PL=rmax_pl, Rmax_LPL=rmax_lpl,
-                    fPL_0=fpl0, fLPL_0=flpl0,
+                    fPL_0=fpl0, fLPL_0=flpl0, t0=t0,
                 )
             else:
                 y_assoc = solve_two_site_association(
                     t_assoc_rel, analyte_conc, k_off / Kd, k_off,
                     Rmax_PL=rmax_pl, Rmax_LPL=rmax_lpl,
-                    fPL_0=fpl0, fLPL_0=flpl0,
+                    fPL_0=fpl0, fLPL_0=flpl0, t0=t0,
                 )
 
             out[_a_offsets[i]:_a_offsets[i + 1]] = y_assoc[:, 0]
@@ -1315,8 +1316,12 @@ def fit_induced_fit_sites_assoc_and_disso(
     list
         Fitted values for each dissociation signal, same dimensions as disso_signal_lst.
     """
+    # Edited with AI assistance and reviewed by a human in PR #16: carry-over only for single-cycle steps, and t0 is passed to the model.
     # Set a flag for the association that was done after a dissociation step
     initial_signal_at_zero = [time[0] < 2 for time in assoc_time_lst]
+
+    # Flag associations that follow directly after the previous dissociation
+    continuos_time = detect_time_list_continuos(assoc_time_lst, disso_time_lst)
 
     # Preprocess time
     time_lst_assoc = [np.asarray(t) for t in assoc_time_lst]
@@ -1364,15 +1369,17 @@ def fit_induced_fit_sites_assoc_and_disso(
         i = 0
         for t_assoc, t_dissoc in zip(time_lst_assoc, time_lst_disso):
 
-            if i == 0 or initial_signal_at_zero[i]:
-                sP1L, sP2l = 0, 0
-            else:
+            # Single-cycle: continue from the previous dissociation. Otherwise start empty.
+            if continuos_time[i] and not (i == 0 or initial_signal_at_zero[i]):
                 s0, sP1L, sP2l = last
+            else:
+                sP1L, sP2l = 0, 0
 
             conc = analyte_conc_lst[i]
+            t0 = 0 if fixed_t0 else args[start + smax_idx[i]]
             smax = args[start + smax_idx[i] + n_t0s] if shared_smax else args[start + i + n_t0s]
 
-            mat_assoc = solve_induced_fit_association(t_assoc, conc, kon1, koff1, kon2, koff2, sP1L=sP1L, sP2L=sP2l, smax=smax)
+            mat_assoc = solve_induced_fit_association(t_assoc, conc, kon1, koff1, kon2, koff2, sP1L=sP1L, sP2L=sP2l, smax=smax, t0=t0)
             out[_a_offsets[i]:_a_offsets[i + 1]] = mat_assoc[:, 0]
             last = mat_assoc[-1]
 
