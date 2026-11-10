@@ -36,7 +36,7 @@ from .utils.processing      import (
     remove_at
 )
 
-from .utils.math import  get_desired_rss
+from .utils.math import  get_desired_rss, correlation_from_covariance
 
 from .fitter import KineticsFitterGeneral
 
@@ -239,6 +239,55 @@ class KineticsFitter(KineticsFitterGeneral):
 
         return None
 
+    @staticmethod
+    def _group_labels(names, n_groups):
+        """
+        Labels for parameters fitted once per group, numbered from 1.
+
+        Parameters
+        ----------
+        names : str or tuple of str
+            Parameter name, or several names fitted together for each group
+            (for example ('Rmax_PL', 'Rmax_LPL')).
+        n_groups : int
+            Number of groups.
+
+        Returns
+        -------
+        list of str
+            For example ['Smax 1', 'Smax 2'], or
+            ['Rmax_PL 1', 'Rmax_LPL 1', 'Rmax_PL 2', 'Rmax_LPL 2'].
+        """
+        # This function is AI generated and reviewed by a human (PR #XX).
+        names = (names,) if isinstance(names, str) else tuple(names)
+        return [f"{name} {i + 1}" for i in range(n_groups) for name in names]
+
+    def _store_correlation(self, cov, labels, kind='kinetics'):
+        """
+        Store the correlation matrix of the fitted parameters.
+
+        Parameters
+        ----------
+        cov : np.ndarray
+            Covariance matrix from the fit.
+        labels : list of str
+            Parameter names, in the order of the fitted parameter vector.
+        kind : str, optional
+            'kinetics' (default) or 'ss' for steady state.
+
+        Returns
+        -------
+        None
+            Sets fit_params_kinetics_correlation or fit_params_ss_correlation.
+        """
+        # This function is AI generated and reviewed by a human (PR #XX).
+        corr = correlation_from_covariance(cov, labels)
+        if kind == 'ss':
+            self.fit_params_ss_correlation = corr
+        else:
+            self.fit_params_kinetics_correlation = corr
+        return None
+
     def fit_steady_state_one_site(self):
 
         """
@@ -305,6 +354,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         self.params      = fit
         self.p0          = p0
+        self._store_correlation(cov, ['Kd [µM]'] + self._group_labels('Smax', len(fit) - 1), kind='ss')
         self.low_bounds  = low_bounds
         self.high_bounds = high_bounds
 
@@ -434,6 +484,8 @@ class KineticsFitter(KineticsFitterGeneral):
 
         self.params = fit
         self.p0 = p0
+        self._store_correlation(
+            cov, ['Kd1 [µM]', 'Kd2 [µM]', 'fraction_site1'] + self._group_labels('Rmax', len(fit) - 3), kind='ss')
         self.low_bounds = low_bounds
         self.high_bounds = high_bounds
         self.signal_ss_fit = fit_vals
@@ -561,6 +613,9 @@ class KineticsFitter(KineticsFitterGeneral):
 
         self.params = fit
         self.p0 = p0
+        self._store_correlation(
+            cov, ['Kd [µM]'] + (['sigma'] if fit_sigma else []) + self._group_labels(('Rmax_PL', 'Rmax_LPL'), len(rmax_pl)),
+            kind='ss')
         self.low_bounds = low_bounds
         self.high_bounds = high_bounds
         self.signal_ss_fit = fit_vals
@@ -688,6 +743,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         self.params = fit
 
+        self._store_correlation(cov, ['Kd [µM]', 'k_off [1/s]'] + self._group_labels('Smax', len(fit) - 2))
         self.signal_assoc_fit = fit_vals
 
         self.Kd = fit[0]
@@ -885,6 +941,7 @@ class KineticsFitter(KineticsFitterGeneral):
         self.fit_params_kinetics_error = df_error
         self.params = fit
 
+        self._store_correlation(cov, ['k_off [1/s]'] + self._group_labels('S0', len(fit) - 1))
         if calc_loo:
 
             self.calc_leave_one_out_errors()
@@ -1204,6 +1261,11 @@ class KineticsFitter(KineticsFitterGeneral):
 
         self.params      = fit
         self.p0          = p0
+        n_groups = len(np.unique(self.smax_id))
+        labels = ['Kd [µM]', 'k_off [1/s]']
+        labels += [] if fixed_t0 else self._group_labels('t0', n_groups)
+        labels += self._group_labels('Ktr', n_groups) if fit_ktr else []
+        self._store_correlation(cov, labels + self._group_labels('Smax', len(fit) - len(labels)))
         self.low_bounds  = low_bounds
         self.high_bounds = high_bounds
 
@@ -1543,6 +1605,9 @@ class KineticsFitter(KineticsFitterGeneral):
 
         self.params = fit
         self.p0 = p0
+        labels = ['Kd [µM]', 'k_off [1/s]'] + (['sigma'] if fit_sigma else [])
+        labels += [] if fixed_t0 else self._group_labels('t0', n_unq_smax)
+        self._store_correlation(cov, labels + self._group_labels(('Rmax_PL', 'Rmax_LPL'), len(rmax_pl)))
         self.low_bounds = p0_low
         self.high_bounds = p0_high
 
@@ -1921,6 +1986,9 @@ class KineticsFitter(KineticsFitterGeneral):
 
         self.params = fit
         self.p0 = p0
+        labels = ['Kd1 [µM]', 'k_off1 [1/s]', 'Kd2 [µM]', 'k_off2 [1/s]', 'fraction_site1']
+        labels += [] if fixed_t0 else self._group_labels('t0', n_unq_smax)
+        self._store_correlation(cov, labels + self._group_labels('Rmax', len(fit) - len(labels)))
         self.low_bounds = low_bounds
         self.high_bounds = high_bounds
         self.best_Kd1_grid = best_Kd1
@@ -2285,6 +2353,8 @@ class KineticsFitter(KineticsFitterGeneral):
 
         self.params      = fit
         self.p0          = p0
+        self._store_correlation(
+            cov, ['k_on [1/(s*µM)]', 'k_off [1/s]', 'k_c [1/s]', 'k_rev [1/s]'] + self._group_labels('Smax', len(fit) - 4))
         self.low_bounds  = low_bounds
         self.high_bounds = high_bounds
 

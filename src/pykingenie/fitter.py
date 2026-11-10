@@ -24,6 +24,10 @@ class KineticsFitterGeneral:
             Fitted parameters for the association / dissociation kinetics.
         fit_params_ss : pandas.DataFrame or None
             Fitted parameters for the steady state.
+        fit_params_kinetics_correlation : pandas.DataFrame or None
+            Correlation matrix of the fitted kinetics parameters.
+        fit_params_ss_correlation : pandas.DataFrame or None
+            Correlation matrix of the fitted steady-state parameters.
         fitted_params_boundaries : pandas.DataFrame or None
             DataFrame with fitting boundaries and fitted parameters.
         params : numpy.ndarray or None
@@ -39,6 +43,8 @@ class KineticsFitterGeneral:
         self.signal_disso_fit = None  # Dissociation kinetics fitted signal
         self.fit_params_kinetics = None  # Fitted parameters for the association / dissociation kinetics
         self.fit_params_ss = None  # Values of the fitted parameters - steady state
+        self.fit_params_kinetics_correlation = None  # Correlation of the fitted kinetics parameters
+        self.fit_params_ss_correlation = None  # Correlation of the fitted steady-state parameters
         self.fitted_params_boundaries = None  # DataFrame with fitting boundaries and fitted parameters
         self.params = None  # Parameters used for fitting
         self.low_bounds = None  # Lower bounds for fitting parameters
@@ -59,6 +65,8 @@ class KineticsFitterGeneral:
         self.signal_disso_fit = None  # Association kinetics fitted signal
         self.fit_params_kinetics = None  # Fitted parameters for the association / dissociation kinetics
         self.fit_params_ss = None  # Values of the fitted parameters - steady state
+        self.fit_params_kinetics_correlation = None
+        self.fit_params_ss_correlation = None
 
         return None
 

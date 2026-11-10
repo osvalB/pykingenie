@@ -10,7 +10,8 @@ ___all__ = ['single_exponential',
            'median_filter',
            'rss_p',
            'get_rss',
-           'get_desired_rss']
+           'get_desired_rss',
+           'correlation_from_covariance']
 
 def single_exponential(t, a0, a1, kobs):
     """
@@ -177,3 +178,45 @@ def get_desired_rss(y, y_fit, n, p, alpha=0.05):
     rss = get_rss(y, y_fit)
 
     return rss_p(rss, n, p, alpha)
+
+
+def correlation_from_covariance(cov, labels):
+    """
+    Correlation matrix of fitted parameters from their covariance matrix.
+
+    The correlation of parameters i and j is cov[i, j] / (sd_i * sd_j), from -1
+    to 1. Values near ±1 mean the two parameters trade off against each other:
+    the data constrain a combination of them, not each one separately.
+
+    Parameters
+    ----------
+    cov : np.ndarray
+        Covariance matrix of the fitted parameters, as returned by curve_fit.
+    labels : list of str
+        Parameter names, in the order of the rows of cov.
+
+    Returns
+    -------
+    pd.DataFrame
+        Correlation matrix with labels as index and columns. Entries are NaN
+        for parameters whose variance is not finite and positive (for example
+        when curve_fit cannot estimate the covariance).
+    """
+    # This function is AI generated and reviewed by a human (PR #XX).
+    cov = np.array(cov, dtype=float, ndmin=2)
+    if cov.shape != (len(labels), len(labels)):
+        raise ValueError(
+            f"Covariance matrix of shape {cov.shape} does not match {len(labels)} labels.")
+
+    sd = np.sqrt(np.diag(cov))
+    valid = np.isfinite(sd) & (sd > 0)
+
+    corr = np.full(cov.shape, np.nan)
+    both = np.outer(valid, valid)
+    with np.errstate(divide='ignore', invalid='ignore'):
+        corr[both] = (cov / np.outer(sd, sd))[both]
+    corr[~np.isfinite(corr)] = np.nan
+    corr = np.clip(corr, -1.0, 1.0)
+    corr[np.diag_indices_from(corr)] = np.where(valid, 1.0, np.nan)
+
+    return pd.DataFrame(corr, index=list(labels), columns=list(labels))
