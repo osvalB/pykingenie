@@ -364,6 +364,7 @@ class KineticsFitter(KineticsFitterGeneral):
             - Kd_ss: The equilibrium dissociation constant(s)
             - Smax_upper_bound_factor: Factor to determine the upper bound for Smax
         """
+        # This function contains AI-generated changes (PR #19).
 
         self.clear_fittings()
 
@@ -484,6 +485,7 @@ class KineticsFitter(KineticsFitterGeneral):
         None
             Updates fitted steady-state signals, fitted parameters, and bounds.
         """
+        # This function contains AI-generated changes (PR #19).
 
         self.clear_fittings()
 
@@ -598,6 +600,7 @@ class KineticsFitter(KineticsFitterGeneral):
             - sigma_ss: The fitted cooperativity factor (if fit_sigma=True)
             - Smax_upper_bound_factor: Factor to determine upper Smax bounds
         """
+        # This function contains AI-generated changes (PR #19).
 
         self.clear_fittings()
 
@@ -775,6 +778,7 @@ class KineticsFitter(KineticsFitterGeneral):
             - k_off: The dissociation rate constant
             - Smax: The maximum signal values
         """
+        # This function contains AI-generated changes (PR #19).
 
         self.clear_fittings()
         self.shared_smax = shared_smax
@@ -950,6 +954,7 @@ class KineticsFitter(KineticsFitterGeneral):
             - fit_params_kinetics: DataFrame with the fitted parameters
             - fit_params_kinetics_error: DataFrame with the relative errors
         """
+        # This function contains AI-generated changes (PR #19).
 
         self.model = "one_site_dissociation"
         self.clear_fittings()
@@ -1165,6 +1170,7 @@ class KineticsFitter(KineticsFitterGeneral):
             Whether to calculate leave-one-out cross-validation, default is False.
 
         """
+        # This function contains AI-generated changes (PR #19).
         # Edited with AI assistance and reviewed by a human in PR #18: grid of starting points for the mass-transport fit.
 
         self.clear_fittings()
@@ -1485,6 +1491,7 @@ class KineticsFitter(KineticsFitterGeneral):
             Whether to calculate leave-one-out (LOO) estimates for Kd and k_off,
             default is False. If True, the function will fit the model multiple times, each time leaving out one curve, to estimate the variability of the fitted parameters.
         """
+        # This function contains AI-generated changes (PR #19).
 
         self.clear_fittings()
 
@@ -1834,6 +1841,7 @@ class KineticsFitter(KineticsFitterGeneral):
         None
             Updates fitted signal, parameter, bounds, and grid-search attributes.
         """
+        # This function contains AI-generated changes (PR #19).
 
         self.clear_fittings()
 
@@ -2295,6 +2303,7 @@ class KineticsFitter(KineticsFitterGeneral):
             - Smax: The maximum signal values
             - fit_params_kinetics: DataFrame with the fitted parameters
         """
+        # This function contains AI-generated changes (PR #19).
 
         # Fit first a model without induced-fit
 

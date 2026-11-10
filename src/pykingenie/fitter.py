@@ -37,6 +37,7 @@ class KineticsFitterGeneral:
         high_bounds : numpy.ndarray or None
             Upper bounds for fitting parameters.
         """
+        # This function contains AI-generated changes (PR #19).
 
         self.signal_ss_fit = None  # Steady state fitted signal
         self.signal_assoc_fit = None  # Association kinetics fitted signal
@@ -60,6 +61,7 @@ class KineticsFitterGeneral:
         -------
         None
         """
+        # This function contains AI-generated changes (PR #19).
         self.signal_ss_fit = None  # Steady state fitted signal
         self.signal_assoc_fit = None  # Association kinetics fitted signal
         self.signal_disso_fit = None  # Association kinetics fitted signal
