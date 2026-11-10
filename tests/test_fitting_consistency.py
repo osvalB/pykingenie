@@ -1,4 +1,4 @@
-# This file is AI generated.
+# This file is AI generated (PR #15).
 """Regressions for grouping, confidence limits, and optional fitting inputs."""
 
 import numpy as np
@@ -34,7 +34,7 @@ from pykingenie.utils.signal_surface import (
 
 @pytest.mark.parametrize("group_ids", [[7, 2, 7, 2, 7, 2], np.array([7, 2, 7, 2, 7, 2])])
 def test_interleaved_smax_groups_recover_distinct_capacities(group_ids):
-    # This function is AI generated.
+    # This function is AI generated (PR #15).
     t = np.linspace(0, 150, 41)
     concs = [0.2, 0.2, 1.0, 1.0, 5.0, 5.0]
     capacities = [3.0, 8.0, 3.0, 8.0, 3.0, 8.0]
@@ -54,7 +54,7 @@ def test_interleaved_smax_groups_recover_distinct_capacities(group_ids):
 @pytest.mark.parametrize("target_rss", [0.51, 2.0, 50.0])
 def test_confidence_limits_reach_profile_rss_threshold(parameter, target_rss):
     """Refit real traces at both limits and check the RSS crossing on each side."""
-    # This function is AI generated.
+    # This function is AI generated (PR #15).
     t = np.linspace(0, 60, 25)
     concs = [0.1, 0.5, 2.0]
     assoc = [one_site_association_analytical(t, 0, 5.0, 0.03, 0.5, c) for c in concs]
@@ -76,7 +76,7 @@ def test_confidence_limits_reach_profile_rss_threshold(parameter, target_rss):
         confidence_limits = surface_fits.one_site_assoc_and_disso_asymmetric_ci95_koff
 
     def profile_rss(value):
-        # This function is AI generated.
+        # This function is AI generated (PR #15).
         fixed = (dict(fixed_Kd=True, Kd_value=value) if parameter == "Kd"
                  else dict(fixed_koff=True, koff_value=value))
         _, _, fitted_assoc, fitted_disso = surface_fits.fit_one_site_assoc_and_disso(
@@ -95,7 +95,7 @@ def test_confidence_limits_reach_profile_rss_threshold(parameter, target_rss):
 
 @pytest.mark.parametrize("equal_complex_signals", [False, True])
 def test_induced_fit_can_measure_only_free_protein(equal_complex_signals):
-    # This function is AI generated.
+    # This function is AI generated (PR #15).
     times = [np.linspace(0, 30, 41), np.linspace(0, 40, 55)]
     concs = [0.5, 2.0]
     rates = dict(k1=0.4, k_minus1=0.03, k2=0.1, k_minus2=0.02)
@@ -114,7 +114,7 @@ def test_induced_fit_can_measure_only_free_protein(equal_complex_signals):
 
 
 def test_solution_one_site_wrapper_accepts_unequal_trace_lengths():
-    # This function is AI generated.
+    # This function is AI generated (PR #15).
     times = [np.linspace(0, 5, 31), np.linspace(0, 8, 53)]
     concs = [0.5, 2.0]
     signals = [signal_ode_one_site_insolution(t, 0.5, 0.5, 1.0, c, signal_complex=3.0)
@@ -128,7 +128,7 @@ def test_solution_one_site_wrapper_accepts_unequal_trace_lengths():
 
 @pytest.mark.parametrize("model", ["induced_fit", "conformational_selection"])
 def test_solution_initial_search_accepts_unequal_trace_lengths(model):
-    # This function is AI generated.
+    # This function is AI generated (PR #15).
     times = [np.linspace(0, 30, 31), np.linspace(0, 50, 47)]
     concs = [0.5, 2.0]
     if model == "induced_fit":
@@ -157,7 +157,7 @@ def test_solution_initial_search_accepts_unequal_trace_lengths(model):
 @pytest.mark.parametrize("groups", [[0, 1, 2], [0, 1, 0, 2]])
 def test_loo_keeps_group_parameters_aligned(model, shared_smax, fixed_t0, groups):
     """Run every LOO optimization and recover the simulated rates and group Ktr values."""
-    # This function is AI generated.
+    # This function is AI generated (PR #15).
     n_groups = len(set(groups))
     n_traces = len(groups)
     t = np.linspace(0, 60, 41)

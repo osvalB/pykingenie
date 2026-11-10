@@ -1,4 +1,4 @@
-# This file contains AI-generated changes.
+# This file contains AI-generated changes (PR #15).
 """Fit steady-state and kinetic models for surface-based experiments."""
 
 import numpy as np
@@ -1602,7 +1602,7 @@ def one_site_assoc_and_disso_asymmetric_ci95(kd_estimated, rss_desired,
     float
         Maximum Kd value for the 95% confidence interval.
     """
-    # This function contains AI-generated changes.
+    # This function contains AI-generated changes (PR #15).
     # Pre-concatenate the static reference signals once
     _ref_assoc = concat_signal_lst(assoc_signal_lst)
     _ref_disso = concat_signal_lst(disso_signal_lst)
@@ -1736,7 +1736,7 @@ def one_site_assoc_and_disso_asymmetric_ci95_koff(koff_estimated, rss_desired,
     float
         Maximum koff value for the 95% confidence interval.
     """
-    # This function contains AI-generated changes.
+    # This function contains AI-generated changes (PR #15).
     # Pre-concatenate the static reference signals once
     _ref_assoc = concat_signal_lst(assoc_signal_lst)
     _ref_disso = concat_signal_lst(disso_signal_lst)

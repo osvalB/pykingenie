@@ -1,4 +1,4 @@
-# Note: this file contains AI-generated code, written with AI coding assistants.
+# Note: this file contains AI-generated code, written with AI coding assistants (updated in PR #15).
 
 """Exercise the real XY renderer as well as the kinetics-to-chart mapping."""
 
@@ -941,7 +941,7 @@ def test_empty_and_invalid_inputs(analyzer):
 def test_missing_xy_dependency():
     # Load the real plotting code, then remove third-party import paths in a
     # separate interpreter so XY is genuinely unavailable without affecting pytest.
-    # This function contains AI-generated changes.
+    # This function contains AI-generated changes (PR #15).
     script = """
 import importlib.util
 import sys
