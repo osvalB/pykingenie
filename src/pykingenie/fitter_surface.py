@@ -2277,7 +2277,8 @@ class KineticsFitter(KineticsFitterGeneral):
         This method first fits a simple one-site model to get initial parameter estimates,
         then explores different values of the conformational change rate constants (kc and krev)
         to find good initial guesses for the induced fit model. Finally, it fits the full
-        induced fit model with these initial guesses.
+        induced fit model with these initial guesses. If that fit fails, it starts again
+        from the next-best guesses (up to three) and raises the error only if all fail.
         
         Parameters
         ----------
@@ -2303,7 +2304,7 @@ class KineticsFitter(KineticsFitterGeneral):
             - Smax: The maximum signal values
             - fit_params_kinetics: DataFrame with the fitted parameters
         """
-        # This function contains AI-generated changes (PR #19).
+        # This function contains AI-generated changes (PR #19, PR #XX).
 
         # Fit first a model without induced-fit
 
@@ -2331,10 +2332,7 @@ class KineticsFitter(KineticsFitterGeneral):
         mask = combinations[:, 0] >= combinations[:, 1] / 100
         combinations = combinations[mask]
 
-        rss_init    = np.inf
-        best_kc     = None
-        best_krev   = None
-        best_params = None
+        grid_results = []  # (rss, kc, krev, params) of each grid point that could be fitted
 
         # We create a subsample of the time points to speed up the fitting for the initial guess
         time_assoc_lst_subsampled = [subset_data(t) for t in self.time_assoc_lst]
@@ -2365,48 +2363,70 @@ class KineticsFitter(KineticsFitterGeneral):
                 rss_asso  = np.sum([np.sum((y - fit_y)**2) for y, fit_y in zip(assoc_lst_subsampled, fit_vals_assoc)])
                 rss_disso = np.sum([np.sum((y - fit_y)**2) for y, fit_y in zip(disso_lst_subsampled, fit_vals_disso)])
 
-                rss = rss_asso + rss_disso
-
-                if rss < rss_init:
-
-                    rss_init = rss
-                    best_kc  = kc
-                    best_krev = krev
-                    best_params = params
+                grid_results.append((rss_asso + rss_disso, kc, krev, params))
 
             except:
 
                 # If the fit fails, just continue to the next combination
                 continue
 
-        # Insert the kc and krev parameters into the p0, low_bounds and high_bounds lists
+        # Edited with AI assistance and reviewed by a human in PR #XX: when kc and krev
+        # are fast, the curves only fix kon and an apparent koff, and the fit creeps
+        # along a flat valley of equally good solutions. It gets four times the
+        # default number of evaluations to stop, and if it still fails it starts
+        # again from the next-best grid points.
+        grid_results.sort(key=lambda result: result[0])
 
-        factor = 1e3  # Factor to scale the bounds for kc and krev
+        factor        = 1e3  # Factor to scale the bounds for kc and krev
+        n_starts      = 3    # Grid points tried, best first, until one fit succeeds
+        best          = None
+        last_error    = None
 
-        p0.insert(2, best_kc)
-        low_bounds.insert(2, best_kc/factor)
-        high_bounds.insert(2, best_kc*factor)
-        p0.insert(3, best_krev)
-        low_bounds.insert(3, best_krev/factor)
-        high_bounds.insert(3, best_krev*factor)
+        for _, best_kc, best_krev, best_params in grid_results[:n_starts]:
 
-        # Replace the kon and koff with the best parameters
-        p0[0]  = best_params[0]  # kon
-        p0[1]  = best_params[1]  # koff
+            # Insert the kc and krev parameters into the p0, low_bounds and high_bounds lists
+            start      = list(p0)
+            start_low  = list(low_bounds)
+            start_high = list(high_bounds)
 
-        low_bounds[0]  = best_params[0] / factor  # kon
-        high_bounds[0] = best_params[0] * factor
+            start.insert(2, best_kc)
+            start_low.insert(2, best_kc/factor)
+            start_high.insert(2, best_kc*factor)
+            start.insert(3, best_krev)
+            start_low.insert(3, best_krev/factor)
+            start_high.insert(3, best_krev*factor)
 
-        low_bounds[1]  = best_params[1] / factor  # koff
-        high_bounds[1] = best_params[1] * factor
+            # Replace the kon and koff with the best parameters
+            start[0]  = best_params[0]  # kon
+            start[1]  = best_params[1]  # koff
 
-        fit, cov, fit_vals_assoc, fit_vals_disso = fit_induced_fit_sites_assoc_and_disso(
-            self.assoc_lst,self.time_assoc_lst,self.lig_conc_lst,
-            self.disso_lst,self.time_disso_lst,
-            p0,low_bounds,high_bounds,
-            smax_idx=self.smax_id,
-            shared_smax=shared_smax,
-            fixed_t0=True)
+            start_low[0]  = best_params[0] / factor  # kon
+            start_high[0] = best_params[0] * factor
+
+            start_low[1]  = best_params[1] / factor  # koff
+            start_high[1] = best_params[1] * factor
+
+            try:
+                result = fit_induced_fit_sites_assoc_and_disso(
+                    self.assoc_lst,self.time_assoc_lst,self.lig_conc_lst,
+                    self.disso_lst,self.time_disso_lst,
+                    start,start_low,start_high,
+                    smax_idx=self.smax_id,
+                    shared_smax=shared_smax,
+                    fixed_t0=True,
+                    max_nfev=400 * len(start))
+            except RuntimeError as error:
+                last_error = error
+                continue
+
+            best = (result, start, start_low, start_high)
+            break
+
+        if best is None:
+            raise last_error if last_error is not None else RuntimeError(
+                "The induced-fit model could not be fitted from any starting point.")
+
+        (fit, cov, fit_vals_assoc, fit_vals_disso), p0, low_bounds, high_bounds = best
 
         self.signal_assoc_fit = fit_vals_assoc
         self.signal_disso_fit = fit_vals_disso
