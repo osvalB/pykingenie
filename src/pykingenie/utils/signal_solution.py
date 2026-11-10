@@ -1,4 +1,5 @@
 """Calculate solution-phase kinetic signals and numerical trajectories."""
+# AI-assisted correction: induced-fit relaxation rates use the stated forward/reverse rates.
 
 import  numpy as np
 from scipy.integrate import odeint
@@ -388,20 +389,29 @@ def get_kobs_induced_fit(tot_lig, tot_prot, kr, ke, kon, koff, dominant=True):
     koff : float
         Rate constant for E1S -> E1 + S.
     dominant : bool, optional
-        If True, calculate the dominant relaxation rate, otherwise calculate the non-dominant relaxation rate, default is True.
+        If True, return the slower equilibrium relaxation rate; otherwise return
+        the faster rate. Default is True.
         
     Returns
     -------
     float
         Observed rate constant (in 1/s).
+
+    Notes
+    -----
+    These are the two relaxation rates of the reaction equations linearised
+    around equilibrium. ``ke`` is the forward conformational rate (k_c), and
+    ``kr`` is the reverse rate (k_rev). The apparent dissociation constant is
+    ``koff * kr / (kon * (ke + kr))``.
     """
     # Edited with AI assistance and reviewed by a human in PR #16: dominant=False returns the fast rate, not the mean.
-    kd_app = koff * ke / (kon * (ke + kr))
+    # AI-assisted correction: equilibrium affinity uses kr; the discriminant uses ke.
+    kd_app = koff * kr / (kon * (ke + kr))
     delta  = np.sqrt((tot_lig - tot_prot + kd_app) ** 2 + 4 * tot_prot * kd_app)
     gamma  = -ke - kr + koff + kon * (delta - kd_app)
 
     sign = -1 if dominant else 1
-    kobs = ke + kr + 0.5 * gamma + sign * 0.5 * np.sqrt(gamma ** 2 + 4 * koff * kr)
+    kobs = ke + kr + 0.5 * gamma + sign * 0.5 * np.sqrt(gamma ** 2 + 4 * koff * ke)
 
     return kobs  # units are 1/s
 
