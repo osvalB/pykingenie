@@ -209,9 +209,11 @@ def test_analyzer_get_correlation_matrices():
         analyzer.get_correlation_matrices(kind="other")
 
 
-# The matrix flags underdetermined rates: in the test file kc and krev
-# correlate almost perfectly with the other rates, while with a slow
-# conformational step they do not.
+# The matrix flags underdetermined rates. With a conformational step faster
+# than dissociation, the curves only fix kon and an apparent koff, so kc and
+# krev correlate almost perfectly with the other rates; with a slow step they
+# do not. Both use data with noise: on noise-free data the covariance is
+# set by round-off and changes between platforms.
 def test_correlation_flags_underdetermined_induced_fit_rates():
     def max_rate_correlation(fitter):
         corr = fitter.fit_params_kinetics_correlation.abs()
@@ -219,32 +221,35 @@ def test_correlation_flags_underdetermined_induced_fit_rates():
         sub = corr.loc[["k_c [1/s]", "k_rev [1/s]"], rates].to_numpy()
         return np.nanmax(np.where(sub < 1.0 - 1e-12, sub, np.nan))
 
-    fitter = _fitter(INDUCED_FIT)
-    fitter.fit_steady_state()
+    fitter = _induced_fit_fitter(0.1, 0.01, 0.2, 1.0, [0.01, 0.03, 0.09, 0.27, 0.81], seed=2)
     fitter.fit_one_site_if_assoc_and_disso(shared_smax=True)
-    assert max_rate_correlation(fitter) > 0.95
+    assert max_rate_correlation(fitter) > 0.98
 
     fitter = _slow_induced_fit_fitter()
     fitter.fit_one_site_if_assoc_and_disso(shared_smax=True)
     assert max_rate_correlation(fitter) < 0.9
 
 
-def _slow_induced_fit_fitter():
-    """Induced-fit data with a slow conformational step, so all four rates are determined."""
-    kon, koff, kc, krev, smax = 0.1, 0.05, 0.01, 0.005, 5.0
-    concs = [0.05, 0.15, 0.45, 1.35, 4.05]
+def _induced_fit_fitter(kon, koff, kc, krev, concs, seed, smax=5.0):
+    """Induced-fit data with noise of 0.5 % of Smax."""
     t_assoc = np.arange(0, 600.0, 2.0)
     t_disso = np.arange(600.0, 1800.0, 4.0)
-    rng = np.random.default_rng(0)
+    rng = np.random.default_rng(seed)
     assoc, disso = [], []
     for c in concs:
         y = solve_induced_fit_association(t_assoc, c, kon, koff, kc, krev, smax=smax)
         d = solve_induced_fit_dissociation(t_disso, koff, kc, krev, s0=y[-1, 0], sP2L=y[-1, 2], smax=smax)[:, 0]
         assoc.append(y[:, 0] + rng.normal(0, 0.005 * smax, len(t_assoc)))
         disso.append(d + rng.normal(0, 0.005 * smax, len(t_disso)))
-    fitter = KineticsFitter([t_assoc] * 5, assoc, concs, [t_disso] * 5, disso, smax_id=[0] * 5)
+    n = len(concs)
+    fitter = KineticsFitter([t_assoc] * n, assoc, concs, [t_disso] * n, disso, smax_id=[0] * n)
     fitter.fit_steady_state()
     return fitter
+
+
+def _slow_induced_fit_fitter():
+    """Induced-fit data with a slow conformational step, so all four rates are determined."""
+    return _induced_fit_fitter(0.1, 0.05, 0.01, 0.005, [0.05, 0.15, 0.45, 1.35, 4.05], seed=0)
 
 
 # The induced-fit fit stores its own relative errors, not those of the
