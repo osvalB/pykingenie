@@ -1,4 +1,4 @@
-# This code is AI generated and reviewed by a human (PR #18, PR #XX).
+# This code is AI generated and reviewed by a human (PR #18, PR #21).
 """
 Fits that must recover known parameters from simulated data with noise:
 starting points for mass transport, carry-over between steps, and an

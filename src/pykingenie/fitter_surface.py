@@ -2304,7 +2304,7 @@ class KineticsFitter(KineticsFitterGeneral):
             - Smax: The maximum signal values
             - fit_params_kinetics: DataFrame with the fitted parameters
         """
-        # This function contains AI-generated changes (PR #19, PR #XX).
+        # This function contains AI-generated changes (PR #19, PR #21).
 
         # Fit first a model without induced-fit
 
@@ -2370,7 +2370,7 @@ class KineticsFitter(KineticsFitterGeneral):
                 # If the fit fails, just continue to the next combination
                 continue
 
-        # Edited with AI assistance and reviewed by a human in PR #XX: when kc and krev
+        # Edited with AI assistance and reviewed by a human in PR #21: when kc and krev
         # are fast, the curves only fix kon and an apparent koff, and the fit creeps
         # along a flat valley of equally good solutions. It gets four times the
         # default number of evaluations to stop, and if it still fails it starts
