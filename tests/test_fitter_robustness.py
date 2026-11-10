@@ -7,6 +7,7 @@ induced-fit model whose rates are all determined by the curves.
 import numpy as np
 import pytest
 
+import pykingenie.utils.fitting_surface as fitting_surface
 from pykingenie.fitter_surface import KineticsFitter
 from pykingenie.utils.fitting_surface import fit_one_site_assoc_and_disso_ktr
 from pykingenie.utils.signal_surface import (
@@ -85,6 +86,49 @@ def test_mass_transport_fit_restarts_after_gap():
 
     np.testing.assert_allclose(params, [ktr, SMAX], rtol=1e-4)
     assert _max_rel_error(fit_assoc[1], assoc[1]) < 1e-4
+
+
+def _two_start_fit(Kd=0.5, koff=0.01, ktr=0.05):
+    """Fit noise-free mass-transport data from a start and one start candidate."""
+    concs = [0.25, 1.0]
+    assoc, disso = [], []
+    for c in concs:
+        a = solve_ode_one_site_mass_transport_association(T_ASSOC, 0.0, c, Kd, koff, ktr, SMAX)
+        assoc.append(a)
+        disso.append(solve_ode_one_site_mass_transport_dissociation(T_DISSO - T_DISSO[0], a[-1], Kd, koff, ktr, SMAX))
+    return fit_one_site_assoc_and_disso_ktr(
+        assoc, [T_ASSOC] * 2, concs, disso, [T_DISSO] * 2,
+        initial_parameters=[0.4, 0.012, 0.04, 4.5],
+        low_bounds=[1e-3, 1e-4, 1e-4, 1.0], high_bounds=[10, 1, 1, 20],
+        smax_idx=[0, 0], shared_smax=True,
+        start_candidates=[[0.6, 0.008, 0.06, 5.5]])
+
+
+# If the fit from one start fails, the fit from the other start is returned.
+def test_two_start_fit_survives_one_failed_start(monkeypatch):
+    original = fitting_surface.curve_fit
+    calls = []
+
+    def fail_first(*args, **kwargs):
+        calls.append(kwargs["p0"])
+        if len(calls) == 1:
+            raise RuntimeError("Optimal parameters not found")
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(fitting_surface, "curve_fit", fail_first)
+    params = _two_start_fit()[0]
+    assert len(calls) == 2
+    np.testing.assert_allclose(params, [0.5, 0.01, 0.05, SMAX], rtol=1e-4)
+
+
+# If the fits from both starts fail, the error is raised.
+def test_two_start_fit_raises_when_all_starts_fail(monkeypatch):
+    def always_fail(*args, **kwargs):
+        raise RuntimeError("Optimal parameters not found")
+
+    monkeypatch.setattr(fitting_surface, "curve_fit", always_fail)
+    with pytest.raises(RuntimeError, match="Optimal parameters not found"):
+        _two_start_fit()
 
 
 # With a slow conformational change (kc, krev below koff), the curves show
