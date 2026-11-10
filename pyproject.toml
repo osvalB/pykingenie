@@ -6,15 +6,15 @@ license = {text = "MIT"}
 authors = [
   { name = "Osvaldo Burastero", email = "oburastero@gmail.com" }
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
   "plotly>=6.2.0",
   "kaleido>=1.0.0",
   "numpy>=2.2.5",
-  "pandas>=2.2.3",
+  "pandas>=3.1.1",
   "scipy>=1.15.2",
   "matplotlib>=3.10.1",
-  "xy>=0.0.8,<0.1; python_version >= '3.11'",
+  "xy>=0.0.8,<0.1",
 ]
 
 [build-system]

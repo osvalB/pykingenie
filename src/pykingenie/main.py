@@ -106,7 +106,7 @@ class KineticsAnalyzer:
         combined['Trace']      = tr_names_all
 
         # Delete the experiment column
-        combined.drop(columns=['Experiment'], inplace=True)
+        combined = combined.drop(columns=['Experiment'])
 
         # Set the sampleID column values to 'Sample 1'
         combined['SampleID'] = 'Sample 1'
@@ -218,7 +218,7 @@ class KineticsAnalyzer:
         # Delete columns if they have only one unique value
         for col in ['Experiment', 'Replicate', 'Analyte_location', 'Loading_location']:
             if col in df.columns and df[col].nunique() == 1:
-                df.drop(columns=[col], inplace=True)
+                df = df.drop(columns=[col])
 
         self.combined_ligand_conc_df = df.copy()
 
@@ -289,7 +289,7 @@ class KineticsAnalyzer:
         assoc_all      =  []
 
         # Reset dataframe index
-        df.reset_index(drop=True, inplace=True)
+        df = df.reset_index(drop=True)
 
         # Find if 'Experiment' is in the data frame column names
         df_colnames    = df.columns
@@ -442,7 +442,7 @@ class KineticsAnalyzer:
         assoc_all      =  []
 
         # Reset dataframe index
-        df.reset_index(drop=True, inplace=True)
+        df = df.reset_index(drop=True)
 
         # Find if 'Experiment' is in the data frame column names
         df_colnames     = df.columns
