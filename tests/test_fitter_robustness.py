@@ -1,12 +1,14 @@
-# This code is AI generated and reviewed by a human (PR #18).
+# This code is AI generated and reviewed by a human (PR #18, PR #21).
 """
 Fits that must recover known parameters from simulated data with noise:
 starting points for mass transport, carry-over between steps, and an
-induced-fit model whose rates are all determined by the curves.
+induced-fit model whose rates are all determined by the curves, or only
+partly when the conformational step is fast.
 """
 import numpy as np
 import pytest
 
+import pykingenie.fitter_surface as fitter_surface
 import pykingenie.utils.fitting_surface as fitting_surface
 from pykingenie.fitter_surface import KineticsFitter
 from pykingenie.utils.fitting_surface import fit_one_site_assoc_and_disso_ktr
@@ -153,3 +155,100 @@ def test_induced_fit_recovers_all_rates(seed):
 
     np.testing.assert_allclose([fitter.k_on, fitter.k_off, fitter.k_c, fitter.k_rev],
                                [kon, koff, kc, krev], rtol=0.05)
+
+
+def _induced_fit_data(kon, koff, kc, krev, concs, seed):
+    """Induced-fit fitter on data with noise of 0.5 % of Smax, and the residual of the true curves."""
+    t_assoc = np.arange(0, 600.0, 2.0)
+    t_disso = np.arange(600.0, 1800.0, 4.0)
+    rng = np.random.default_rng(seed)
+    assoc, disso, rss_true = [], [], 0.0
+    for c in concs:
+        y = solve_induced_fit_association(t_assoc, c, kon, koff, kc, krev, smax=SMAX)
+        d = solve_induced_fit_dissociation(t_disso, koff, kc, krev, s0=y[-1, 0], sP2L=y[-1, 2], smax=SMAX)[:, 0]
+        noise_a = rng.normal(0, 0.005 * SMAX, len(t_assoc))
+        noise_d = rng.normal(0, 0.005 * SMAX, len(t_disso))
+        assoc.append(y[:, 0] + noise_a)
+        disso.append(d + noise_d)
+        rss_true += np.sum(noise_a ** 2) + np.sum(noise_d ** 2)
+    n = len(concs)
+    fitter = KineticsFitter([t_assoc] * n, assoc, concs, [t_disso] * n, disso, smax_id=[0] * n)
+    fitter.fit_steady_state()
+    return fitter, rss_true
+
+
+def _fit_rss(fitter):
+    return sum(np.sum((y - f) ** 2) for y, f in zip(fitter.assoc_lst + fitter.disso_lst,
+                                                    fitter.signal_assoc_fit + fitter.signal_disso_fit))
+
+
+def _kd_app(kon, koff, kc, krev):
+    """Equilibrium dissociation constant of the induced-fit model."""
+    return koff / kon * krev / (kc + krev)
+
+
+# With a conformational step faster than dissociation the curves only fix kon
+# and an apparent koff, and many (kc, krev) fit equally well. With this noise
+# the fit used to stop at the evaluation limit and raise; it now ends as close
+# to the data as the true curves, with the right equilibrium Kd.
+@pytest.mark.parametrize("shared_smax", [True, False])
+def test_induced_fit_fast_conformational_step_converges(shared_smax):
+    rates = (0.1, 0.01, 0.1, 1.0)
+    fitter, rss_true = _induced_fit_data(*rates, [0.01, 0.03, 0.09, 0.27, 0.81], seed=0)
+    fitter.fit_one_site_if_assoc_and_disso(shared_smax=shared_smax)
+    assert _fit_rss(fitter) < 1.01 * rss_true
+    np.testing.assert_allclose(_kd_app(fitter.k_on, fitter.k_off, fitter.k_c, fitter.k_rev),
+                               _kd_app(*rates), rtol=0.02)
+
+
+def _final_fit_calls(monkeypatch, n_failures):
+    """Make the first n_failures full-data induced-fit fits raise; return the starts tried."""
+    original = fitter_surface.fit_induced_fit_sites_assoc_and_disso
+    starts = []
+
+    def fail_final(*args, **kwargs):
+        if kwargs.get("max_nfev") is None:  # grid fits on subsampled data
+            return original(*args, **kwargs)
+        starts.append(list(args[5]))
+        if len(starts) <= n_failures:
+            raise RuntimeError("Optimal parameters not found")
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(fitter_surface, "fit_induced_fit_sites_assoc_and_disso", fail_final)
+    return starts
+
+
+# If the fit from the best grid point fails, the fit starts again from the
+# next-best grid point.
+def test_induced_fit_falls_back_to_next_grid_point(monkeypatch):
+    fitter, rss_true = _induced_fit_data(0.1, 0.05, 0.01, 0.005, [0.05, 0.15, 0.45, 1.35, 4.05], seed=0)
+    starts = _final_fit_calls(monkeypatch, n_failures=1)
+    fitter.fit_one_site_if_assoc_and_disso(shared_smax=True)
+    assert len(starts) == 2
+    assert starts[0][2:4] != starts[1][2:4]  # a different (kc, krev) start
+    assert fitter.p0 == starts[1]
+    assert _fit_rss(fitter) < 1.01 * rss_true
+
+
+# If the fits from all tried grid points fail, the error is raised.
+def test_induced_fit_raises_when_all_starts_fail(monkeypatch):
+    fitter, _ = _induced_fit_data(0.1, 0.05, 0.01, 0.005, [0.05, 0.15, 0.45, 1.35, 4.05], seed=0)
+    starts = _final_fit_calls(monkeypatch, n_failures=100)
+    with pytest.raises(RuntimeError, match="Optimal parameters not found"):
+        fitter.fit_one_site_if_assoc_and_disso(shared_smax=True)
+    assert len(starts) == 3
+
+
+# If no grid point can be fitted, there is no start for the full fit and an
+# error says so.
+def test_induced_fit_raises_without_grid_start(monkeypatch):
+    fitter, _ = _induced_fit_data(0.1, 0.05, 0.01, 0.005, [0.05, 0.15, 0.45, 1.35, 4.05], seed=0)
+
+    def always_fail(*args, **kwargs):
+        raise RuntimeError("Optimal parameters not found")
+
+    fitter.fit_one_site_assoc_and_disso(shared_smax=True)  # starting values, before patching
+    monkeypatch.setattr(fitter, "fit_one_site_assoc_and_disso", lambda **kwargs: None)
+    monkeypatch.setattr(fitter_surface, "fit_induced_fit_sites_assoc_and_disso", always_fail)
+    with pytest.raises(RuntimeError, match="could not be fitted from any starting point"):
+        fitter.fit_one_site_if_assoc_and_disso(shared_smax=True)
