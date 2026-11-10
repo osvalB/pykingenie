@@ -454,7 +454,7 @@ def solve_steady_state(A, b):
     """
     return -solve(A, b)
 
-def solve_induced_fit_association(time, a_conc, kon, koff, kc, krev, sP1L=0, sP2L=0, smax=0):
+def solve_induced_fit_association(time, a_conc, kon, koff, kc, krev, sP1L=0, sP2L=0, smax=0, t0=0):
     """
     Obtain the signal for the induced fit model (surface-based).
 
@@ -481,13 +481,16 @@ def solve_induced_fit_association(time, a_conc, kon, koff, kc, krev, sP1L=0, sP2
         Initial signal proportional to the concentration of ES, default is 0.
     smax : float, optional
         Signal proportional to the complex (E·S or ES), default is 0.
+    t0 : float, optional
+        Time offset; the association starts at time t0 after the first
+        time point, default is 0.
 
     Returns
     -------
     np.ndarray
         Signal over time.
     """
-    time = time - np.min(time) # Start at zero
+    time = time - np.min(time) - t0
 
     b_col = constant_vector_induced_fit(koff, smax, kc)
 
@@ -513,15 +516,16 @@ def solve_induced_fit_association(time, a_conc, kon, koff, kc, krev, sP1L=0, sP2
 
 def solve_all_states_fast(time, A, initial_conditions, steady_state_value):
     """
-    Solve the system of differential equations for all time points using eigendecomposition.
+    Solve the linear system dx/dt = A·x + b for all time points.
 
-    The system  dx/dt = A·x + b  has the analytical solution
+    The solution is
 
-        x(t) = x_ss + V · diag(exp(λ·t)) · V⁻¹ · (x₀ − x_ss)
+        x(t) = x_ss + exp(A·t) · (x₀ − x_ss)
 
-    where λ and V are the eigenvalues/vectors of A and x_ss is the steady
-    state.  All time points are evaluated in a single vectorised operation
-    (no Python loop).
+    where x_ss is the steady state. exp(A·t) comes from the eigendecomposition
+    of A. When the eigenvectors are nearly parallel (equal eigenvalues, so A
+    cannot be diagonalised), a 2×2 matrix is evaluated in closed form
+    instead. All time points are evaluated at once.
 
     Parameters
     ----------
@@ -540,16 +544,41 @@ def solve_all_states_fast(time, A, initial_conditions, steady_state_value):
         Array of shape (len(time), len(initial_conditions)) containing the
         state of the system at each time point.
     """
-    v = initial_conditions - steady_state_value
+    time = np.asarray(time, dtype=float)
+    A = np.asarray(A, dtype=float)
+    v = np.asarray(initial_conditions, dtype=float) - steady_state_value
+
     eigvals, eigvecs = np.linalg.eig(A)
-    alpha = np.linalg.solve(eigvecs, v)          # more stable than inv @ v
+
+    if A.shape == (2, 2) and np.linalg.cond(eigvecs) > 1e6:
+        # Eigenvalues, computed without cancellation
+        half_tr = 0.5 * (A[0, 0] + A[1, 1])
+        det = A[0, 0] * A[1, 1] - A[0, 1] * A[1, 0]
+        root = np.sqrt(complex(half_tr * half_tr - det))
+        big = half_tr + root if half_tr >= 0 else half_tr - root
+        small = det / big if big != 0 else 0.0
+        lam1, lam2 = (big, small) if big.real >= np.real(small) else (small, big)
+
+        # exp(A·t) = e^(λ1·t)·I + f(t)·(A − λ1·I), with
+        # f(t) = (e^(λ1·t) − e^(λ2·t)) / (λ1 − λ2), which tends to t·e^(λ1·t)
+        x = (lam1 - lam2) * time
+        small_x = np.abs(x) < 1e-12
+        g = np.ones_like(x)
+        g[~small_x] = -np.expm1(-x[~small_x]) / x[~small_x]
+
+        e1 = np.exp(lam1 * time)
+        f = e1 * time * g
+
+        w = (A - lam1 * np.eye(2)) @ v
+        states = steady_state_value + np.outer(e1, v) + np.outer(f, w)
+
+        return states.real
+
+    alpha = np.linalg.solve(eigvecs, v)
 
     # exp_matrix[i, j] = exp(eigvals[j] * time[i])   — shape (N, n)
     exp_matrix = np.exp(np.outer(time, eigvals))
 
-    # For each time point: state = ss + eigvecs @ (exp_diag * alpha)
-    # Vectorised:  (exp_matrix * alpha) has shape (N, n),
-    #              @ eigvecs.T  gives (N, n)
     states = steady_state_value + (exp_matrix * alpha) @ eigvecs.T
 
     return states.real                           # discard tiny imaginary noise
@@ -782,7 +811,8 @@ def solve_ode_mixture_analyte_association(t, Ris0, C_TOT, Fis, Ris_max, koffs, K
     t = t + t0
 
     out = solve_ivp(ode_mixture_analyte_association, t_span=[np.min(t), np.max(t)],
-                    t_eval=t, y0=Ris0, args=(C_TOT, Fis, Ris_max, koffs, Kds), method="LSODA")
+                    t_eval=t, y0=Ris0, args=(C_TOT, Fis, Ris_max, koffs, Kds), method="LSODA",
+                    rtol=1e-8, atol=1e-10 * np.max(Ris_max))
 
     return out.y
 
@@ -841,7 +871,8 @@ def solve_ode_mixture_analyte_dissociation(t, Ris0, koffs, t0=0):
     t = t + t0
 
     out = solve_ivp(ode_mixture_analyte_dissociation, t_span=[np.min(t), np.max(t)],
-                    t_eval=t, y0=Ris0, args=(koffs,), method="LSODA")
+                    t_eval=t, y0=Ris0, args=(koffs,), method="LSODA",
+                    rtol=1e-8, atol=1e-10 * max(np.max(np.abs(Ris0)), 1e-300))
 
     return out.y
 
@@ -1244,7 +1275,7 @@ def differential_matrix_dissociation_two_site_cooperative(koff, sigma):
     return np.array([row1, row2])
 
 
-def solve_two_site_association(time, a_conc, kon, koff, Rmax_PL=0, Rmax_LPL=0, fPL_0=0, fLPL_0=0):
+def solve_two_site_association(time, a_conc, kon, koff, Rmax_PL=0, Rmax_LPL=0, fPL_0=0, fLPL_0=0, t0=0):
     """
     Solve the two-site binding model (non-cooperative) during association.
 
@@ -1271,13 +1302,16 @@ def solve_two_site_association(time, a_conc, kon, koff, Rmax_PL=0, Rmax_LPL=0, f
         Initial fraction of singly-bound ligand, default is 0.
     fLPL_0 : float, optional
         Initial fraction of doubly-bound ligand, default is 0.
+    t0 : float, optional
+        Time offset; the association starts at time t0 after the first
+        time point, default is 0.
 
     Returns
     -------
     np.ndarray
         Array with columns [total_signal, signal_PL, signal_LPL].
     """
-    time = time - np.min(time)
+    time = time - np.min(time) - t0
 
     A = differential_matrix_association_two_site(kon, koff, a_conc)
     b = constant_vector_two_site(kon, a_conc)
@@ -1294,7 +1328,7 @@ def solve_two_site_association(time, a_conc, kon, koff, Rmax_PL=0, Rmax_LPL=0, f
     return np.column_stack((total_signal, signal_PL, signal_LPL))
 
 
-def solve_two_site_cooperative_association(time, a_conc, kon, koff, sigma, Rmax_PL=0, Rmax_LPL=0, fPL_0=0, fLPL_0=0):
+def solve_two_site_cooperative_association(time, a_conc, kon, koff, sigma, Rmax_PL=0, Rmax_LPL=0, fPL_0=0, fLPL_0=0, t0=0):
     """
     Solve the two-site binding model (cooperative) during association.
 
@@ -1325,13 +1359,16 @@ def solve_two_site_cooperative_association(time, a_conc, kon, koff, sigma, Rmax_
         Initial fraction of singly-bound ligand, default is 0.
     fLPL_0 : float, optional
         Initial fraction of doubly-bound ligand, default is 0.
+    t0 : float, optional
+        Time offset; the association starts at time t0 after the first
+        time point, default is 0.
 
     Returns
     -------
     np.ndarray
         Array with columns [total_signal, signal_PL, signal_LPL].
     """
-    time = time - np.min(time)
+    time = time - np.min(time) - t0
 
     A = differential_matrix_association_two_site_cooperative(kon, koff, sigma, a_conc)
     b = constant_vector_two_site(kon, a_conc)

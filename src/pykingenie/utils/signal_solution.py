@@ -399,7 +399,8 @@ def get_kobs_induced_fit(tot_lig, tot_prot, kr, ke, kon, koff, dominant=True):
     delta  = np.sqrt((tot_lig - tot_prot + kd_app) ** 2 + 4 * tot_prot * kd_app)
     gamma  = -ke - kr + koff + kon * (delta - kd_app)
 
-    kobs = ke + kr + 0.5 * gamma + (-1*dominant * 0.5 * np.sqrt(gamma ** 2 + 4 * koff * kr))
+    sign = -1 if dominant else 1
+    kobs = ke + kr + 0.5 * gamma + sign * 0.5 * np.sqrt(gamma ** 2 + 4 * koff * kr)
 
     return kobs  # units are 1/s
 
@@ -435,6 +436,7 @@ def get_kobs_conformational_selection(tot_lig, tot_prot, kr, ke, kon, koff, domi
     alpha = kr - ke + koff * ((2 * ke + kr) * delta + kr * (tot_lig - tot_prot - kd_app)) / (2 * ke * kd_app)
 
 
-    kobs = ke + 0.5 * alpha + (-1*dominant* 0.5 * np.sqrt(alpha**2 + beta))
+    sign = -1 if dominant else 1
+    kobs = ke + 0.5 * alpha + sign * 0.5 * np.sqrt(alpha**2 + beta)
 
     return kobs  # units are 1/s
