@@ -1531,9 +1531,12 @@ def fit_one_site_assoc_and_disso_ktr(assoc_signal_lst, assoc_time_lst, analyte_c
 
     all_signal = np.concatenate([all_signal_assoc,all_signal_disso], axis=0)
 
+    # Kd, koff, Ktr and Smax differ by orders of magnitude. Without scaling
+    # by the Jacobian, the trust region can stop on xtol far from the minimum.
     global_fit_params, cov = curve_fit(fit_fx, 1, all_signal,
                                        p0=initial_parameters,
-                                       bounds=(low_bounds, high_bounds))
+                                       bounds=(low_bounds, high_bounds),
+                                       x_scale="jac")
 
     predicted_curve = fit_fx(1, *global_fit_params)
 
