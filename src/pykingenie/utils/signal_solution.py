@@ -1,5 +1,5 @@
 """Calculate solution-phase kinetic signals and numerical trajectories."""
-# AI-assisted correction: induced-fit relaxation rates use the stated forward/reverse rates.
+# AI-generated correction (PR #20): https://github.com/osvalB/pykingenie/pull/20
 
 import  numpy as np
 from scipy.integrate import odeint
@@ -405,7 +405,8 @@ def get_kobs_induced_fit(tot_lig, tot_prot, kr, ke, kon, koff, dominant=True):
     ``koff * kr / (kon * (ke + kr))``.
     """
     # Edited with AI assistance and reviewed by a human in PR #16: dominant=False returns the fast rate, not the mean.
-    # AI-assisted correction: equilibrium affinity uses kr; the discriminant uses ke.
+    # AI-generated correction (PR #20): https://github.com/osvalB/pykingenie/pull/20
+    # Equilibrium affinity uses kr; the discriminant uses ke.
     kd_app = koff * kr / (kon * (ke + kr))
     delta  = np.sqrt((tot_lig - tot_prot + kd_app) ** 2 + 4 * tot_prot * kd_app)
     gamma  = -ke - kr + koff + kon * (delta - kd_app)

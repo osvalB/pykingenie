@@ -1,5 +1,5 @@
 # This code is AI generated and reviewed by a human (PR #16).
-# AI-generated additions extend the induced-fit relaxation-rate regression tests.
+# AI-generated additions (PR #20): https://github.com/osvalB/pykingenie/pull/20
 """
 Checks for fixes found by comparing the surface and solution models with their
 reaction equations solved directly.
@@ -164,7 +164,8 @@ def test_induced_fit_fitter_restarts_after_gap():
     (0.5, 0.2, 0.02, 0.3, 0.1, 10.0),
 ])
 def test_kobs_induced_fit_both_rates(k1, km1, k2, km2, E, L):
-    # AI-generated regression: compare correctly named rates with the ODE Jacobian.
+    # AI-generated regression (PR #20): https://github.com/osvalB/pykingenie/pull/20
+    # Compare correctly named rates with the ODE Jacobian.
     f = lambda t, y: ode_induced_fit_insolution(t, y, k1, km1, k2, km2, E, L)
     y_eq = _reference(f, [0.0, 0.0], np.array([0.0, 1e6]))[-1]
     rates = np.sort(-np.linalg.eigvals(_jacobian(f, y_eq)).real)

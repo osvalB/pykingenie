@@ -1,4 +1,4 @@
-# AI-generated corrections update the induced-fit relaxation-rate regression.
+# AI-generated corrections (PR #20): https://github.com/osvalB/pykingenie/pull/20
 import pytest
 import numpy as np
 
@@ -89,7 +89,8 @@ def test_signal_ode_conformational_selection_insolution():
     (False, 142.13338257),
 ])
 def test_get_kobs_induced_fit(dominant, expected):
-    # AI-generated regression: expected rates are eigenvalues of the equilibrium Jacobian.
+    # AI-generated regression (PR #20): https://github.com/osvalB/pykingenie/pull/20
+    # Expected rates are eigenvalues of the equilibrium Jacobian.
     tot_lig = 0.5
     tot_prot = 0.5
     kr = 1
