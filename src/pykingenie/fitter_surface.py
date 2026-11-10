@@ -1,3 +1,4 @@
+# This file contains AI-generated changes (PR #15).
 """Fit steady-state and kinetic models to surface-based experimental data."""
 
 import itertools
@@ -38,6 +39,38 @@ from .utils.processing      import (
 from .utils.math import  get_desired_rss
 
 from .fitter import KineticsFitterGeneral
+
+
+def _leave_one_out_parameters(params, low_bounds, high_bounds, smax_ids, omitted,
+                              shared_smax, n_global, group_blocks=(), response_width=1):
+    """Select parameters and bounds for the traces and groups retained by a LOO fit.
+
+    Parameters are ordered as global rates, optional per-group blocks (such as
+    t0 and Ktr), then one response block per group or per trace. Return the
+    original retained group IDs as well, so group-specific results stay aligned.
+    """
+    # This function is AI generated (PR #15).
+    retained_traces = [i for i in range(len(smax_ids)) if i != omitted]
+    retained_groups = sorted({smax_ids[i] for i in retained_traces})
+    group_map = {group: i for i, group in enumerate(retained_groups)}
+    remapped_ids = [group_map[smax_ids[i]] for i in retained_traces]
+    n_groups = len(set(smax_ids))
+
+    indices = list(range(n_global))
+    offset = n_global
+    for width in group_blocks:
+        for group in retained_groups:
+            indices.extend(range(offset + width * group, offset + width * (group + 1)))
+        offset += width * n_groups
+
+    responses = retained_groups if shared_smax else retained_traces
+    for response in responses:
+        indices.extend(range(offset + response_width * response,
+                             offset + response_width * (response + 1)))
+
+    selected = [[values[i] for i in indices] for values in (params, low_bounds, high_bounds)]
+    return *selected, remapped_ids, retained_groups
+
 
 class KineticsFitter(KineticsFitterGeneral):
     """
@@ -127,6 +160,7 @@ class KineticsFitter(KineticsFitterGeneral):
         is_single_cycle : bool, optional
             Whether the experiment is a single cycle kinetics experiment, default is False.
         """
+        # This function contains AI-generated changes (PR #15).
 
         super().__init__
 
@@ -148,15 +182,9 @@ class KineticsFitter(KineticsFitterGeneral):
         if smax_id is None:
             smax_id = [0 for _ in range(len(association_signal_lst))]
 
-        # We need to rearrange smax_id to start at 0, then 1, then 2, etc.
-        smax_id_unq, idx = np.unique(smax_id, return_index=True)
-        smax_id_unq = smax_id_unq[np.argsort(idx)]
-
-        smax_id_new = []
-        for i,unq in enumerate(smax_id_unq):
-            smax_id_new += [i for _ in range(len(np.where(smax_id == unq)[0]))]
-
-        self.smax_id = smax_id_new
+        # Renumber groups in first-seen order without changing trace membership.
+        group_map = {group: i for i, group in enumerate(dict.fromkeys(smax_id))}
+        self.smax_id = [group_map[group] for group in smax_id]
 
         self.signal_assoc_fit = None
         self.signal_disso_fit = None
@@ -709,6 +737,7 @@ class KineticsFitter(KineticsFitterGeneral):
             - k_off_loo_std: Standard deviation of LOO estimates for k_off
             - df_fit_loo: DataFrame with mean ± SD for Kd and k_off
         """
+        # This function contains AI-generated changes (PR #15).
 
         """
         Leave-one-out curve method for error estimation of the fitted parameters.
@@ -732,21 +761,13 @@ class KineticsFitter(KineticsFitterGeneral):
             temp_lig_conc_lst = copy.deepcopy(self.lig_conc_lst)
             temp_lig_conc_lst = remove_at(temp_lig_conc_lst, i)
 
-            temp_p0 = copy.deepcopy(self.params)
-            temp_low_bounds = copy.deepcopy(self.low_bounds)
-            temp_high_bounds = copy.deepcopy(self.high_bounds)
-
-            # Remove element from the initial guess and bounds corresponding to the removed measurement
-            
-            if not self.shared_smax:
-                idx = 2 + i # Kd + Koff + index of the Smax to remove
-                temp_p0 = remove_at(temp_p0, idx)
-                temp_low_bounds = remove_at(temp_low_bounds, idx)
-                temp_high_bounds = remove_at(temp_high_bounds, idx)
-
-            temp_smax_idx = copy.deepcopy(self.smax_id)
-
-            temp_smax_idx = remove_at(temp_smax_idx, i)
+            temp_p0, temp_low_bounds, temp_high_bounds, temp_smax_idx, _ = (
+                _leave_one_out_parameters(
+                    self.params, self.low_bounds, self.high_bounds, self.smax_id, i,
+                    shared_smax=self.shared_smax, n_global=2,
+                    group_blocks=(), response_width=1,
+                )
+            )
 
             try:
 
@@ -1165,6 +1186,7 @@ class KineticsFitter(KineticsFitterGeneral):
         - k_off_loo_std: Standard deviation of leave-one-out estimates for k_off
         - df_fit_loo: DataFrame with mean ± SD for Kd and k_off
         """
+        # This function contains AI-generated changes (PR #15).
 
         Kd_loo = []
         k_off_loo = []
@@ -1172,7 +1194,6 @@ class KineticsFitter(KineticsFitterGeneral):
         fit_ktr = self.fit_ktr
         fixed_t0 = self.fixed_t0
         shared_smax = self.shared_smax
-        smax_param_start = self.smax_param_start
         n_ktr = len(np.unique(self.smax_id))
         n_fits_loo_ok = 0
         n_fits_loo_fail = 0
@@ -1200,22 +1221,13 @@ class KineticsFitter(KineticsFitterGeneral):
             temp_lig_conc_lst = copy.deepcopy(self.lig_conc_lst)
             temp_lig_conc_lst = remove_at(temp_lig_conc_lst, i)
 
-            temp_p0 = copy.deepcopy(self.params)
-            temp_low_bounds = copy.deepcopy(self.low_bounds)
-            temp_high_bounds = copy.deepcopy(self.high_bounds)
-
-            # Remove element from the initial guess and bounds corresponding to the removed measurement
-            
-            if not shared_smax:
-
-                idx = smax_param_start + i
-                temp_p0 = remove_at(temp_p0, idx)
-                temp_low_bounds = remove_at(temp_low_bounds, idx)
-                temp_high_bounds = remove_at(temp_high_bounds, idx)
-
-            temp_smax_idx = copy.deepcopy(self.smax_id)
-
-            temp_smax_idx = remove_at(temp_smax_idx, i)
+            temp_p0, temp_low_bounds, temp_high_bounds, temp_smax_idx, retained_groups = (
+                _leave_one_out_parameters(
+                    self.params, self.low_bounds, self.high_bounds, self.smax_id, i,
+                    shared_smax=shared_smax, n_global=2,
+                    group_blocks=(1,) * ((not fixed_t0) + fit_ktr), response_width=1,
+                )
+            )
 
             kwargs = {
                 'assoc_signal_lst' : temp_assoc_lst,
@@ -1238,15 +1250,16 @@ class KineticsFitter(KineticsFitterGeneral):
                 fit_loo, _, _, _ = fit_fx(**kwargs)
                 ktrs = []
                 if fit_ktr:
-                    idx_start = 2 + (not fixed_t0) * n_ktr
-                    ktrs = fit_loo[idx_start:smax_param_start]
+                    n_retained = len(retained_groups)
+                    idx_start = 2 + (not fixed_t0) * n_retained
+                    ktrs = fit_loo[idx_start:idx_start + n_retained]
 
                 Kd_loo.append(fit_loo[0])
                 k_off_loo.append(fit_loo[1])
 
                 if fit_ktr:
-                    for j, ktr in enumerate(ktrs):
-                        ktrs_loo[j].append(ktr)
+                    for group, ktr in zip(retained_groups, ktrs):
+                        ktrs_loo[group].append(ktr)
 
                 n_fits_loo_ok += 1
             except Exception:
@@ -1520,11 +1533,11 @@ class KineticsFitter(KineticsFitterGeneral):
         - sigma_loo_mean: Mean of leave-one-out estimates for sigma (if fitted)
         - sigma_loo_std: Standard deviation of leave-one-out estimates for sigma (if fitted
         """
+        # This function contains AI-generated changes (PR #15).
 
         shared_smax = self.shared_smax
         fixed_t0 = self.fixed_t0
         fit_sigma = self.fit_sigma
-        n_unq_smax = len(np.unique(self.smax_id))
         n_fits_loo_ok = 0
         n_fits_loo_fail = 0
 
@@ -1552,30 +1565,13 @@ class KineticsFitter(KineticsFitterGeneral):
             temp_lig_conc_lst = copy.deepcopy(self.lig_conc_lst)
             temp_lig_conc_lst = remove_at(temp_lig_conc_lst, i)
 
-            temp_p0 = copy.deepcopy(self.params)
-            temp_low_bounds = copy.deepcopy(self.low_bounds)
-            temp_high_bounds = copy.deepcopy(self.high_bounds)
-
-            # Remove element from the initial guess and bounds corresponding to the removed measurement
-            
-            if not shared_smax:
-
-                idx_start = 2 + fit_sigma + (not fixed_t0) * n_unq_smax
-
-                idx_rmax_pl = idx_start + 2 * i
-                idx_rmax_lpl = idx_rmax_pl + 1
-
-                temp_p0 = remove_at(temp_p0, idx_rmax_lpl)
-                temp_p0 = remove_at(temp_p0, idx_rmax_pl)
-
-                temp_low_bounds = remove_at(temp_low_bounds, idx_rmax_lpl)
-                temp_low_bounds = remove_at(temp_low_bounds, idx_rmax_pl)
-
-                temp_high_bounds = remove_at(temp_high_bounds, idx_rmax_lpl)
-                temp_high_bounds = remove_at(temp_high_bounds, idx_rmax_pl)
-
-            temp_smax_idx = copy.deepcopy(self.smax_id)
-            temp_smax_idx = remove_at(temp_smax_idx, i)
+            temp_p0, temp_low_bounds, temp_high_bounds, temp_smax_idx, _ = (
+                _leave_one_out_parameters(
+                    self.params, self.low_bounds, self.high_bounds, self.smax_id, i,
+                    shared_smax=shared_smax, n_global=2 + fit_sigma,
+                    group_blocks=(1,) * (not fixed_t0), response_width=2,
+                )
+            )
 
             kwargs_loo = {
                 'assoc_signal_lst' : temp_assoc_lst,
@@ -1921,10 +1917,10 @@ class KineticsFitter(KineticsFitterGeneral):
         - fraction_site1_loo_std: Standard deviation of leave-one-out estimates for fraction_site1
         - df_fit_loo: DataFrame with mean ± SD for Kd1, k_off1, Kd2, k_off2, and fraction_site1
         """
+        # This function contains AI-generated changes (PR #15).
 
         shared_smax = self.shared_smax
         fixed_t0 = self.fixed_t0
-        n_unq_smax = len(np.unique(self.smax_id))
         n_fits_loo_ok = 0
         n_fits_loo_fail = 0
 
@@ -1949,19 +1945,13 @@ class KineticsFitter(KineticsFitterGeneral):
             temp_lig_conc_lst = copy.deepcopy(self.lig_conc_lst)
             temp_lig_conc_lst = remove_at(temp_lig_conc_lst, i)
 
-            temp_p0 = copy.deepcopy(self.params)
-            temp_low_bounds = copy.deepcopy(self.low_bounds)
-            temp_high_bounds = copy.deepcopy(self.high_bounds)
-
-            if not shared_smax:
-                idx_start = 5 + (not fixed_t0) * n_unq_smax
-                idx_rmax = idx_start + i
-                temp_p0 = remove_at(temp_p0, idx_rmax)
-                temp_low_bounds = remove_at(temp_low_bounds, idx_rmax)
-                temp_high_bounds = remove_at(temp_high_bounds, idx_rmax)
-
-            temp_smax_idx = copy.deepcopy(self.smax_id)
-            temp_smax_idx = remove_at(temp_smax_idx, i)
+            temp_p0, temp_low_bounds, temp_high_bounds, temp_smax_idx, _ = (
+                _leave_one_out_parameters(
+                    self.params, self.low_bounds, self.high_bounds, self.smax_id, i,
+                    shared_smax=shared_smax, n_global=5,
+                    group_blocks=(1,) * (not fixed_t0), response_width=1,
+                )
+            )
 
             kwargs_loo = {
                 'assoc_signal_lst': temp_assoc_lst,
@@ -2268,6 +2258,7 @@ class KineticsFitter(KineticsFitterGeneral):
         Repeats the global association/dissociation fit after omitting each
         replicate and stores the resulting parameter distributions.
         """
+        # This function contains AI-generated changes (PR #15).
 
         shared_smax = self.shared_smax
 
@@ -2295,23 +2286,13 @@ class KineticsFitter(KineticsFitterGeneral):
             temp_lig_conc_lst = copy.deepcopy(self.lig_conc_lst)
             temp_lig_conc_lst = remove_at(temp_lig_conc_lst, i)
 
-            temp_p0 = copy.deepcopy(self.params)
-            temp_low_bounds = copy.deepcopy(self.low_bounds)
-            temp_high_bounds = copy.deepcopy(self.high_bounds)
-
-            # Remove element from the initial guess and bounds corresponding to the removed measurement
-            if not shared_smax:
-
-                idx_start = 4
-
-                idx_rmax = idx_start +  i 
-
-                temp_p0 = remove_at(temp_p0, idx_rmax)
-                temp_low_bounds = remove_at(temp_low_bounds, idx_rmax)
-                temp_high_bounds = remove_at(temp_high_bounds, idx_rmax)
-
-            temp_smax_idx = copy.deepcopy(self.smax_id)
-            temp_smax_idx = remove_at(temp_smax_idx, i)
+            temp_p0, temp_low_bounds, temp_high_bounds, temp_smax_idx, _ = (
+                _leave_one_out_parameters(
+                    self.params, self.low_bounds, self.high_bounds, self.smax_id, i,
+                    shared_smax=shared_smax, n_global=4,
+                    group_blocks=(), response_width=1,
+                )
+            )
 
             kwargs_loo = {
                 'assoc_signal_lst' : temp_assoc_lst,

@@ -1,9 +1,10 @@
-# Note: this file contains AI-generated code, written with AI coding assistants.
+# Note: this file contains AI-generated code, written with AI coding assistants (updated in PR #15).
 
 """Exercise the real XY renderer as well as the kinetics-to-chart mapping."""
 
-import builtins
 import inspect
+import subprocess
+import sys
 from copy import deepcopy
 from dataclasses import asdict, replace
 from pathlib import Path
@@ -937,17 +938,38 @@ def test_empty_and_invalid_inputs(analyzer):
         )
 
 
-def test_missing_xy_dependency(monkeypatch):
-    original_import = builtins.__import__
+def test_missing_xy_dependency():
+    # Load the real plotting code, then remove third-party import paths in a
+    # separate interpreter so XY is genuinely unavailable without affecting pytest.
+    # This function contains AI-generated changes (PR #15).
+    script = """
+import importlib.util
+import sys
+import sysconfig
 
-    def without_xy(name, *args, **kwargs):
-        if name == "xy":
-            raise ModuleNotFoundError("No module named 'xy'")
-        return original_import(name, *args, **kwargs)
+sys.path.insert(0, sys.argv[1])
+from pykingenie.utils import plotting_xy
 
-    monkeypatch.setattr(builtins, "__import__", without_xy)
-    with pytest.raises(ImportError, match="pip install pykingenie"):
-        plotting.plot_traces([], [], [], [], [])
+assert "xy" not in sys.modules
+sys.path = [sysconfig.get_path("stdlib")]
+assert importlib.util.find_spec("xy") is None
+
+try:
+    plotting_xy.plot_traces([], [], [], [], [])
+except ImportError as exc:
+    assert "pip install pykingenie" in str(exc)
+    assert isinstance(exc.__cause__, ModuleNotFoundError)
+    assert exc.__cause__.name == "xy"
+else:
+    raise AssertionError("Missing XY should raise an actionable ImportError")
+"""
+    result = subprocess.run(
+        [sys.executable, "-I", "-c", script, str(Path(plotting.__file__).resolve().parents[2])],
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
 
 
 def test_octet_data_end_to_end():

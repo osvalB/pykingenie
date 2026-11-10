@@ -1,3 +1,4 @@
+# This file contains AI-generated changes (PR #15).
 """Fit kinetic models for solution-based experiments."""
 
 import numpy as np
@@ -259,6 +260,7 @@ def fit_induced_fit_solution(
     - scale_factor_2 if fit_scale_factor                      (scale factor for the second signal)
     ...
     """
+    # This function contains AI-generated changes (PR #15).
     # Flatten signals once
     all_signal = np.concatenate(signal_lst)
 
@@ -290,6 +292,7 @@ def fit_induced_fit_solution(
 
     def fit_fx(_, *args):
         """Evaluate the solution binding model with an induced-fit step."""
+        # This function contains AI-generated changes (PR #15).
         # Efficient argument unpacking
         idx = 0
 
@@ -299,6 +302,7 @@ def fit_induced_fit_solution(
         signal_S  = 0 if not fit_signal_S  else args[idx]
         idx += fit_signal_S
 
+        signal_ES = signal_ESint = 0.0
         if fit_signal_ES:
             signal_ES = args[idx]
             idx += 1
@@ -661,6 +665,7 @@ def find_initial_parameters_induced_fit_solution(
     np.ndarray
         Best initial parameters found by the heuristic algorithm.
     """
+    # This function contains AI-generated changes (PR #15).
     kc_seq   = 10 ** (np.linspace(np_linspace_low, np_linspace_high, np_linspace_num))
     krev_seq = kc_seq
 
@@ -688,7 +693,7 @@ def find_initial_parameters_induced_fit_solution(
     # 9. t0 of the first curve
     # ... t0 of the last curve
 
-    max_signal = np.max(signal_lst)
+    max_signal = max(np.max(signal) for signal in signal_lst)
     max_prot   = np.max(protein_conc_lst)
     max_lig    = np.max(ligand_conc_lst)
 
@@ -833,6 +838,7 @@ def find_initial_parameters_conformational_selection_solution(
     np.ndarray
         Best initial parameters found by the heuristic algorithm.
     """
+    # This function contains AI-generated changes (PR #15).
     kc_seq   = 10 ** (np.linspace(np_linspace_low, np_linspace_high, np_linspace_num))
     krev_seq = kc_seq
 
@@ -860,7 +866,7 @@ def find_initial_parameters_conformational_selection_solution(
     # 9. t0 of the first curve
     # ... t0 of the last curve
 
-    max_signal = np.max(signal_lst)
+    max_signal = max(np.max(signal) for signal in signal_lst)
     max_prot   = np.max(protein_conc_lst)
     max_lig    = np.max(ligand_conc_lst)
 

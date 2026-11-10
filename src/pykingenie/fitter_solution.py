@@ -1,3 +1,4 @@
+# This file contains AI-generated changes (PR #15).
 """Fit kinetic models to solution-based experimental data."""
 
 import numpy as np
@@ -324,6 +325,7 @@ class KineticsFitterSolution(KineticsFitterGeneral):
             - signal_assoc_fit: List of fitted association signals
             - fit_params_kinetics: DataFrame with the fitted parameters
         """
+        # This function contains AI-generated changes (PR #15).
 
         # Initial parameters are as follows:
         # 1. Signal amplitude of the free protein
@@ -337,7 +339,7 @@ class KineticsFitterSolution(KineticsFitterGeneral):
 
         self.clear_fittings()
 
-        max_signal = np.max(self.assoc_lst)
+        max_signal = max(np.max(signal) for signal in self.assoc_lst)
         max_prot   = np.max(self.prot_conc)
         max_lig    = np.max(self.lig_conc)
 
