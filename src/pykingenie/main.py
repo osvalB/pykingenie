@@ -783,6 +783,40 @@ class KineticsAnalyzer:
 
         return None
 
+    def get_correlation_matrices(self, kind='kinetics'):
+        """
+        Get the correlation matrices of the fitted parameters.
+
+        Correlations near ±1 mean two parameters trade off against each other:
+        the data determine a combination of them, not each one separately, and
+        their individual values should not be trusted.
+
+        Parameters
+        ----------
+        kind : str, optional
+            'kinetics' (default) for the latest kinetics fit, or 'steady_state'
+            for the latest steady-state fit.
+
+        Returns
+        -------
+        dict of str to pandas.DataFrame
+            One correlation matrix per fitting, keyed by fitting name. Fittings
+            without a matrix of that kind are left out.
+        """
+        # This function is AI generated and reviewed by a human (PR #19).
+        attributes = {'kinetics': 'fit_params_kinetics_correlation',
+                      'steady_state': 'fit_params_ss_correlation'}
+        if kind not in attributes:
+            raise ValueError("kind must be 'kinetics' or 'steady_state', got " + repr(kind))
+
+        matrices = {}
+        for name in self.fittings_names:
+            corr = getattr(self.fittings[name], attributes[kind], None)
+            if corr is not None:
+                matrices[name] = corr.copy()
+
+        return matrices
+
     def get_legends_table(self):
         """
         Get the legends table for plotting the kinetics data.
