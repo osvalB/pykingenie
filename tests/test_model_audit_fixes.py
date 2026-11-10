@@ -1,4 +1,5 @@
 # This code is AI generated and reviewed by a human (PR #16).
+# AI-generated additions (PR #20): https://github.com/osvalB/pykingenie/pull/20
 """
 Checks for fixes found by comparing the surface and solution models with their
 reaction equations solved directly.
@@ -154,13 +155,23 @@ def test_induced_fit_fitter_restarts_after_gap():
 
 # Induced fit in solution: the two kobs values are the two relaxation rates
 # of the reaction equations linearised around equilibrium.
-def test_kobs_induced_fit_both_rates():
-    k1, km1, k2, km2, E, L = 0.3, 0.02, 0.05, 0.004, 1.0, 3.0
+@pytest.mark.parametrize("k1, km1, k2, km2, E, L", [
+    (0.3, 0.02, 0.05, 0.004, 1.0, 3.0),
+    (0.3, 0.02, 0.004, 0.05, 1.0, 3.0),
+    (0.3, 0.02, 0.05, 0.05, 1.0, 3.0),
+    (1.3, 0.4, 0.7, 0.2, 2.4, 1.2),
+    (1.0, 0.1, 0.1, 0.01, 1.0, 1.0),
+    (0.5, 0.2, 0.02, 0.3, 0.1, 10.0),
+])
+def test_kobs_induced_fit_both_rates(k1, km1, k2, km2, E, L):
+    # AI-generated regression (PR #20): https://github.com/osvalB/pykingenie/pull/20
+    # Compare correctly named rates with the ODE Jacobian.
     f = lambda t, y: ode_induced_fit_insolution(t, y, k1, km1, k2, km2, E, L)
     y_eq = _reference(f, [0.0, 0.0], np.array([0.0, 1e6]))[-1]
     rates = np.sort(-np.linalg.eigvals(_jacobian(f, y_eq)).real)
-    slow = get_kobs_induced_fit(L, E, k2, km2, k1, km1, dominant=True)
-    fast = get_kobs_induced_fit(L, E, k2, km2, k1, km1, dominant=False)
+    slow = get_kobs_induced_fit(L, E, kr=km2, ke=k2, kon=k1, koff=km1, dominant=True)
+    fast = get_kobs_induced_fit(L, E, kr=km2, ke=k2, kon=k1, koff=km1, dominant=False)
+    assert 0 < slow <= fast
     np.testing.assert_allclose([slow, fast], rates, rtol=1e-6)
 
 

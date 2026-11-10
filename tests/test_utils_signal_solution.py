@@ -1,3 +1,4 @@
+# AI-generated corrections (PR #20): https://github.com/osvalB/pykingenie/pull/20
 import pytest
 import numpy as np
 
@@ -83,19 +84,22 @@ def test_signal_ode_conformational_selection_insolution():
 
     np.testing.assert_array_almost_equal(result, expected, decimal=4, err_msg="The result of the ODE solution (conformational selection) does not match the expected values.")
 
-def test_get_kobs_induced_fit():
-
+@pytest.mark.parametrize("dominant, expected", [
+    (True, 3.37417673),
+    (False, 142.13338257),
+])
+def test_get_kobs_induced_fit(dominant, expected):
+    # AI-generated regression (PR #20): https://github.com/osvalB/pykingenie/pull/20
+    # Expected rates are eigenvalues of the equilibrium Jacobian.
     tot_lig = 0.5
     tot_prot = 0.5
     kr = 1
     ke= 10
     kon = 100
     koff = 100
-    dominant=True
-
     result = get_kobs_induced_fit(tot_lig, tot_prot, kr, ke, kon, koff, dominant)
 
-    assert np.isclose(result, 10.38016, atol=1e-3), "The kobs value for induced fit does not match the expected value."
+    assert np.isclose(result, expected, rtol=1e-8), "The kobs value for induced fit does not match the expected value."
 
 def test_get_kobs_conformational_selection():
     
