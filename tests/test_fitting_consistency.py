@@ -173,13 +173,13 @@ def test_loo_keeps_group_parameters_aligned(model, shared_smax, fixed_t0, groups
             a = one_site_association_analytical(t, 0, smax, 0.03, 0.5, c, t0)
             d = one_site_dissociation_analytical(t, a[-1], 0.03)
         elif model == "transport":
-            a, cs = solve_ode_one_site_mass_transport_association(
-                t, 0, 0, c, 0.5, 0.03, ktrs[group], smax, t0, return_cs=True)
+            a = solve_ode_one_site_mass_transport_association(
+                t, 0, c, 0.5, 0.03, ktrs[group], smax, t0)
             d = solve_ode_one_site_mass_transport_dissociation(
-                t, a[-1], 0.5, 0.03, ktrs[group], smax, cs_0=cs[-1])
+                t, a[-1], 0.5, 0.03, ktrs[group], smax)
         elif model == "two_site":
             states = solve_two_site_cooperative_association(
-                t-t0, c, 0.06, 0.03, 1.5, smax, 2*smax)
+                t, c, 0.06, 0.03, 1.5, smax, 2*smax, t0=t0)
             a = states[:, 0]
             d = solve_two_site_cooperative_dissociation(
                 t, 0.03, 1.5, smax, 2*smax,
