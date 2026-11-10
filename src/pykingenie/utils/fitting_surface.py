@@ -1423,7 +1423,8 @@ def fit_one_site_assoc_and_disso_ktr(assoc_signal_lst, assoc_time_lst, analyte_c
                                  shared_smax=False,
                                  fixed_t0=True,
                                  fixed_Kd=False, Kd_value=None,
-                                 fixed_koff=False, koff_value=None):
+                                 fixed_koff=False, koff_value=None,
+                                 start_candidates=None):
     """
     Global fit to a set of association and dissociation traces - one-to-one with mass transport limitation binding model.
     
@@ -1459,6 +1460,11 @@ def fit_one_site_assoc_and_disso_ktr(assoc_signal_lst, assoc_time_lst, analyte_c
         If True, koff is fixed to koff_value, default is False.
     koff_value : float, optional
         Value of koff to use if fixed_koff is True.
+    start_candidates : list of list, optional
+        Other starting points, ordered like initial_parameters. The model is
+        evaluated once at each; a second fit starts from the one with the
+        lowest sum of squared residuals, and the better of the two fits is
+        returned, default is None.
 
     Returns
     -------
@@ -1471,6 +1477,7 @@ def fit_one_site_assoc_and_disso_ktr(assoc_signal_lst, assoc_time_lst, analyte_c
     list
         Fitted values for each dissociation signal, same dimensions as disso_signal_lst.
     """
+    # Edited with AI assistance and reviewed by a human in PR #XX: carry-over only for single-cycle steps, and a second fit from the best start candidate.
     all_signal_assoc = concat_signal_lst(assoc_signal_lst)
     all_signal_disso = concat_signal_lst(disso_signal_lst)
 
@@ -1478,6 +1485,9 @@ def fit_one_site_assoc_and_disso_ktr(assoc_signal_lst, assoc_time_lst, analyte_c
     time_lst_disso = [np.array(t) for t in disso_time_lst]
 
     initial_signal_at_zero = [time[0] < 2 for time in assoc_time_lst]
+
+    # Flag associations that follow directly after the previous dissociation
+    continuos_time = detect_time_list_continuos(assoc_time_lst, disso_time_lst)
 
     time_lst_disso = [t - t[0] for t in time_lst_disso]
 
@@ -1521,11 +1531,11 @@ def fit_one_site_assoc_and_disso_ktr(assoc_signal_lst, assoc_time_lst, analyte_c
             k_tr   = args[start + smax_idx[i]] if fixed_t0 else args[start + n_t0s + smax_idx[i]]
             s_max  = args[start+smax_idx[i]+n_t0s+n_ktr] if shared_smax else args[start + i + n_t0s + n_ktr]
 
-            # New cycle: empty surface. Single-cycle: continue from the previous dissociation.
-            if np.logical_or(i == 0, initial_signal_at_zero[i]):
-                s0 = 0.0
-            else:
+            # Single-cycle: continue from the previous dissociation. Otherwise start empty.
+            if continuos_time[i] and not (i == 0 or initial_signal_at_zero[i]):
                 s0 = prev_disso_end
+            else:
+                s0 = 0.0
 
             y_assoc = solve_ode_one_site_mass_transport_association(t_assoc-t_assoc[0],s0,analyte_conc,Kd,Koff,k_tr,s_max,t0)
             out[_a_offsets[i]:_a_offsets[i + 1]] = y_assoc
@@ -1539,12 +1549,36 @@ def fit_one_site_assoc_and_disso_ktr(assoc_signal_lst, assoc_time_lst, analyte_c
 
     all_signal = np.concatenate([all_signal_assoc,all_signal_disso], axis=0)
 
-    # Kd, koff, Ktr and Smax differ by orders of magnitude. Without scaling
-    # by the Jacobian, the trust region can stop on xtol far from the minimum.
-    global_fit_params, cov = curve_fit(fit_fx, 1, all_signal,
-                                       p0=initial_parameters,
-                                       bounds=(low_bounds, high_bounds),
-                                       x_scale="jac")
+    # Fit from initial_parameters and, if given, from the start candidate whose
+    # curves are closest to the data. Keep the fit with the lower residual.
+    starts = [list(initial_parameters)]
+    if start_candidates:
+        candidates = [np.clip(p, low_bounds, high_bounds) for p in start_candidates]
+        ssr = [np.sum((fit_fx(1, *p) - all_signal) ** 2) for p in candidates]
+        best = list(candidates[int(np.nanargmin(ssr))])
+        if not np.allclose(best, starts[0], rtol=1e-12, atol=0):
+            starts.append(best)
+
+    best_fit, best_ssr, last_error = None, np.inf, None
+    for p0 in starts:
+        try:
+            # Kd, koff, Ktr and Smax differ by orders of magnitude. Without scaling
+            # by the Jacobian, the trust region can stop on xtol far from the minimum.
+            fit = curve_fit(fit_fx, 1, all_signal,
+                            p0=p0,
+                            bounds=(low_bounds, high_bounds),
+                            x_scale="jac")
+        except RuntimeError as error:
+            last_error = error
+            continue
+        fit_ssr = np.sum((fit_fx(1, *fit[0]) - all_signal) ** 2)
+        if fit_ssr < best_ssr:
+            best_fit, best_ssr = fit, fit_ssr
+
+    if best_fit is None:
+        raise last_error
+
+    global_fit_params, cov = best_fit
 
     predicted_curve = fit_fx(1, *global_fit_params)
 

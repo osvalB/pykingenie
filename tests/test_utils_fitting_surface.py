@@ -344,6 +344,7 @@ def test_fit_one_site_assoc_and_disso_ktr_uses_previous_disso_end_branch():
 
 
 def test_fit_one_site_assoc_and_disso_ktr_single_cycle_recovers_parameters():
+    # Edited with AI assistance and reviewed by a human in PR #XX: absolute dissociation times.
 
     Kd_true, koff_true, ktr_true, smax_true = 0.5, 0.01, 0.005, 5.0
     concs = [0.25, 0.5, 1.0, 2.0]
@@ -360,7 +361,8 @@ def test_fit_one_site_assoc_and_disso_ktr_single_cycle_recovers_parameters():
         d = solve_ode_one_site_mass_transport_dissociation(
             t_d, a[-1], Kd_true, koff_true, ktr_true, smax_true
         )
-        assoc_t.append(t_a); disso_t.append(t_d); assoc_s.append(a); disso_s.append(d)
+        # Dissociation times are absolute, as in real data, so steps are detected as continuous
+        assoc_t.append(t_a); disso_t.append(t_a[-1] + t_d); assoc_s.append(a); disso_s.append(d)
         s0, t_start = d[-1], t_a[-1] + 60
 
     fit, _, fitted_assoc, _ = fit_one_site_assoc_and_disso_ktr(
