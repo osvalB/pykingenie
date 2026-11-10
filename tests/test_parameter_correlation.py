@@ -1,4 +1,4 @@
-# This code is AI generated and reviewed by a human (PR #XX).
+# This code is AI generated and reviewed by a human (PR #19).
 """
 Correlation matrices of fitted surface-binding parameters: the helper that
 builds them, the labels each fit stores, access from KineticsAnalyzer, and

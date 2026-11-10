@@ -258,7 +258,7 @@ class KineticsFitter(KineticsFitterGeneral):
             For example ['Smax 1', 'Smax 2'], or
             ['Rmax_PL 1', 'Rmax_LPL 1', 'Rmax_PL 2', 'Rmax_LPL 2'].
         """
-        # This function is AI generated and reviewed by a human (PR #XX).
+        # This function is AI generated and reviewed by a human (PR #19).
         names = (names,) if isinstance(names, str) else tuple(names)
         return [f"{name} {i + 1}" for i in range(n_groups) for name in names]
 
@@ -278,7 +278,7 @@ class KineticsFitter(KineticsFitterGeneral):
             For example ['Smax (0.2 µM)', 'Smax (0.441 µM)']. Traces with the
             same concentration are numbered, for example 'Smax (1 µM, 2)'.
         """
-        # This function is AI generated and reviewed by a human (PR #XX).
+        # This function is AI generated and reviewed by a human (PR #19).
         names = (names,) if isinstance(names, str) else tuple(names)
         concs = [f"{c:.3g} µM" for c in self.lig_conc_lst]
         totals = {c: concs.count(c) for c in concs}
@@ -294,7 +294,7 @@ class KineticsFitter(KineticsFitterGeneral):
         Labels for the signal amplitudes of a kinetics fit: numbered per
         group when they are shared, otherwise named by trace concentration.
         """
-        # This function is AI generated and reviewed by a human (PR #XX).
+        # This function is AI generated and reviewed by a human (PR #19).
         if shared_smax:
             return self._group_labels(names, len(np.unique(self.smax_id)))
         return self._trace_labels(names)
@@ -310,7 +310,7 @@ class KineticsFitter(KineticsFitterGeneral):
             Whether the rows of fit_params_kinetics are one per trace (for
             example when Smax is fitted for each trace).
         """
-        # This function is AI generated and reviewed by a human (PR #XX).
+        # This function is AI generated and reviewed by a human (PR #19).
         if not per_trace:
             return None
         for name in ('fit_params_kinetics', 'fit_params_kinetics_error'):
@@ -337,7 +337,7 @@ class KineticsFitter(KineticsFitterGeneral):
         None
             Sets fit_params_kinetics_correlation or fit_params_ss_correlation.
         """
-        # This function is AI generated and reviewed by a human (PR #XX).
+        # This function is AI generated and reviewed by a human (PR #19).
         corr = correlation_from_covariance(cov, labels)
         if kind == 'ss':
             self.fit_params_ss_correlation = corr
@@ -2412,7 +2412,7 @@ class KineticsFitter(KineticsFitterGeneral):
                                'Smax':             self.Smax})
 
         # Relative errors (%) of this fit, replacing the table left by the
-        # one-to-one fit used for the starting values (AI generated, PR #XX).
+        # one-to-one fit used for the starting values (AI generated, PR #19).
         with np.errstate(divide='ignore', invalid='ignore'):
             rel_error = np.sqrt(np.diag(cov)) / np.abs(fit) * 100
 

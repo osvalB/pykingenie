@@ -202,7 +202,7 @@ def correlation_from_covariance(cov, labels):
         for parameters whose variance is not finite and positive (for example
         when curve_fit cannot estimate the covariance).
     """
-    # This function is AI generated and reviewed by a human (PR #XX).
+    # This function is AI generated and reviewed by a human (PR #19).
     cov = np.array(cov, dtype=float, ndmin=2)
     if cov.shape != (len(labels), len(labels)):
         raise ValueError(

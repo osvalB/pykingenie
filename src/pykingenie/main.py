@@ -803,7 +803,7 @@ class KineticsAnalyzer:
             One correlation matrix per fitting, keyed by fitting name. Fittings
             without a matrix of that kind are left out.
         """
-        # This function is AI generated and reviewed by a human (PR #XX).
+        # This function is AI generated and reviewed by a human (PR #19).
         attributes = {'kinetics': 'fit_params_kinetics_correlation',
                       'steady_state': 'fit_params_ss_correlation'}
         if kind not in attributes:
