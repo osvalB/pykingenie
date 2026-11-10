@@ -299,6 +299,7 @@ def fit_induced_fit_solution(
         signal_S  = 0 if not fit_signal_S  else args[idx]
         idx += fit_signal_S
 
+        signal_ES = signal_ESint = 0.0
         if fit_signal_ES:
             signal_ES = args[idx]
             idx += 1
@@ -688,7 +689,7 @@ def find_initial_parameters_induced_fit_solution(
     # 9. t0 of the first curve
     # ... t0 of the last curve
 
-    max_signal = np.max(signal_lst)
+    max_signal = max(np.max(signal) for signal in signal_lst)
     max_prot   = np.max(protein_conc_lst)
     max_lig    = np.max(ligand_conc_lst)
 
@@ -860,7 +861,7 @@ def find_initial_parameters_conformational_selection_solution(
     # 9. t0 of the first curve
     # ... t0 of the last curve
 
-    max_signal = np.max(signal_lst)
+    max_signal = max(np.max(signal) for signal in signal_lst)
     max_prot   = np.max(protein_conc_lst)
     max_lig    = np.max(ligand_conc_lst)
 

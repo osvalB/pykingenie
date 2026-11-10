@@ -337,7 +337,7 @@ class KineticsFitterSolution(KineticsFitterGeneral):
 
         self.clear_fittings()
 
-        max_signal = np.max(self.assoc_lst)
+        max_signal = max(np.max(signal) for signal in self.assoc_lst)
         max_prot   = np.max(self.prot_conc)
         max_lig    = np.max(self.lig_conc)
 

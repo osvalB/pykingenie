@@ -1655,7 +1655,7 @@ def one_site_assoc_and_disso_asymmetric_ci95(kd_estimated, rss_desired,
 
         if rss1 + rss2 > rss_desired:
             boundsMin = np.array([kd_estimated/test_factor,
-                                  kd_estimated *test_factors[i-1]]) * 1e3
+                                  kd_estimated / test_factors[i-1]]) * 1e3
             break
 
     def f_to_optimize(Kd):
@@ -1779,14 +1779,14 @@ def one_site_assoc_and_disso_asymmetric_ci95_koff(koff_estimated, rss_desired,
             smax_idx=smax_idx,
             shared_smax=shared_smax,
             fixed_t0=fixed_t0,
-            fixed_koff=True, koff_value=koff_estimated*test_factor)
+            fixed_koff=True, koff_value=koff_estimated/test_factor)
 
         rss1 = get_rss(_ref_assoc, concat_signal_lst(fitted_values_assoc))
         rss2 = get_rss(_ref_disso, concat_signal_lst(fitted_values_disso))
 
         if rss1 + rss2 > rss_desired:
             boundsMin = np.array([koff_estimated/test_factor,
-                                  koff_estimated *test_factors[i-1]]) * 1e3
+                                  koff_estimated / test_factors[i-1]]) * 1e3
             break
 
     def f_to_optimize(Koff):
