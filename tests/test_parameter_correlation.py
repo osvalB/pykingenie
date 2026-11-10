@@ -1,7 +1,8 @@
 # This code is AI generated and reviewed by a human (PR #XX).
 """
 Correlation matrices of fitted surface-binding parameters: the helper that
-builds them, the labels each fit stores, and access from KineticsAnalyzer.
+builds them, the labels each fit stores, access from KineticsAnalyzer, and
+the concentration column of tables with one row per trace.
 """
 import numpy as np
 import pandas as pd
@@ -106,10 +107,11 @@ def test_steady_state_correlation_labels(model, kwargs, path, head):
 
 
 # Each kinetics fit stores a matrix labelled in the order of its parameters,
-# including t0 and Ktr when they are fitted.
+# including t0 and Ktr when they are fitted. Amplitudes shared by a group
+# are numbered; amplitudes fitted per trace are named by concentration.
+@pytest.mark.parametrize("shared_smax", [True, False])
 @pytest.mark.parametrize("method, kwargs, path, head, per_group", [
     ("fit_one_site_association", {}, ONE_SITE, ["Kd [µM]", "k_off [1/s]"], []),
-    ("fit_one_site_dissociation", {}, ONE_SITE, ["k_off [1/s]"], []),
     ("fit_one_site_assoc_and_disso", {}, ONE_SITE, ["Kd [µM]", "k_off [1/s]"], []),
     ("fit_one_site_assoc_and_disso", {"fixed_t0": False}, ONE_SITE, ["Kd [µM]", "k_off [1/s]"], ["t0"]),
     ("fit_one_site_assoc_and_disso", {"fit_ktr": True}, MASS_TRANSPORT, ["Kd [µM]", "k_off [1/s]"], ["Ktr"]),
@@ -122,24 +124,55 @@ def test_steady_state_correlation_labels(model, kwargs, path, head):
     ("fit_one_site_if_assoc_and_disso", {}, INDUCED_FIT,
      ["k_on [1/(s*µM)]", "k_off [1/s]", "k_c [1/s]", "k_rev [1/s]"], []),
 ])
-def test_kinetics_correlation_labels(method, kwargs, path, head, per_group):
+def test_kinetics_correlation_labels(method, kwargs, path, head, per_group, shared_smax):
     fitter = _fitter(path)
     fitter.fit_steady_state()
-    getattr(fitter, method)(**kwargs)
+    getattr(fitter, method)(shared_smax=shared_smax, **kwargs)
     n_groups = len(np.unique(fitter.smax_id))
     labels = list(head)
     for name in per_group:
         labels += KineticsFitter._group_labels(name, n_groups)
-    n_rest = len(fitter.params) - len(labels)
     if method == "fit_two_site_assoc_and_disso":
-        labels += KineticsFitter._group_labels(("Rmax_PL", "Rmax_LPL"), n_rest // 2)
-    elif method == "fit_one_site_dissociation":
-        labels += KineticsFitter._group_labels("S0", n_rest)
+        amplitude = ("Rmax_PL", "Rmax_LPL")
     elif method == "fit_two_site_heterogeneous_ligand_assoc_and_disso":
-        labels += KineticsFitter._group_labels("Rmax", n_rest)
+        amplitude = "Rmax"
     else:
-        labels += KineticsFitter._group_labels("Smax", n_rest)
+        amplitude = "Smax"
+    if shared_smax:
+        labels += KineticsFitter._group_labels(amplitude, n_groups)
+    else:
+        labels += fitter._trace_labels(amplitude)
     _check_matrix(fitter.fit_params_kinetics_correlation, labels)
+
+    # Tables with one row per trace start with the trace's concentration
+    table = fitter.fit_params_kinetics
+    if shared_smax:
+        assert "Concentration [µM]" not in table
+    else:
+        assert list(table.columns)[0] == "Concentration [µM]"
+        np.testing.assert_allclose(table["Concentration [µM]"], fitter.lig_conc_lst, rtol=1e-12)
+
+
+# The dissociation fit has one initial signal per trace, named by concentration,
+# and its tables start with the concentration of each trace.
+def test_dissociation_correlation_labels():
+    fitter = _fitter(ONE_SITE)
+    fitter.fit_one_site_dissociation()
+    _check_matrix(fitter.fit_params_kinetics_correlation,
+                  ["k_off [1/s]"] + fitter._trace_labels("S0"))
+    for table in (fitter.fit_params_kinetics, fitter.fit_params_kinetics_error):
+        assert list(table.columns)[0] == "Concentration [µM]"
+        np.testing.assert_allclose(table["Concentration [µM]"], fitter.lig_conc_lst, rtol=1e-12)
+
+
+# Per-trace labels show the concentration with 3 significant figures,
+# numbering traces that share a concentration so every label is unique.
+def test_trace_labels():
+    fitter = _fitter(ONE_SITE)
+    fitter.lig_conc_lst = [0.2, 0.44097, 1.0, 1.0]
+    assert fitter._trace_labels("Smax") == [
+        "Smax (0.2 µM)", "Smax (0.441 µM)", "Smax (1 µM, 1)", "Smax (1 µM, 2)"]
+    assert fitter._trace_labels(("Rmax_PL", "Rmax_LPL"))[:2] == ["Rmax_PL (0.2 µM)", "Rmax_LPL (0.2 µM)"]
 
 
 # A new fit clears the previous matrices.

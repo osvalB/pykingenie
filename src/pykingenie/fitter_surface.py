@@ -262,6 +262,63 @@ class KineticsFitter(KineticsFitterGeneral):
         names = (names,) if isinstance(names, str) else tuple(names)
         return [f"{name} {i + 1}" for i in range(n_groups) for name in names]
 
+    def _trace_labels(self, names):
+        """
+        Labels for parameters fitted once per trace, named by the trace's
+        analyte concentration.
+
+        Parameters
+        ----------
+        names : str or tuple of str
+            Parameter name, or several names fitted together for each trace.
+
+        Returns
+        -------
+        list of str
+            For example ['Smax (0.2 µM)', 'Smax (0.441 µM)']. Traces with the
+            same concentration are numbered, for example 'Smax (1 µM, 2)'.
+        """
+        # This function is AI generated and reviewed by a human (PR #XX).
+        names = (names,) if isinstance(names, str) else tuple(names)
+        concs = [f"{c:.3g} µM" for c in self.lig_conc_lst]
+        totals = {c: concs.count(c) for c in concs}
+        seen = {}
+        tags = []
+        for c in concs:
+            seen[c] = seen.get(c, 0) + 1
+            tags.append(f"{c}, {seen[c]}" if totals[c] > 1 else c)
+        return [f"{name} ({tag})" for tag in tags for name in names]
+
+    def _amplitude_labels(self, names, shared_smax):
+        """
+        Labels for the signal amplitudes of a kinetics fit: numbered per
+        group when they are shared, otherwise named by trace concentration.
+        """
+        # This function is AI generated and reviewed by a human (PR #XX).
+        if shared_smax:
+            return self._group_labels(names, len(np.unique(self.smax_id)))
+        return self._trace_labels(names)
+
+    def _add_concentrations(self, per_trace):
+        """
+        Add the analyte concentration of each trace as the first column of
+        the kinetics tables, when the tables have one row per trace.
+
+        Parameters
+        ----------
+        per_trace : bool
+            Whether the rows of fit_params_kinetics are one per trace (for
+            example when Smax is fitted for each trace).
+        """
+        # This function is AI generated and reviewed by a human (PR #XX).
+        if not per_trace:
+            return None
+        for name in ('fit_params_kinetics', 'fit_params_kinetics_error'):
+            df = getattr(self, name)
+            if df is not None and len(df) == len(self.lig_conc_lst) and 'Concentration [µM]' not in df:
+                df.insert(0, 'Concentration [µM]', list(self.lig_conc_lst))
+        return None
+
     def _store_correlation(self, cov, labels, kind='kinetics'):
         """
         Store the correlation matrix of the fitted parameters.
@@ -743,7 +800,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         self.params = fit
 
-        self._store_correlation(cov, ['Kd [µM]', 'k_off [1/s]'] + self._group_labels('Smax', len(fit) - 2))
+        self._store_correlation(cov, ['Kd [µM]', 'k_off [1/s]'] + self._amplitude_labels('Smax', shared_smax))
         self.signal_assoc_fit = fit_vals
 
         self.Kd = fit[0]
@@ -764,6 +821,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         self.fit_params_kinetics       = df_fit
         self.fit_params_kinetics_error = df_error
+        self._add_concentrations(per_trace=not shared_smax)
 
         if calc_loo:
 
@@ -939,9 +997,10 @@ class KineticsFitter(KineticsFitterGeneral):
                                  'S0':          rel_error[1:]})
 
         self.fit_params_kinetics_error = df_error
+        self._add_concentrations(per_trace=True)
         self.params = fit
 
-        self._store_correlation(cov, ['k_off [1/s]'] + self._group_labels('S0', len(fit) - 1))
+        self._store_correlation(cov, ['k_off [1/s]'] + self._trace_labels('S0'))
         if calc_loo:
 
             self.calc_leave_one_out_errors()
@@ -1258,6 +1317,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         self.fit_params_kinetics       = df_fit
         self.fit_params_kinetics_error = df_error
+        self._add_concentrations(per_trace=not shared_smax)
 
         self.params      = fit
         self.p0          = p0
@@ -1265,7 +1325,7 @@ class KineticsFitter(KineticsFitterGeneral):
         labels = ['Kd [µM]', 'k_off [1/s]']
         labels += [] if fixed_t0 else self._group_labels('t0', n_groups)
         labels += self._group_labels('Ktr', n_groups) if fit_ktr else []
-        self._store_correlation(cov, labels + self._group_labels('Smax', len(fit) - len(labels)))
+        self._store_correlation(cov, labels + self._amplitude_labels('Smax', shared_smax))
         self.low_bounds  = low_bounds
         self.high_bounds = high_bounds
 
@@ -1602,12 +1662,13 @@ class KineticsFitter(KineticsFitterGeneral):
 
         self.fit_params_kinetics = df_fit
         self.fit_params_kinetics_error = df_error
+        self._add_concentrations(per_trace=not shared_smax)
 
         self.params = fit
         self.p0 = p0
         labels = ['Kd [µM]', 'k_off [1/s]'] + (['sigma'] if fit_sigma else [])
         labels += [] if fixed_t0 else self._group_labels('t0', n_unq_smax)
-        self._store_correlation(cov, labels + self._group_labels(('Rmax_PL', 'Rmax_LPL'), len(rmax_pl)))
+        self._store_correlation(cov, labels + self._amplitude_labels(('Rmax_PL', 'Rmax_LPL'), shared_smax))
         self.low_bounds = p0_low
         self.high_bounds = p0_high
 
@@ -1983,12 +2044,13 @@ class KineticsFitter(KineticsFitterGeneral):
 
         self.fit_params_kinetics = df_fit
         self.fit_params_kinetics_error = df_error
+        self._add_concentrations(per_trace=not shared_smax)
 
         self.params = fit
         self.p0 = p0
         labels = ['Kd1 [µM]', 'k_off1 [1/s]', 'Kd2 [µM]', 'k_off2 [1/s]', 'fraction_site1']
         labels += [] if fixed_t0 else self._group_labels('t0', n_unq_smax)
-        self._store_correlation(cov, labels + self._group_labels('Rmax', len(fit) - len(labels)))
+        self._store_correlation(cov, labels + self._amplitude_labels('Rmax', shared_smax))
         self.low_bounds = low_bounds
         self.high_bounds = high_bounds
         self.best_Kd1_grid = best_Kd1
@@ -2350,11 +2412,12 @@ class KineticsFitter(KineticsFitterGeneral):
                                'Smax':             self.Smax})
 
         self.fit_params_kinetics = df_fit
+        self._add_concentrations(per_trace=not shared_smax)
 
         self.params      = fit
         self.p0          = p0
         self._store_correlation(
-            cov, ['k_on [1/(s*µM)]', 'k_off [1/s]', 'k_c [1/s]', 'k_rev [1/s]'] + self._group_labels('Smax', len(fit) - 4))
+            cov, ['k_on [1/(s*µM)]', 'k_off [1/s]', 'k_c [1/s]', 'k_rev [1/s]'] + self._amplitude_labels('Smax', shared_smax))
         self.low_bounds  = low_bounds
         self.high_bounds = high_bounds
 
