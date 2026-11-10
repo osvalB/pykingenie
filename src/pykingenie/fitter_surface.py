@@ -2411,7 +2411,19 @@ class KineticsFitter(KineticsFitterGeneral):
                                'k_rev [1/s]':      self.k_rev,
                                'Smax':             self.Smax})
 
-        self.fit_params_kinetics = df_fit
+        # Relative errors (%) of this fit, replacing the table left by the
+        # one-to-one fit used for the starting values (AI generated, PR #XX).
+        with np.errstate(divide='ignore', invalid='ignore'):
+            rel_error = np.sqrt(np.diag(cov)) / np.abs(fit) * 100
+
+        df_error = pd.DataFrame({'k_on [1/(s*µM)]': rel_error[0],
+                                 'k_off [1/s]':     rel_error[1],
+                                 'k_c [1/s]':       rel_error[2],
+                                 'k_rev [1/s]':     rel_error[3],
+                                 'Smax':            rel_error[4:]})
+
+        self.fit_params_kinetics       = df_fit
+        self.fit_params_kinetics_error = df_error
         self._add_concentrations(per_trace=not shared_smax)
 
         self.params      = fit

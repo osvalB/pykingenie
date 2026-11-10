@@ -224,6 +224,13 @@ def test_correlation_flags_underdetermined_induced_fit_rates():
     fitter.fit_one_site_if_assoc_and_disso(shared_smax=True)
     assert max_rate_correlation(fitter) > 0.95
 
+    fitter = _slow_induced_fit_fitter()
+    fitter.fit_one_site_if_assoc_and_disso(shared_smax=True)
+    assert max_rate_correlation(fitter) < 0.9
+
+
+def _slow_induced_fit_fitter():
+    """Induced-fit data with a slow conformational step, so all four rates are determined."""
     kon, koff, kc, krev, smax = 0.1, 0.05, 0.01, 0.005, 5.0
     concs = [0.05, 0.15, 0.45, 1.35, 4.05]
     t_assoc = np.arange(0, 600.0, 2.0)
@@ -237,5 +244,20 @@ def test_correlation_flags_underdetermined_induced_fit_rates():
         disso.append(d + rng.normal(0, 0.005 * smax, len(t_disso)))
     fitter = KineticsFitter([t_assoc] * 5, assoc, concs, [t_disso] * 5, disso, smax_id=[0] * 5)
     fitter.fit_steady_state()
-    fitter.fit_one_site_if_assoc_and_disso(shared_smax=True)
-    assert max_rate_correlation(fitter) < 0.9
+    return fitter
+
+
+# The induced-fit fit stores its own relative errors, not those of the
+# one-to-one fit it runs first for starting values.
+@pytest.mark.parametrize("shared_smax", [True, False])
+def test_induced_fit_error_table(shared_smax):
+    fitter = _slow_induced_fit_fitter()
+    fitter.fit_one_site_if_assoc_and_disso(shared_smax=shared_smax)
+    errors = fitter.fit_params_kinetics_error
+    rates = ["k_on [1/(s*µM)]", "k_off [1/s]", "k_c [1/s]", "k_rev [1/s]"]
+    assert list(errors.columns) == list(fitter.fit_params_kinetics.columns)
+    assert all(rate in errors for rate in rates) and "Kd [µM]" not in errors
+    assert len(errors) == len(fitter.fit_params_kinetics)
+    # Well-determined rates: small, positive relative errors (%)
+    values = errors[rates].to_numpy()
+    assert np.all((values > 0) & (values < 10))
