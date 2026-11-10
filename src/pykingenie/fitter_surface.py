@@ -990,6 +990,48 @@ class KineticsFitter(KineticsFitterGeneral):
 
         return None
 
+    def _mtl_start_candidates(self, p0, fixed_t0,
+                              kd_factors=(1/3, 1, 3),
+                              koff_factors=(0.3, 1, 3, 10, 30, 100),
+                              transport_factors=(0.01, 0.1, 1, 10, 100)):
+        """Grid of starting points for the mass-transport fit.
+
+        Rebinding slows the observed rates, so the 1:1 koff guess is usually too
+        low, and the Kd guess from steady state can be off when binding is
+        transport limited. The grid scales Kd and koff around their guesses and
+        sets Ktr = kon * Smax * factor (factor > 1: binding-limited, factor < 1:
+        transport-limited). The grid point whose curves are closest to the
+        data is used as a second starting point.
+
+        Parameters
+        ----------
+        p0 : list
+            Starting point ordered [Kd, koff, (t0...), Ktr..., Smax...], with one
+            t0 and one Ktr per Smax group.
+        fixed_t0 : bool
+            Whether t0 is fixed (and absent from p0).
+        kd_factors, koff_factors, transport_factors : tuple, optional
+            Grid values, as multiples of the guesses.
+
+        Returns
+        -------
+        list of list
+            One starting point per grid point.
+        """
+        # This function is AI generated and reviewed by a human (PR #18).
+        n_groups = len(self.smax_guesses_unq)
+        ktr_start = 2 + (0 if fixed_t0 else n_groups)
+        candidates = []
+        for kd_f, koff_f, tr_f in itertools.product(kd_factors, koff_factors, transport_factors):
+            p = list(p0)
+            p[0] = p0[0] * kd_f
+            p[1] = p0[1] * koff_f
+            kon = p[1] / p[0]
+            for g, smax in enumerate(self.smax_guesses_unq):
+                p[ktr_start + g] = kon * smax * tr_f
+            candidates.append(p)
+        return candidates
+
     def fit_one_site_assoc_and_disso(self,shared_smax=True,fixed_t0=True,fit_ktr=False,calc_loo=False):
 
         """
@@ -1007,6 +1049,7 @@ class KineticsFitter(KineticsFitterGeneral):
             Whether to calculate leave-one-out cross-validation, default is False.
 
         """
+        # Edited with AI assistance and reviewed by a human in PR #18: grid of starting points for the mass-transport fit.
 
         self.clear_fittings()
 
@@ -1057,7 +1100,8 @@ class KineticsFitter(KineticsFitterGeneral):
                 p0,low_bounds,high_bounds,
                 smax_idx=self.smax_id,
                 shared_smax=shared_smax,
-                fixed_t0=fixed_t0
+                fixed_t0=fixed_t0,
+                start_candidates=self._mtl_start_candidates(p0, fixed_t0)
             )
 
             kwargs = {

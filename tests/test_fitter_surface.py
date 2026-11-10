@@ -686,71 +686,55 @@ def test_fit_one_site_assoc_and_disso_3():
 
 
 def test_fit_one_site_assoc_and_disso_if():
+    # Edited with AI assistance and reviewed by a human in PR #18: check the apparent Kd, not kc and krev.
 
     fitter_surface = create_fitter(test_file_3)
     fitter_surface.fit_steady_state()
 
     fitter_surface.fit_one_site_if_assoc_and_disso(shared_smax=True,calc_loo=True)
 
-    # Asses if self.k_on, self.k_off, self.k_c, self.k_rev are correctly fitted
-    assert 0.08 < fitter_surface.k_on < 0.12, f"Expected k_on to be between 0.08 and 0.12, got {fitter_surface.k_on}."
-
-    assert 0.008 < fitter_surface.k_off < 0.012, f"Expected k_off to be between 0.008 and 0.012, got {fitter_surface.k_off}."
-
-    assert 0.7 < fitter_surface.k_c < 1.3, f"Expected k_c to be between 0.7 and 1.3, got {fitter_surface.k_c}."
-
-    assert 7 < fitter_surface.k_rev < 13, f"Expected k_rev to be between 7 and 13, got {fitter_surface.k_rev}."
+    # Simulated with kon 0.1, koff 0.01, kc 1 and krev 10. The conformational step is
+    # fast and mostly reversed, so it only lowers the apparent Kd to
+    # (koff/kon) * krev / (kc + krev) = 0.0909 µM; kc and krev are not determined
+    # separately by these curves, and are not checked.
+    fs = fitter_surface
+    assert 0.08 < fs.k_on < 0.12, f"Expected k_on to be between 0.08 and 0.12, got {fs.k_on}."
+    assert 0.008 < fs.k_off < 0.012, f"Expected k_off to be between 0.008 and 0.012, got {fs.k_off}."
+    kd_app = fs.k_off / fs.k_on * fs.k_rev / (fs.k_c + fs.k_rev)
+    assert np.isclose(kd_app, 0.1 / 1.1, rtol=0.02, atol=0), f"Expected apparent Kd near 0.0909, got {kd_app}."
 
     # Check the loo dataframe is created and has the correct shape
-    assert isinstance(fitter_surface.df_fit_loo, pd.DataFrame), "The loo dataframe should be a pandas DataFrame."
+    assert isinstance(fs.df_fit_loo, pd.DataFrame), "The loo dataframe should be a pandas DataFrame."
 
-    fs = fitter_surface
-
-    # verify the fitted values - kon-0.1_koff-0.01_kc-1_krev-10
-    # We check betw
     assert (fs.k_on_loo_mean - fs.k_on_loo_std*2) < 0.1 * 1.05 # 5 % tolerance error for k_on
     assert (fs.k_on_loo_mean + fs.k_on_loo_std*2) > 0.1 * 0.95 # 5 % tolerance error for k_on
 
     assert (fs.k_off_loo_mean - fs.k_off_loo_std*2) < 0.01 * 1.05 # 5 % tolerance error for k_off
     assert (fs.k_off_loo_mean + fs.k_off_loo_std*2) > 0.01 * 0.95 # 5 % tolerance error for k_off
 
-    assert (fs.k_c_loo_mean - fs.k_c_loo_std*2) < 1 * 1.3 # 30 % tolerance error for k_c
-    assert (fs.k_c_loo_mean + fs.k_c_loo_std*2) > 1 * 0.7 # 30 % tolerance error for k_c
-
-    assert (fs.k_rev_loo_mean - fs.k_rev_loo_std*2) < 10 * 1.3 # 30 % tolerance error for k_rev
-    assert (fs.k_rev_loo_mean + fs.k_rev_loo_std*2) > 10 * 0.7 # 30 % tolerance error for k_rev
-
 def test_fit_one_site_assoc_and_disso_if_non_shared_smax():
+    # Edited with AI assistance and reviewed by a human in PR #18: check the apparent Kd, not kc and krev.
 
     fitter_surface = create_fitter(test_file_3)
     fitter_surface.fit_steady_state()
 
     fitter_surface.fit_one_site_if_assoc_and_disso(shared_smax=False,calc_loo=True)
 
-    # Asses if self.k_on, self.k_off, self.k_c, self.k_rev are correctly fitted
-    assert 0.08 < fitter_surface.k_on < 0.12, f"Expected k_on to be between 0.08 and 0.12, got {fitter_surface.k_on}."
-
-    assert 0.008 < fitter_surface.k_off < 0.012, f"Expected k_off to be between 0.008 and 0.012, got {fitter_surface.k_off}."
-
-    assert 0.7 < fitter_surface.k_c < 1.3, f"Expected k_c to be between 0.7 and 1.3, got {fitter_surface.k_c}."
-
-    assert 7 < fitter_surface.k_rev < 13, f"Expected k_rev to be between 7 and 13, got {fitter_surface.k_rev}."
+    # Simulated with kon 0.1, koff 0.01, kc 1 and krev 10. The conformational step is
+    # fast and mostly reversed, so it only lowers the apparent Kd to
+    # (koff/kon) * krev / (kc + krev) = 0.0909 µM; kc and krev are not determined
+    # separately by these curves, and are not checked.
+    fs = fitter_surface
+    assert 0.08 < fs.k_on < 0.12, f"Expected k_on to be between 0.08 and 0.12, got {fs.k_on}."
+    assert 0.008 < fs.k_off < 0.012, f"Expected k_off to be between 0.008 and 0.012, got {fs.k_off}."
+    kd_app = fs.k_off / fs.k_on * fs.k_rev / (fs.k_c + fs.k_rev)
+    assert np.isclose(kd_app, 0.1 / 1.1, rtol=0.02, atol=0), f"Expected apparent Kd near 0.0909, got {kd_app}."
 
     # Check the loo dataframe is created and has the correct shape
-    assert isinstance(fitter_surface.df_fit_loo, pd.DataFrame), "The loo dataframe should be a pandas DataFrame."
+    assert isinstance(fs.df_fit_loo, pd.DataFrame), "The loo dataframe should be a pandas DataFrame."
 
-    fs = fitter_surface
-
-    # verify the fitted values - kon-0.1_koff-0.01_kc-1_krev-10
-    # We check betw
     assert (fs.k_on_loo_mean - fs.k_on_loo_std*2) < 0.1 * 1.05 # 5 % tolerance error for k_on
     assert (fs.k_on_loo_mean + fs.k_on_loo_std*2) > 0.1 * 0.95 # 5 % tolerance error for k_on
 
     assert (fs.k_off_loo_mean - fs.k_off_loo_std*2) < 0.01 * 1.05 # 5 % tolerance error for k_off
     assert (fs.k_off_loo_mean + fs.k_off_loo_std*2) > 0.01 * 0.95 # 5 % tolerance error for k_off
-
-    assert (fs.k_c_loo_mean - fs.k_c_loo_std*2) < 1 * 1.3 # 30 % tolerance error for k_c
-    assert (fs.k_c_loo_mean + fs.k_c_loo_std*2) > 1 * 0.7 # 30 % tolerance error for k_c
-
-    assert (fs.k_rev_loo_mean - fs.k_rev_loo_std*2) < 10 * 1.3 # 30 % tolerance error for k_rev
-    assert (fs.k_rev_loo_mean + fs.k_rev_loo_std*2) > 10 * 0.7 # 30 % tolerance error for k_rev
