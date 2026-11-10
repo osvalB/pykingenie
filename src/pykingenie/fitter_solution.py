@@ -1,3 +1,4 @@
+# This file contains AI-generated changes.
 """Fit kinetic models to solution-based experimental data."""
 
 import numpy as np
@@ -324,6 +325,7 @@ class KineticsFitterSolution(KineticsFitterGeneral):
             - signal_assoc_fit: List of fitted association signals
             - fit_params_kinetics: DataFrame with the fitted parameters
         """
+        # This function contains AI-generated changes.
 
         # Initial parameters are as follows:
         # 1. Signal amplitude of the free protein

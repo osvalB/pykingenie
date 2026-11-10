@@ -1,3 +1,4 @@
+# This file contains AI-generated changes.
 """Fit kinetic models for solution-based experiments."""
 
 import numpy as np
@@ -259,6 +260,7 @@ def fit_induced_fit_solution(
     - scale_factor_2 if fit_scale_factor                      (scale factor for the second signal)
     ...
     """
+    # This function contains AI-generated changes.
     # Flatten signals once
     all_signal = np.concatenate(signal_lst)
 
@@ -290,6 +292,7 @@ def fit_induced_fit_solution(
 
     def fit_fx(_, *args):
         """Evaluate the solution binding model with an induced-fit step."""
+        # This function contains AI-generated changes.
         # Efficient argument unpacking
         idx = 0
 
@@ -662,6 +665,7 @@ def find_initial_parameters_induced_fit_solution(
     np.ndarray
         Best initial parameters found by the heuristic algorithm.
     """
+    # This function contains AI-generated changes.
     kc_seq   = 10 ** (np.linspace(np_linspace_low, np_linspace_high, np_linspace_num))
     krev_seq = kc_seq
 
@@ -834,6 +838,7 @@ def find_initial_parameters_conformational_selection_solution(
     np.ndarray
         Best initial parameters found by the heuristic algorithm.
     """
+    # This function contains AI-generated changes.
     kc_seq   = 10 ** (np.linspace(np_linspace_low, np_linspace_high, np_linspace_num))
     krev_seq = kc_seq
 

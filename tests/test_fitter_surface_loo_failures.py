@@ -1,3 +1,4 @@
+# This file contains AI-generated changes.
 """Leave-one-out fits skip real invalid-data failures and retain valid results."""
 
 import numpy as np
@@ -17,6 +18,7 @@ from pykingenie.utils.signal_surface import (
 
 
 def _create_loo_fitter(model="one_site"):
+    # This function contains AI-generated changes.
     t = np.linspace(0, 60, 41)
     concs = [0.2, 1.0, 3.0]
     assoc, disso = [], []
@@ -94,6 +96,7 @@ def test_calc_leave_one_out_errors_rejects_unavailable_model(model):
     }),
 ])
 def test_loo_skips_invalid_data_and_keeps_successful_fit(model, method_name, expected):
+    # This function is AI generated.
     fitter = _create_loo_fitter(model)
     getattr(fitter, method_name)()
 

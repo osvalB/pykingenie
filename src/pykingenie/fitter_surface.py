@@ -1,3 +1,4 @@
+# This file contains AI-generated changes.
 """Fit steady-state and kinetic models to surface-based experimental data."""
 
 import itertools
@@ -48,6 +49,7 @@ def _leave_one_out_parameters(params, low_bounds, high_bounds, smax_ids, omitted
     t0 and Ktr), then one response block per group or per trace. Return the
     original retained group IDs as well, so group-specific results stay aligned.
     """
+    # This function is AI generated.
     retained_traces = [i for i in range(len(smax_ids)) if i != omitted]
     retained_groups = sorted({smax_ids[i] for i in retained_traces})
     group_map = {group: i for i, group in enumerate(retained_groups)}
@@ -158,6 +160,7 @@ class KineticsFitter(KineticsFitterGeneral):
         is_single_cycle : bool, optional
             Whether the experiment is a single cycle kinetics experiment, default is False.
         """
+        # This function contains AI-generated changes.
 
         super().__init__
 
@@ -734,6 +737,7 @@ class KineticsFitter(KineticsFitterGeneral):
             - k_off_loo_std: Standard deviation of LOO estimates for k_off
             - df_fit_loo: DataFrame with mean ± SD for Kd and k_off
         """
+        # This function contains AI-generated changes.
 
         """
         Leave-one-out curve method for error estimation of the fitted parameters.
@@ -1178,6 +1182,7 @@ class KineticsFitter(KineticsFitterGeneral):
         - k_off_loo_std: Standard deviation of leave-one-out estimates for k_off
         - df_fit_loo: DataFrame with mean ± SD for Kd and k_off
         """
+        # This function contains AI-generated changes.
 
         Kd_loo = []
         k_off_loo = []
@@ -1524,6 +1529,7 @@ class KineticsFitter(KineticsFitterGeneral):
         - sigma_loo_mean: Mean of leave-one-out estimates for sigma (if fitted)
         - sigma_loo_std: Standard deviation of leave-one-out estimates for sigma (if fitted
         """
+        # This function contains AI-generated changes.
 
         shared_smax = self.shared_smax
         fixed_t0 = self.fixed_t0
@@ -1907,6 +1913,7 @@ class KineticsFitter(KineticsFitterGeneral):
         - fraction_site1_loo_std: Standard deviation of leave-one-out estimates for fraction_site1
         - df_fit_loo: DataFrame with mean ± SD for Kd1, k_off1, Kd2, k_off2, and fraction_site1
         """
+        # This function contains AI-generated changes.
 
         shared_smax = self.shared_smax
         fixed_t0 = self.fixed_t0
@@ -2247,6 +2254,7 @@ class KineticsFitter(KineticsFitterGeneral):
         Repeats the global association/dissociation fit after omitting each
         replicate and stores the resulting parameter distributions.
         """
+        # This function contains AI-generated changes.
 
         shared_smax = self.shared_smax
 
