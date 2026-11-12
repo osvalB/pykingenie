@@ -19,6 +19,7 @@ from functools import lru_cache
 import numpy as np
 
 from .math import median_filter
+from .palettes import CONCENTRATION_PALETTES
 from .processing import (
     get_colors_from_numeric_values,
     get_palette,
@@ -49,6 +50,8 @@ class PlotConfig:
 
     Ranges are expressed in data units, including on logarithmic axes. An empty title
     hides the main title; ``None`` keeps the helper's usual title.
+    ``palette`` colors traces by ligand concentration: ``"viridis"`` (default)
+    or ``"blues"``, where the highest concentration is the darkest blue.
     """
 
     plot_width: int | None = None
@@ -58,14 +61,24 @@ class PlotConfig:
     title: str | None = None
     x_range: tuple[float, float] | None = None
     y_range: tuple[float, float] | None = None
+    palette: str | None = None
 
     def __post_init__(self):
-        """Validate dimensions, font size, and axis ranges after initialization."""
+        """Validate dimensions, font size, axis ranges, and palette."""
         for name in ("plot_width", "plot_height"):
             _validate_count(getattr(self, name), name)
         _validate_size(self.font_size, "font_size", positive=True)
         self.x_range = _validate_range(self.x_range, "x_range")
         self.y_range = _validate_range(self.y_range, "y_range")
+        if self.palette is not None:
+            if (
+                not isinstance(self.palette, str)
+                or self.palette.lower() not in CONCENTRATION_PALETTES
+            ):
+                raise ValueError(
+                    "palette must be one of: " + ", ".join(CONCENTRATION_PALETTES)
+                )
+            self.palette = self.palette.lower()
 
 
 @dataclass
@@ -274,6 +287,7 @@ def _plot_settings(config, *, width=900, height=420, font_size=14, title=None):
         font_size=font_size,
         plot_type="png",
         title=title,
+        palette="viridis",
     )
 
 
@@ -315,7 +329,7 @@ def _legend_style(font_size):
     return {"fontSize": f"{font_size}px", "background": "transparent"}
 
 
-def _concentration_colorbar(low, high):
+def _concentration_colorbar(low, high, palette="viridis"):
     """Colorbar settings for ligand concentrations in μM, colored on log10.
 
     XY has no log color scale for scatter marks, so colors use log10 values and
@@ -338,6 +352,7 @@ def _concentration_colorbar(low, high):
         for tick in ticks
     ]
     return {
+        "colors": CONCENTRATION_PALETTES[palette],
         "title": f"[Ligand] ({unit})",
         "domain": domain,
         "ticks": ticks,
@@ -838,7 +853,7 @@ def _grid(
                         [x0, x0],
                         [y0, y0],
                         color=list(colorbar["domain"]),
-                        colormap="viridis",
+                        colormap=colorbar["colors"],
                         color_domain=colorbar["domain"],
                         opacity=0,
                         density=False,
@@ -1315,7 +1330,8 @@ def plot_association_dissociation(
     """Plot kinetics observations and fitted curves, colored by concentration.
 
     One colorbar beside the top-right panel shows the ligand concentration
-    (log-scaled Viridis), shared by all panels. LayoutConfig controls
+    (log-scaled; Viridis, or Blues via ``PlotConfig(palette="blues")``),
+    shared by all panels. LayoutConfig controls
     splitting by Smax ID. TraceConfig controls fitted overlays, median
     smoothing and the sampling budget per Smax group.
     """
@@ -1346,7 +1362,7 @@ def plot_association_dissociation(
         trace.line_width if trace.fit_line_width is None else trace.fit_line_width
     )
     low, high = _kinetics_concentration_range(pyKinetics)
-    colorbar = _concentration_colorbar(low, high)
+    colorbar = _concentration_colorbar(low, high, plot.palette)
     colorbar["needs_color_mark"] = trace.smooth_curves or trace.marker_size <= 0
     charts = []
     for sample, fit in pyKinetics.fittings.items():
@@ -1354,7 +1370,9 @@ def plot_association_dissociation(
         for i, group in enumerate(fit.lig_conc_lst_per_id):
             limit = max(1, int(np.ceil(trace.max_points / len(group))))
             for concentration in group:
-                color = get_colors_from_numeric_values([concentration], low, high)[0]
+                color = get_colors_from_numeric_values(
+                    [concentration], low, high, palette=colorbar["colors"]
+                )[0]
                 for phase, times, raw, fitted in (
                     ("Assoc", fit.time_assoc_lst, fit.assoc_lst, fit.signal_assoc_fit),
                     ("Disso", fit.time_disso_lst, fit.disso_lst, fit.signal_disso_fit),
@@ -1364,7 +1382,7 @@ def plot_association_dissociation(
                         y = median_filter(y, x, trace.rolling_window)
                     x, y = subset_data(x, limit), subset_data(y, limit)
                     if trace.smooth_curves and trace.line_width > 0:
-                        # Lines take one constant color, the closest Viridis step.
+                        # Lines take one constant color, the closest palette step.
                         marks.append(
                             xy.line(
                                 x,
@@ -1380,7 +1398,7 @@ def plot_association_dissociation(
                                 x,
                                 y,
                                 color=np.full(len(x), np.log10(concentration)),
-                                colormap="viridis",
+                                colormap=colorbar["colors"],
                                 color_domain=colorbar["domain"],
                                 size=trace.marker_size,
                                 opacity=trace.opacity,
@@ -1525,7 +1543,7 @@ def plot_association_dissociation_residuals(
         trace_config, TraceConfig, marker_size=4, line_width=2, max_points=2000
     )
     low, high = _kinetics_concentration_range(pyKinetics)
-    colorbar = _concentration_colorbar(low, high)
+    colorbar = _concentration_colorbar(low, high, plot.palette)
     colorbar["needs_color_mark"] = trace.smooth_curves or trace.marker_size <= 0
     charts = []
     for sample, fit in pyKinetics.fittings.items():
@@ -1555,7 +1573,10 @@ def plot_association_dissociation_residuals(
                                 x,
                                 y,
                                 color=get_colors_from_numeric_values(
-                                    [concentration], low, high
+                                    [concentration],
+                                    low,
+                                    high,
+                                    palette=colorbar["colors"],
                                 )[0],
                                 width=trace.line_width,
                                 opacity=trace.opacity,
@@ -1567,7 +1588,7 @@ def plot_association_dissociation_residuals(
                                 x,
                                 y,
                                 color=np.full(len(x), np.log10(concentration)),
-                                colormap="viridis",
+                                colormap=colorbar["colors"],
                                 color_domain=colorbar["domain"],
                                 size=trace.marker_size,
                                 opacity=trace.opacity,
