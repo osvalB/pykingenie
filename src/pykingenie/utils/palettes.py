@@ -7,6 +7,8 @@ in plots. These palettes are collections of colors represented as hex values.
 
 __all__ = [
     "VIRIDIS",
+    "BLUES",
+    "CONCENTRATION_PALETTES",
     "set1_colors",
     "set3_colors"
 ]
@@ -22,6 +24,22 @@ Viridis color palette.
 A perceptually uniform color map that is readable by those with colorblindness.
 Contains 21 hex color values transitioning from dark purple to yellow.
 """
+
+BLUES = [
+    "#94c4df", "#87bddc", "#7cb7da", "#6fb0d7", "#64a9d3", "#5ba3d0", "#519ccc",
+    "#4695c8", "#3e8ec4", "#3686c0", "#2e7ebc", "#2676b8", "#1f6eb3", "#1966ad",
+    "#135fa7", "#0d57a1", "#084f99", "#08488e", "#084082", "#083776", "#08306b"
+]
+"""
+Blues color palette.
+
+A sequential palette (ColorBrewer Blues, without its near-white end) with 21
+hex color values from light to dark blue. Used for concentrations, the
+highest concentration takes the darkest blue.
+"""
+
+CONCENTRATION_PALETTES = {"viridis": VIRIDIS, "blues": BLUES}
+"""Sequential palettes available for coloring by concentration, low to high."""
 
 set1_colors = [
     "#e41a1c",  # red

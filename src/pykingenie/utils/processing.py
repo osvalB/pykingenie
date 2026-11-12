@@ -440,9 +440,11 @@ def sample_type_to_letter(string):
         return string[0] if string else ""
     return mapping[string]
 
-def get_colors_from_numeric_values(values, min_val, max_val, use_log_scale=True):
+def get_colors_from_numeric_values(
+    values, min_val, max_val, use_log_scale=True, palette=None
+):
     """
-    Map numeric values to colors in the VIRIDIS palette based on a specified range.
+    Map numeric values to colors of a sequential palette over a specified range.
     
     Parameters
     ----------
@@ -454,6 +456,8 @@ def get_colors_from_numeric_values(values, min_val, max_val, use_log_scale=True)
         Maximum value of the range.
     use_log_scale : bool, optional
         Whether to use logarithmic scaling for the values, default is True.
+    palette : list of str, optional
+        Colors ordered from the lowest to the highest value. Defaults to VIRIDIS.
         
     Returns
     -------
@@ -465,9 +469,10 @@ def get_colors_from_numeric_values(values, min_val, max_val, use_log_scale=True)
         min_val = np.log10(min_val)
         max_val = np.log10(max_val)
         values = np.log10(values)
-    seq = np.linspace(min_val, max_val, 21)
+    palette = VIRIDIS if palette is None else palette
+    seq = np.linspace(min_val, max_val, len(palette))
     idx = [np.argmin(np.abs(v - seq)) for v in values]
-    return [VIRIDIS[i] for i in idx]
+    return [palette[i] for i in idx]
 
 def find_index_of_previous_step_type(df_steps, step_index, step_type):
     """

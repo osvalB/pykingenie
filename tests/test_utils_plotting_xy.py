@@ -1198,3 +1198,35 @@ def test_legends_have_no_background_box(analyzer):
             for engine in engines:
                 assert engine.legend_options["style"]["background"] == "transparent"
             assert "rgba(128,128,128,0.08)" not in fig.to_svg()
+
+
+def test_blues_palette_gives_the_highest_concentration_the_darkest_blue(analyzer):
+    from pykingenie.utils.palettes import BLUES
+
+    config = plotting.PlotConfig(palette="Blues")
+    assert config.palette == "blues"
+    grid = plotting.plot_association_dissociation(analyzer, plot_config=config)
+    scatters = [t for p in grid.figures for t in p.traces if t.kind == "scatter"]
+    to_rgb = lambda c: [int(c[i : i + 2], 16) for i in (1, 3, 5)]
+    assert all(t.color_ch.colormap == [to_rgb(c) for c in BLUES] for t in scatters)
+
+    smooth = plotting.plot_association_dissociation(
+        analyzer,
+        plot_config=config,
+        trace_config=plotting.TraceConfig(smooth_curves=True, show_fit=False),
+    )
+    lines = [t for p in smooth.figures for t in p.traces if t.kind == "line"]
+    # Concentrations 10, 1 and 3 (association and dissociation each).
+    colors = [t.style["color"] for t in lines]
+    assert colors[0] == colors[1] == BLUES[-1]
+    assert colors[2] == colors[3] == BLUES[0]
+
+    # Viridis stays the default.
+    default = plotting.plot_association_dissociation(analyzer)
+    default_scatter = [t for p in default.figures for t in p.traces][0]
+    assert default_scatter.color_ch.colormap != scatters[0].color_ch.colormap
+
+
+def test_invalid_palette_is_rejected():
+    with pytest.raises(ValueError, match="palette must be one of"):
+        plotting.PlotConfig(palette="reds")
