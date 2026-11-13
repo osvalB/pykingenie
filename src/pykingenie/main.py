@@ -632,8 +632,8 @@ class KineticsAnalyzer:
         Kd2_values : list, optional
             Candidate Kd2 values for the heterogeneous ligand grid search.
         fit_signal_ratio : bool, optional
-            For the one_to_one_if model, let the induced complex produce a
-            different signal than the intermediate complex by fitting their
+            For the one_to_one_if model, let the induced complex (AL) produce a
+            different signal than the intermediate complex (ALint) by fitting their
             ratio. Ignored by the other models. Default is False.
 
         Returns

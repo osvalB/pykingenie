@@ -116,9 +116,9 @@ def test_fitter_recovers_signal_ratio(ratio):
     assert fitter.signal_ratio == pytest.approx(ratio, rel=0.02)
     assert fitter.Smax[0] == pytest.approx(SMAX, rel=0.02)
 
-    assert 'Signal ratio (ES/E·S)' in fitter.fit_params_kinetics.columns
-    assert 'Signal ratio (ES/E·S)' in fitter.fit_params_kinetics_error.columns
-    assert 'Signal ratio (ES/E·S)' in fitter.fit_params_kinetics_correlation.columns
+    assert 'Signal ratio (AL/ALint)' in fitter.fit_params_kinetics.columns
+    assert 'Signal ratio (AL/ALint)' in fitter.fit_params_kinetics_error.columns
+    assert 'Signal ratio (AL/ALint)' in fitter.fit_params_kinetics_correlation.columns
     assert len(fitter.params) == len(fitter.low_bounds) == len(fitter.high_bounds) == 6
     assert (fitter.low_bounds[4], fitter.high_bounds[4]) == (0.1, 10.0)
 
@@ -132,7 +132,7 @@ def test_fitter_signal_ratio_per_trace_smax_and_loo():
     np.testing.assert_allclose(fitter.Smax, smax_values, rtol=0.02)
     assert len(fitter.signal_ratio_loo) == len(CONCS)
     assert fitter.signal_ratio_loo_mean == pytest.approx(1.8, rel=0.02)
-    assert 'Signal ratio (ES/E·S)' in fitter.df_fit_loo.columns
+    assert 'Signal ratio (AL/ALint)' in fitter.df_fit_loo.columns
 
 
 def _ode_rhs(t, y, a, kon, koff, kc, krev, smax):
@@ -274,5 +274,5 @@ def test_fitter_default_keeps_equal_signals():
     fitter.fit_one_site_if_assoc_and_disso(shared_smax=True)
     assert fitter.signal_ratio == 1.0
     assert not fitter.fit_signal_ratio
-    assert 'Signal ratio (ES/E·S)' not in fitter.fit_params_kinetics.columns
+    assert 'Signal ratio (AL/ALint)' not in fitter.fit_params_kinetics.columns
     assert len(fitter.params) == 5

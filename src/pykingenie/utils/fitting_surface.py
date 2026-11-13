@@ -1310,10 +1310,10 @@ def fit_induced_fit_sites_assoc_and_disso(
     max_nfev : int, optional
         Maximum number of function evaluations.
     fit_signal_ratio : bool, optional
-        If True, fit the signal of the induced complex (ES) relative to the
-        intermediate complex (E·S) as one global parameter, default is False.
+        If True, fit the signal of the induced complex (AL) relative to the
+        intermediate complex (ALint) as one global parameter, default is False.
     signal_ratio_value : float, optional
-        Signal of ES relative to E·S used if fit_signal_ratio is False,
+        Signal of AL relative to ALint used if fit_signal_ratio is False,
         default is 1 (both complexes produce the same signal).
     
     Returns

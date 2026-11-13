@@ -322,7 +322,7 @@ def test_submit_kinetics_fitting():
                                                        fit_signal_ratio=True)
     assert successful, "The induced-fit model with a signal ratio should be fitted."
     assert all(kf.fit_signal_ratio for kf in successful)
-    assert all('Signal ratio (ES/E·S)' in kf.fit_params_kinetics.columns for kf in successful)
+    assert all('Signal ratio (AL/ALint)' in kf.fit_params_kinetics.columns for kf in successful)
 
 
 def test_submit_kinetics_fitting_two_to_one_parameter_recovery_from_kingenie_csv():

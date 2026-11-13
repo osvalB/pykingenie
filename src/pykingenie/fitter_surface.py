@@ -2289,10 +2289,10 @@ class KineticsFitter(KineticsFitterGeneral):
         calc_loo : bool, optional
             Whether to calculate leave-one-out cross-validation.
         fit_signal_ratio : bool, optional
-            If True, the induced complex (ES) may produce a different signal
-            than the intermediate complex (E·S). Their ratio is fitted as one
+            If True, the induced complex (AL) may produce a different signal
+            than the intermediate complex (ALint). Their ratio is fitted as one
             global parameter, and Smax is the signal of the surface fully
-            occupied by E·S. Default is False (both produce the same signal).
+            occupied by ALint. Default is False (both produce the same signal).
         signal_ratio_bounds : tuple of float, optional
             Lower and upper bounds for the signal ratio, default is (0.1, 10).
 
@@ -2310,7 +2310,7 @@ class KineticsFitter(KineticsFitterGeneral):
             - k_off: The dissociation rate constant
             - k_c: The forward conformational change rate constant
             - k_rev: The reverse conformational change rate constant
-            - signal_ratio: Signal of ES relative to E·S (1 if not fitted)
+            - signal_ratio: Signal of AL relative to ALint (1 if not fitted)
             - Smax: The maximum signal values
             - fit_params_kinetics: DataFrame with the fitted parameters
         """
@@ -2407,7 +2407,7 @@ class KineticsFitter(KineticsFitterGeneral):
             start_high.insert(3, best_krev*factor)
 
             if fit_signal_ratio:
-                # Start from equal signals for E·S and ES
+                # Start from equal signals for ALint and AL
                 start.insert(4, float(np.clip(1.0, *signal_ratio_bounds)))
                 start_low.insert(4, signal_ratio_bounds[0])
                 start_high.insert(4, signal_ratio_bounds[1])
@@ -2471,8 +2471,8 @@ class KineticsFitter(KineticsFitterGeneral):
                          'k_rev [1/s]':     rel_error[3]}
 
         if fit_signal_ratio:
-            fit_columns['Signal ratio (ES/E·S)']   = self.signal_ratio
-            error_columns['Signal ratio (ES/E·S)'] = rel_error[4]
+            fit_columns['Signal ratio (AL/ALint)']   = self.signal_ratio
+            error_columns['Signal ratio (AL/ALint)'] = rel_error[4]
 
         fit_columns['Smax']   = self.Smax
         error_columns['Smax'] = rel_error[n_global:]
@@ -2488,7 +2488,7 @@ class KineticsFitter(KineticsFitterGeneral):
         self.p0          = p0
         global_labels = ['k_on [1/(s*µM)]', 'k_off [1/s]', 'k_c [1/s]', 'k_rev [1/s]']
         if fit_signal_ratio:
-            global_labels.append('Signal ratio (ES/E·S)')
+            global_labels.append('Signal ratio (AL/ALint)')
         self._store_correlation(
             cov, global_labels + self._amplitude_labels('Smax', shared_smax))
         self.low_bounds  = low_bounds
@@ -2602,7 +2602,7 @@ class KineticsFitter(KineticsFitterGeneral):
             self.signal_ratio_loo = signal_ratio_loo
             self.signal_ratio_loo_mean = np.mean(signal_ratio_loo)
             self.signal_ratio_loo_std = np.std(signal_ratio_loo)
-            df_fit_loo['Signal ratio (ES/E·S)'] = [
+            df_fit_loo['Signal ratio (AL/ALint)'] = [
                 f'{self.signal_ratio_loo_mean:.2e} ± {self.signal_ratio_loo_std:.2e}']
 
         self.df_fit_loo = df_fit_loo
