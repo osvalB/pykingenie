@@ -7,6 +7,7 @@ from .octet             import OctetExperiment
 from .gator             import GatorExperiment
 from .kingenie_solution import KinGenieCsvSolution
 from .kingenie_surface  import KinGenieCsv
+from .surface_csv       import SurfaceCsvExperiment
 
 from .utils.processing import (
     guess_experiment_name,
