@@ -315,6 +315,15 @@ def test_submit_kinetics_fitting():
     assert isinstance(df, pd.DataFrame), "Fitting results should be a dataframe."
     assert not df.empty, "Fitting results dataframe should not be empty."
 
+    # Induced fit where the induced complex has its own signal amplitude (AI generated)
+    successful, _ = pyKinetics.submit_kinetics_fitting(fitting_model='one_to_one_if',
+                                                       fitting_region='association_dissociation',
+                                                       shared_smax=True,
+                                                       fit_signal_ratio=True)
+    assert successful, "The induced-fit model with a signal ratio should be fitted."
+    assert all(kf.fit_signal_ratio for kf in successful)
+    assert all('Signal ratio (ES/E·S)' in kf.fit_params_kinetics.columns for kf in successful)
+
 
 def test_submit_kinetics_fitting_two_to_one_parameter_recovery_from_kingenie_csv():
     """

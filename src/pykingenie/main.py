@@ -606,7 +606,8 @@ class KineticsAnalyzer:
                                 fit_sigma=False,
                                 fixed_t0=True,
                                 Kd1_values=None,
-                                Kd2_values=None):
+                                Kd2_values=None,
+                                fit_signal_ratio=False):
         """
         Fit models to surface-based kinetics data.
 
@@ -630,6 +631,10 @@ class KineticsAnalyzer:
             Candidate Kd1 values for the heterogeneous ligand grid search.
         Kd2_values : list, optional
             Candidate Kd2 values for the heterogeneous ligand grid search.
+        fit_signal_ratio : bool, optional
+            For the one_to_one_if model, let the induced complex produce a
+            different signal than the intermediate complex by fitting their
+            ratio. Ignored by the other models. Default is False.
 
         Returns
         -------
@@ -664,7 +669,8 @@ class KineticsAnalyzer:
                     kf.fit_one_site_dissociation()
 
                 if fitting_model == 'one_to_one_if' and fitting_region == 'association_dissociation':
-                    kf.fit_one_site_if_assoc_and_disso(shared_smax=shared_smax)
+                    kf.fit_one_site_if_assoc_and_disso(shared_smax=shared_smax,
+                                                       fit_signal_ratio=fit_signal_ratio)
 
                 if fitting_model == 'two_to_one' and fitting_region == 'association_dissociation':
                     kf.fit_two_site_assoc_and_disso(shared_smax=shared_smax, fit_sigma=fit_sigma)
