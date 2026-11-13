@@ -219,6 +219,56 @@ def test_fit_recovers_parameters_from_ode_data(single_cycle):
     np.testing.assert_allclose(fit, list(rates) + [ratio, SMAX], rtol=1e-4)
 
 
+def _single_cycle_fitter(ratio, seed, noise=0.005, dt=2.0):
+    """
+    Single-cycle data from the ODEs: increasing concentrations, a short
+    dissociation after each, and a long final one. Each step starts from the
+    state at the end of the previous step, as the fit assumes.
+    """
+    rng = np.random.default_rng(seed)
+    y0, t = np.zeros(2), 0.0
+    t_a_lst, t_d_lst, s_a_lst, s_d_lst = [], [], [], []
+
+    for i, c in enumerate(CONCS):
+        disso_length = 1200.0 if i == len(CONCS) - 1 else 300.0
+        t_a = np.arange(t, t + 300.0, dt)
+        t_d = np.arange(t_a[-1] + dt, t_a[-1] + dt + disso_length, dt)
+
+        ode_a = _ode_solve(t_a, y0, c, RATES, SMAX)
+        ode_d = _ode_solve(t_d, ode_a[-1], 0.0, RATES, SMAX)
+
+        t_a_lst.append(t_a)
+        t_d_lst.append(t_d)
+        s_a_lst.append(ode_a[:, 0] + ratio * ode_a[:, 1] + rng.normal(0, noise * SMAX, len(t_a)))
+        s_d_lst.append(ode_d[:, 0] + ratio * ode_d[:, 1] + rng.normal(0, noise * SMAX, len(t_d)))
+        y0, t = ode_d[-1], t_d[-1] + dt
+
+    fitter = KineticsFitter(t_a_lst, s_a_lst, CONCS, t_d_lst, s_d_lst,
+                            smax_id=[0] * len(CONCS), is_single_cycle=True)
+    fitter.get_steady_state()
+    return fitter
+
+
+@pytest.mark.parametrize("ratio", [0.5, 2.0])
+@pytest.mark.parametrize("seed", [0, 1])
+def test_single_cycle_fitter_recovers_signal_ratio(ratio, seed):
+    """Single-cycle kinetics: rates, signal ratio and Smax are recovered from noisy data."""
+    fitter = _single_cycle_fitter(ratio, seed)
+    fitter.fit_one_site_if_assoc_and_disso(shared_smax=True, fit_signal_ratio=True)
+
+    np.testing.assert_allclose([fitter.k_on, fitter.k_off, fitter.k_c, fitter.k_rev], RATES, rtol=0.05)
+    assert fitter.signal_ratio == pytest.approx(ratio, rel=0.02)
+    assert fitter.Smax[0] == pytest.approx(SMAX, rel=0.02)
+
+
+def test_single_cycle_fitter_exact_without_noise():
+    fitter = _single_cycle_fitter(2.0, seed=0, noise=0.0)
+    fitter.fit_one_site_if_assoc_and_disso(shared_smax=True, fit_signal_ratio=True)
+    np.testing.assert_allclose(
+        [fitter.k_on, fitter.k_off, fitter.k_c, fitter.k_rev, fitter.signal_ratio, fitter.Smax[0]],
+        list(RATES) + [2.0, SMAX], rtol=1e-3)
+
+
 def test_fitter_default_keeps_equal_signals():
     fitter = _noisy_fitter(1.0)
     fitter.fit_one_site_if_assoc_and_disso(shared_smax=True)
