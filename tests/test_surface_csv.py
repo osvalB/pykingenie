@@ -176,6 +176,31 @@ def test_traces_without_data(tmp_path):
         read_traces_file(str(f))
 
 
+def test_traces_metadata_without_delimiter_and_trailing_columns(tmp_path):
+
+    f = tmp_path / 'traces.csv'
+    f.write_text('Exported traces\nTime,A1,\n0,1,\n1,2,\n')
+
+    df = read_traces_file(str(f))
+
+    # The metadata line has no delimiter; the empty trailing column is dropped
+    assert list(df.columns) == ['Time', 'A1']
+    assert df['A1'].tolist() == [1, 2]
+
+
+def test_steps_longer_than_traces_warns(tmp_path):
+
+    df = pd.read_csv(steps_file, sep='\t')
+    extra = df.iloc[[-1]].copy()
+    extra['Step Name '] = 'Extra'
+    df = pd.concat([df, extra], ignore_index=True)
+    steps = tmp_path / 'steps.txt'
+    df.to_csv(steps, sep='\t', index=False)
+
+    with pytest.warns(UserWarning, match='No data points found'):
+        SurfaceCsvExperiment().read_files(str(steps), traces_file, concentrations=concs)
+
+
 def test_get_step_xy_single_cycle():
 
     exp = load(concentrations=concs)

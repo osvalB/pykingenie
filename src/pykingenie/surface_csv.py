@@ -180,11 +180,9 @@ def read_traces_file(file):
 
     df.columns = header[:n_cols]
 
-    # Drop columns that are completely empty (e.g. from trailing delimiters)
+    # Drop columns that are completely empty (e.g. from trailing delimiters).
+    # At least two columns remain: the first data row has two or more numeric fields.
     df = df.dropna(axis=1, how='all')
-
-    if df.shape[1] < 2:
-        raise ValueError("The traces file must contain a time column and at least one sensor column.")
 
     return df
 
