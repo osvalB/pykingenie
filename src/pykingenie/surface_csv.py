@@ -1,4 +1,4 @@
-# Note: this file contains AI-generated code, written with AI coding assistants (PR #XX).
+# Note: this file contains AI-generated code, written with AI coding assistants (PR #24).
 """Import surface-based binding data from a steps table and a column-formatted traces file.
 
 This importer is instrument-agnostic. It needs two plain-text files:

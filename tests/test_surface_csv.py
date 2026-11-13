@@ -1,4 +1,4 @@
-# Note: this file contains AI-generated code, written with AI coding assistants (PR #XX).
+# Note: this file contains AI-generated code, written with AI coding assistants (PR #24).
 import numpy as np
 import pandas as pd
 import pytest

@@ -1,4 +1,4 @@
-# Note: this file contains AI-generated code, written with AI coding assistants (PR #XX).
+# Note: this file contains AI-generated code, written with AI coding assistants (PR #24).
 """
 Single-cycle parameter recovery for every kinetic model, using the steps/traces file format.
 
