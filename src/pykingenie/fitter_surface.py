@@ -2293,6 +2293,8 @@ class KineticsFitter(KineticsFitterGeneral):
             than the intermediate complex (ALint). Their ratio is fitted as one
             global parameter, and Smax is the signal of the surface fully
             occupied by ALint. Default is False (both produce the same signal).
+            A is the analyte (the molecule in solution) and L the ligand
+            immobilised on the sensor: A + L <-> ALint <-> AL.
         signal_ratio_bounds : tuple of float, optional
             Lower and upper bounds for the signal ratio, default is (0.1, 10).
 
@@ -2470,6 +2472,8 @@ class KineticsFitter(KineticsFitterGeneral):
                          'k_c [1/s]':       rel_error[2],
                          'k_rev [1/s]':     rel_error[3]}
 
+        # A is the analyte and L the immobilised ligand: ALint is the
+        # intermediate complex and AL the induced complex.
         if fit_signal_ratio:
             fit_columns['Signal ratio (AL/ALint)']   = self.signal_ratio
             error_columns['Signal ratio (AL/ALint)'] = rel_error[4]

@@ -1312,6 +1312,8 @@ def fit_induced_fit_sites_assoc_and_disso(
     fit_signal_ratio : bool, optional
         If True, fit the signal of the induced complex (AL) relative to the
         intermediate complex (ALint) as one global parameter, default is False.
+        A is the analyte and L the immobilised ligand (E·S and ES in the
+        signal functions).
     signal_ratio_value : float, optional
         Signal of AL relative to ALint used if fit_signal_ratio is False,
         default is 1 (both complexes produce the same signal).

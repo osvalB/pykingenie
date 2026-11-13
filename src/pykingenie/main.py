@@ -634,7 +634,8 @@ class KineticsAnalyzer:
         fit_signal_ratio : bool, optional
             For the one_to_one_if model, let the induced complex (AL) produce a
             different signal than the intermediate complex (ALint) by fitting their
-            ratio. Ignored by the other models. Default is False.
+            ratio. A is the analyte and L the immobilised ligand. Ignored by
+            the other models. Default is False.
 
         Returns
         -------
