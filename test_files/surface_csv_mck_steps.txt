@@ -1,0 +1,12 @@
+Assay	Step Number	Step Name	Step Time	Step Type Name	Sample Location	Sample ID
+1	1	Baseline	60	Baseline	p1A1	
+1	2	Loading	120	Loading	p1A2	ligandA
+1	3	Baseline2	60	Baseline	p1A3	
+1	4	Association	180	Association	p1A4	sampleAB
+1	5	Dissociation	300	Dissociation	p1A3	
+1	6	Regeneration	30	Regeneration	p1A10	
+1	7	Baseline3	60	Baseline	p1A1	
+1	8	Loading2	120	Loading	p1A5	ligandB
+1	9	Baseline4	60	Baseline	p1A3	
+1	10	Association2	180	Association	p1A4	sampleAB
+1	11	Dissociation2	300	Dissociation	p1A3	

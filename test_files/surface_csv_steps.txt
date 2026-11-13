@@ -1,0 +1,14 @@
+Assay 	Step Number 	Step Name 	Step Time 	Step Type Name 	Sample Location
+1	1	Baseline	60	Baseline	p1A1
+1	2	Loading	120	Loading	p1A2
+1	3	Baseline2	60	Baseline	p1A3
+1	4	Association1	120	Association	p1A4
+1	5	Dissociation	60	Dissociation	p1A9
+1	6	Association2	120	Association	p1A5
+1	7	Dissociation	60	Dissociation	p1A9
+1	8	Association3	120	Association	p1A6
+1	9	Dissociation	60	Dissociation	p1A9
+1	10	Association4	120	Association	p1A7
+1	11	Dissociation	60	Dissociation	p1A9
+1	12	Association5	120	Association	p1A8
+1	13	Dissociation2	300	Dissociation	p1A9
