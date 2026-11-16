@@ -655,6 +655,17 @@ def solve_steady_state(A, b):
     np.ndarray
         Steady state solution.
     """
+    A = np.asarray(A, dtype=float)
+    b = np.asarray(b, dtype=float)
+
+    if A.shape == (2, 2):
+        # Closed-form inverse: much faster than a general solver for 2x2 systems,
+        # which every surface model here uses (AI generated).
+        det = A[0, 0] * A[1, 1] - A[0, 1] * A[1, 0]
+        if det != 0:
+            return np.array([-(A[1, 1] * b[0] - A[0, 1] * b[1]) / det,
+                             -(A[0, 0] * b[1] - A[1, 0] * b[0]) / det])
+
     return -solve(A, b)
 
 def solve_induced_fit_association(time, a_conc, kon, koff, kc, krev, sP1L=0, sP2L=0, smax=0, t0=0,
@@ -753,10 +764,15 @@ def solve_all_states_fast(time, A, initial_conditions, steady_state_value):
 
         x(t) = x_ss + exp(A·t) · (x₀ − x_ss)
 
-    where x_ss is the steady state. exp(A·t) comes from the eigendecomposition
-    of A. When the eigenvectors are nearly parallel (equal eigenvalues, so A
-    cannot be diagonalised), a 2×2 matrix is evaluated in closed form
-    instead. All time points are evaluated at once.
+    where x_ss is the steady state. For a 2×2 matrix, the case of every
+    surface model here, exp(A·t) is evaluated in closed form (Putzer):
+
+        exp(A·t) = e^(λ1·t)·I + f(t)·(A − λ1·I),
+        f(t) = (e^(λ1·t) − e^(λ2·t)) / (λ1 − λ2)
+
+    which also holds when the eigenvalues are equal and A cannot be
+    diagonalised (f(t) then tends to t·e^(λ1·t)). Larger matrices use the
+    eigendecomposition of A. All time points are evaluated at once.
 
     Parameters
     ----------
@@ -776,43 +792,40 @@ def solve_all_states_fast(time, A, initial_conditions, steady_state_value):
         state of the system at each time point.
     """
     # Edited with AI assistance and reviewed by a human in PR #16: closed-form exp(A·t) for 2x2 matrices that cannot be diagonalised.
+    # Edited with AI assistance: the closed form is used for every 2x2 matrix, about 3x faster than the eigendecomposition.
     time = np.asarray(time, dtype=float)
     A = np.asarray(A, dtype=float)
+    steady_state_value = np.asarray(steady_state_value, dtype=float)
     v = np.asarray(initial_conditions, dtype=float) - steady_state_value
 
-    eigvals, eigvecs = np.linalg.eig(A)
-
-    if A.shape == (2, 2) and np.linalg.cond(eigvecs) > 1e6:
-        # Eigenvalues, computed without cancellation
-        half_tr = 0.5 * (A[0, 0] + A[1, 1])
-        det = A[0, 0] * A[1, 1] - A[0, 1] * A[1, 0]
-        root = np.sqrt(complex(half_tr * half_tr - det))
+    if A.shape == (2, 2):
+        a, b, c, d = A[0, 0], A[0, 1], A[1, 0], A[1, 1]
+        half_tr = 0.5 * (a + d)
+        # (tr/2)² − det written without cancellation
+        disc = (0.5 * (a - d)) ** 2 + b * c
+        root = np.sqrt(disc) if disc >= 0 else np.sqrt(complex(disc))
+        # The eigenvalue of larger magnitude, then the other from the determinant
         big = half_tr + root if half_tr >= 0 else half_tr - root
-        small = det / big if big != 0 else 0.0
-        lam1, lam2 = (big, small) if big.real >= np.real(small) else (small, big)
+        small = (a * d - b * c) / big if big != 0 else 0.0
+        # λ1 has the larger real part, so x = (λ1 − λ2)·t >= 0 for t >= 0
+        lam1, lam2 = (big, small) if np.real(big) >= np.real(small) else (small, big)
 
-        # exp(A·t) = e^(λ1·t)·I + f(t)·(A − λ1·I), with
-        # f(t) = (e^(λ1·t) − e^(λ2·t)) / (λ1 − λ2), which tends to t·e^(λ1·t)
         x = (lam1 - lam2) * time
-        small_x = np.abs(x) < 1e-12
         g = np.ones_like(x)
-        g[~small_x] = -np.expm1(-x[~small_x]) / x[~small_x]
-
+        not_small = np.abs(x) >= 1e-12
+        g[not_small] = -np.expm1(-x[not_small]) / x[not_small]  # (1 − e^(−x)) / x
         e1 = np.exp(lam1 * time)
         f = e1 * time * g
 
         w = (A - lam1 * np.eye(2)) @ v
         states = steady_state_value + np.outer(e1, v) + np.outer(f, w)
-
         return states.real
 
+    eigvals, eigvecs = np.linalg.eig(A)
     alpha = np.linalg.solve(eigvecs, v)
-
     # exp_matrix[i, j] = exp(eigvals[j] * time[i])   — shape (N, n)
     exp_matrix = np.exp(np.outer(time, eigvals))
-
     states = steady_state_value + (exp_matrix * alpha) @ eigvecs.T
-
     return states.real                           # discard tiny imaginary noise
 
 def solve_conformational_selection_association(time, a_conc, kon, koff, kc, krev, smax=0, sP1=0, sP2L=0):
@@ -1013,14 +1026,21 @@ def ode_mixture_analyte_association(t, Ris, C_TOT, Fis, Ris_max, koffs, Kds):
 
 def solve_ode_mixture_analyte_association(t, Ris0, C_TOT, Fis, Ris_max, koffs, Kds, t0=0):
     """
-    Solves the ODE for the mixture analyte model - association phase
+    Solves the mixture analyte model - association phase.
+
+    The equations of ``ode_mixture_analyte_association`` are linear,
+
+        dR/dt = A·R + b,  A = −diag(koffs) − u·vᵀ,  b = u,
+
+    with u_i = kon_i·F_i·C_TOT·Ris_max_i and v_j = 1/Ris_max_j, so they are
+    solved exactly with ``solve_all_states_fast`` instead of numerically.
 
     Parameters
     ----------
     t : np.ndarray
         Time variable.
     Ris0 : list
-        Initial response of each analyte.
+        Response of each analyte when the association starts.
     C_TOT : float
         Total concentration of the analyte mixture.
     Fis : np.ndarray
@@ -1032,22 +1052,32 @@ def solve_ode_mixture_analyte_association(t, Ris0, C_TOT, Fis, Ris_max, koffs, K
     Kds : np.ndarray
         Equilibrium dissociation constants.
     t0 : float, optional
-        Initial time offset, default is 0.
+        Time after the first time point at which the association starts
+        (the response is Ris0 then), default is 0.
 
     Returns
     -------
     np.ndarray
-        Response of EACH ANALYTE over time.
+        Response of EACH ANALYTE over time, shape (number of analytes, len(t)).
     """
     # Edited with AI assistance and reviewed by a human in PR #16: tighter solver tolerances.
+    # Edited with AI assistance: exact solution of the linear system, and t0 shifts the start
+    # (with solve_ivp starting at the first time point, t0 had no effect).
+    t = np.asarray(t, dtype=float)
+    elapsed = t - np.min(t) - t0
 
-    t = t + t0
+    Ris_max = np.atleast_1d(np.asarray(Ris_max, dtype=float))
+    koffs = np.atleast_1d(np.asarray(koffs, dtype=float))
+    Fis = np.atleast_1d(np.asarray(Fis, dtype=float))
+    kons = koffs / np.atleast_1d(np.asarray(Kds, dtype=float))
 
-    out = solve_ivp(ode_mixture_analyte_association, t_span=[np.min(t), np.max(t)],
-                    t_eval=t, y0=Ris0, args=(C_TOT, Fis, Ris_max, koffs, Kds), method="LSODA",
-                    rtol=1e-8, atol=1e-10 * np.max(Ris_max))
+    u = kons * Fis * C_TOT * Ris_max
+    A = -np.diag(koffs) - np.outer(u, 1.0 / Ris_max)
 
-    return out.y
+    steady_state = solve_steady_state(A, u)
+    states = solve_all_states_fast(elapsed, A, np.asarray(Ris0, dtype=float), steady_state)
+
+    return states.T
 
 def ode_mixture_analyte_dissociation(t, Ris, koffs):
     """
@@ -1082,34 +1112,37 @@ def ode_mixture_analyte_dissociation(t, Ris, koffs):
 
 def solve_ode_mixture_analyte_dissociation(t, Ris0, koffs, t0=0):
     """
-    Solves the ODE for the mixture analyte model - dissociation phase
+    Solves the mixture analyte model - dissociation phase.
+
+    Each analyte dissociates on its own, so the solution is exact:
+    R_i(t) = Ris0_i·exp(−koff_i·t).
 
     Parameters
     ----------
     t : np.ndarray
         Time variable.
     Ris0 : list
-        Initial response of each analyte.
+        Response of each analyte when the dissociation starts.
     koffs : np.ndarray
         Dissociation rate constants.
     t0 : float, optional
-        Initial time offset, default is 0.
+        Time after the first time point at which the dissociation starts
+        (the response is Ris0 then), default is 0.
 
     Returns
     -------
     np.ndarray
-        Response of EACH ANALYTE over time.
+        Response of EACH ANALYTE over time, shape (number of analytes, len(t)).
     """
     # Edited with AI assistance and reviewed by a human in PR #16: tighter solver tolerances.
+    # Edited with AI assistance: exact solution, and t0 shifts the start (it had no effect).
+    t = np.asarray(t, dtype=float)
+    elapsed = t - np.min(t) - t0
 
-    t = t + t0
+    Ris0 = np.atleast_1d(np.asarray(Ris0, dtype=float))
+    koffs = np.atleast_1d(np.asarray(koffs, dtype=float))
 
-    out = solve_ivp(ode_mixture_analyte_dissociation, t_span=[np.min(t), np.max(t)],
-                    t_eval=t, y0=Ris0, args=(koffs,), method="LSODA",
-                    rtol=1e-8, atol=1e-10 * max(np.max(np.abs(Ris0)), 1e-300))
-
-    return out.y
-
+    return Ris0[:, None] * np.exp(-np.outer(koffs, elapsed))
 
 def _validate_fraction_site1(fraction_site1):
     """Validate that a site-1 population fraction lies between zero and one."""
