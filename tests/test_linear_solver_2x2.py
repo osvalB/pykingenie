@@ -110,3 +110,56 @@ def test_larger_systems_use_the_eigendecomposition():
     np.testing.assert_allclose(x_ss, -np.linalg.solve(A, b), rtol=1e-12)
     np.testing.assert_allclose(solve_all_states_fast(T, A, x0, x_ss), _expm_reference(A, x0, x_ss),
                                rtol=1e-10, atol=1e-14)
+
+
+# Real eigenvalues (every surface model) take a path with scalar coefficients
+
+
+def _putzer_with_outer(time, A, x0, x_ss):
+    """The previous implementation of the 2x2 closed form, built with np.outer."""
+    a, b, c, d = A.ravel()
+    half_tr, disc = 0.5 * (a + d), (0.5 * (a - d)) ** 2 + b * c
+    root = np.sqrt(disc)
+    big = half_tr + root if half_tr >= 0 else half_tr - root
+    small = (a * d - b * c) / big if big != 0 else 0.0
+    lam1, lam2 = max(big, small), min(big, small)
+    x = (lam1 - lam2) * time
+    g = np.ones_like(x)
+    g[np.abs(x) >= 1e-12] = -np.expm1(-x[np.abs(x) >= 1e-12]) / x[np.abs(x) >= 1e-12]
+    e1 = np.exp(lam1 * time)
+    v = x0 - x_ss
+    return x_ss + np.outer(e1, v) + np.outer(e1 * time * g, (A - lam1 * np.eye(2)) @ v)
+
+
+def test_real_eigenvalues_match_the_previous_implementation():
+    t = T
+    for A, b, x0 in _model_systems():
+        A = np.asarray(A, dtype=float)
+        x_ss = solve_steady_state(A, b)
+        states = solve_all_states_fast(t, A, x0, x_ss)
+        previous = _putzer_with_outer(t, A, x0, x_ss)
+        scale = np.max(np.abs(previous), axis=0)
+        np.testing.assert_allclose(states / scale, previous / scale, rtol=0, atol=1e-13)
+
+
+@pytest.mark.parametrize("gap", [0.0, 1e-15, 1e-9])
+def test_equal_and_nearly_equal_eigenvalues(gap):
+    """[[λ+gap, 1], [0, λ]]: exp(A·t) = [[e^((λ+gap)·t), (e^((λ+gap)·t) − e^(λ·t)) / gap], [0, e^(λ·t)]],
+    with (e^((λ+gap)·t) − e^(λ·t)) / gap = t·e^(λ·t) when gap = 0."""
+    lam = -0.02
+    A = np.array([[lam + gap, 1.0], [0.0, lam]])
+    x0 = np.array([0.5, 2.0])
+    states = solve_all_states_fast(T, A, x0, np.zeros(2))
+
+    e = np.exp(lam * T)
+    coupling = T * e if gap == 0 else e * np.expm1(gap * T) / gap
+    expected = np.column_stack((np.exp((lam + gap) * T) * x0[0] + coupling * x0[1], e * x0[1]))
+    np.testing.assert_allclose(states, expected, rtol=1e-12, atol=1e-15)
+
+
+def test_single_time_point():
+    A = np.array([[-0.05, 0.01], [0.02, -0.03]])
+    x0, x_ss = np.array([1.0, 2.0]), np.array([0.2, 0.1])
+    states = solve_all_states_fast(np.array([7.0]), A, x0, x_ss)
+    assert states.shape == (1, 2)
+    np.testing.assert_allclose(states, _expm_reference(A, x0, x_ss, t=[7.0]), rtol=1e-12)

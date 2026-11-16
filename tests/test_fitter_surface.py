@@ -473,8 +473,10 @@ def test_fit_one_site_assoc_and_disso_0():
 
     ci95 = fitter_surface.fit_params_kinetics_ci95
 
-    assert all(ci95.iloc[:, 1] < ci95.iloc[:, 2]), \
-              "The lower bound of the 95% CI should be less than the upper bound."
+    # Edited with AI assistance: this data is noise-free, so the interval is only about
+    # 1e-14 wide (relative) and its limits can both round to the estimate.
+    assert all(ci95.iloc[:, 1] <= ci95.iloc[:, 2]), \
+              "The lower bound of the 95% CI should not exceed the upper bound."
 
     # fit with shared_smax=False, fixed_t0=True and fit_ktr=False
     fitter_surface.fit_one_site_assoc_and_disso(shared_smax=False,fixed_t0=True,fit_ktr=False)
@@ -482,8 +484,10 @@ def test_fit_one_site_assoc_and_disso_0():
 
     ci95 = fitter_surface.fit_params_kinetics_ci95
 
-    assert all(ci95.iloc[:, 1] < ci95.iloc[:, 2]), \
-              "The lower bound of the 95% CI should be less than the upper bound."
+    # Edited with AI assistance: this data is noise-free, so the interval is only about
+    # 1e-14 wide (relative) and its limits can both round to the estimate.
+    assert all(ci95.iloc[:, 1] <= ci95.iloc[:, 2]), \
+              "The lower bound of the 95% CI should not exceed the upper bound."
 
     # fit with shared_smax=False, fixed_t0=False and fit_ktr=False
     fitter_surface.fit_one_site_assoc_and_disso(shared_smax=False,fixed_t0=False,fit_ktr=False)

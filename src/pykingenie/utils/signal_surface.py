@@ -252,7 +252,7 @@ def solve_ode_one_site_mass_transport_dissociation(t, s1_0, K_d, k_off, k_tr, s_
 
     return out.y[0]
 
-def _lambertw_log_form(L, y0, n_newton=4):
+def _lambertw_log_form(L, y0, n_halley=4):
     """
     Solve ``ln|y| + y = L`` on the branch through ``y0``.
 
@@ -261,14 +261,22 @@ def _lambertw_log_form(L, y0, n_newton=4):
     (L below its value at y0) y moves from y0 towards 0. Backward in time it moves away
     from 0; for y0 < 0 it stops at -1, the end of the principal branch.
 
+    The equation is solved for u = ln|y| with Halley steps from a series start, in
+    real arithmetic (scipy.special.lambertw works in complex numbers and was most of
+    the cost of the mass transport fit). For y > 0, u + exp(u) = L is increasing and
+    convex for every L. For -1 <= y < 0, u - exp(u) = L starts from the expansion
+    around the branch point y = -1 when -exp(L) is near -1/e, otherwise from the
+    series of W around 0.
+
     Parameters
     ----------
     L : np.ndarray
         Right-hand side, ``ln|y0| + y0`` minus the scaled elapsed time.
     y0 : float
         Value at time zero, not 0. Sets the sign of the solution.
-    n_newton : int, optional
-        Newton steps used to polish the starting guess, default is 4.
+    n_halley : int, optional
+        Halley steps from the series start, default is 4 (3 already reach machine
+        precision against 50-digit references).
 
     Returns
     -------
@@ -276,8 +284,6 @@ def _lambertw_log_form(L, y0, n_newton=4):
         The solution y, with the same shape as L.
     """
     # This function is AI generated.
-    from scipy.special import lambertw
-
     L = np.asarray(L, dtype=float)
     backward = L > np.log(abs(y0)) + y0
 
@@ -291,25 +297,32 @@ def _lambertw_log_form(L, y0, n_newton=4):
 
     with np.errstate(over='ignore', under='ignore', invalid='ignore', divide='ignore'):
         if y0 > 0:
-            # W0(exp(L)) for moderate L, asymptotic expansion where exp(L) overflows
-            big = L > 700
-            y = np.empty_like(L)
-            y[~big] = lambertw(np.exp(L[~big])).real
-            lb = L[big]
-            y[big] = lb - np.log(lb) + np.log(lb) / lb
+            # Start: u = L - exp(L) where y is small, u = ln(L - ln L) where it is large
+            big = L > 1.0
+            L_big = np.where(big, L, 2.0)
+            u = np.where(big, np.log(L_big - np.log(L_big)), L - np.exp(np.minimum(L, 1.0)))
+            for _ in range(n_halley):
+                e = np.exp(u)
+                h, dh = u + e - L, 1.0 + e
+                u = u - 2 * h * dh / (2 * dh * dh - h * e)
+            y = np.exp(u)
         else:
-            # -exp(L) >= -1/e except backward past the branch point, where W0 is clipped to -1
-            y = lambertw(np.maximum(-np.exp(L), -np.exp(-1.0))).real
+            # z = -exp(L) >= -1/e, except backward past the branch point, where y is clipped to -1
+            z = -np.exp(np.minimum(L, -1.0))
+            p = np.sqrt(np.maximum(2.0 * (1.0 + np.e * z), 0.0))
+            y_branch = -1.0 + p - p * p / 3.0 + 11.0 / 72.0 * p ** 3
+            y_zero = z * (1.0 - z * (1.0 - z * (1.5 - z * 8.0 / 3.0)))
+            y = np.where(z < -0.25, y_branch, y_zero)
+            # Where exp(L) underflows, u = ln(-y) is L itself
+            u = np.where(L < -700, L, np.log(-np.clip(y, -1.0, -1e-320)))
+            for _ in range(n_halley):
+                e = np.exp(u)
+                h, dh = u - e - L, 1.0 - e
+                step = 2 * h * dh / (2 * dh * dh + h * e)
+                u = np.minimum(u - np.where(np.isfinite(step), step, 0.0), 0.0)
+            y = -np.exp(u)
 
         y = np.clip(y, lo, hi)
-
-        # Newton on f(y) = ln|y| + y - L, f'(y) = (1 + y) / y. Polishes the guess where the
-        # direct Lambert W evaluation loses precision (near y = -1 and where exp(L) overflowed).
-        active = y != 0
-        for _ in range(n_newton):
-            ya = y[active]
-            step = (np.log(np.abs(ya)) + ya - L[active]) * ya / (1 + ya)
-            y[active] = np.clip(ya - np.where(np.isfinite(step), step, 0.0), lo[active], hi[active])
 
     return y
 
@@ -750,11 +763,13 @@ def _induced_fit_signal_columns(states, smax, signal_ratio):
         Columns: total signal, signal of E·S, and amount of ES in E·S signal units.
     """
     # This function is AI generated (induced complex signal ratio).
-    col2 = smax - states[:, 0] - states[:, 1]  # Signal produced by E·S
-    col3 = states[:, 1]                        # ES, in E·S signal units
-    col1 = col2 + signal_ratio * col3          # Total signal
+    # Edited with AI assistance: filled in place instead of np.column_stack
+    columns = np.empty((states.shape[0], 3))
+    np.subtract(smax - states[:, 0], states[:, 1], out=columns[:, 1])  # Signal produced by E·S
+    columns[:, 2] = states[:, 1]                                       # ES, in E·S signal units
+    columns[:, 0] = columns[:, 1] + signal_ratio * columns[:, 2]       # Total signal
 
-    return np.column_stack((col1, col2, col3))
+    return columns
 
 def solve_all_states_fast(time, A, initial_conditions, steady_state_value):
     """
@@ -793,17 +808,46 @@ def solve_all_states_fast(time, A, initial_conditions, steady_state_value):
     """
     # Edited with AI assistance and reviewed by a human in PR #16: closed-form exp(A·t) for 2x2 matrices that cannot be diagonalised.
     # Edited with AI assistance: the closed form is used for every 2x2 matrix, about 3x faster than the eigendecomposition.
+    # Edited with AI assistance: real eigenvalues (every surface model) use scalar coefficients and
+    # write the two columns directly, about 2x faster than building them with np.outer.
     time = np.asarray(time, dtype=float)
     A = np.asarray(A, dtype=float)
     steady_state_value = np.asarray(steady_state_value, dtype=float)
     v = np.asarray(initial_conditions, dtype=float) - steady_state_value
 
     if A.shape == (2, 2):
-        a, b, c, d = A[0, 0], A[0, 1], A[1, 0], A[1, 1]
+        a, b, c, d = (float(entry) for entry in A.ravel())
         half_tr = 0.5 * (a + d)
         # (tr/2)² − det written without cancellation
         disc = (0.5 * (a - d)) ** 2 + b * c
-        root = np.sqrt(disc) if disc >= 0 else np.sqrt(complex(disc))
+
+        if disc >= 0:
+            root = disc ** 0.5
+            # The eigenvalue of larger magnitude, then the other from the determinant
+            big = half_tr + root if half_tr >= 0 else half_tr - root
+            small = (a * d - b * c) / big if big != 0 else 0.0
+            lam1, lam2 = (big, small) if big >= small else (small, big)
+            gap = lam1 - lam2
+
+            v0, v1 = float(v[0]), float(v[1])
+            w0 = (a - lam1) * v0 + b * v1  # (A − λ1·I)·v
+            w1 = c * v0 + (d - lam1) * v1
+
+            # f(t) = (e^(λ1·t) − e^(λ2·t)) / (λ1 − λ2) = e^(λ1·t)·(1 − e^(−x)) / (λ1 − λ2), x = (λ1 − λ2)·t,
+            # which tends to t·e^(λ1·t) for small x
+            e1 = np.exp(lam1 * time)
+            x = gap * time
+            not_small = np.abs(x) >= 1e-12
+            with np.errstate(invalid='ignore', divide='ignore'):
+                f = e1 * np.where(not_small, -np.expm1(-x) / gap, time)
+
+            states = np.empty((time.size, 2))
+            states[:, 0] = steady_state_value[0] + v0 * e1 + w0 * f
+            states[:, 1] = steady_state_value[1] + v1 * e1 + w1 * f
+            return states
+
+        # Complex pair of eigenvalues
+        root = np.sqrt(complex(disc))
         # The eigenvalue of larger magnitude, then the other from the determinant
         big = half_tr + root if half_tr >= 0 else half_tr - root
         small = (a * d - b * c) / big if big != 0 else 0.0

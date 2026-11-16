@@ -26,10 +26,10 @@ from .signal_surface import (
 
 from .math import get_rss
 
-from .fitting_general import fit_single_exponential
+from .fitting_general import fit_single_exponential, curve_fit_log_scale
 
 from scipy.optimize import curve_fit
-from scipy.optimize import minimize_scalar
+from scipy.optimize import minimize_scalar, brentq
 
 __all__ = [
     'guess_initial_signal',
@@ -90,6 +90,44 @@ def guess_initial_signal(assoc_time_lst, assoc_signal_lst, time_limit=30):
         except:
 
             s0s.append(y[0])
+
+    return s0s
+
+def initial_signal_guesses_where_needed(assoc_time_lst, assoc_signal_lst, disso_time_lst):
+    """
+    Guess the initial signal only for the association traces that need it.
+
+    The one-to-one fit chains each association from the previous dissociation when
+    the two are continuous in time, or starts it from zero. Only the other traces use
+    the guess from guess_initial_signal, so the single-exponential fits are skipped
+    for the rest.
+
+    Parameters
+    ----------
+    assoc_time_lst : list
+        List of association time arrays.
+    assoc_signal_lst : list
+        List of association signal arrays.
+    disso_time_lst : list
+        List of dissociation time arrays, as given to the fit.
+
+    Returns
+    -------
+    list
+        Initial signal guess for each association trace, None where it is not used.
+    """
+    # This function is AI generated.
+    continuos_time = detect_time_list_continuos(assoc_time_lst, disso_time_lst)
+    needed = [i for i, continuos in enumerate(continuos_time) if not continuos]
+
+    s0s = [None] * len(assoc_time_lst)
+    if not needed:
+        return s0s
+
+    guesses = guess_initial_signal([assoc_time_lst[i] for i in needed],
+                                   [assoc_signal_lst[i] for i in needed])
+    for i, guess in zip(needed, guesses):
+        s0s[i] = guess
 
     return s0s
 
@@ -657,7 +695,8 @@ def fit_one_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
                                  shared_smax=False,
                                  fixed_t0=True,
                                  fixed_Kd=False, Kd_value=None,
-                                 fixed_koff=False, koff_value=None):
+                                 fixed_koff=False, koff_value=None,
+                                 s0_guesses=None):
     """
     Global fit to a set of association and dissociation traces - one-to-one binding model.
     
@@ -693,6 +732,11 @@ def fit_one_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
         If True, koff is fixed to koff_value, default is False.
     koff_value : float, optional
         Value of koff to use if fixed_koff is True.
+    s0_guesses : list, optional
+        Initial signal of each association trace that is not continuous with the
+        previous dissociation, from initial_signal_guesses_where_needed. Computed
+        here if None; pass it to avoid recomputing it when fitting the same data
+        many times.
         
     Returns
     -------
@@ -721,7 +765,13 @@ def fit_one_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
     n_t0s = len(np.unique(smax_idx))*(not fixed_t0)
 
     continuos_time = detect_time_list_continuos(time_lst_assoc,disso_time_lst)
-    s0s            = guess_initial_signal(assoc_time_lst, assoc_signal_lst)
+
+    # Edited with AI assistance: the guess is used only for traces that are not
+    # continuous in time, and can be passed in when the same data is refitted many
+    # times (the confidence intervals refit it about a hundred times).
+    if s0_guesses is None:
+        s0_guesses = initial_signal_guesses_where_needed(assoc_time_lst, assoc_signal_lst, disso_time_lst)
+    s0s = s0_guesses
 
     # Pre-compute slice boundaries for output array
     _n_traces = len(time_lst_assoc)
@@ -777,9 +827,10 @@ def fit_one_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
 
     all_signal = np.concatenate([all_signal_assoc,all_signal_disso], axis=0)
 
-    global_fit_params, cov = curve_fit(fit_fx, 1, all_signal,
-                                       p0=initial_parameters,
-                                       bounds=(low_bounds, high_bounds))
+    # Edited with AI assistance: positive parameters are fitted on a log scale (curve_fit_log_scale)
+    global_fit_params, cov = curve_fit_log_scale(fit_fx, 1, all_signal,
+                                                 p0=initial_parameters,
+                                                 bounds=(low_bounds, high_bounds))
 
     predicted_curve = fit_fx(1, *global_fit_params)
 
@@ -991,7 +1042,8 @@ def fit_two_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
 
     all_signal = np.concatenate([all_signal_assoc, all_signal_disso], axis=0)
 
-    global_fit_params, cov = curve_fit(
+    # Edited with AI assistance: positive parameters are fitted on a log scale (curve_fit_log_scale)
+    global_fit_params, cov = curve_fit_log_scale(
         fit_fx,
         1,
         all_signal,
@@ -1227,7 +1279,8 @@ def fit_two_site_heterogeneous_ligand_assoc_and_disso(
 
     all_signal = np.concatenate([all_signal_assoc, all_signal_disso], axis=0)
 
-    global_fit_params, cov = curve_fit(
+    # Edited with AI assistance: positive parameters are fitted on a log scale (curve_fit_log_scale)
+    global_fit_params, cov = curve_fit_log_scale(
         fit_fx,
         1,
         all_signal,
@@ -1583,10 +1636,11 @@ def fit_one_site_assoc_and_disso_ktr(assoc_signal_lst, assoc_time_lst, analyte_c
         try:
             # Kd, koff, Ktr and Smax differ by orders of magnitude. Without scaling
             # by the Jacobian, the trust region can stop on xtol far from the minimum.
-            fit = curve_fit(fit_fx, 1, all_signal,
-                            p0=p0,
-                            bounds=(low_bounds, high_bounds),
-                            x_scale="jac")
+            # Edited with AI assistance: fitting them on a log scale also needs fewer evaluations.
+            fit = curve_fit_log_scale(fit_fx, 1, all_signal,
+                                      p0=p0,
+                                      bounds=(low_bounds, high_bounds),
+                                      x_scale="jac")
         except RuntimeError as error:
             last_error = error
             continue
@@ -1611,6 +1665,91 @@ def fit_one_site_assoc_and_disso_ktr(assoc_signal_lst, assoc_time_lst, analyte_c
 
     return global_fit_params, cov, fitted_values_assoc, fitted_values_disso
 
+
+def _asymmetric_ci95_limits(fit_fixed, estimate, rss_desired, initial_parameters, test_factors):
+    """
+    Lower and upper 95% confidence limits of one parameter, from the profile of the RSS.
+
+    Each limit is where the RSS of the global fit, with the parameter fixed, reaches
+    rss_desired. The parameter is moved away from the estimate by the test factors until
+    the RSS passes rss_desired, then the crossing inside that bracket is found with
+    brentq. Each refit starts from the refit at the nearest value already tried. The
+    estimate itself counts as below rss_desired, since it is the optimum.
+
+    If the RSS does not pass rss_desired within the test factors, the limit is searched
+    between 100 and 10,000 times the estimate (or 1/10,000 and 1/100 of it) by minimising
+    the distance to rss_desired, as before.
+
+    Parameters
+    ----------
+    fit_fixed : callable
+        fit_fixed(value, start) refits with the parameter fixed at value, starting from
+        the other parameters start, and returns (rss, fitted parameters).
+    estimate : float
+        Fitted value of the parameter.
+    rss_desired : float
+        RSS at the confidence limits.
+    initial_parameters : list
+        Start of the first refit, without the fixed parameter.
+    test_factors : list of float
+        Increasing factors (above 1) applied to the estimate to bracket each limit.
+
+    Returns
+    -------
+    float
+        Lower limit.
+    float
+        Upper limit.
+    """
+    # This function is AI generated.
+    refits = {}  # value -> (rss, parameters)
+
+    def rss_at(value):
+        if value not in refits:
+            if refits:
+                nearest = min(refits, key=lambda tried: abs(np.log(tried / value)))
+                start = refits[nearest][1]
+            else:
+                start = initial_parameters
+            refits[value] = fit_fixed(value, start)
+        return refits[value][0]
+
+    def excess(value):
+        excess = rss_at(value) - rss_desired
+        # The estimate is the optimum, so its RSS is below the target. A refit there can
+        # only exceed it by rounding, when the RSS is at rounding level (noise-free data).
+        return min(excess, -1e-12 * rss_desired) if value == estimate else excess
+
+    def distance_to_target(scaled_value):
+        return np.abs(rss_at(scaled_value / 1e3) - rss_desired)
+
+    limits = []
+    for direction in (1, -1):  # upper limit, then lower limit
+
+        # The inner end is the estimate or a value whose RSS is not above the target
+        bracket = None
+        inner = estimate
+        for factor in test_factors:
+            outer = estimate * factor ** direction
+            if rss_at(outer) > rss_desired:
+                bracket = sorted((inner, outer))
+                break
+            inner = outer
+
+        if bracket is not None:
+            limit = brentq(excess, *bracket, xtol=1e-12 * estimate, rtol=1e-8)
+        else:
+            # No crossing up to the last test factor: minimise the distance to rss_desired
+            # between 100 and 10,000 times the estimate (or the inverse), scaled by 1e3 as before
+            bracket = sorted((estimate * 1e2 ** direction, estimate * 1e4 ** direction))
+            result = minimize_scalar(distance_to_target, bounds=np.array(bracket) * 1e3, method='bounded')
+            limit = result.x / 1e3
+
+        limits.append(limit)
+
+    upper, lower = limits
+
+    return lower, upper
 
 def one_site_assoc_and_disso_asymmetric_ci95(kd_estimated, rss_desired,
                                              assoc_signal_lst, assoc_time_lst, analyte_conc_lst,
@@ -1664,92 +1803,33 @@ def one_site_assoc_and_disso_asymmetric_ci95(kd_estimated, rss_desired,
         Maximum Kd value for the 95% confidence interval.
     """
     # This function contains AI-generated changes (PR #15).
-    # Pre-concatenate the static reference signals once
+    # Edited with AI assistance: the limits are found with a root search and warm-started
+    # refits (_asymmetric_ci95_limits).
     _ref_assoc = concat_signal_lst(assoc_signal_lst)
     _ref_disso = concat_signal_lst(disso_signal_lst)
 
-    boundsMax = np.array([kd_estimated*1e2, kd_estimated * 1e4]) * 1e3
+    # Guess the initial signals once for all the refits
+    s0_guesses = initial_signal_guesses_where_needed(assoc_time_lst, assoc_signal_lst, disso_time_lst)
 
-    # Guess starting point for the upper bound
-    test_factors = [1,1.1,1.5, 2, 5, 10, 25,50,100]
-    for i,test_factor in enumerate(test_factors):
-
-        if test_factor == 1:
-            continue
-
-        _, _, fitted_values_assoc, fitted_values_disso = fit_one_site_assoc_and_disso(
+    def fit_fixed_kd(Kd, start):
+        """Refit with Kd fixed, starting at start; return the RSS and the parameters."""
+        params, _, fitted_values_assoc, fitted_values_disso = fit_one_site_assoc_and_disso(
             assoc_signal_lst, assoc_time_lst, analyte_conc_lst,
             disso_signal_lst, disso_time_lst,
-            initial_parameters, low_bounds, high_bounds,
+            np.clip(start, low_bounds, high_bounds), low_bounds, high_bounds,
             smax_idx=smax_idx,
             shared_smax=shared_smax,
             fixed_t0=fixed_t0,
-            fixed_Kd=True, Kd_value=kd_estimated*test_factor,
+            s0_guesses=s0_guesses,
+            fixed_Kd=True, Kd_value=Kd,
             fixed_koff=fixed_koff, koff_value=koff_value)
 
-        rss1 = get_rss(_ref_assoc, concat_signal_lst(fitted_values_assoc))
-        rss2 = get_rss(_ref_disso, concat_signal_lst(fitted_values_disso))
+        rss = (get_rss(_ref_assoc, concat_signal_lst(fitted_values_assoc)) +
+               get_rss(_ref_disso, concat_signal_lst(fitted_values_disso)))
+        return rss, params
 
-        if rss1 + rss2 > rss_desired:
-            boundsMax = np.array([kd_estimated*test_factors[i-1],
-                                  kd_estimated *test_factor]) * 1e3
-            break
-
-    boundsMin = np.array([kd_estimated/1e4, kd_estimated / 1e2]) * 1e3
-
-    # Guess starting point for the lower bound
-    for i,test_factor in enumerate(test_factors):
-
-        if test_factor == 1:
-            continue
-
-        _, _, fitted_values_assoc, fitted_values_disso = fit_one_site_assoc_and_disso(
-            assoc_signal_lst, assoc_time_lst, analyte_conc_lst,
-            disso_signal_lst, disso_time_lst,
-            initial_parameters, low_bounds, high_bounds,
-            smax_idx=smax_idx,
-            shared_smax=shared_smax,
-            fixed_t0=fixed_t0,
-            fixed_Kd=True, Kd_value=kd_estimated/test_factor,
-            fixed_koff=fixed_koff, koff_value=koff_value)
-
-        rss1 = get_rss(_ref_assoc, concat_signal_lst(fitted_values_assoc))
-        rss2 = get_rss(_ref_disso, concat_signal_lst(fitted_values_disso))
-
-        if rss1 + rss2 > rss_desired:
-            boundsMin = np.array([kd_estimated/test_factor,
-                                  kd_estimated / test_factors[i-1]]) * 1e3
-            break
-
-    def f_to_optimize(Kd):
-        """Measure the global fit's RSS difference from the Kd limit target."""
-
-        Kd = Kd / 1e3
-
-        _, _, fitted_values_assoc, fitted_values_disso = fit_one_site_assoc_and_disso(
-                                                            assoc_signal_lst, assoc_time_lst, analyte_conc_lst,
-                                                            disso_signal_lst, disso_time_lst,
-                                                            initial_parameters,low_bounds, high_bounds,
-                                                            smax_idx=smax_idx,
-                                                            shared_smax=shared_smax,
-                                                            fixed_t0=fixed_t0,
-                                                            fixed_Kd=True,Kd_value=Kd,
-                                                            fixed_koff=fixed_koff,koff_value=koff_value)
-
-        rss1 = get_rss(_ref_assoc, concat_signal_lst(fitted_values_assoc))
-        rss2 = get_rss(_ref_disso, concat_signal_lst(fitted_values_disso))
-
-        return np.abs(rss1 + rss2 - rss_desired)
-
-    kd_min95 = minimize_scalar(f_to_optimize, bounds=boundsMin,method='bounded')
-    kd_max95 = minimize_scalar(f_to_optimize, bounds=boundsMax,method='bounded')
-
-    kd_min95, kd_max95 = kd_min95.x, kd_max95.x
-
-    # Rescale back the Kd to micromolar
-    kd_min95, kd_max95 = kd_min95 / 1e3, kd_max95 / 1e3
-
-    return kd_min95, kd_max95
+    return _asymmetric_ci95_limits(fit_fixed_kd, kd_estimated, rss_desired, initial_parameters,
+                                   test_factors=[1.1, 1.5, 2, 5, 10, 25, 50, 100])
 
 def one_site_assoc_and_disso_asymmetric_ci95_koff(koff_estimated, rss_desired,
                                              assoc_signal_lst, assoc_time_lst, analyte_conc_lst,
@@ -1798,87 +1878,29 @@ def one_site_assoc_and_disso_asymmetric_ci95_koff(koff_estimated, rss_desired,
         Maximum koff value for the 95% confidence interval.
     """
     # This function contains AI-generated changes (PR #15).
-    # Pre-concatenate the static reference signals once
+    # Edited with AI assistance: the limits are found with a root search and warm-started
+    # refits (_asymmetric_ci95_limits).
     _ref_assoc = concat_signal_lst(assoc_signal_lst)
     _ref_disso = concat_signal_lst(disso_signal_lst)
 
-    boundsMax = np.array([koff_estimated*1e2, koff_estimated * 1e4]) * 1e3
+    # Guess the initial signals once for all the refits
+    s0_guesses = initial_signal_guesses_where_needed(assoc_time_lst, assoc_signal_lst, disso_time_lst)
 
-    # Guess starting point for the upper bound
-    test_factors = [1,1.02,1.1,1.5, 2, 5, 10, 25,50,100]
-    for i,test_factor in enumerate(test_factors):
-
-        if test_factor == 1:
-            continue
-
-        _, _, fitted_values_assoc, fitted_values_disso = fit_one_site_assoc_and_disso(
+    def fit_fixed_koff(Koff, start):
+        """Refit with koff fixed, starting at start; return the RSS and the parameters."""
+        params, _, fitted_values_assoc, fitted_values_disso = fit_one_site_assoc_and_disso(
             assoc_signal_lst, assoc_time_lst, analyte_conc_lst,
             disso_signal_lst, disso_time_lst,
-            initial_parameters, low_bounds, high_bounds,
+            np.clip(start, low_bounds, high_bounds), low_bounds, high_bounds,
             smax_idx=smax_idx,
             shared_smax=shared_smax,
             fixed_t0=fixed_t0,
-            fixed_koff=True, koff_value=koff_estimated*test_factor)
+            s0_guesses=s0_guesses,
+            fixed_koff=True, koff_value=Koff)
 
-        rss1 = get_rss(_ref_assoc, concat_signal_lst(fitted_values_assoc))
-        rss2 = get_rss(_ref_disso, concat_signal_lst(fitted_values_disso))
+        rss = (get_rss(_ref_assoc, concat_signal_lst(fitted_values_assoc)) +
+               get_rss(_ref_disso, concat_signal_lst(fitted_values_disso)))
+        return rss, params
 
-        if rss1 + rss2 > rss_desired:
-            boundsMax = np.array([koff_estimated*test_factors[i-1],
-                                  koff_estimated *test_factor]) * 1e3
-            break
-
-    boundsMin = np.array([koff_estimated/1e4, koff_estimated / 1e2]) * 1e3
-
-    # Guess starting point for the lower bound
-    for i,test_factor in enumerate(test_factors):
-
-        if test_factor == 1:
-            continue
-
-        _, _, fitted_values_assoc, fitted_values_disso = fit_one_site_assoc_and_disso(
-            assoc_signal_lst, assoc_time_lst, analyte_conc_lst,
-            disso_signal_lst, disso_time_lst,
-            initial_parameters, low_bounds, high_bounds,
-            smax_idx=smax_idx,
-            shared_smax=shared_smax,
-            fixed_t0=fixed_t0,
-            fixed_koff=True, koff_value=koff_estimated/test_factor)
-
-        rss1 = get_rss(_ref_assoc, concat_signal_lst(fitted_values_assoc))
-        rss2 = get_rss(_ref_disso, concat_signal_lst(fitted_values_disso))
-
-        if rss1 + rss2 > rss_desired:
-            boundsMin = np.array([koff_estimated/test_factor,
-                                  koff_estimated / test_factors[i-1]]) * 1e3
-            break
-
-    def f_to_optimize(Koff):
-        """Measure the global fit's RSS difference from the koff limit target."""
-
-        Koff = Koff / 1e3
-
-        _, _, fitted_values_assoc, fitted_values_disso = fit_one_site_assoc_and_disso(
-                                                            assoc_signal_lst, assoc_time_lst, analyte_conc_lst,
-                                                            disso_signal_lst, disso_time_lst,
-                                                            initial_parameters,low_bounds, high_bounds,
-                                                            smax_idx=smax_idx,
-                                                            shared_smax=shared_smax,
-                                                            fixed_t0=fixed_t0,
-                                                            fixed_koff=True,
-                                                            koff_value=Koff)
-
-        rss1 = get_rss(_ref_assoc, concat_signal_lst(fitted_values_assoc))
-        rss2 = get_rss(_ref_disso, concat_signal_lst(fitted_values_disso))
-
-        return np.abs(rss1 + rss2 - rss_desired)
-
-    k_min95 = minimize_scalar(f_to_optimize, bounds=boundsMin,method='bounded')
-    k_max95 = minimize_scalar(f_to_optimize, bounds=boundsMax,method='bounded')
-
-    k_min95, k_max95 = k_min95.x, k_max95.x
-
-    # Rescale back the k_off
-    k_min95, k_max95 = k_min95 / 1e3, k_max95 / 1e3
-
-    return k_min95, k_max95
+    return _asymmetric_ci95_limits(fit_fixed_koff, koff_estimated, rss_desired, initial_parameters,
+                                   test_factors=[1.02, 1.1, 1.5, 2, 5, 10, 25, 50, 100])
