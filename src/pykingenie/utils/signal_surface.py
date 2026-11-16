@@ -1026,14 +1026,21 @@ def ode_mixture_analyte_association(t, Ris, C_TOT, Fis, Ris_max, koffs, Kds):
 
 def solve_ode_mixture_analyte_association(t, Ris0, C_TOT, Fis, Ris_max, koffs, Kds, t0=0):
     """
-    Solves the ODE for the mixture analyte model - association phase
+    Solves the mixture analyte model - association phase.
+
+    The equations of ``ode_mixture_analyte_association`` are linear,
+
+        dR/dt = A·R + b,  A = −diag(koffs) − u·vᵀ,  b = u,
+
+    with u_i = kon_i·F_i·C_TOT·Ris_max_i and v_j = 1/Ris_max_j, so they are
+    solved exactly with ``solve_all_states_fast`` instead of numerically.
 
     Parameters
     ----------
     t : np.ndarray
         Time variable.
     Ris0 : list
-        Initial response of each analyte.
+        Response of each analyte when the association starts.
     C_TOT : float
         Total concentration of the analyte mixture.
     Fis : np.ndarray
@@ -1045,22 +1052,32 @@ def solve_ode_mixture_analyte_association(t, Ris0, C_TOT, Fis, Ris_max, koffs, K
     Kds : np.ndarray
         Equilibrium dissociation constants.
     t0 : float, optional
-        Initial time offset, default is 0.
+        Time after the first time point at which the association starts
+        (the response is Ris0 then), default is 0.
 
     Returns
     -------
     np.ndarray
-        Response of EACH ANALYTE over time.
+        Response of EACH ANALYTE over time, shape (number of analytes, len(t)).
     """
     # Edited with AI assistance and reviewed by a human in PR #16: tighter solver tolerances.
+    # Edited with AI assistance: exact solution of the linear system, and t0 shifts the start
+    # (with solve_ivp starting at the first time point, t0 had no effect).
+    t = np.asarray(t, dtype=float)
+    elapsed = t - np.min(t) - t0
 
-    t = t + t0
+    Ris_max = np.atleast_1d(np.asarray(Ris_max, dtype=float))
+    koffs = np.atleast_1d(np.asarray(koffs, dtype=float))
+    Fis = np.atleast_1d(np.asarray(Fis, dtype=float))
+    kons = koffs / np.atleast_1d(np.asarray(Kds, dtype=float))
 
-    out = solve_ivp(ode_mixture_analyte_association, t_span=[np.min(t), np.max(t)],
-                    t_eval=t, y0=Ris0, args=(C_TOT, Fis, Ris_max, koffs, Kds), method="LSODA",
-                    rtol=1e-8, atol=1e-10 * np.max(Ris_max))
+    u = kons * Fis * C_TOT * Ris_max
+    A = -np.diag(koffs) - np.outer(u, 1.0 / Ris_max)
 
-    return out.y
+    steady_state = solve_steady_state(A, u)
+    states = solve_all_states_fast(elapsed, A, np.asarray(Ris0, dtype=float), steady_state)
+
+    return states.T
 
 def ode_mixture_analyte_dissociation(t, Ris, koffs):
     """
@@ -1095,34 +1112,37 @@ def ode_mixture_analyte_dissociation(t, Ris, koffs):
 
 def solve_ode_mixture_analyte_dissociation(t, Ris0, koffs, t0=0):
     """
-    Solves the ODE for the mixture analyte model - dissociation phase
+    Solves the mixture analyte model - dissociation phase.
+
+    Each analyte dissociates on its own, so the solution is exact:
+    R_i(t) = Ris0_i·exp(−koff_i·t).
 
     Parameters
     ----------
     t : np.ndarray
         Time variable.
     Ris0 : list
-        Initial response of each analyte.
+        Response of each analyte when the dissociation starts.
     koffs : np.ndarray
         Dissociation rate constants.
     t0 : float, optional
-        Initial time offset, default is 0.
+        Time after the first time point at which the dissociation starts
+        (the response is Ris0 then), default is 0.
 
     Returns
     -------
     np.ndarray
-        Response of EACH ANALYTE over time.
+        Response of EACH ANALYTE over time, shape (number of analytes, len(t)).
     """
     # Edited with AI assistance and reviewed by a human in PR #16: tighter solver tolerances.
+    # Edited with AI assistance: exact solution, and t0 shifts the start (it had no effect).
+    t = np.asarray(t, dtype=float)
+    elapsed = t - np.min(t) - t0
 
-    t = t + t0
+    Ris0 = np.atleast_1d(np.asarray(Ris0, dtype=float))
+    koffs = np.atleast_1d(np.asarray(koffs, dtype=float))
 
-    out = solve_ivp(ode_mixture_analyte_dissociation, t_span=[np.min(t), np.max(t)],
-                    t_eval=t, y0=Ris0, args=(koffs,), method="LSODA",
-                    rtol=1e-8, atol=1e-10 * max(np.max(np.abs(Ris0)), 1e-300))
-
-    return out.y
-
+    return Ris0[:, None] * np.exp(-np.outer(koffs, elapsed))
 
 def _validate_fraction_site1(fraction_site1):
     """Validate that a site-1 population fraction lies between zero and one."""
