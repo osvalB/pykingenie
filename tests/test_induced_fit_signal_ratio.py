@@ -344,3 +344,14 @@ def test_fitter_default_keeps_equal_signals():
     assert not fitter.fit_signal_ratio
     assert 'Signal ratio (AL/ALint)' not in fitter.fit_params_kinetics.columns
     assert len(fitter.params) == 5
+
+
+def test_signal_columns_from_the_states():
+    # This test is AI generated.
+    from pykingenie.utils.signal_surface import _induced_fit_signal_columns
+    states = np.array([[1.0, 0.5], [2.0, 1.5], [0.0, 3.0]])
+    columns = _induced_fit_signal_columns(states, smax=5.0, signal_ratio=2.0)
+    es_complex = 5.0 - states[:, 0] - states[:, 1]
+    np.testing.assert_array_equal(columns[:, 1], es_complex)
+    np.testing.assert_array_equal(columns[:, 2], states[:, 1])
+    np.testing.assert_array_equal(columns[:, 0], es_complex + 2.0 * states[:, 1])
