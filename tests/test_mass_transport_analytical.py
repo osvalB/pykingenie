@@ -99,6 +99,18 @@ def test_starting_at_equilibrium_stays_constant():
     np.testing.assert_allclose(s, s_eq, rtol=1e-12)
 
 
+@pytest.mark.parametrize("ktr", [0.01, np.inf])
+def test_starting_exactly_at_equilibrium(ktr):
+    """Exactly at equilibrium the Lambert W form is undefined (ln 0), so the constant is returned."""
+    # Dissociation from an empty surface stays empty
+    s = one_site_mass_transport_dissociation_analytical(T, 0.0, 0.5, 0.05, ktr, SMAX)
+    np.testing.assert_array_equal(s, 0.0)
+
+    # Kd = c and Smax = 1 make the equilibrium exactly 0.5 in floating point
+    s = one_site_mass_transport_association_analytical(T, 0.5, 1.0, 1.0, 0.05, ktr, 1.0)
+    np.testing.assert_array_equal(s, 0.5)
+
+
 def test_infinite_ktr_is_the_one_to_one_model():
     Kd, koff, conc = 0.5, 0.05, 1.0
     assoc = one_site_mass_transport_association_analytical(T, 0.0, conc, Kd, koff, np.inf, SMAX)
