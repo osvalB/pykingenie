@@ -12,8 +12,8 @@ from .signal_surface import (
     steady_state_two_site_heterogeneous_ligand,
     one_site_association_analytical,
     one_site_dissociation_analytical,
-    solve_ode_one_site_mass_transport_association,
-    solve_ode_one_site_mass_transport_dissociation,
+    one_site_mass_transport_association_analytical,
+    one_site_mass_transport_dissociation_analytical,
     solve_induced_fit_association,
     solve_induced_fit_dissociation,
     solve_two_site_association,
@@ -1537,10 +1537,10 @@ def fit_one_site_assoc_and_disso_ktr(assoc_signal_lst, assoc_time_lst, analyte_c
             else:
                 s0 = 0.0
 
-            y_assoc = solve_ode_one_site_mass_transport_association(t_assoc-t_assoc[0],s0,analyte_conc,Kd,Koff,k_tr,s_max,t0)
+            y_assoc = one_site_mass_transport_association_analytical(t_assoc-t_assoc[0],s0,analyte_conc,Kd,Koff,k_tr,s_max,t0)
             out[_a_offsets[i]:_a_offsets[i + 1]] = y_assoc
 
-            y_disso = solve_ode_one_site_mass_transport_dissociation(t_dissoc,y_assoc[-1],Kd,Koff,k_tr,s_max)
+            y_disso = one_site_mass_transport_dissociation_analytical(t_dissoc,y_assoc[-1],Kd,Koff,k_tr,s_max)
             out[_d_offsets[i]:_d_offsets[i + 1]] = y_disso
 
             prev_disso_end = y_disso[-1]
