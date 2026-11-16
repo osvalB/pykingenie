@@ -718,18 +718,21 @@ class KineticsAnalyzer:
 
         return successful_fits, failed_fits
 
-    def calculate_asymmetric_error(self, shared_smax=True, fixed_t0=True, fit_ktr=False):
+    def calculate_asymmetric_error(self, shared_smax=None, fixed_t0=None, fit_ktr=None):
         """
         Calculate asymmetric error (confidence intervals) for all fitting objects.
+
+        Each fitting object uses the settings of its own fit. The arguments are
+        kept for backward compatibility: if given, they must match those settings.
 
         Parameters
         ----------
         shared_smax : bool, optional
-            Whether Smax is shared across different curves. Default is True.
+            Whether Smax is shared across different curves. Default is None (use the fit's setting).
         fixed_t0 : bool, optional
-            Whether t0 (start time) is fixed during fitting. Default is True.
+            Whether t0 (start time) is fixed during fitting. Default is None (use the fit's setting).
         fit_ktr : bool, optional
-            Whether to fit mass transport limitation parameter ktr. Default is False.
+            Whether the mass transport parameter ktr was fitted. Default is None (use the fit's setting).
 
         Returns
         -------

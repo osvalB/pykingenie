@@ -2193,32 +2193,64 @@ class KineticsFitter(KineticsFitterGeneral):
 
         return None
 
-    def calculate_ci95(self, shared_smax=True, fixed_t0=True, fit_ktr=False):
+    def calculate_ci95(self, shared_smax=None, fixed_t0=None, fit_ktr=None):
         """
         Calculate 95% confidence intervals for the fitted parameters.
         
         This method computes asymmetrical 95% confidence intervals for the
-        equilibrium dissociation constant (Kd) and the dissociation rate constant (k_off).
+        equilibrium dissociation constant (Kd) and the dissociation rate constant (k_off)
+        of the one-site association and dissociation fit.
         
         Parameters
         ----------
         shared_smax : bool, optional
-            Whether Smax was shared across curves with the same Smax ID, default is True.
+            Whether Smax was shared across curves with the same Smax ID. Default is
+            None: use the setting of the fit.
         fixed_t0 : bool, optional
-            Whether the time offset (t0) was fixed to zero, default is True.
+            Whether the time offset (t0) was fixed to zero. Default is None: use the
+            setting of the fit.
         fit_ktr : bool, optional
-            Whether mass transport rate constants were included in the model, default is False.
+            Whether mass transport rate constants were included in the model. Default
+            is None: use the setting of the fit.
             
         Returns
         -------
         None
             Updates the fit_params_kinetics_ci95 attribute with a DataFrame containing
             the 95% confidence intervals for Kd and k_off.
+        
+        Raises
+        ------
+        ValueError
+            If a setting is given and differs from the one used by the fit. The
+            fitted parameters would otherwise be read in the wrong order.
             
         Notes
         -----
-        This method will create an empty DataFrame if the confidence interval calculation fails.
+        This method will create an empty DataFrame if the confidence interval
+        calculation fails, if the last fit is not the one-site association and
+        dissociation fit, or if it included mass transport.
         """
+        # Edited with AI assistance: use the settings of the fit instead of the caller's.
+        fit_settings = {'shared_smax': getattr(self, 'shared_smax', None),
+                        'fixed_t0':    getattr(self, 'fixed_t0', None),
+                        'fit_ktr':     getattr(self, 'fit_ktr', None)}
+        given = {'shared_smax': shared_smax, 'fixed_t0': fixed_t0, 'fit_ktr': fit_ktr}
+
+        for name, value in given.items():
+            if value is not None and fit_settings[name] is not None and value != fit_settings[name]:
+                raise ValueError(
+                    f"{name}={value} differs from the fit, which used {name}={fit_settings[name]}. "
+                    f"Leave it out to use the setting of the fit.")
+
+        # Only the one-site association and dissociation fit is supported. Other
+        # models have other parameters, and the mass transport case is not done.
+        if getattr(self, 'model', None) != "one_site_association_and_dissociation" or fit_settings['fit_ktr']:
+            self.fit_params_kinetics_ci95 = pd.DataFrame()
+            return None
+
+        shared_smax = fit_settings['shared_smax']
+        fixed_t0    = fit_settings['fixed_t0']
 
         try:
 

@@ -23,7 +23,7 @@ krev = 100
 
 noise = np.random.default_rng(42).normal(0, 0.0001, len(t))
 
-def generate_ys(E_tot,S_tot,kc,krev,kon,koff,signal_E1, signal_E2, signal_S, signal_E2S):
+def generate_ys(E_tot,S_tot,kc,krev,kon,koff,signal_E1, signal_E2, signal_S, signal_E2S, t0=0):
 
     ys = []
 
@@ -34,7 +34,7 @@ def generate_ys(E_tot,S_tot,kc,krev,kon,koff,signal_E1, signal_E2, signal_S, sig
         y0 = [E2, 0]
 
         y = signal_ode_conformational_selection_insolution(
-            t, y0, kc,krev,kon,koff, E_tot, S_tot[i], 0,
+            t, y0, kc,krev,kon,koff, E_tot, S_tot[i], t0,
             signal_E1, signal_E2, signal_S, signal_E2S)
 
         y += noise
@@ -50,13 +50,16 @@ def test_fit_cs_solution_fixed_constants_t0():
     signal_S = 0
     signal_E2S = 20
 
-    signal_lst = generate_ys(E_tot,S_tot[-3:],kc,krev,kon,koff,signal_E, signal_E, signal_S, signal_E2S)
+    # The reaction starts 0.03 s before the first time point (a mixing dead time).
+    # Edited with AI assistance: before, the time axis was shifted instead, which a
+    # dead time cannot express, and the test passed only because t0 had no effect.
+    signal_lst = generate_ys(E_tot,S_tot[-3:],kc,krev,kon,koff,signal_E, signal_E, signal_S, signal_E2S, t0=0.03)
 
-    time_lst = [t + 0.03] * len(signal_lst)
+    time_lst = [t] * len(signal_lst)
     ligand_conc_lst = S_tot[-3:]
     protein_conc_lst = [E_tot] * len(signal_lst)
 
-    initial_parameters = [20] + ([0.03] * len(time_lst))
+    initial_parameters = [20] + ([0.01] * len(time_lst))
     low_bounds = [10] + ([0.003] * len(time_lst))
     high_bounds = [30] + ([0.3] * len(time_lst))
 
