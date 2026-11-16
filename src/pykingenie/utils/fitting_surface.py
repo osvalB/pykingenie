@@ -93,6 +93,44 @@ def guess_initial_signal(assoc_time_lst, assoc_signal_lst, time_limit=30):
 
     return s0s
 
+def initial_signal_guesses_where_needed(assoc_time_lst, assoc_signal_lst, disso_time_lst):
+    """
+    Guess the initial signal only for the association traces that need it.
+
+    The one-to-one fit chains each association from the previous dissociation when
+    the two are continuous in time, or starts it from zero. Only the other traces use
+    the guess from guess_initial_signal, so the single-exponential fits are skipped
+    for the rest.
+
+    Parameters
+    ----------
+    assoc_time_lst : list
+        List of association time arrays.
+    assoc_signal_lst : list
+        List of association signal arrays.
+    disso_time_lst : list
+        List of dissociation time arrays, as given to the fit.
+
+    Returns
+    -------
+    list
+        Initial signal guess for each association trace, None where it is not used.
+    """
+    # This function is AI generated.
+    continuos_time = detect_time_list_continuos(assoc_time_lst, disso_time_lst)
+    needed = [i for i, continuos in enumerate(continuos_time) if not continuos]
+
+    s0s = [None] * len(assoc_time_lst)
+    if not needed:
+        return s0s
+
+    guesses = guess_initial_signal([assoc_time_lst[i] for i in needed],
+                                   [assoc_signal_lst[i] for i in needed])
+    for i, guess in zip(needed, guesses):
+        s0s[i] = guess
+
+    return s0s
+
 def get_smax_upper_bound_factor(Kd_ss):
     """
     Get a factor to determine the upper bound for Smax based on Kd_ss value.
@@ -655,7 +693,8 @@ def fit_one_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
                                  shared_smax=False,
                                  fixed_t0=True,
                                  fixed_Kd=False, Kd_value=None,
-                                 fixed_koff=False, koff_value=None):
+                                 fixed_koff=False, koff_value=None,
+                                 s0_guesses=None):
     """
     Global fit to a set of association and dissociation traces - one-to-one binding model.
     
@@ -691,6 +730,11 @@ def fit_one_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
         If True, koff is fixed to koff_value, default is False.
     koff_value : float, optional
         Value of koff to use if fixed_koff is True.
+    s0_guesses : list, optional
+        Initial signal of each association trace that is not continuous with the
+        previous dissociation, from initial_signal_guesses_where_needed. Computed
+        here if None; pass it to avoid recomputing it when fitting the same data
+        many times.
         
     Returns
     -------
@@ -719,7 +763,13 @@ def fit_one_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
     n_t0s = len(np.unique(smax_idx))*(not fixed_t0)
 
     continuos_time = detect_time_list_continuos(time_lst_assoc,disso_time_lst)
-    s0s            = guess_initial_signal(assoc_time_lst, assoc_signal_lst)
+
+    # Edited with AI assistance: the guess is used only for traces that are not
+    # continuous in time, and can be passed in when the same data is refitted many
+    # times (the confidence intervals refit it about a hundred times).
+    if s0_guesses is None:
+        s0_guesses = initial_signal_guesses_where_needed(assoc_time_lst, assoc_signal_lst, disso_time_lst)
+    s0s = s0_guesses
 
     # Pre-compute slice boundaries for output array
     _n_traces = len(time_lst_assoc)
@@ -1666,6 +1716,9 @@ def one_site_assoc_and_disso_asymmetric_ci95(kd_estimated, rss_desired,
     _ref_assoc = concat_signal_lst(assoc_signal_lst)
     _ref_disso = concat_signal_lst(disso_signal_lst)
 
+    # Edited with AI assistance: guess the initial signals once for all the refits
+    s0_guesses = initial_signal_guesses_where_needed(assoc_time_lst, assoc_signal_lst, disso_time_lst)
+
     boundsMax = np.array([kd_estimated*1e2, kd_estimated * 1e4]) * 1e3
 
     # Guess starting point for the upper bound
@@ -1682,6 +1735,7 @@ def one_site_assoc_and_disso_asymmetric_ci95(kd_estimated, rss_desired,
             smax_idx=smax_idx,
             shared_smax=shared_smax,
             fixed_t0=fixed_t0,
+            s0_guesses=s0_guesses,
             fixed_Kd=True, Kd_value=kd_estimated*test_factor,
             fixed_koff=fixed_koff, koff_value=koff_value)
 
@@ -1708,6 +1762,7 @@ def one_site_assoc_and_disso_asymmetric_ci95(kd_estimated, rss_desired,
             smax_idx=smax_idx,
             shared_smax=shared_smax,
             fixed_t0=fixed_t0,
+            s0_guesses=s0_guesses,
             fixed_Kd=True, Kd_value=kd_estimated/test_factor,
             fixed_koff=fixed_koff, koff_value=koff_value)
 
@@ -1731,6 +1786,7 @@ def one_site_assoc_and_disso_asymmetric_ci95(kd_estimated, rss_desired,
                                                             smax_idx=smax_idx,
                                                             shared_smax=shared_smax,
                                                             fixed_t0=fixed_t0,
+            s0_guesses=s0_guesses,
                                                             fixed_Kd=True,Kd_value=Kd,
                                                             fixed_koff=fixed_koff,koff_value=koff_value)
 
@@ -1800,6 +1856,9 @@ def one_site_assoc_and_disso_asymmetric_ci95_koff(koff_estimated, rss_desired,
     _ref_assoc = concat_signal_lst(assoc_signal_lst)
     _ref_disso = concat_signal_lst(disso_signal_lst)
 
+    # Edited with AI assistance: guess the initial signals once for all the refits
+    s0_guesses = initial_signal_guesses_where_needed(assoc_time_lst, assoc_signal_lst, disso_time_lst)
+
     boundsMax = np.array([koff_estimated*1e2, koff_estimated * 1e4]) * 1e3
 
     # Guess starting point for the upper bound
@@ -1816,6 +1875,7 @@ def one_site_assoc_and_disso_asymmetric_ci95_koff(koff_estimated, rss_desired,
             smax_idx=smax_idx,
             shared_smax=shared_smax,
             fixed_t0=fixed_t0,
+            s0_guesses=s0_guesses,
             fixed_koff=True, koff_value=koff_estimated*test_factor)
 
         rss1 = get_rss(_ref_assoc, concat_signal_lst(fitted_values_assoc))
@@ -1841,6 +1901,7 @@ def one_site_assoc_and_disso_asymmetric_ci95_koff(koff_estimated, rss_desired,
             smax_idx=smax_idx,
             shared_smax=shared_smax,
             fixed_t0=fixed_t0,
+            s0_guesses=s0_guesses,
             fixed_koff=True, koff_value=koff_estimated/test_factor)
 
         rss1 = get_rss(_ref_assoc, concat_signal_lst(fitted_values_assoc))
@@ -1863,6 +1924,7 @@ def one_site_assoc_and_disso_asymmetric_ci95_koff(koff_estimated, rss_desired,
                                                             smax_idx=smax_idx,
                                                             shared_smax=shared_smax,
                                                             fixed_t0=fixed_t0,
+            s0_guesses=s0_guesses,
                                                             fixed_koff=True,
                                                             koff_value=Koff)
 
