@@ -174,6 +174,38 @@ def test_backward_past_full_surface_stays_finite():
         np.testing.assert_allclose(s[before][::-1], ref, rtol=1e-7)
 
 
+@pytest.mark.parametrize("ktr", [1e-3, 1e-1, 1e1, np.inf])
+def test_single_cycle_chain_matches_ode(ktr):
+    """Single-cycle kinetics: each step starts where the previous one ended, on absolute times.
+
+    The closed-form chain and an ODE chain integrated with tight tolerances stay together
+    over five association/dissociation cycles, so no error builds up from step to step.
+    """
+    Kd, koff, smax = 0.5, 0.01, 5.0
+    concs = [Kd * x for x in (0.1, 0.3, 1, 3, 10)]
+    s_ana = s_ode = 0.0
+    t_start, peak = 0.0, 0.0
+    for conc in concs:
+        t_a = t_start + np.linspace(0, 120, 121)
+        t_d = t_a[-1] + np.linspace(0, 240, 121)
+
+        a_ana = one_site_mass_transport_association_analytical(t_a, s_ana, conc, Kd, koff, ktr, smax)
+        d_ana = one_site_mass_transport_dissociation_analytical(t_d, a_ana[-1], Kd, koff, ktr, smax)
+        a_ode = _reference_ode(t_a, s_ode, conc, Kd, koff, ktr, smax)
+        d_ode = _reference_ode(t_d, a_ode[-1], 0.0, Kd, koff, ktr, smax)
+
+        np.testing.assert_allclose(a_ana, a_ode, rtol=0, atol=1e-9 * smax)
+        np.testing.assert_allclose(d_ana, d_ode, rtol=0, atol=1e-9 * smax)
+        assert a_ana[0] == s_ana  # each step starts exactly where the last one ended
+
+        s_ana, s_ode = d_ana[-1], d_ode[-1]
+        peak = max(peak, a_ana[-1])
+        t_start = t_d[-1]
+
+    # The signal builds up over the run (slowly when strongly transport limited), so the check is not trivial
+    assert peak > 0.1 * smax
+
+
 def test_fit_uses_closed_form(monkeypatch):
     """The fit no longer calls the ODE solver, and recovers parameters from ODE-simulated data."""
     Kd, koff, ktr, smax = 0.5, 0.01, 0.05, 5.0

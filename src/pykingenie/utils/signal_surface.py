@@ -389,6 +389,7 @@ def one_site_mass_transport_analytical(t, s1_0, analyte_conc, K_d, k_off, k_tr, 
 
         L0 = np.log(abs(y0)) + y0
         y  = _lambertw_log_form(L0 - k_s * elapsed / B, y0)
+        y[elapsed == 0] = y0
         # Written relative to s0 so the first point is exact
         s  = s0 - (B / k) * (y - y0)
 
