@@ -14,6 +14,9 @@ __all__ = [
     'ode_one_site_mass_transport',
     'solve_ode_one_site_mass_transport_association',
     'solve_ode_one_site_mass_transport_dissociation',
+    'one_site_mass_transport_analytical',
+    'one_site_mass_transport_association_analytical',
+    'one_site_mass_transport_dissociation_analytical',
     'differential_matrix_association_induced_fit',
     'differential_matrix_association_conformational_selection',
     'differential_matrix_dissociation_induced_fit',
@@ -248,6 +251,224 @@ def solve_ode_one_site_mass_transport_dissociation(t, s1_0, K_d, k_off, k_tr, s_
                     rtol=1e-8,atol=1e-10*s_max)
 
     return out.y[0]
+
+def _lambertw_log_form(L, y0, n_newton=4):
+    """
+    Solve ``ln|y| + y = L`` on the branch through ``y0``.
+
+    This is the principal branch of the Lambert W function, y = W0(sign(y0) * exp(L)),
+    written so that exp(L) is never formed when it would overflow. Forward in time
+    (L below its value at y0) y moves from y0 towards 0. Backward in time it moves away
+    from 0; for y0 < 0 it stops at -1, the end of the principal branch.
+
+    Parameters
+    ----------
+    L : np.ndarray
+        Right-hand side, ``ln|y0| + y0`` minus the scaled elapsed time.
+    y0 : float
+        Value at time zero, not 0. Sets the sign of the solution.
+    n_newton : int, optional
+        Newton steps used to polish the starting guess, default is 4.
+
+    Returns
+    -------
+    np.ndarray
+        The solution y, with the same shape as L.
+    """
+    # This function is AI generated.
+    from scipy.special import lambertw
+
+    L = np.asarray(L, dtype=float)
+    backward = L > np.log(abs(y0)) + y0
+
+    # Bounds per point: between y0 and 0 forward in time, beyond y0 backward
+    if y0 > 0:
+        lo = np.where(backward, y0, 0.0)
+        hi = np.where(backward, np.inf, y0)
+    else:
+        lo = np.where(backward, -1.0, y0)
+        hi = np.where(backward, y0, 0.0)
+
+    with np.errstate(over='ignore', under='ignore', invalid='ignore', divide='ignore'):
+        if y0 > 0:
+            # W0(exp(L)) for moderate L, asymptotic expansion where exp(L) overflows
+            big = L > 700
+            y = np.empty_like(L)
+            y[~big] = lambertw(np.exp(L[~big])).real
+            lb = L[big]
+            y[big] = lb - np.log(lb) + np.log(lb) / lb
+        else:
+            # -exp(L) >= -1/e except backward past the branch point, where W0 is clipped to -1
+            y = lambertw(np.maximum(-np.exp(L), -np.exp(-1.0))).real
+
+        y = np.clip(y, lo, hi)
+
+        # Newton on f(y) = ln|y| + y - L, f'(y) = (1 + y) / y. Polishes the guess where the
+        # direct Lambert W evaluation loses precision (near y = -1 and where exp(L) overflowed).
+        active = y != 0
+        for _ in range(n_newton):
+            ya = y[active]
+            step = (np.log(np.abs(ya)) + ya - L[active]) * ya / (1 + ya)
+            y[active] = np.clip(ya - np.where(np.isfinite(step), step, 0.0), lo[active], hi[active])
+
+    return y
+
+def one_site_mass_transport_analytical(t, s1_0, analyte_conc, K_d, k_off, k_tr, s_max, t0=0):
+    """
+    Closed-form solution of the mass transport-limited one-site model.
+
+    Solves the same equation as ``ode_one_site_mass_transport``
+
+        dS/dt = (k_on * c0 * (s_max - S) - k_off * S) / (1 + k_on * (s_max - S) / k_tr)
+
+    without numerical integration. With free sites F = s_max - S, k = k_on / k_tr,
+    k_s = k_on * c0 + k_off, F_eq = k_off * s_max / k_s and B = 1 + k * F_eq, the
+    variables separate and y = k * (F - F_eq) / B satisfies
+
+        y * exp(y) = y0 * exp(y0) * exp(-k_s * t / B)
+
+    so y(t) = W0(y0 * exp(y0 - k_s * t / B)), with W0 the principal branch of the
+    Lambert W function. The principal branch always applies, because F >= 0 gives y > -1.
+
+    The signal is ``s1_0`` at time ``min(t) + t0``, as in ``one_site_association_analytical``.
+    Points before that are the same solution followed backward in time. With t0 = 0 this
+    matches ``solve_ode_one_site_mass_transport_association``; in the ODE solvers t0 has no
+    effect, because the integration always starts at the first time point.
+
+    Backward in time from above equilibrium the surface can fill (S = s_max). Before that
+    point the signal follows dS/dt = -k_off * S, as in the ODE, which clips free sites at 0.
+
+    Parameters
+    ----------
+    t : np.ndarray
+        Time variable.
+    s1_0 : float
+        Signal at time ``min(t) + t0``. Values above s_max are treated as s_max.
+    analyte_conc : float
+        Concentration of the analyte in the bulk, 0 during dissociation.
+    K_d : float
+        Equilibrium dissociation constant.
+    k_off : float
+        Dissociation rate constant.
+    k_tr : float
+        Lumped mass transport coefficient (signal per µM per second). np.inf gives the
+        1:1 model without transport limitation.
+    s_max : float
+        Maximum signal.
+    t0 : float, optional
+        Time after the first time point at which the signal is s1_0, default is 0.
+
+    Returns
+    -------
+    np.ndarray
+        Signal over time.
+    """
+    # This function is AI generated.
+    t = np.asarray(t, dtype=float)
+    elapsed = t - np.min(t) - t0
+
+    k_on = k_off / K_d
+    k    = k_on / k_tr
+    k_s  = k_on * analyte_conc + k_off
+
+    f_eq = k_off * s_max / k_s
+    s0   = min(s1_0, s_max)
+    u0   = s_max - s0 - f_eq
+
+    if u0 == 0:
+        return np.full_like(elapsed, s_max - f_eq)
+
+    if k == 0:
+        # No transport limitation: the 1:1 exponential
+        s = s0 - u0 * np.expm1(-k_s * elapsed)
+        # Time at which the surface is full (F = 0), reached only backward from above equilibrium
+        t_full = np.log(-u0 / f_eq) / k_s if u0 < 0 else -np.inf
+    else:
+        B  = 1 + k * f_eq
+        y0 = k * u0 / B
+
+        L0 = np.log(abs(y0)) + y0
+        y  = _lambertw_log_form(L0 - k_s * elapsed / B, y0)
+        y[elapsed == 0] = y0
+        # Written relative to s0 so the first point is exact
+        s  = s0 - (B / k) * (y - y0)
+
+        if u0 < 0:
+            y_full = -k * f_eq / B
+            t_full = (L0 - np.log(-y_full) - y_full) * B / k_s
+        else:
+            t_full = -np.inf
+
+    # Before the surface fills there are no free sites. Like the ODE, which clips free sites
+    # at zero, the signal then follows dS/dt = -k_off * S.
+    full = elapsed < t_full
+    s[full] = s_max * np.exp(-k_off * (elapsed[full] - t_full))
+
+    return s
+
+def one_site_mass_transport_association_analytical(t, s1_0, analyte_conc, K_d, k_off, k_tr, s_max, t0=0):
+    """
+    Closed-form mass transport model - association phase.
+
+    Drop-in replacement for ``solve_ode_one_site_mass_transport_association``.
+    See ``one_site_mass_transport_analytical``.
+
+    Parameters
+    ----------
+    t : np.ndarray
+        Time variable.
+    s1_0 : float
+        Initial signal.
+    analyte_conc : float
+        Concentration of the analyte.
+    K_d : float
+        Equilibrium dissociation constant.
+    k_off : float
+        Dissociation rate constant.
+    k_tr : float
+        Lumped mass transport coefficient (signal per µM per second).
+    s_max : float
+        Maximum signal.
+    t0 : float, optional
+        Time after the first time point at which the signal is s1_0, default is 0.
+
+    Returns
+    -------
+    np.ndarray
+        Signal over time.
+    """
+    return one_site_mass_transport_analytical(t, s1_0, analyte_conc, K_d, k_off, k_tr, s_max, t0)
+
+def one_site_mass_transport_dissociation_analytical(t, s1_0, K_d, k_off, k_tr, s_max, t0=0):
+    """
+    Closed-form mass transport model - dissociation phase.
+
+    Drop-in replacement for ``solve_ode_one_site_mass_transport_dissociation``.
+    See ``one_site_mass_transport_analytical``.
+
+    Parameters
+    ----------
+    t : np.ndarray
+        Time variable.
+    s1_0 : float
+        Initial signal.
+    K_d : float
+        Equilibrium dissociation constant.
+    k_off : float
+        Dissociation rate constant.
+    k_tr : float
+        Lumped mass transport coefficient (signal per µM per second).
+    s_max : float
+        Maximum signal.
+    t0 : float, optional
+        Time after the first time point at which the signal is s1_0, default is 0.
+
+    Returns
+    -------
+    np.ndarray
+        Signal over time.
+    """
+    return one_site_mass_transport_analytical(t, s1_0, 0.0, K_d, k_off, k_tr, s_max, t0)
 
 def differential_matrix_association_induced_fit(koff, kon, kc, krev, a):
     """
