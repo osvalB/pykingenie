@@ -135,6 +135,74 @@ def test_fitter_signal_ratio_per_trace_smax_and_loo():
     assert 'Signal ratio (AL/ALint)' in fitter.df_fit_loo.columns
 
 
+@pytest.mark.parametrize("ratio", [0.15, 5.0, 9.0])
+def test_fitter_recovers_ratio_across_default_bounds(ratio):
+    """Ratios near both ends of the default bounds (0.1-10) are recovered.
+
+    The Smax bounds come from the one-to-one fit, which sees about Smax * ratio.
+    Without widening them, a ratio above about 3.5 pinned Smax to its lower
+    bound and gave wrong rates, even without noise.
+    """
+    fitter = _noisy_fitter(ratio)
+    fitter.fit_one_site_if_assoc_and_disso(shared_smax=True, fit_signal_ratio=True)
+
+    np.testing.assert_allclose([fitter.k_on, fitter.k_off, fitter.k_c, fitter.k_rev],
+                               RATES, rtol=0.05)
+    assert fitter.signal_ratio == pytest.approx(ratio, rel=0.02)
+    assert fitter.Smax[0] == pytest.approx(SMAX, rel=0.02)
+    assert fitter.low_bounds[5] < SMAX < fitter.high_bounds[5]
+
+
+def test_fitter_custom_ratio_bounds_excluding_one():
+    """Custom bounds are used as given; the ratio starts at the bound closest to 1."""
+    fitter = _noisy_fitter(3.0)
+    fitter.fit_one_site_if_assoc_and_disso(shared_smax=True, fit_signal_ratio=True,
+                                           signal_ratio_bounds=(2.0, 5.0))
+
+    assert (fitter.low_bounds[4], fitter.high_bounds[4]) == (2.0, 5.0)
+    assert fitter.p0[4] == 2.0
+    assert fitter.signal_ratio == pytest.approx(3.0, rel=0.02)
+    np.testing.assert_allclose([fitter.k_on, fitter.k_off, fitter.k_c, fitter.k_rev],
+                               RATES, rtol=0.05)
+
+
+def test_global_fit_with_ratio_and_fitted_t0():
+    """The ratio comes before the t0 values in the parameter vector."""
+    kon, koff, kc, krev = RATES
+    ratio, t0 = 2.0, 5.0
+    assoc, disso = [], []
+    for c in CONCS:
+        y = solve_induced_fit_association(T_ASSOC, c, kon, koff, kc, krev, smax=SMAX, t0=t0, signal_ratio=ratio)
+        d = solve_induced_fit_dissociation(T_DISSO, koff, kc, krev, s0=y[-1, 0], sP2L=y[-1, 2],
+                                           smax=SMAX, signal_ratio=ratio)
+        assoc.append(y[:, 0])
+        disso.append(d[:, 0])
+
+    fit, _, _, _ = fit_induced_fit_sites_assoc_and_disso(
+        assoc, [T_ASSOC] * 5, CONCS, disso, [T_DISSO] * 5,
+        [0.08, 0.06, 0.012, 0.004, 1.0, 0.0, 4.5],
+        [1e-4] * 4 + [0.1, -20, 0.1], [10] * 4 + [10, 20, 50],
+        smax_idx=[0] * 5, shared_smax=True, fixed_t0=False, fit_signal_ratio=True)
+
+    np.testing.assert_allclose(fit, list(RATES) + [ratio, t0, SMAX], rtol=1e-4)
+
+
+def test_global_fit_with_ratio_and_fixed_conformational_rates():
+    """With kc and krev fixed, the ratio comes right after kon and koff."""
+    ratio = 2.0
+    assoc, disso = _simulate(ratio)
+    kon, koff, kc, krev = RATES
+
+    fit, _, _, _ = fit_induced_fit_sites_assoc_and_disso(
+        [a[:, 0] for a in assoc], [T_ASSOC] * 5, CONCS, [d[:, 0] for d in disso], [T_DISSO] * 5,
+        [0.08, 0.06, 1.0, 4.5], [1e-4, 1e-4, 0.1, 0.1], [10, 10, 10, 50],
+        smax_idx=[0] * 5, shared_smax=True,
+        fixed_kon2=True, kon2_value=kc, fixed_koff2=True, koff2_value=krev,
+        fit_signal_ratio=True)
+
+    np.testing.assert_allclose(fit, [kon, koff, ratio, SMAX], rtol=1e-4)
+
+
 def _ode_rhs(t, y, a, kon, koff, kc, krev, smax):
     """Mass-action ODEs for R[E·S] and R[ES], in E·S signal units."""
     c1, c2 = y

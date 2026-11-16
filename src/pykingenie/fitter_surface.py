@@ -2414,6 +2414,15 @@ class KineticsFitter(KineticsFitterGeneral):
                 start_low.insert(4, signal_ratio_bounds[0])
                 start_high.insert(4, signal_ratio_bounds[1])
 
+                # The Smax bounds come from the one-to-one fit, which sees the total
+                # plateau, about Smax * ratio. Smax is now the signal of a surface full
+                # of ALint, so widen its bounds by the allowed ratios. Otherwise, for a
+                # ratio above about 3.5 the true Smax is below the lower bound and the
+                # fit stops on it with wrong rates.
+                for j in range(5, len(start)):
+                    start_low[j]  /= max(1.0, signal_ratio_bounds[1])
+                    start_high[j] *= max(1.0, 1.0 / signal_ratio_bounds[0])
+
             # Replace the kon and koff with the best parameters
             start[0]  = best_params[0]  # kon
             start[1]  = best_params[1]  # koff
