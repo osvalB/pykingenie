@@ -10,7 +10,7 @@ from .math import (
     double_exponential
 )
 
-__all__ = ['fit_single_exponential', 'fit_double_exponential','re_fit','re_fit_2']
+__all__ = ['fit_single_exponential', 'fit_double_exponential','re_fit','re_fit_2','curve_fit_log_scale']
 
 def convert_to_numpy_array(data):
     """
@@ -308,6 +308,66 @@ def expand_low_bound(value, factor=10):
     new_value = value * factor if value < 0 else value / factor
 
     return new_value
+
+def curve_fit_log_scale(f, xdata, ydata, p0, bounds, **kwargs):
+    """
+    curve_fit with the strictly positive parameters fitted on a log scale.
+
+    Rate constants, Kd and amplitudes span orders of magnitude, so equal steps in
+    each parameter are badly scaled and the optimizer can need many iterations.
+    Parameters whose lower bound is above zero are fitted as log(p); the others
+    (for example a time offset t0) stay on a linear scale.
+
+    The covariance is converted back with cov_p = D·cov_q·D, D = diag(p) for the
+    log-scaled parameters. At the same optimum this is the covariance a linear-scale
+    fit reports, and the correlation matrix is the same.
+
+    Parameters
+    ----------
+    f : callable
+        Model function f(xdata, *params), as for scipy.optimize.curve_fit.
+    xdata : array_like
+        Independent variable, passed to f unchanged.
+    ydata : array_like
+        Data to fit.
+    p0 : array_like
+        Initial parameters, within the bounds.
+    bounds : tuple
+        Lower and upper bounds, each a scalar or one value per parameter.
+    **kwargs
+        Passed to scipy.optimize.curve_fit.
+
+    Returns
+    -------
+    np.ndarray
+        Fitted parameters.
+    np.ndarray
+        Covariance matrix of the fitted parameters.
+    """
+    # This function is AI generated.
+    p0 = np.asarray(p0, dtype=float)
+    low, high = (np.broadcast_to(np.asarray(b, dtype=float), p0.shape) for b in bounds)
+    log = low > 0
+
+    def to_linear(q):
+        p = np.array(q, dtype=float)
+        p[log] = np.exp(p[log])
+        return p
+
+    def f_log(x, *q):
+        return f(x, *to_linear(q))
+
+    # A p0 outside the bounds gives a q0 outside them (or nan), so curve_fit raises as before
+    with np.errstate(divide='ignore', invalid='ignore'):
+        q0, q_low, q_high = p0.copy(), low.copy(), high.copy()
+        q0[log], q_low[log], q_high[log] = np.log(p0[log]), np.log(low[log]), np.log(high[log])
+
+    q, cov_q = curve_fit(f_log, xdata, ydata, p0=q0, bounds=(q_low, q_high), **kwargs)
+
+    params = to_linear(q)
+    scale = np.where(log, params, 1.0)
+
+    return params, cov_q * np.outer(scale, scale)
 
 def re_fit(fit, cov, fit_vals, fit_fx, low_bounds, high_bounds, times, **kwargs):
     """

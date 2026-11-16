@@ -108,7 +108,7 @@ def _two_start_fit(Kd=0.5, koff=0.01, ktr=0.05):
 
 # If the fit from one start fails, the fit from the other start is returned.
 def test_two_start_fit_survives_one_failed_start(monkeypatch):
-    original = fitting_surface.curve_fit
+    original = fitting_surface.curve_fit_log_scale  # the MTL fit runs on a log scale
     calls = []
 
     def fail_first(*args, **kwargs):
@@ -117,7 +117,7 @@ def test_two_start_fit_survives_one_failed_start(monkeypatch):
             raise RuntimeError("Optimal parameters not found")
         return original(*args, **kwargs)
 
-    monkeypatch.setattr(fitting_surface, "curve_fit", fail_first)
+    monkeypatch.setattr(fitting_surface, "curve_fit_log_scale", fail_first)
     params = _two_start_fit()[0]
     assert len(calls) == 2
     np.testing.assert_allclose(params, [0.5, 0.01, 0.05, SMAX], rtol=1e-4)
@@ -128,7 +128,7 @@ def test_two_start_fit_raises_when_all_starts_fail(monkeypatch):
     def always_fail(*args, **kwargs):
         raise RuntimeError("Optimal parameters not found")
 
-    monkeypatch.setattr(fitting_surface, "curve_fit", always_fail)
+    monkeypatch.setattr(fitting_surface, "curve_fit_log_scale", always_fail)
     with pytest.raises(RuntimeError, match="Optimal parameters not found"):
         _two_start_fit()
 

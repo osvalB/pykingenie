@@ -26,7 +26,7 @@ from .signal_surface import (
 
 from .math import get_rss
 
-from .fitting_general import fit_single_exponential
+from .fitting_general import fit_single_exponential, curve_fit_log_scale
 
 from scipy.optimize import curve_fit
 from scipy.optimize import minimize_scalar
@@ -825,9 +825,10 @@ def fit_one_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
 
     all_signal = np.concatenate([all_signal_assoc,all_signal_disso], axis=0)
 
-    global_fit_params, cov = curve_fit(fit_fx, 1, all_signal,
-                                       p0=initial_parameters,
-                                       bounds=(low_bounds, high_bounds))
+    # Edited with AI assistance: positive parameters are fitted on a log scale (curve_fit_log_scale)
+    global_fit_params, cov = curve_fit_log_scale(fit_fx, 1, all_signal,
+                                                 p0=initial_parameters,
+                                                 bounds=(low_bounds, high_bounds))
 
     predicted_curve = fit_fx(1, *global_fit_params)
 
@@ -1039,7 +1040,8 @@ def fit_two_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
 
     all_signal = np.concatenate([all_signal_assoc, all_signal_disso], axis=0)
 
-    global_fit_params, cov = curve_fit(
+    # Edited with AI assistance: positive parameters are fitted on a log scale (curve_fit_log_scale)
+    global_fit_params, cov = curve_fit_log_scale(
         fit_fx,
         1,
         all_signal,
@@ -1275,7 +1277,8 @@ def fit_two_site_heterogeneous_ligand_assoc_and_disso(
 
     all_signal = np.concatenate([all_signal_assoc, all_signal_disso], axis=0)
 
-    global_fit_params, cov = curve_fit(
+    # Edited with AI assistance: positive parameters are fitted on a log scale (curve_fit_log_scale)
+    global_fit_params, cov = curve_fit_log_scale(
         fit_fx,
         1,
         all_signal,
@@ -1631,10 +1634,11 @@ def fit_one_site_assoc_and_disso_ktr(assoc_signal_lst, assoc_time_lst, analyte_c
         try:
             # Kd, koff, Ktr and Smax differ by orders of magnitude. Without scaling
             # by the Jacobian, the trust region can stop on xtol far from the minimum.
-            fit = curve_fit(fit_fx, 1, all_signal,
-                            p0=p0,
-                            bounds=(low_bounds, high_bounds),
-                            x_scale="jac")
+            # Edited with AI assistance: fitting them on a log scale also needs fewer evaluations.
+            fit = curve_fit_log_scale(fit_fx, 1, all_signal,
+                                      p0=p0,
+                                      bounds=(low_bounds, high_bounds),
+                                      x_scale="jac")
         except RuntimeError as error:
             last_error = error
             continue
