@@ -523,7 +523,9 @@ def fit_one_site_association(signal_lst, time_lst, analyte_conc_lst,
     """
     all_signal = concat_signal_lst(signal_lst)
 
-    time_lst = [np.array(t) for t in time_lst]
+    # Start each trace at time zero, as the joint fit does. t0 then shifts the
+    # start of the association from the first time point, not from absolute zero.
+    time_lst = [np.array(t) - np.min(t) for t in time_lst]
 
     start = 3 - sum([fixed_t0, fixed_Kd, fixed_koff])
 

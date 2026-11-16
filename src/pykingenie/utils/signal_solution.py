@@ -110,6 +110,57 @@ def signal_ode_one_site_insolution(t, koff, Kd, a_total, b_total, t0=0, signal_a
     return signal
 
 
+def _odeint_from_start(fun, y0, t, t0, args):
+    """
+    Integrate an autonomous ODE that holds ``y0`` when the reaction starts.
+
+    The reaction starts ``t0`` before the first time point, so the elapsed time
+    at each point is ``t - min(t) + t0``. With t0 = 0, ``y0`` is the state at the
+    first time point. A negative ``t0`` (the reaction starts after the first
+    point) integrates backward in time for the earlier points.
+
+    Parameters
+    ----------
+    fun : callable
+        Right-hand side ``fun(t, y, *args)``.
+    y0 : list
+        State when the reaction starts.
+    t : np.ndarray
+        Time points.
+    t0 : float
+        Time between the start of the reaction and the first time point.
+    args : tuple
+        Extra arguments for ``fun``.
+
+    Returns
+    -------
+    np.ndarray
+        State at each time point, one row per time point.
+    """
+    # This function is AI generated.
+    t = np.asarray(t, dtype=float)
+    elapsed = t - np.min(t) + t0
+
+    # odeint needs a monotonic time sequence that starts at the initial state
+    unique, inverse = np.unique(elapsed, return_inverse=True)
+    states = np.empty((len(unique), len(y0)))
+
+    zero = unique == 0
+    states[zero] = y0
+
+    forward = unique > 0
+    if np.any(forward):
+        sol = odeint(fun, y0, np.concatenate(([0.0], unique[forward])), args=args, tfirst=True)
+        states[forward] = sol[1:]
+
+    backward = unique < 0
+    if np.any(backward):
+        sol = odeint(fun, y0, np.concatenate(([0.0], unique[backward][::-1])), args=args, tfirst=True)
+        states[backward] = sol[1:][::-1]
+
+    return states[inverse.ravel()]
+
+
 def ode_induced_fit_insolution(t, y, k1, k_minus1, k2, k_minus2, E_tot, S_tot):
     """
     Reduced ODEs for induced fit model using conservation of E and S.
@@ -170,16 +221,15 @@ def solve_ode_induced_fit_insolution(t, y0, k1, k_minus1, k2, k_minus2, E_tot, S
     S_tot : float
         Total concentration of the substrate.
     t0 : float, optional
-        Initial time, default is 0.
+        Time between the start of the reaction and the first time point, default is 0.
         
     Returns
     -------
     np.ndarray
         Solution of the ODE, contains the concentration of E, S, E·S and ES.
     """
-    t = t + t0
-    sol = odeint(ode_induced_fit_insolution, y0, t,
-                 args=(k1, k_minus1, k2, k_minus2, E_tot, S_tot), tfirst=True)
+    sol = _odeint_from_start(ode_induced_fit_insolution, y0, t, t0,
+                             (k1, k_minus1, k2, k_minus2, E_tot, S_tot))
     E_S = sol[:, 0]
     ES  = sol[:, 1]
     # Include the concentrations of E and S in the output
@@ -213,7 +263,7 @@ def signal_ode_induced_fit_insolution(t, y, k1, k_minus1, k2, k_minus2, E_tot, S
     S_tot : float
         Total concentration of the substrate.
     t0 : float, optional
-        Initial time, default is 0.
+        Time between the start of the reaction and the first time point, default is 0.
     signal_E : float, optional
         Signal for E, default is 0.
     signal_S : float, optional
@@ -277,17 +327,15 @@ def solve_ode_conformational_selection_insolution(t, y, k1, k_minus1, k2, k_minu
     S_tot : float
         total substrate concentration
     t0 : float, optional
-        Initial time, default is 0.
+        Time between the start of the reaction and the first time point, default is 0.
 
     Returns
     -------
     np.ndarray
         Solution of the ODE, contains the concentration of E1, E2, S, E2S.
     """
-    t = t + t0
-
-    sol = odeint(ode_conformational_selection_insolution, y, t,
-                 args=(k1, k_minus1, k2, k_minus2, E_tot, S_tot), tfirst=True)
+    sol = _odeint_from_start(ode_conformational_selection_insolution, y, t, t0,
+                             (k1, k_minus1, k2, k_minus2, E_tot, S_tot))
 
     E2  = sol[:, 0]
     E2S = sol[:, 1]
@@ -324,7 +372,7 @@ def signal_ode_conformational_selection_insolution(
     S_tot : float
         total substrate concentration
     t0 : float, optional
-        Initial time, default is 0.
+        Time between the start of the reaction and the first time point, default is 0.
     signal_E1 : float, optional
         Signal for E1, default is 0.
     signal_E2 : float, optional
