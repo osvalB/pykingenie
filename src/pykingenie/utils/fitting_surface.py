@@ -1257,10 +1257,15 @@ def fit_induced_fit_sites_assoc_and_disso(
     fixed_koff1=False, koff1_value=None,
     fixed_kon2=False, kon2_value=None,
     fixed_koff2=False, koff2_value=None,
-    max_nfev=None
+    max_nfev=None,
+    fit_signal_ratio=False, signal_ratio_value=1.0
 ):
     """
     Global fit to association and dissociation traces - one-to-one binding model with induced fit.
+
+    The parameters are ordered as: kon1, koff1, kon2 (kc), koff2 (krev) -
+    each only if not fixed -, the signal ratio (if fit_signal_ratio), the t0
+    values (if not fixed_t0), and the Smax values.
     
     Parameters
     ----------
@@ -1304,6 +1309,14 @@ def fit_induced_fit_sites_assoc_and_disso(
         Value of koff2 to use if fixed_koff2 is True.
     max_nfev : int, optional
         Maximum number of function evaluations.
+    fit_signal_ratio : bool, optional
+        If True, fit the signal of the induced complex (AL) relative to the
+        intermediate complex (ALint) as one global parameter, default is False.
+        A is the analyte and L the immobilised ligand (E·S and ES in the
+        signal functions).
+    signal_ratio_value : float, optional
+        Signal of AL relative to ALint used if fit_signal_ratio is False,
+        default is 1 (both complexes produce the same signal).
     
     Returns
     -------
@@ -1317,6 +1330,7 @@ def fit_induced_fit_sites_assoc_and_disso(
         Fitted values for each dissociation signal, same dimensions as disso_signal_lst.
     """
     # Edited with AI assistance and reviewed by a human in PR #16: carry-over only for single-cycle steps, and t0 is passed to the model.
+    # Edited with AI assistance: optional global signal ratio between the induced (ES) and intermediate (E·S) complex.
     # Set a flag for the association that was done after a dissociation step
     initial_signal_at_zero = [time[0] < 2 for time in assoc_time_lst]
 
@@ -1328,7 +1342,7 @@ def fit_induced_fit_sites_assoc_and_disso(
     time_lst_disso = [np.asarray(t) - t[0] for t in disso_time_lst]  # normalize
 
     # Indexing logic
-    start = 4 - sum([fixed_kon1, fixed_koff1, fixed_kon2, fixed_koff2])
+    start = 4 - sum([fixed_kon1, fixed_koff1, fixed_kon2, fixed_koff2]) + bool(fit_signal_ratio)
     n_unq_smax = len(np.unique(smax_idx))
     n_t0s = n_unq_smax * (not fixed_t0)
 
@@ -1363,6 +1377,7 @@ def fit_induced_fit_sites_assoc_and_disso(
         koff1 = koff1_value if fixed_koff1 else args[idx]; idx += not fixed_koff1
         kon2 = kon2_value if fixed_kon2 else args[idx]; idx += not fixed_kon2
         koff2 = koff2_value if fixed_koff2 else args[idx]; idx += not fixed_koff2
+        ratio = args[idx] if fit_signal_ratio else signal_ratio_value
 
         out = np.empty(_total)
 
@@ -1379,12 +1394,14 @@ def fit_induced_fit_sites_assoc_and_disso(
             t0 = 0 if fixed_t0 else args[start + smax_idx[i]]
             smax = args[start + smax_idx[i] + n_t0s] if shared_smax else args[start + i + n_t0s]
 
-            mat_assoc = solve_induced_fit_association(t_assoc, conc, kon1, koff1, kon2, koff2, sP1L=sP1L, sP2L=sP2l, smax=smax, t0=t0)
+            mat_assoc = solve_induced_fit_association(t_assoc, conc, kon1, koff1, kon2, koff2, sP1L=sP1L, sP2L=sP2l, smax=smax, t0=t0,
+                                                      signal_ratio=ratio)
             out[_a_offsets[i]:_a_offsets[i + 1]] = mat_assoc[:, 0]
             last = mat_assoc[-1]
 
             s0, sP1L, sP2l = last
-            mat_disso = solve_induced_fit_dissociation(t_dissoc, koff1, kon2, koff2, s0=s0, sP2L=sP2l, smax=smax)
+            mat_disso = solve_induced_fit_dissociation(t_dissoc, koff1, kon2, koff2, s0=s0, sP2L=sP2l, smax=smax,
+                                                       signal_ratio=ratio)
             out[_d_offsets[i]:_d_offsets[i + 1]] = mat_disso[:, 0]
 
             last = mat_disso[-1]

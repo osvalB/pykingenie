@@ -436,12 +436,15 @@ def solve_steady_state(A, b):
     """
     return -solve(A, b)
 
-def solve_induced_fit_association(time, a_conc, kon, koff, kc, krev, sP1L=0, sP2L=0, smax=0, t0=0):
+def solve_induced_fit_association(time, a_conc, kon, koff, kc, krev, sP1L=0, sP2L=0, smax=0, t0=0,
+                                  signal_ratio=1.0):
     """
     Obtain the signal for the induced fit model (surface-based).
 
-    We assume that the signal is given by the complex E·S and ES is the same.
-    In other words, the complex before and after the conformational change produces the same signal.
+    By default the complex before (E·S) and after (ES) the conformational
+    change produce the same signal. Set ``signal_ratio`` to let the induced
+    complex ES produce a different signal: the total signal is then
+    R(E·S) + signal_ratio·R(ES), where R is the response of E·S.
 
     Parameters
     ----------
@@ -462,15 +465,21 @@ def solve_induced_fit_association(time, a_conc, kon, koff, kc, krev, sP1L=0, sP2
     sP2L : float, optional
         Initial signal proportional to the concentration of ES, default is 0.
     smax : float, optional
-        Signal proportional to the complex (E·S or ES), default is 0.
+        Signal of the surface fully occupied by the intermediate complex
+        (E·S), default is 0.
     t0 : float, optional
         Time offset; the association starts at time t0 after the first
         time point, default is 0.
+    signal_ratio : float, optional
+        Signal of the induced complex (ES) relative to the intermediate
+        complex (E·S), default is 1 (same signal).
 
     Returns
     -------
     np.ndarray
-        Signal over time.
+        Array with three columns: the total signal, the signal of E·S, and
+        the amount of ES expressed in E·S signal units (ES contributes
+        signal_ratio times this column to the total signal).
     """
     # Edited with AI assistance and reviewed by a human in PR #16: added t0 so a fitted t0 shifts the association.
     time = time - np.min(time) - t0
@@ -488,14 +497,32 @@ def solve_induced_fit_association(time, a_conc, kon, koff, kc, krev, sP1L=0, sP2
 
     states = solve_all_states_fast(time, m, initial_conditions, res_steady_state)
 
-    # Create a numpy array of three columns
-    col1 = smax - states[:, 0]  # Total signal minus the signal produced by E·S and ES
+    return _induced_fit_signal_columns(states, smax, signal_ratio)
+
+def _induced_fit_signal_columns(states, smax, signal_ratio):
+    """
+    Convert the induced fit states into signal columns.
+
+    Parameters
+    ----------
+    states : np.ndarray
+        States of the system, with columns smax - R([E·S] + [ES]) and R[ES].
+    smax : float
+        Signal of the surface fully occupied by E·S.
+    signal_ratio : float
+        Signal of ES relative to E·S.
+
+    Returns
+    -------
+    np.ndarray
+        Columns: total signal, signal of E·S, and amount of ES in E·S signal units.
+    """
+    # This function is AI generated (induced complex signal ratio).
     col2 = smax - states[:, 0] - states[:, 1]  # Signal produced by E·S
-    col3 = states[:, 1]  # Signal produced by ES
+    col3 = states[:, 1]                        # ES, in E·S signal units
+    col1 = col2 + signal_ratio * col3          # Total signal
 
-    arr = np.column_stack((col1, col2, col3))
-
-    return arr
+    return np.column_stack((col1, col2, col3))
 
 def solve_all_states_fast(time, A, initial_conditions, steady_state_value):
     """
@@ -620,12 +647,13 @@ def solve_conformational_selection_association(time, a_conc, kon, koff, kc, krev
 
     return arr
 
-def solve_induced_fit_dissociation(time, koff, kc, krev, s0=0, sP2L=0, smax=0):
+def solve_induced_fit_dissociation(time, koff, kc, krev, s0=0, sP2L=0, smax=0, signal_ratio=1.0):
     """
     Obtain the dissociation signal for the induced fit model (surface-based).
 
-    We assume that the signal given by the complex E·S and ES is the same.
-    In other words, the complex before and after the conformational change produces the same signal.
+    By default the complex before (E·S) and after (ES) the conformational
+    change produce the same signal. Set ``signal_ratio`` to let ES produce a
+    different signal (see solve_induced_fit_association).
 
     Parameters
     ----------
@@ -638,16 +666,20 @@ def solve_induced_fit_dissociation(time, koff, kc, krev, s0=0, sP2L=0, smax=0):
     krev : float
         Rate constant for ES -> E·S.
     s0 : float, optional
-        Initial signal, default is 0.
+        Initial total signal, default is 0.
     sP2L : float, optional
-        Initial signal proportional to the concentration of ES, default is 0.
+        Initial amount of ES in E·S signal units (third column returned by
+        solve_induced_fit_association), default is 0.
     smax : float, optional
-        Signal proportional to the complex (E·S or ES), default is 0.
+        Signal of the surface fully occupied by E·S, default is 0.
+    signal_ratio : float, optional
+        Signal of ES relative to E·S, default is 1 (same signal).
 
     Returns
     -------
     np.ndarray
-        Signal over time, with columns for total signal, signal produced by E·S, and signal produced by ES.
+        Signal over time, with columns for total signal, signal produced by
+        E·S, and amount of ES in E·S signal units.
     """
     time = time - np.min(time) # Start at zero
 
@@ -656,18 +688,13 @@ def solve_induced_fit_dissociation(time, koff, kc, krev, s0=0, sP2L=0, smax=0):
 
     res_steady_state = solve_steady_state(m, b_col)
 
-    initial_conditions = np.array([smax-s0, sP2L])
+    # The total signal is R[E·S] + signal_ratio·R[ES], so the bound amount is
+    # s0 - (signal_ratio - 1)·sP2L
+    initial_conditions = np.array([smax - s0 + (signal_ratio - 1) * sP2L, sP2L])
 
     states = solve_all_states_fast(time, m, initial_conditions, res_steady_state)
 
-    # Create a numpy array of three columns
-    col1 = smax - states[:, 0]  # Total signal minus the signal produced by E·S and ES
-    col2 = smax - states[:, 0] - states[:, 1]  # Signal produced by E·S
-    col3 = states[:, 1]  # Signal produced by ES
-
-    arr = np.column_stack((col1, col2, col3))
-
-    return arr
+    return _induced_fit_signal_columns(states, smax, signal_ratio)
 
 def solve_conformational_selection_dissociation(time, koff, kc, krev, smax=0, sP1=0, sP2L=0):
     """
