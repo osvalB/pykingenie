@@ -1,7 +1,8 @@
 # Parameter-recovery benchmark
 
 These notebooks check that pykingenie recovers the true parameters of each
-surface-based kinetics model. They are AI generated.
+surface-based kinetics model. They are AI generated, and have been reviewed by
+Osvaldo Burastero.
 
 For each model and each experiment layout, a notebook:
 
