@@ -1949,6 +1949,16 @@ class KineticsFitter(KineticsFitterGeneral):
         if len(candidate_pairs) == 0:
             raise ValueError("Grid search requires at least one Kd pair with Kd1 < Kd2.")
 
+        # Edited with AI assistance: keep only the pairs whose Kd2 is within the lower
+        # bound of the final fit (10 * min_kd, computed below in the same way). Otherwise
+        # the best pair could start the final fit outside its bounds, and the fit failed.
+        min_conc = np.min(self.lig_conc_lst)
+        candidate_pairs = [(Kd1, Kd2) for Kd1, Kd2 in candidate_pairs
+                           if Kd2 >= np.min([Kd1, Kd2, min_conc/10])*10]
+
+        if len(candidate_pairs) == 0:
+            raise ValueError("Grid search requires at least one Kd pair with Kd2 >= 10 * min(Kd1, lowest concentration / 10).")
+
         time_assoc_lst_subsampled = [subset_data(t) for t in self.time_assoc_lst]
         time_disso_lst_subsampled = [subset_data(t) for t in self.time_disso_lst]
         assoc_lst_subsampled = [subset_data(y) for y in self.assoc_lst]
@@ -1966,8 +1976,12 @@ class KineticsFitter(KineticsFitterGeneral):
             **self._fit_masks(time_assoc_lst_subsampled, time_disso_lst_subsampled),
         }
 
+        # Edited with AI assistance: the fraction of site 1 has the same lower bound
+        # (0.01) as in the final fit. With 1e-6 the grid could return a fraction
+        # below 0.01, and the final fit then failed because its start was outside
+        # the bounds; a site with less than 1% of the signal is not meaningful.
         p0_grid_base = [koff_init, koff_init, 0.5] + smax_init
-        low_grid_base = [max(koff_init / 1e3, 1e-8), max(koff_init / 1e3, 1e-8), 1e-6] + [max(x / 50, 1e-12) for x in smax_init]
+        low_grid_base = [max(koff_init / 1e3, 1e-8), max(koff_init / 1e3, 1e-8), 0.01] + [max(x / 50, 1e-12) for x in smax_init]
         high_grid_base = [min(koff_init * 1e3, 10.0), min(koff_init * 1e3, 10.0), 1.0] + [max(x * 25, 1e-12) for x in smax_init]
 
         best_rss = np.inf
