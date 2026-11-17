@@ -8,6 +8,7 @@ Welcome to **pyKinGenie**!, a python package for analysing binding kinetics data
 
 - Import Octet files (.frd)
 - Import Gator files (Assay_#_Channel#.csv, Setting.ini and ExperimentStep.ini)
+- Import Biacore result files (.blr)
 - Import custom CSV files 
 - Process the traces (alignment, baseline correction)
 - Calculate binding kinetics (*k*<sub>on</sub>, *k*<sub>off</sub>, *K*<sub>D</sub>)

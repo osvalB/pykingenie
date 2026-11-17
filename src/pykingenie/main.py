@@ -265,7 +265,7 @@ class KineticsAnalyzer:
 
         return None
 
-    def generate_fittings(self, df):
+    def generate_fittings(self, df, trim_time=0):
         """
         Generate fitting objects for surface-based experiments from a DataFrame.
 
@@ -273,12 +273,22 @@ class KineticsAnalyzer:
         ----------
         df : pandas.DataFrame
             DataFrame containing experiment data.
+        trim_time : float, optional
+            Seconds, from the start of each association and each dissociation,
+            left out of the kinetic fits. For example, 1 leaves out the first
+            second of each step, where SPR curves show the bulk refractive index
+            spike. The points are kept and plotted, and the models still start
+            at the beginning of each step, so the fitted rates are not shifted.
+            Default is 0 (every point is fitted).
 
         Returns
         -------
         list
             List of messages about fitting creation.
         """
+        # Edited with AI assistance: trim_time.
+        if trim_time < 0:
+            raise ValueError("trim_time must be zero or positive.")
 
         # List of messages to be shown in the console
         messages = []
@@ -411,7 +421,8 @@ class KineticsAnalyzer:
                 dissociation_signal_lst=diss_lst,
                 smax_id=smax_id_vec,
                 name_lst=[f"{unq}_id_{smax}" for smax in unq_smax_id],
-                is_single_cycle=any([t[0] > 1 for t in time_assoc_lst]) or len(time_assoc_lst) == 1
+                is_single_cycle=any([t[0] > 1 for t in time_assoc_lst]) or len(time_assoc_lst) == 1,
+                trim_time=trim_time
             )
 
             fit.get_steady_state()

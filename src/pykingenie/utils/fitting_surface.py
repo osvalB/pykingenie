@@ -33,6 +33,7 @@ from scipy.optimize import minimize_scalar, brentq
 
 __all__ = [
     'guess_initial_signal',
+    'trim_masks',
     'fit_steady_state_one_site',
     'fit_steady_state_two_site',
     'fit_steady_state_two_site_heterogeneous_ligand',
@@ -49,7 +50,7 @@ __all__ = [
     'get_smax_upper_bound_factor'
 ]
 
-def guess_initial_signal(assoc_time_lst, assoc_signal_lst, time_limit=30):
+def guess_initial_signal(assoc_time_lst, assoc_signal_lst, time_limit=30, mask_lst=None):
     """
     Guess the initial signal for each signal in the list by fitting single exponentials.
     
@@ -63,19 +64,29 @@ def guess_initial_signal(assoc_time_lst, assoc_signal_lst, time_limit=30):
         List of association signal arrays.
     time_limit : float, optional
         Time limit to consider for the fit, default is 30 seconds.
+    mask_lst : list, optional
+        Boolean array per trace, True for the points to use (see trim_masks).
+        The exponential is still extrapolated to the first time point. Default
+        uses every point.
 
     Returns
     -------
     list
         List of initial signals for each association signal.
     """
+    # Edited with AI assistance: optional masks of the points to use (trim_time).
     s0s = []
 
-    for t,y in zip(assoc_time_lst,assoc_signal_lst):
+    if mask_lst is None:
+        mask_lst = [None] * len(assoc_time_lst)
+
+    for t,y,mask in zip(assoc_time_lst,assoc_signal_lst,mask_lst):
 
         try:
 
             t = t - t[0]
+            if mask is not None:
+                y, t = y[mask], t[mask]
             y = y[t < time_limit]
             t = t[t < time_limit]
 
@@ -85,7 +96,10 @@ def guess_initial_signal(assoc_time_lst, assoc_signal_lst, time_limit=30):
 
             a0, a1, kobs = fit_params
 
-            s0s.append(a0 + a1)
+            # fit_single_exponential starts the time at the first point it is given.
+            # Extrapolate back to the start of the step if the first points were left
+            # out (t[0] > 0); otherwise this is a0 + a1.
+            s0s.append(a0 + a1 * np.exp(kobs * t[0]))
 
         except:
 
@@ -93,7 +107,8 @@ def guess_initial_signal(assoc_time_lst, assoc_signal_lst, time_limit=30):
 
     return s0s
 
-def initial_signal_guesses_where_needed(assoc_time_lst, assoc_signal_lst, disso_time_lst):
+def initial_signal_guesses_where_needed(assoc_time_lst, assoc_signal_lst, disso_time_lst,
+                                        assoc_mask_lst=None):
     """
     Guess the initial signal only for the association traces that need it.
 
@@ -110,6 +125,9 @@ def initial_signal_guesses_where_needed(assoc_time_lst, assoc_signal_lst, disso_
         List of association signal arrays.
     disso_time_lst : list
         List of dissociation time arrays, as given to the fit.
+    assoc_mask_lst : list, optional
+        Boolean array per association trace, True for the points to use (see
+        trim_masks). Default uses every point.
 
     Returns
     -------
@@ -125,11 +143,104 @@ def initial_signal_guesses_where_needed(assoc_time_lst, assoc_signal_lst, disso_
         return s0s
 
     guesses = guess_initial_signal([assoc_time_lst[i] for i in needed],
-                                   [assoc_signal_lst[i] for i in needed])
+                                   [assoc_signal_lst[i] for i in needed],
+                                   mask_lst=None if assoc_mask_lst is None else [assoc_mask_lst[i] for i in needed])
     for i, guess in zip(needed, guesses):
         s0s[i] = guess
 
     return s0s
+
+def trim_masks(time_lst, trim_time):
+    """
+    Masks of the points at least trim_time after the start of each step.
+
+    Used to leave the first seconds of each association and dissociation out of
+    the fit, for example to skip the bulk refractive index spike at the start of
+    an SPR injection. The model still starts at the first time point of each step.
+
+    Parameters
+    ----------
+    time_lst : list or None
+        Time array of each step.
+    trim_time : float
+        Time, from the first point of each step, to leave out of the fit.
+
+    Returns
+    -------
+    list or None
+        Boolean array per step, True for the points to fit. None if trim_time is
+        0 or time_lst is None, meaning every point is fitted.
+    """
+    # This function is AI generated.
+    if time_lst is None or not trim_time:
+        return None
+    masks = []
+    for t in time_lst:
+        t = np.asarray(t, dtype=float)
+        masks.append(t - t[0] >= trim_time)
+    return masks
+
+def _concat_masks(mask_lsts, signal_lsts):
+    """
+    One mask over the concatenated traces, in the order the fits concatenate them.
+
+    Parameters
+    ----------
+    mask_lsts : list
+        Mask lists (one boolean array per trace, or None to fit every point of the
+        traces), e.g. [assoc_mask_lst, disso_mask_lst].
+    signal_lsts : list
+        The matching signal lists, giving the trace lengths.
+
+    Returns
+    -------
+    np.ndarray or None
+        Boolean mask, or None if every point is fitted.
+    """
+    # This function is AI generated.
+    if all(masks is None for masks in mask_lsts):
+        return None
+    parts = []
+    for masks, signals in zip(mask_lsts, signal_lsts):
+        if masks is None:
+            parts.extend(np.ones(len(y), dtype=bool) for y in signals)
+        else:
+            if len(masks) != len(signals) or any(len(m) != len(y) for m, y in zip(masks, signals)):
+                raise ValueError("Each fit mask must have one value per data point.")
+            parts.extend(np.asarray(m, dtype=bool) for m in masks)
+    mask = np.concatenate(parts)
+    if not mask.any():
+        raise ValueError("No data points are left to fit; reduce trim_time.")
+    return mask
+
+def _fit_points(fit_fx, all_signal, mask):
+    """
+    The model and data restricted to the points to fit.
+
+    Parameters
+    ----------
+    fit_fx : callable
+        Model, fit_fx(x, *params), returning one value per point of all_signal.
+    all_signal : np.ndarray
+        Concatenated signal.
+    mask : np.ndarray or None
+        Points to fit, from _concat_masks. None fits every point.
+
+    Returns
+    -------
+    callable
+        Model returning only the points to fit.
+    np.ndarray
+        Signal at the points to fit.
+    """
+    # This function is AI generated.
+    if mask is None:
+        return fit_fx, all_signal
+
+    def fit_fx_points(x, *args):
+        return fit_fx(x, *args)[mask]
+
+    return fit_fx_points, all_signal[mask]
 
 def get_smax_upper_bound_factor(Kd_ss):
     """
@@ -517,7 +628,8 @@ def fit_one_site_association(signal_lst, time_lst, analyte_conc_lst,
                              shared_smax=False,
                              fixed_t0=True,
                              fixed_Kd=False, Kd_value=None,
-                             fixed_koff=False, koff_value=None):
+                             fixed_koff=False, koff_value=None,
+                             mask_lst=None):
     """
     Global fit to a list of association traces - one-to-one binding model.
 
@@ -549,6 +661,9 @@ def fit_one_site_association(signal_lst, time_lst, analyte_conc_lst,
         If True, koff is fixed to koff_value, default is False.
     koff_value : float, optional
         Value of koff to use if fixed_koff is True.
+    mask_lst : list, optional
+        Boolean array per trace, True for the points to fit (see trim_masks).
+        The model is still evaluated at every point. Default fits every point.
 
     Returns
     -------
@@ -590,7 +705,10 @@ def fit_one_site_association(signal_lst, time_lst, analyte_conc_lst,
             out[_offsets[i]:_offsets[i + 1]] = one_site_association_analytical(t,0,s_max,Koff,Kd,analyte_conc,t0)
         return out
 
-    global_fit_params, cov = curve_fit(fit_fx, 1, all_signal,
+    # Edited with AI assistance: optional masks of the points to fit (trim_time).
+    fit_fx_points, signal_points = _fit_points(fit_fx, all_signal, _concat_masks([mask_lst], [signal_lst]))
+
+    global_fit_params, cov = curve_fit(fit_fx_points, 1, signal_points,
                                        p0=initial_parameters,
                                        bounds=(low_bounds, high_bounds))
 
@@ -606,7 +724,8 @@ def fit_one_site_dissociation(signal_lst, time_lst,
                              initial_parameters, low_bounds, high_bounds,
                              fixed_t0=True,
                              fixed_koff=False, koff_value=None,
-                             fit_s0=True):
+                             fit_s0=True,
+                             mask_lst=None):
     """
     Global fit to a list of dissociation traces - one-to-one binding model.
 
@@ -630,6 +749,9 @@ def fit_one_site_dissociation(signal_lst, time_lst,
         Value of koff to use if fixed_koff is True.
     fit_s0 : bool, optional
         If True, s0 is fitted, otherwise it is fixed to the first value of the signal, default is True.
+    mask_lst : list, optional
+        Boolean array per trace, True for the points to fit (see trim_masks).
+        The model is still evaluated at every point. Default fits every point.
 
     Returns
     -------
@@ -674,7 +796,10 @@ def fit_one_site_dissociation(signal_lst, time_lst,
             out[_offsets[_k]:_offsets[_k + 1]] = one_site_dissociation_analytical(t, s0, Koff, t0)
         return out
 
-    global_fit_params, cov = curve_fit(fit_fx, 1, all_signal,
+    # Edited with AI assistance: optional masks of the points to fit (trim_time).
+    fit_fx_points, signal_points = _fit_points(fit_fx, all_signal, _concat_masks([mask_lst], [signal_lst]))
+
+    global_fit_params, cov = curve_fit(fit_fx_points, 1, signal_points,
                                        p0=initial_parameters,
                                        bounds=(low_bounds, high_bounds))
 
@@ -696,7 +821,8 @@ def fit_one_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
                                  fixed_t0=True,
                                  fixed_Kd=False, Kd_value=None,
                                  fixed_koff=False, koff_value=None,
-                                 s0_guesses=None):
+                                 s0_guesses=None,
+                                 assoc_mask_lst=None, disso_mask_lst=None):
     """
     Global fit to a set of association and dissociation traces - one-to-one binding model.
     
@@ -738,6 +864,11 @@ def fit_one_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
         here if None; pass it to avoid recomputing it when fitting the same data
         many times.
         
+    assoc_mask_lst, disso_mask_lst : list, optional
+        Boolean array per association / dissociation trace, True for the points
+        to fit (see trim_masks). The model is still evaluated at every point,
+        from the first time point of each step. Default fits every point.
+
     Returns
     -------
     list
@@ -770,7 +901,8 @@ def fit_one_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
     # continuous in time, and can be passed in when the same data is refitted many
     # times (the confidence intervals refit it about a hundred times).
     if s0_guesses is None:
-        s0_guesses = initial_signal_guesses_where_needed(assoc_time_lst, assoc_signal_lst, disso_time_lst)
+        s0_guesses = initial_signal_guesses_where_needed(assoc_time_lst, assoc_signal_lst, disso_time_lst,
+                                                         assoc_mask_lst=assoc_mask_lst)
     s0s = s0_guesses
 
     # Pre-compute slice boundaries for output array
@@ -827,8 +959,13 @@ def fit_one_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
 
     all_signal = np.concatenate([all_signal_assoc,all_signal_disso], axis=0)
 
+    # Edited with AI assistance: optional masks of the points to fit (trim_time).
+    fit_fx_points, signal_points = _fit_points(
+        fit_fx, all_signal,
+        _concat_masks([assoc_mask_lst, disso_mask_lst], [assoc_signal_lst, disso_signal_lst]))
+
     # Edited with AI assistance: positive parameters are fitted on a log scale (curve_fit_log_scale)
-    global_fit_params, cov = curve_fit_log_scale(fit_fx, 1, all_signal,
+    global_fit_params, cov = curve_fit_log_scale(fit_fx_points, 1, signal_points,
                                                  p0=initial_parameters,
                                                  bounds=(low_bounds, high_bounds))
 
@@ -853,7 +990,8 @@ def fit_two_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
                                  fixed_t0=True,
                                  fixed_Kd=False, Kd_value=None,
                                  fixed_koff=False, koff_value=None,
-                                 fit_sigma=False):
+                                 fit_sigma=False,
+                                 assoc_mask_lst=None, disso_mask_lst=None):
     """
     Global fit to association and dissociation traces - two-site binding model.
 
@@ -902,6 +1040,11 @@ def fit_two_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
     fit_sigma : bool, optional
         If True, fit sigma as a shared parameter for cooperativity, default is False.
     
+    assoc_mask_lst, disso_mask_lst : list, optional
+        Boolean array per association / dissociation trace, True for the points
+        to fit (see trim_masks). The model is still evaluated at every point,
+        from the first time point of each step. Default fits every point.
+
     Returns
     -------
     list
@@ -1042,11 +1185,16 @@ def fit_two_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
 
     all_signal = np.concatenate([all_signal_assoc, all_signal_disso], axis=0)
 
+    # Edited with AI assistance: optional masks of the points to fit (trim_time).
+    fit_fx_points, signal_points = _fit_points(
+        fit_fx, all_signal,
+        _concat_masks([assoc_mask_lst, disso_mask_lst], [assoc_signal_lst, disso_signal_lst]))
+
     # Edited with AI assistance: positive parameters are fitted on a log scale (curve_fit_log_scale)
     global_fit_params, cov = curve_fit_log_scale(
-        fit_fx,
+        fit_fx_points,
         1,
-        all_signal,
+        signal_points,
         p0=initial_parameters,
         bounds=(low_bounds, high_bounds),
     )
@@ -1086,6 +1234,8 @@ def fit_two_site_heterogeneous_ligand_assoc_and_disso(
     koff2_value=None,
     fixed_fraction_site1=False,
     fraction_site1_value=None,
+    assoc_mask_lst=None,
+    disso_mask_lst=None,
 ):
     """
     Global fit to association and dissociation traces for a 2:1 heterogeneous ligand model.
@@ -1146,6 +1296,11 @@ def fit_two_site_heterogeneous_ligand_assoc_and_disso(
         If True, keep fraction_site1 fixed to fraction_site1_value.
     fraction_site1_value : float, optional
         Value to use when fixed_fraction_site1=True.
+
+    assoc_mask_lst, disso_mask_lst : list, optional
+        Boolean array per association / dissociation trace, True for the points
+        to fit (see trim_masks). The model is still evaluated at every point,
+        from the first time point of each step. Default fits every point.
 
     Returns
     -------
@@ -1279,11 +1434,16 @@ def fit_two_site_heterogeneous_ligand_assoc_and_disso(
 
     all_signal = np.concatenate([all_signal_assoc, all_signal_disso], axis=0)
 
+    # Edited with AI assistance: optional masks of the points to fit (trim_time).
+    fit_fx_points, signal_points = _fit_points(
+        fit_fx, all_signal,
+        _concat_masks([assoc_mask_lst, disso_mask_lst], [assoc_signal_lst, disso_signal_lst]))
+
     # Edited with AI assistance: positive parameters are fitted on a log scale (curve_fit_log_scale)
     global_fit_params, cov = curve_fit_log_scale(
-        fit_fx,
+        fit_fx_points,
         1,
-        all_signal,
+        signal_points,
         p0=initial_parameters,
         bounds=(low_bounds, high_bounds),
     )
@@ -1313,7 +1473,8 @@ def fit_induced_fit_sites_assoc_and_disso(
     fixed_kon2=False, kon2_value=None,
     fixed_koff2=False, koff2_value=None,
     max_nfev=None,
-    fit_signal_ratio=False, signal_ratio_value=1.0
+    fit_signal_ratio=False, signal_ratio_value=1.0,
+    assoc_mask_lst=None, disso_mask_lst=None
 ):
     """
     Global fit to association and dissociation traces - one-to-one binding model with induced fit.
@@ -1373,6 +1534,11 @@ def fit_induced_fit_sites_assoc_and_disso(
         Signal of AL relative to ALint used if fit_signal_ratio is False,
         default is 1 (both complexes produce the same signal).
     
+    assoc_mask_lst, disso_mask_lst : list, optional
+        Boolean array per association / dissociation trace, True for the points
+        to fit (see trim_masks). The model is still evaluated at every point,
+        from the first time point of each step. Default fits every point.
+
     Returns
     -------
     list
@@ -1466,8 +1632,12 @@ def fit_induced_fit_sites_assoc_and_disso(
         return out
 
     # Run fitting
+    # Edited with AI assistance: optional masks of the points to fit (trim_time).
+    fit_fx_points, signal_points = _fit_points(
+        fit_fx, all_signal,
+        _concat_masks([assoc_mask_lst, disso_mask_lst], [assoc_signal_lst, disso_signal_lst]))
     global_fit_params, cov = curve_fit(
-        fit_fx, xdata=1, ydata=all_signal,
+        fit_fx_points, xdata=1, ydata=signal_points,
         p0=initial_parameters,
         bounds=(low_bounds, high_bounds),
         max_nfev=max_nfev
@@ -1496,7 +1666,8 @@ def fit_one_site_assoc_and_disso_ktr(assoc_signal_lst, assoc_time_lst, analyte_c
                                  fixed_t0=True,
                                  fixed_Kd=False, Kd_value=None,
                                  fixed_koff=False, koff_value=None,
-                                 start_candidates=None):
+                                 start_candidates=None,
+                                 assoc_mask_lst=None, disso_mask_lst=None):
     """
     Global fit to a set of association and dissociation traces - one-to-one with mass transport limitation binding model.
     
@@ -1537,6 +1708,11 @@ def fit_one_site_assoc_and_disso_ktr(assoc_signal_lst, assoc_time_lst, analyte_c
         evaluated once at each; a second fit starts from the one with the
         lowest sum of squared residuals, and the better of the two fits is
         returned, default is None.
+
+    assoc_mask_lst, disso_mask_lst : list, optional
+        Boolean array per association / dissociation trace, True for the points
+        to fit (see trim_masks). The model is still evaluated at every point,
+        from the first time point of each step. Default fits every point.
 
     Returns
     -------
@@ -1621,12 +1797,17 @@ def fit_one_site_assoc_and_disso_ktr(assoc_signal_lst, assoc_time_lst, analyte_c
 
     all_signal = np.concatenate([all_signal_assoc,all_signal_disso], axis=0)
 
+    # Edited with AI assistance: optional masks of the points to fit (trim_time).
+    fit_fx_points, signal_points = _fit_points(
+        fit_fx, all_signal,
+        _concat_masks([assoc_mask_lst, disso_mask_lst], [assoc_signal_lst, disso_signal_lst]))
+
     # Fit from initial_parameters and, if given, from the start candidate whose
     # curves are closest to the data. Keep the fit with the lower residual.
     starts = [list(initial_parameters)]
     if start_candidates:
         candidates = [np.clip(p, low_bounds, high_bounds) for p in start_candidates]
-        ssr = [np.sum((fit_fx(1, *p) - all_signal) ** 2) for p in candidates]
+        ssr = [np.sum((fit_fx_points(1, *p) - signal_points) ** 2) for p in candidates]
         best = list(candidates[int(np.nanargmin(ssr))])
         if not np.allclose(best, starts[0], rtol=1e-12, atol=0):
             starts.append(best)
@@ -1637,14 +1818,14 @@ def fit_one_site_assoc_and_disso_ktr(assoc_signal_lst, assoc_time_lst, analyte_c
             # Kd, koff, Ktr and Smax differ by orders of magnitude. Without scaling
             # by the Jacobian, the trust region can stop on xtol far from the minimum.
             # Edited with AI assistance: fitting them on a log scale also needs fewer evaluations.
-            fit = curve_fit_log_scale(fit_fx, 1, all_signal,
+            fit = curve_fit_log_scale(fit_fx_points, 1, signal_points,
                                       p0=p0,
                                       bounds=(low_bounds, high_bounds),
                                       x_scale="jac")
         except RuntimeError as error:
             last_error = error
             continue
-        fit_ssr = np.sum((fit_fx(1, *fit[0]) - all_signal) ** 2)
+        fit_ssr = np.sum((fit_fx_points(1, *fit[0]) - signal_points) ** 2)
         if fit_ssr < best_ssr:
             best_fit, best_ssr = fit, fit_ssr
 
@@ -1758,7 +1939,8 @@ def one_site_assoc_and_disso_asymmetric_ci95(kd_estimated, rss_desired,
                                              smax_idx=None,
                                              shared_smax=False,
                                              fixed_t0=True,
-                                             fixed_koff=False, koff_value=None):
+                                             fixed_koff=False, koff_value=None,
+                                             assoc_mask_lst=None, disso_mask_lst=None):
     """
     Calculate the asymmetric confidence interval for the Kd value, given a desired RSS value.
     
@@ -1795,6 +1977,11 @@ def one_site_assoc_and_disso_asymmetric_ci95(kd_estimated, rss_desired,
     koff_value : float, optional
         Value of koff to use if fixed_koff is True.
         
+    assoc_mask_lst, disso_mask_lst : list, optional
+        Boolean array per association / dissociation trace, True for the points
+        to fit (see trim_masks). Only these points count in the RSS. Default
+        fits every point.
+
     Returns
     -------
     float
@@ -1805,11 +1992,15 @@ def one_site_assoc_and_disso_asymmetric_ci95(kd_estimated, rss_desired,
     # This function contains AI-generated changes (PR #15).
     # Edited with AI assistance: the limits are found with a root search and warm-started
     # refits (_asymmetric_ci95_limits).
-    _ref_assoc = concat_signal_lst(assoc_signal_lst)
-    _ref_disso = concat_signal_lst(disso_signal_lst)
+    # Edited with AI assistance: only the points to fit count in the RSS (trim_time).
+    _mask = _concat_masks([assoc_mask_lst, disso_mask_lst], [assoc_signal_lst, disso_signal_lst])
+    _ref = concat_signal_lst(list(assoc_signal_lst) + list(disso_signal_lst))
+    if _mask is not None:
+        _ref = _ref[_mask]
 
     # Guess the initial signals once for all the refits
-    s0_guesses = initial_signal_guesses_where_needed(assoc_time_lst, assoc_signal_lst, disso_time_lst)
+    s0_guesses = initial_signal_guesses_where_needed(assoc_time_lst, assoc_signal_lst, disso_time_lst,
+                                                     assoc_mask_lst=assoc_mask_lst)
 
     def fit_fixed_kd(Kd, start):
         """Refit with Kd fixed, starting at start; return the RSS and the parameters."""
@@ -1822,10 +2013,11 @@ def one_site_assoc_and_disso_asymmetric_ci95(kd_estimated, rss_desired,
             fixed_t0=fixed_t0,
             s0_guesses=s0_guesses,
             fixed_Kd=True, Kd_value=Kd,
-            fixed_koff=fixed_koff, koff_value=koff_value)
+            fixed_koff=fixed_koff, koff_value=koff_value,
+            assoc_mask_lst=assoc_mask_lst, disso_mask_lst=disso_mask_lst)
 
-        rss = (get_rss(_ref_assoc, concat_signal_lst(fitted_values_assoc)) +
-               get_rss(_ref_disso, concat_signal_lst(fitted_values_disso)))
+        fitted = concat_signal_lst(list(fitted_values_assoc) + list(fitted_values_disso))
+        rss = get_rss(_ref, fitted if _mask is None else fitted[_mask])
         return rss, params
 
     return _asymmetric_ci95_limits(fit_fixed_kd, kd_estimated, rss_desired, initial_parameters,
@@ -1837,7 +2029,8 @@ def one_site_assoc_and_disso_asymmetric_ci95_koff(koff_estimated, rss_desired,
                                              initial_parameters, low_bounds, high_bounds,
                                              smax_idx=None,
                                              shared_smax=False,
-                                             fixed_t0=True):
+                                             fixed_t0=True,
+                                             assoc_mask_lst=None, disso_mask_lst=None):
     """
     Calculate the asymmetric confidence interval for the koff value, given a desired RSS value.
     
@@ -1870,6 +2063,11 @@ def one_site_assoc_and_disso_asymmetric_ci95_koff(koff_estimated, rss_desired,
     fixed_t0 : bool, optional
         If True, t0 is fixed to 0, otherwise we fit it, default is True
         
+    assoc_mask_lst, disso_mask_lst : list, optional
+        Boolean array per association / dissociation trace, True for the points
+        to fit (see trim_masks). Only these points count in the RSS. Default
+        fits every point.
+
     Returns
     -------
     float
@@ -1880,11 +2078,15 @@ def one_site_assoc_and_disso_asymmetric_ci95_koff(koff_estimated, rss_desired,
     # This function contains AI-generated changes (PR #15).
     # Edited with AI assistance: the limits are found with a root search and warm-started
     # refits (_asymmetric_ci95_limits).
-    _ref_assoc = concat_signal_lst(assoc_signal_lst)
-    _ref_disso = concat_signal_lst(disso_signal_lst)
+    # Edited with AI assistance: only the points to fit count in the RSS (trim_time).
+    _mask = _concat_masks([assoc_mask_lst, disso_mask_lst], [assoc_signal_lst, disso_signal_lst])
+    _ref = concat_signal_lst(list(assoc_signal_lst) + list(disso_signal_lst))
+    if _mask is not None:
+        _ref = _ref[_mask]
 
     # Guess the initial signals once for all the refits
-    s0_guesses = initial_signal_guesses_where_needed(assoc_time_lst, assoc_signal_lst, disso_time_lst)
+    s0_guesses = initial_signal_guesses_where_needed(assoc_time_lst, assoc_signal_lst, disso_time_lst,
+                                                     assoc_mask_lst=assoc_mask_lst)
 
     def fit_fixed_koff(Koff, start):
         """Refit with koff fixed, starting at start; return the RSS and the parameters."""
@@ -1896,10 +2098,11 @@ def one_site_assoc_and_disso_asymmetric_ci95_koff(koff_estimated, rss_desired,
             shared_smax=shared_smax,
             fixed_t0=fixed_t0,
             s0_guesses=s0_guesses,
-            fixed_koff=True, koff_value=Koff)
+            fixed_koff=True, koff_value=Koff,
+            assoc_mask_lst=assoc_mask_lst, disso_mask_lst=disso_mask_lst)
 
-        rss = (get_rss(_ref_assoc, concat_signal_lst(fitted_values_assoc)) +
-               get_rss(_ref_disso, concat_signal_lst(fitted_values_disso)))
+        fitted = concat_signal_lst(list(fitted_values_assoc) + list(fitted_values_disso))
+        rss = get_rss(_ref, fitted if _mask is None else fitted[_mask])
         return rss, params
 
     return _asymmetric_ci95_limits(fit_fixed_koff, koff_estimated, rss_desired, initial_parameters,

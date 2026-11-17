@@ -172,7 +172,8 @@ def guess_experiment_type(files):
         files = [files]
 
     for file in files:
-        if file.endswith('.frd'):
+        # Edited with AI assistance: Biacore result files (.blr) are surface-based
+        if file.endswith('.frd') or file.lower().endswith('.blr'):
             return 'surface'
 
     for file in files:

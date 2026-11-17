@@ -20,6 +20,7 @@ from .utils.fitting_surface import (
     fit_two_site_heterogeneous_ligand_assoc_and_disso,
     one_site_assoc_and_disso_asymmetric_ci95,
     one_site_assoc_and_disso_asymmetric_ci95_koff,
+    trim_masks,
     get_smax_upper_bound_factor
 )
 
@@ -137,7 +138,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
     def __init__(self,time_assoc_lst,association_signal_lst,lig_conc_lst,
                  time_diss_lst=None,dissociation_signal_lst=None,
-                 smax_id=None,name_lst=None,is_single_cycle=False):
+                 smax_id=None,name_lst=None,is_single_cycle=False,trim_time=0):
         """
         Initialize the KineticsFitter class.
         
@@ -159,8 +160,18 @@ class KineticsFitter(KineticsFitterGeneral):
             List of experiment names.
         is_single_cycle : bool, optional
             Whether the experiment is a single cycle kinetics experiment, default is False.
+        trim_time : float, optional
+            Time, in seconds from the first point of each association and each
+            dissociation, left out of the kinetic fits, their errors and
+            confidence intervals. The models still start at the first point of
+            each step, so the fitted parameters are not shifted. Default is 0
+            (every point is fitted).
         """
         # This function contains AI-generated changes (PR #15).
+        # Edited with AI assistance: trim_time.
+
+        if trim_time < 0:
+            raise ValueError("trim_time must be zero or positive.")
 
         super().__init__
 
@@ -171,6 +182,7 @@ class KineticsFitter(KineticsFitterGeneral):
         self.time_assoc_lst   = time_assoc_lst
         self.time_disso_lst   = time_diss_lst
         self.is_single_cycle  = is_single_cycle
+        self.trim_time        = trim_time
 
         self.lig_conc_lst_per_id = None  # Ligand concentrations per Smax ID
         self.smax_guesses_unq    = None  # Smax guesses per association signal
@@ -191,6 +203,39 @@ class KineticsFitter(KineticsFitterGeneral):
         self.signal_ss_fit    = None
 
         self.Smax_upper_bound_factor = 1e2  # Normal values for lower than micromolar affinity
+
+    def _fit_masks(self, time_assoc_lst, time_disso_lst):
+        """
+        Masks of the points to fit, as keyword arguments of the fitting functions.
+
+        Parameters
+        ----------
+        time_assoc_lst, time_disso_lst : list
+            Time arrays of the association and dissociation traces being fitted.
+
+        Returns
+        -------
+        dict
+            assoc_mask_lst and disso_mask_lst, from trim_masks and trim_time.
+            Both are None (every point is fitted) if trim_time is 0.
+        """
+        # This function is AI generated.
+        return {'assoc_mask_lst': trim_masks(time_assoc_lst, self.trim_time),
+                'disso_mask_lst': trim_masks(time_disso_lst, self.trim_time)}
+
+    def _grid_rss(self, assoc_lst, fit_assoc_lst, time_assoc_lst,
+                  disso_lst, fit_disso_lst, time_disso_lst):
+        """Residual sum of squares over the points to fit (see trim_time)."""
+        # This function is AI generated.
+        masks = self._fit_masks(time_assoc_lst, time_disso_lst)
+        rss = 0.0
+        for signals, fits, mask_lst in [(assoc_lst, fit_assoc_lst, masks['assoc_mask_lst']),
+                                        (disso_lst, fit_disso_lst, masks['disso_mask_lst'])]:
+            if mask_lst is None:
+                mask_lst = [slice(None)] * len(signals)
+            for y, fit_y, mask in zip(signals, fits, mask_lst):
+                rss += np.sum((np.asarray(y)[mask] - np.asarray(fit_y)[mask]) ** 2)
+        return rss
 
     def get_steady_state(self):
 
@@ -799,7 +844,8 @@ class KineticsFitter(KineticsFitterGeneral):
 
         fit, cov, fit_vals = fit_one_site_association(
             self.assoc_lst,self.time_assoc_lst,self.lig_conc_lst,
-            p0,low_bounds,high_bounds,smax_idx=self.smax_id,shared_smax=shared_smax
+            p0,low_bounds,high_bounds,smax_idx=self.smax_id,shared_smax=shared_smax,
+            mask_lst=trim_masks(self.time_assoc_lst, self.trim_time)
         )
 
         self.params = fit
@@ -898,7 +944,8 @@ class KineticsFitter(KineticsFitterGeneral):
                     low_bounds=temp_low_bounds,
                     high_bounds=temp_high_bounds,
                     smax_idx=temp_smax_idx,
-                    shared_smax=self.shared_smax
+                    shared_smax=self.shared_smax,
+                    mask_lst=trim_masks(temp_time_assoc_lst, self.trim_time)
                 )
 
                 Kd_loo.append(fit_loo[0])
@@ -972,7 +1019,11 @@ class KineticsFitter(KineticsFitterGeneral):
         self.disso_lst_subset = disso_lst
         self.time_disso_lst_subset = time_disso_lst
 
-        p0 = [0.1] + [np.max(signal) for signal in disso_lst]
+        mask_lst = trim_masks(time_disso_lst, self.trim_time)
+        if mask_lst is None:
+            p0 = [0.1] + [np.max(signal) for signal in disso_lst]
+        else:
+            p0 = [0.1] + [np.max(signal[mask]) for signal, mask in zip(disso_lst, mask_lst)]
 
         low_bounds  = [1e-7] + [x/5 for x in p0[1:]]
         high_bounds = [10]   + [x*5 for x in p0[1:]]
@@ -982,7 +1033,8 @@ class KineticsFitter(KineticsFitterGeneral):
         self.high_bounds = high_bounds
 
         fit, cov, fit_vals = fit_one_site_dissociation(disso_lst,time_disso_lst,
-                                                       p0,low_bounds,high_bounds)
+                                                       p0,low_bounds,high_bounds,
+                                                       mask_lst=mask_lst)
 
         self.signal_disso_fit = fit_vals
 
@@ -1059,7 +1111,8 @@ class KineticsFitter(KineticsFitterGeneral):
                     temp_time_disso_lst,
                     temp_p0,
                     low_bounds=temp_low_bounds,
-                    high_bounds=temp_high_bounds)
+                    high_bounds=temp_high_bounds,
+                    mask_lst=trim_masks(temp_time_disso_lst, self.trim_time))
                 k_off_loo.append(fit_loo[0])
                 n_fits_loo_ok += 1
             except Exception:
@@ -1097,8 +1150,14 @@ class KineticsFitter(KineticsFitterGeneral):
         # Initialize a list to store the k_obs values - filld with NaNs
         k_obs = [np.nan for _ in range(len(self.assoc_lst))]
 
+        masks = trim_masks(self.time_assoc_lst, self.trim_time)
+
         i = 0
         for y,t in zip(self.assoc_lst,self.time_assoc_lst):
+
+            # Edited with AI assistance: leave out the first trim_time seconds
+            if masks is not None:
+                y, t = y[masks[i]], t[masks[i]]
 
             fit_params, _, _ = fit_single_exponential(y,t)
 
@@ -1223,7 +1282,8 @@ class KineticsFitter(KineticsFitterGeneral):
                 smax_idx=self.smax_id,
                 shared_smax=shared_smax,
                 fixed_t0=fixed_t0,
-                start_candidates=self._mtl_start_candidates(p0, fixed_t0)
+                start_candidates=self._mtl_start_candidates(p0, fixed_t0),
+                **self._fit_masks(self.time_assoc_lst, self.time_disso_lst)
             )
 
             kwargs = {
@@ -1234,7 +1294,8 @@ class KineticsFitter(KineticsFitterGeneral):
                 'disso_time_lst' : self.time_disso_lst,
                 'shared_smax' : shared_smax,
                 'smax_idx' : self.smax_id,
-                'fixed_t0' : fixed_t0
+                'fixed_t0' : fixed_t0,
+                **self._fit_masks(self.time_assoc_lst, self.time_disso_lst)
             }
 
             fit, cov, fit_vals_assoc, fit_vals_disso,low_bounds, high_bounds = re_fit_2(
@@ -1257,7 +1318,8 @@ class KineticsFitter(KineticsFitterGeneral):
                 p0,low_bounds,high_bounds,
                 smax_idx=self.smax_id,
                 shared_smax=shared_smax,
-                fixed_t0=fixed_t0)
+                fixed_t0=fixed_t0,
+                **self._fit_masks(self.time_assoc_lst, self.time_disso_lst))
 
         self.signal_assoc_fit = fit_vals_assoc
         self.signal_disso_fit = fit_vals_disso
@@ -1412,7 +1474,8 @@ class KineticsFitter(KineticsFitterGeneral):
                 'fixed_t0' : fixed_t0,
                 'initial_parameters' : temp_p0,
                 'low_bounds' : temp_low_bounds,
-                'high_bounds' : temp_high_bounds
+                'high_bounds' : temp_high_bounds,
+                **self._fit_masks(temp_time_assoc_lst, temp_time_disso_lst)
             }
 
             fit_fx = fit_one_site_assoc_and_disso_ktr if fit_ktr else fit_one_site_assoc_and_disso
@@ -1526,6 +1589,7 @@ class KineticsFitter(KineticsFitterGeneral):
             'disso_time_lst' : self.time_disso_lst,
             'shared_smax' : shared_smax,
             'smax_idx' : self.smax_id,
+            **self._fit_masks(self.time_assoc_lst, self.time_disso_lst),
         }
 
         global_fit_params, cov, fitted_values_assoc, fitted_values_disso = fit_two_site_assoc_and_disso(
@@ -1763,6 +1827,7 @@ class KineticsFitter(KineticsFitterGeneral):
                 'smax_idx' : temp_smax_idx,
                 'fixed_t0' : fixed_t0,
                 'fit_sigma' : fit_sigma,
+                **self._fit_masks(temp_time_assoc_lst, temp_time_disso_lst),
             }
 
             try:
@@ -1885,6 +1950,7 @@ class KineticsFitter(KineticsFitterGeneral):
             'shared_smax': shared_smax,
             'smax_idx': self.smax_id,
             'fixed_t0': True,
+            **self._fit_masks(time_assoc_lst_subsampled, time_disso_lst_subsampled),
         }
 
         p0_grid_base = [koff_init, koff_init, 0.5] + smax_init
@@ -1910,9 +1976,8 @@ class KineticsFitter(KineticsFitterGeneral):
                     Kd2_value=Kd2_value,
                 )
 
-                rss_assoc = np.sum([np.sum((y - fit_y) ** 2) for y, fit_y in zip(assoc_lst_subsampled, fit_vals_assoc)])
-                rss_disso = np.sum([np.sum((y - fit_y) ** 2) for y, fit_y in zip(disso_lst_subsampled, fit_vals_disso)])
-                rss = rss_assoc + rss_disso
+                rss = self._grid_rss(assoc_lst_subsampled, fit_vals_assoc, time_assoc_lst_subsampled,
+                                     disso_lst_subsampled, fit_vals_disso, time_disso_lst_subsampled)
 
                 grid_rows.append({'Kd1_value': Kd1_value, 'Kd2_value': Kd2_value, 'rss': rss})
 
@@ -1967,7 +2032,8 @@ class KineticsFitter(KineticsFitterGeneral):
             'disso_time_lst': self.time_disso_lst,
             'shared_smax': shared_smax,
             'smax_idx': self.smax_id,
-            'fixed_t0': fixed_t0
+            'fixed_t0': fixed_t0,
+            **self._fit_masks(self.time_assoc_lst, self.time_disso_lst)
         }
 
         fit, cov, fit_vals_assoc, fit_vals_disso = fit_two_site_heterogeneous_ligand_assoc_and_disso(
@@ -2147,6 +2213,7 @@ class KineticsFitter(KineticsFitterGeneral):
                 'shared_smax': shared_smax,
                 'smax_idx': temp_smax_idx,
                 'fixed_t0': fixed_t0,
+                **self._fit_masks(temp_time_assoc_lst, temp_time_disso_lst),
             }
 
             try:
@@ -2259,6 +2326,14 @@ class KineticsFitter(KineticsFitterGeneral):
 
                 exp_signal_concat = concat_signal_lst(self.assoc_lst+self.disso_lst)
                 fit_signal_concat = concat_signal_lst(self.signal_assoc_fit+self.signal_disso_fit)
+
+                # Edited with AI assistance: only the points to fit count (trim_time)
+                masks = self._fit_masks(self.time_assoc_lst, self.time_disso_lst)
+                if self.trim_time:
+                    keep = np.concatenate(masks['assoc_mask_lst'] + masks['disso_mask_lst'])
+                    exp_signal_concat = exp_signal_concat[keep]
+                    fit_signal_concat = fit_signal_concat[keep]
+
                 n                 = len(exp_signal_concat)
                 p                 = len(self.p0)
 
@@ -2272,7 +2347,7 @@ class KineticsFitter(KineticsFitterGeneral):
                     self.lig_conc_lst,
                     self.disso_lst,self.time_disso_lst,
                     self.p0[1:],self.low_bounds[1:],self.high_bounds[1:],
-                    self.smax_id,shared_smax=shared_smax,fixed_t0=fixed_t0)
+                    self.smax_id,shared_smax=shared_smax,fixed_t0=fixed_t0,**masks)
 
                 p0 = self.p0[:1] + self.p0[2:]
                 low_bounds = self.low_bounds[:1] + self.low_bounds[2:]
@@ -2284,7 +2359,7 @@ class KineticsFitter(KineticsFitterGeneral):
                     self.lig_conc_lst,
                     self.disso_lst,self.time_disso_lst,
                     p0,low_bounds,high_bounds,
-                    self.smax_id,shared_smax=shared_smax,fixed_t0=fixed_t0)
+                    self.smax_id,shared_smax=shared_smax,fixed_t0=fixed_t0,**masks)
 
                 # Convert ci95_Kd and ci95_koff to a nice Table
                 header = ['Parameter','95% CI lower','95% CI upper']
@@ -2400,14 +2475,15 @@ class KineticsFitter(KineticsFitterGeneral):
                     fixed_kon2 = True, # k_on2 refers here to the forward rate constant of the induced fit
                     kon2_value=kc,
                     fixed_koff2 = True, # k_off2 refers here to the reverse rate constant of the induced fit
-                    koff2_value=krev
+                    koff2_value=krev,
+                    **self._fit_masks(time_assoc_lst_subsampled, time_disso_lst_subsampled)
                 )
 
                 # Calculate the residuals for the signals - use the subsampled data
-                rss_asso  = np.sum([np.sum((y - fit_y)**2) for y, fit_y in zip(assoc_lst_subsampled, fit_vals_assoc)])
-                rss_disso = np.sum([np.sum((y - fit_y)**2) for y, fit_y in zip(disso_lst_subsampled, fit_vals_disso)])
+                rss = self._grid_rss(assoc_lst_subsampled, fit_vals_assoc, time_assoc_lst_subsampled,
+                                     disso_lst_subsampled, fit_vals_disso, time_disso_lst_subsampled)
 
-                grid_results.append((rss_asso + rss_disso, kc, krev, params))
+                grid_results.append((rss, kc, krev, params))
 
             except:
 
@@ -2474,7 +2550,8 @@ class KineticsFitter(KineticsFitterGeneral):
                     shared_smax=shared_smax,
                     fixed_t0=True,
                     max_nfev=400 * len(start),
-                    fit_signal_ratio=fit_signal_ratio)
+                    fit_signal_ratio=fit_signal_ratio,
+                    **self._fit_masks(self.time_assoc_lst, self.time_disso_lst))
             except RuntimeError as error:
                 last_error = error
                 continue
@@ -2605,7 +2682,8 @@ class KineticsFitter(KineticsFitterGeneral):
                 'high_bounds' : temp_high_bounds,
                 'shared_smax' : shared_smax,
                 'smax_idx' : temp_smax_idx,
-                'fixed_t0' : True
+                'fixed_t0' : True,
+                **self._fit_masks(temp_time_assoc_lst, temp_time_disso_lst)
             }
 
             try:

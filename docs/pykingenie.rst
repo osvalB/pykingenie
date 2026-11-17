@@ -17,6 +17,14 @@ Subpackages
 Submodules
 ----------
 
+pykingenie.biacore module
+-------------------------
+
+.. automodule:: pykingenie.biacore
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 pykingenie.fitter module
 ------------------------
 
