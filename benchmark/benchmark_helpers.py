@@ -48,7 +48,7 @@ def _noisy(signal, noise_sd, rng):
 
 
 def simulate_mck(rhs, signal, y0, params, concs, assoc_time=300.0, disso_time=600.0,
-                 dt=1.0, noise_sd=0.1, seed=0):
+                 dt=1.0, noise_sd=0.5, seed=0):
     """
     Simulate multi-cycle kinetics.
 
@@ -96,7 +96,7 @@ def simulate_mck(rhs, signal, y0, params, concs, assoc_time=300.0, disso_time=60
 
 
 def simulate_sck(rhs, signal, y0, params, concs, assoc_time=120.0, disso_time=60.0,
-                 final_disso_time=900.0, dt=1.0, noise_sd=0.1, seed=0):
+                 final_disso_time=900.0, dt=1.0, noise_sd=0.5, seed=0):
     """
     Simulate single-cycle kinetics.
 

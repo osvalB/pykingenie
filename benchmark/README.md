@@ -8,7 +8,9 @@ For each model and each experiment layout, a notebook:
 1. writes the model's rate equations from first principles and integrates them
    with SciPy (`solve_ivp`, Radau method). No pykingenie function is used to make
    the data;
-2. adds Gaussian noise (standard deviation 0.1 RU, with Rmax = 50 RU);
+2. adds Gaussian noise with a standard deviation of 0.5 RU, 1% of Rmax (50 RU).
+   This is at the high end of real instruments: reference-subtracted SPR data
+   typically show 0.1-0.5 RU of noise, and BLI 0.3-1% of a typical binding signal;
 3. fits the data with pykingenie, with one Smax (Rmax) shared by all curves;
 4. compares the fitted parameters with the true ones. A parameter counts as
    recovered when its relative error is at most 5%.
@@ -44,15 +46,16 @@ Largest relative error over the fitted parameters of each model:
 
 | Model | Multi-cycle | Single-cycle |
 |---|---|---|
-| 1:1 | +0.09% (Kd) | +0.05% (k_off) |
-| 1:1 with mass transport | −0.27% (k_tr) | −0.66% (k_tr) |
-| Induced fit | +0.48% (k_off) | −0.41% (k_off) |
-| Induced fit, signal ratio | +0.48% (k_off) | −0.44% (k_off) |
-| Two sites | −0.26% (Rmax_PL) | −0.38% (Rmax_PL) |
-| Two sites, cooperative | −0.24% (sigma) | −0.39% (Rmax_PL) |
-| Heterogeneous ligand | −0.37% (Kd2) | −0.19% (k_off2) |
+| 1:1 | +0.43% (Kd) | +0.25% (k_off) |
+| 1:1 with mass transport | −1.35% (k_tr) | −3.35% (k_tr) |
+| Induced fit | +2.40% (k_off) | −2.02% (k_off) |
+| Induced fit, signal ratio | +2.42% (k_off) | −2.19% (k_off) |
+| Two sites | −1.27% (Rmax_PL) | −1.88% (Rmax_PL) |
+| Two sites, cooperative | −1.20% (sigma) | −1.97% (Rmax_PL) |
+| Heterogeneous ligand | −1.83% (Kd2) | −0.96% (k_off2) |
 
-All parameters are recovered within 1% in all 14 notebooks.
+All parameters are recovered within 5% in all 14 notebooks. These errors come from
+one noise draw per notebook, so they show the size of the error, not a bias.
 
 ## Running
 
