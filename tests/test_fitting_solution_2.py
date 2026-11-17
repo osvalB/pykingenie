@@ -6,9 +6,10 @@ from pykingenie.utils.signal_solution  import (
     get_initial_concentration_conformational_selection
 )
 
-from pykingenie.utils.fitting_solution import fit_conformational_selection_solution
-
-from src.pykingenie.utils.fitting_solution import find_initial_parameters_conformational_selection_solution
+from pykingenie.utils.fitting_solution import (
+    fit_conformational_selection_solution,
+    find_initial_parameters_conformational_selection_solution,
+)
 
 
 t = np.linspace(0, 0.5, 20)
