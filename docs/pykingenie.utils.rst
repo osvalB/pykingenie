@@ -9,6 +9,14 @@ pykingenie.utils package
 Submodules
 ----------
 
+pykingenie.utils.compound\_file module
+--------------------------------------
+
+.. automodule:: pykingenie.utils.compound_file
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 pykingenie.utils.fitting\_general module
 ----------------------------------------
 
