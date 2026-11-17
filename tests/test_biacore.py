@@ -13,7 +13,7 @@ import numpy as np
 import pytest
 
 from pykingenie import BiacoreExperiment, KineticsAnalyzer
-from pykingenie.biacore import _injection_type, _parse_events, _read_segment, _read_xy_data
+from pykingenie.biacore import _cycle_date, _injection_type, _parse_events, _read_segment, _read_xy_data
 from pykingenie.utils.compound_file import (
     SIGNATURE,
     _read_compound_bytes,
@@ -189,16 +189,30 @@ def test_sensors_and_steps(experiment):
 def test_first_cycle_steps(experiment):
     first = experiment.df_steps[experiment.df_steps['Cycle'] == 1]
     assert first['Type'].tolist() == ['BASELINE', 'ASSOC', 'DISASSOC', 'BASELINE', 'KREGENERATION', 'BASELINE']
-    np.testing.assert_allclose(first['Start'], [0.0, 63.3, 183.4, 423.4, 495.1, 505.2])
+    # Step starts within the cycle, shifted by the cycle start in the run (464.915 s)
+    np.testing.assert_allclose(first['Start'] - 464.915, [0.0, 63.3, 183.4, 423.4, 495.1, 505.2], atol=1e-5)
     assert first['Sample_position'].iloc[1] == 'R1C12'
+
+
+# Cycle starts in seconds after the run start, as OpenReadout 0.4.0 reports them
+# (its 'cycles' table, rounded to the millisecond)
+CYCLE_STARTS = [464.915, 1035.86, 1606.806, 2177.832, 2746.419, 3315.992, 3884.592,
+                4454.971, 5023.797, 5595.367, 6163.961, 6735.583, 7304.667, 7875.396]
+
+
+def test_cycles_at_their_start_in_the_run(experiment):
+    starts = experiment.df_steps.groupby('Cycle')['Start'].min().to_numpy()
+    np.testing.assert_allclose(starts, CYCLE_STARTS, atol=1e-3)
+    assert experiment.exp_info['Run_start'] == '2017-09-21T19:27:47'
+    assert experiment.exp_info['Run_end'] == '2017-09-21T21:48:50'
 
 
 def test_continuous_time_axis(experiment):
     for s in range(experiment.no_sensors):
         t = np.concatenate(experiment.xs[s])
         assert np.all(np.diff(t) > 0)
-        assert t[0] == pytest.approx(0.1)
-        assert t[-1] == pytest.approx(7776.4)
+        assert t[0] == pytest.approx(CYCLE_STARTS[0] + 0.1, abs=1e-3)
+        assert t[-1] == pytest.approx(8430.996, abs=1e-3)
         assert len(t) == sum(len(y) for y in experiment.ys[s])
     # All sensors share the same times
     for x_a, x_b in zip(experiment.xs[0], experiment.xs[2]):
@@ -240,6 +254,43 @@ def test_fitting_pipeline(experiment):
         warnings.simplefilter('ignore')
         analyzer.submit_steady_state_fitting()
     assert len(analyzer.fittings) == 1
+
+
+def _read_without(monkeypatch, drop):
+    """Read the test file with some streams removed."""
+    import pykingenie.biacore as biacore
+    original = biacore.read_compound_file
+    monkeypatch.setattr(biacore, 'read_compound_file',
+                        lambda path: {k: v for k, v in original(path).items() if not drop(k, v)})
+    exp = BiacoreExperiment()
+    exp.read_blr(BLR_FILE)
+    return exp.df_steps.groupby('Cycle')['Start'].min().to_numpy(), exp
+
+
+def test_without_run_start_cycles_start_from_the_first(monkeypatch):
+    starts, exp = _read_without(monkeypatch, lambda key, value: key == 'Environment')
+    np.testing.assert_allclose(starts, np.array(CYCLE_STARTS) - CYCLE_STARTS[0], atol=1e-3)
+    assert exp.exp_info['Run_start'] is None
+
+
+def test_without_date_stamps_cycles_follow_each_other(monkeypatch):
+    """Without the cycle date stamps (event 10), each cycle starts where the previous ends."""
+    import pykingenie.biacore as biacore
+    monkeypatch.setattr(biacore, '_cycle_date', lambda events: None)
+    exp = BiacoreExperiment()
+    exp.read_blr(BLR_FILE)
+    starts = exp.df_steps.groupby('Cycle')['Start'].min().to_numpy()
+    assert starts[0] == 0.0
+    ends = [np.concatenate([x for x, c in zip(exp.xs[0], exp.df_steps['Cycle']) if c == cycle])[-1]
+            for cycle in range(1, 15)]
+    np.testing.assert_allclose(starts[1:], ends[:-1])
+
+
+def test_cycle_date():
+    events = _parse_events(b'F0;93;bA\nF0;10;d42999.8163440162\nF500;10;d1\n')
+    assert _cycle_date(events) == 42999.8163440162
+    assert _cycle_date(_parse_events(b'F0;10;dnot a date\n')) is None
+    assert _cycle_date([]) is None
 
 
 def test_not_a_biacore_file(tmp_path):

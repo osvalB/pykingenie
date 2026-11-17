@@ -12,8 +12,9 @@ storage per cycle, with:
   ``XYData`` (explicit times).
 
 Each flow cell (and subtracted pair, e.g. ``Fc4-3``) becomes a sensor. The cycles are
-placed one after the other on a single time axis, and each cycle is split into steps
-from its event log:
+placed on a single time axis at their start in the run (seconds after the run start,
+from the date stamps of the event logs), and each cycle is split into steps from its
+event log:
 
 - sample injection start to end: association ('ASSOC');
 - from the end of the sample injection to the end of the report period (event 37) or
@@ -24,6 +25,7 @@ from its event log:
 import re
 import struct
 import warnings
+from datetime import datetime, timedelta
 
 import numpy as np
 import pandas as pd
@@ -37,6 +39,11 @@ __all__ = ['BiacoreExperiment']
 _INJECTION_START = 33
 _INJECTION_END = 34
 _REPORT_END = 37
+_CYCLE_DATE = 10  # at time 0 of the cycle, field 'd': date stamp
+
+# Date stamps are OLE automation dates: days since 1899-12-30
+_OLE_EPOCH = datetime(1899, 12, 30)
+_SECONDS_PER_DAY = 86400.0
 
 # Concentration units of the file, to µM
 _CONC_UNIT_TO_MICROMOLAR = {'M': 1e6, 'mM': 1e3, 'µM': 1.0, 'uM': 1.0, 'nM': 1e-3, 'pM': 1e-6}
@@ -82,6 +89,28 @@ def _parse_events(raw):
         fields = {item[0]: item[1:] for item in match.group(3).split(';') if item}
         events.append((int(match.group(1)) / 1000, int(match.group(2)), fields))
     return events
+
+
+def _ole_date(value):
+    """OLE automation date (days since 1899-12-30) from text, or None."""
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _cycle_date(events):
+    """Date stamp of the cycle start (OLE date), or None if the event log has none."""
+    for time, code, fields in events:
+        if code == _CYCLE_DATE and time == 0:
+            date = _ole_date(fields.get('d'))
+            if date is not None:
+                return date
+    return None
+
+
+def _ole_date_to_iso(date):
+    return (_OLE_EPOCH + timedelta(days=date)).isoformat(timespec='seconds') if date is not None else None
 
 
 def _injection_type(label):
@@ -165,13 +194,26 @@ class BiacoreExperiment(SurfaceBasedExperiment):
         self.xs = [[] for _ in self.sensor_names]
         self.ys = [[] for _ in self.sensor_names]
         steps, conc_rows = [], []
-        offset, n_assoc, n_loading, loading_location = 0.0, 0, 0, '0'
+        previous_end, n_assoc, n_loading, loading_location = 0.0, 0, 0, '0'
 
-        for c, curves in zip(cycles, curves_per_cycle):
+        # Cycles start at their time in the run: seconds after the run start, or after
+        # the first cycle if the run start is missing
+        events_per_cycle = [_parse_events(streams.get(f'_Cycle {c}/EventLog', b'')) for c in cycles]
+        cycle_dates = [_cycle_date(events) for events in events_per_cycle]
+        run_start = _ole_date(_key_values(streams.get('Environment', b'')).get('Timestamp'))
+        if run_start is None:
+            run_start = next((d for d in cycle_dates if d is not None), None)
 
-            events = _parse_events(streams.get(f'_Cycle {c}/EventLog', b''))
+        for c, curves, events, date in zip(cycles, curves_per_cycle, events_per_cycle, cycle_dates):
+
             keywords = next(iter(curves.values()))[2]
             cycle_end = max(t[-1] for t, _, _ in curves.values())
+
+            # Without a date stamp, or if it would overlap the previous cycle, the cycle
+            # follows the previous one
+            offset = previous_end
+            if date is not None and run_start is not None:
+                offset = max((date - run_start) * _SECONDS_PER_DAY, previous_end)
 
             sample_index = 0
             for start, end, step_type, name, fields in self._cycle_steps(events, cycle_end):
@@ -199,7 +241,7 @@ class BiacoreExperiment(SurfaceBasedExperiment):
                     self.xs[s].append(offset + t[sel])
                     self.ys[s].append(y[sel])
 
-            offset += cycle_end
+            previous_end = offset + cycle_end
 
         if n_assoc == 0:
             raise ValueError(f"No sample injections found in {file}.")
@@ -221,6 +263,8 @@ class BiacoreExperiment(SurfaceBasedExperiment):
         chip = _key_values(streams.get('Chip', b''))
 
         info = {key: environment.get(key) for key in ('Application', 'Version', 'RunType', 'InstrumentId')}
+        info['Run_start'] = _ole_date_to_iso(_ole_date(environment.get('Timestamp')))
+        info['Run_end'] = _ole_date_to_iso(_ole_date(environment.get('EndTime')))
         info['Chip'] = chip.get('Name')
         info['Concentration_unit'] = conc_unit
 
