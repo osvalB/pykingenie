@@ -164,6 +164,16 @@ def test_fit_shared_t0_without_steady_state():
     assert abs(fitter.fit_params_kinetics['t0'].iloc[0]) < 0.01
 
 
+def test_fit_with_known_kd_ss_and_no_smax_guesses():
+    # A preset steady-state Kd skips the steady-state fit, so the Smax guesses
+    # still have to be computed
+    fitter = _fitter(steady_state=False)
+    fitter.Kd_ss = 1.0
+    fitter.fit_bivalent_analyte_assoc_and_disso(**COARSE_GRID)
+    assert fitter.smax_guesses_unq is not None
+    _assert_recovered(fitter)
+
+
 def test_fit_function_default_smax_index():
     from pykingenie.utils.fitting_surface import fit_bivalent_analyte_assoc_and_disso
 
