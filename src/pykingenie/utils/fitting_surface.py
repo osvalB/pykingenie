@@ -22,6 +22,8 @@ from .signal_surface import (
     solve_two_site_cooperative_dissociation,
     solve_two_site_heterogeneous_ligand_association,
     solve_two_site_heterogeneous_ligand_dissociation,
+    solve_bivalent_analyte_association,
+    solve_bivalent_analyte_dissociation,
 )
 
 from .math import get_rss
@@ -43,6 +45,7 @@ __all__ = [
     'fit_one_site_assoc_and_disso',
     'fit_two_site_assoc_and_disso',
     'fit_two_site_heterogeneous_ligand_assoc_and_disso',
+    'fit_bivalent_analyte_assoc_and_disso',
     'fit_induced_fit_sites_assoc_and_disso',
     'fit_one_site_assoc_and_disso_ktr',
     'one_site_assoc_and_disso_asymmetric_ci95',
@@ -2107,3 +2110,161 @@ def one_site_assoc_and_disso_asymmetric_ci95_koff(koff_estimated, rss_desired,
 
     return _asymmetric_ci95_limits(fit_fixed_koff, koff_estimated, rss_desired, initial_parameters,
                                    test_factors=[1.02, 1.1, 1.5, 2, 5, 10, 25, 50, 100])
+
+
+def fit_bivalent_analyte_assoc_and_disso(
+    assoc_signal_lst, assoc_time_lst, analyte_conc_lst,
+    disso_signal_lst, disso_time_lst,
+    initial_parameters, low_bounds, high_bounds,
+    smax_idx=None,
+    shared_smax=False,
+    fixed_t0=True,
+    fixed_ka2=False, ka2_value=None,
+    fixed_kd2=False, kd2_value=None,
+    assoc_mask_lst=None, disso_mask_lst=None,
+    rtol=1e-8, coarse=False,
+):
+    """
+    Global fit to association and dissociation traces - bivalent analyte model.
+
+    The analyte binds the immobilised ligand with one arm (Kd1, koff1) and the
+    bound analyte binds a second ligand with its other arm (ka2, kd2). See
+    ode_bivalent_analyte in signal_surface for the rate equations.
+
+    Parameter order when fitting:
+    [Kd1, koff1, ka2, kd2, (t0...), Rmax_1, Rmax_2, ...]
+    ka2 and kd2 are left out when fixed, and t0 when fixed_t0 is True
+    (one t0 per Rmax group otherwise).
+
+    Parameters
+    ----------
+    assoc_signal_lst : list
+        List of association signals to fit, each signal is a numpy array.
+    assoc_time_lst : list
+        List of association time arrays.
+    analyte_conc_lst : list
+        Analyte concentration of each association trace, µM.
+    disso_signal_lst : list
+        List of dissociation signals to fit, each signal is a numpy array.
+    disso_time_lst : list
+        List of dissociation time arrays.
+    initial_parameters : list
+        Initial guess, in the order above.
+    low_bounds : list
+        Lower bounds for the parameters.
+    high_bounds : list
+        Upper bounds for the parameters.
+    smax_idx : list, optional
+        Rmax group of each trace, used if shared_smax is True.
+    shared_smax : bool, optional
+        If True, traces with the same smax_idx share Rmax, default is False.
+    fixed_t0 : bool, optional
+        If True, t0 is fixed to 0, otherwise one t0 per Rmax group is fitted,
+        default is True.
+    fixed_ka2 : bool, optional
+        If True, ka2 is fixed to ka2_value, default is False.
+    ka2_value : float, optional
+        Value of ka2 [1/(signal·s)] to use if fixed_ka2 is True.
+    fixed_kd2 : bool, optional
+        If True, kd2 is fixed to kd2_value, default is False.
+    kd2_value : float, optional
+        Value of kd2 [1/s] to use if fixed_kd2 is True.
+    assoc_mask_lst, disso_mask_lst : list, optional
+        Boolean array per association / dissociation trace, True for the points
+        to fit (see trim_masks). The model is still evaluated at every point,
+        from the first time point of each step. Default fits every point.
+    rtol : float, optional
+        Relative tolerance of the ODE integration, default is 1e-8.
+    coarse : bool, optional
+        If True, stop the optimizer at a relative change of 1e-4 and use a 1e-3
+        finite-difference step, so a looser rtol does not make the Jacobian noisy.
+        Used by the grid search, where the fit only ranks starting points.
+        Default is False.
+
+    Returns
+    -------
+    list
+        Fitted parameters.
+    np.ndarray
+        Covariance matrix of the fitted parameters.
+    list
+        Fitted values for each association signal, same dimensions as assoc_signal_lst.
+    list
+        Fitted values for each dissociation signal, same dimensions as disso_signal_lst.
+    """
+    # This function is AI generated.
+    if smax_idx is None:
+        smax_idx = list(range(len(assoc_signal_lst)))
+
+    # An association that starts after a dissociation of the same cycle (single
+    # cycle kinetics) continues from the complexes left at its end
+    initial_signal_at_zero = [time[0] < 2 for time in assoc_time_lst]
+    continuos_time = detect_time_list_continuos(assoc_time_lst, disso_time_lst)
+
+    time_lst_assoc = [np.array(t, dtype=float) for t in assoc_time_lst]
+    time_lst_disso = [np.array(t, dtype=float) for t in disso_time_lst]
+
+    n_traces = len(time_lst_assoc)
+    n_t0s = len(np.unique(smax_idx)) * (not fixed_t0)
+    n_kinetic = 4 - fixed_ka2 - fixed_kd2
+
+    _a_offsets = np.concatenate([[0], np.cumsum([len(t) for t in time_lst_assoc])]).astype(int)
+    _d_offsets = (_a_offsets[-1] + np.concatenate([[0], np.cumsum([len(t) for t in time_lst_disso])])).astype(int)
+    _total = _d_offsets[-1]
+
+    def fit_fx(dummyVariable, *args):
+        """Evaluate the global bivalent analyte association and dissociation model."""
+        Kd1, koff1 = args[0], args[1]
+        idx = 2
+        ka2 = ka2_value if fixed_ka2 else args[idx]
+        idx += not fixed_ka2
+        kd2 = kd2_value if fixed_kd2 else args[idx]
+
+        out = np.empty(_total)
+        previous_end = (0.0, 0.0)
+
+        for i in range(n_traces):
+            group = smax_idx[i]
+            t0 = 0.0 if fixed_t0 else args[n_kinetic + group]
+            Rmax = args[n_kinetic + n_t0s + (group if shared_smax else i)]
+
+            if continuos_time[i] and not (i == 0 or initial_signal_at_zero[i]):
+                x1_0, x2_0 = previous_end
+            else:
+                x1_0, x2_0 = 0.0, 0.0
+
+            y_assoc = solve_bivalent_analyte_association(
+                time_lst_assoc[i], analyte_conc_lst[i], Kd1, koff1, ka2, kd2, Rmax,
+                x1_0=x1_0, x2_0=x2_0, t0=t0, rtol=rtol)
+            out[_a_offsets[i]:_a_offsets[i + 1]] = y_assoc[:, 0]
+
+            y_disso = solve_bivalent_analyte_dissociation(
+                time_lst_disso[i], koff1, ka2, kd2, Rmax,
+                x1_0=y_assoc[-1, 1], x2_0=y_assoc[-1, 2], rtol=rtol)
+            out[_d_offsets[i]:_d_offsets[i + 1]] = y_disso[:, 0]
+
+            previous_end = (y_disso[-1, 1], y_disso[-1, 2])
+
+        return out
+
+    all_signal = np.concatenate([concat_signal_lst(assoc_signal_lst), concat_signal_lst(disso_signal_lst)])
+
+    fit_fx_points, signal_points = _fit_points(
+        fit_fx, all_signal,
+        _concat_masks([assoc_mask_lst, disso_mask_lst], [assoc_signal_lst, disso_signal_lst]))
+
+    # Rate constants, Kd1 and Rmax span orders of magnitude: fit them on a log scale
+    coarse_kwargs = dict(ftol=1e-4, xtol=1e-4, diff_step=1e-3) if coarse else {}
+    global_fit_params, cov = curve_fit_log_scale(
+        fit_fx_points, 1, signal_points,
+        p0=initial_parameters,
+        bounds=(low_bounds, high_bounds),
+        x_scale='jac',
+        **coarse_kwargs,
+    )
+
+    predicted = fit_fx(1, *global_fit_params)
+    fitted_values_assoc = [predicted[_a_offsets[k]:_a_offsets[k + 1]] for k in range(n_traces)]
+    fitted_values_disso = [predicted[_d_offsets[k]:_d_offsets[k + 1]] for k in range(n_traces)]
+
+    return global_fit_params, cov, fitted_values_assoc, fitted_values_disso
