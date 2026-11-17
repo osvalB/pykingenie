@@ -83,6 +83,29 @@ def _create_heterogeneous_ligand_kinetic_fitter(
     return fitter_surface, truth
 
 
+def test_save_and_restore_array_valued_grid_arguments():
+    fitter, _ = _create_heterogeneous_ligand_kinetic_fitter()
+    kd1_grid = np.array([0.1])
+    kd2_grid = np.array([5.0])
+    fitter.fit_two_site_heterogeneous_ligand_assoc_and_disso(
+        Kd1_values=kd1_grid, Kd2_values=kd2_grid,
+    )
+    fitter.save_fit_result('grid_search', Kd1_values=[0.1], Kd2_values=[5.0])
+    expected = fitter.params.copy()
+
+    # Changing the caller's arrays must not change the recorded arguments.
+    kd1_grid[0] = 1.0
+    kd2_grid[0] = 50.0
+    fitter.fit_one_site_dissociation()
+    fitter.restore_fit_result(
+        'two_site_heterogeneous_ligand_association_and_dissociation',
+        Kd1_values=np.array([0.1]), Kd2_values=[5.0],
+    )
+    np.testing.assert_array_equal(fitter.params, expected)
+    np.testing.assert_array_equal(fitter.fit_settings['Kd1_values'], [0.1])
+    np.testing.assert_array_equal(fitter.fit_settings['Kd2_values'], [5.0])
+
+
 class _PreseededInvalidSignalFitter(KineticsFitter):
     def fit_steady_state_one_site(self):
         self.Kd_ss = 1.0

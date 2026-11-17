@@ -254,4 +254,94 @@ def test_histories_belong_to_each_fitter(fitter):
     fitter.fit_one_site_dissociation()
     other = KineticsFitter(fitter.time_assoc_lst, fitter.assoc_lst, fitter.lig_conc_lst)
     assert other.fit_results == {}
+    assert other.fit_result_history == {}
     assert other.active_fit_result is None
+
+
+def test_save_records_and_checks_explicit_fitting_arguments(fitter):
+    fitter.fit_one_site_assoc_and_disso(shared_smax=False, fixed_t0=True)
+    key = fitter.save_fit_result('per_trace', shared_smax=False, fixed_t0=True)
+    assert key == 'per_trace'
+    assert fitter.fit_results[key]['fit_settings'] == {
+        'shared_smax': False, 'fixed_t0': True, 'fit_ktr': False, 'calc_loo': False,
+    }
+    assert fitter.fit_results[key]['shared_smax'] is False
+    assert fitter.fit_results[key]['fit_model'] == ONE_SITE
+
+    with pytest.raises(ValueError, match='differs from the fitted value'):
+        fitter.save_fit_result('wrong_settings', shared_smax=True)
+    with pytest.raises(TypeError, match='Unknown fit argument'):
+        fitter.save_fit_result('typo', shared_smx=False)
+    assert 'wrong_settings' not in fitter.fit_results
+    assert 'typo' not in fitter.fit_results
+    assert len(fitter.fit_result_history[ONE_SITE]) == 1
+
+
+def test_restore_distinguishes_shared_and_per_trace_smax_without_custom_names(fitter):
+    fitter.fit_one_site_assoc_and_disso(shared_smax=True)
+    shared = fitter.params.copy()
+    fitter.fit_one_site_assoc_and_disso(shared_smax=False)
+    per_trace = fitter.params.copy()
+    assert len(fitter.fit_result_history[ONE_SITE]) == 2
+
+    fitter.restore_fit_result(ONE_SITE, shared_smax=True)
+    assert fitter.shared_smax is True
+    np.testing.assert_array_equal(fitter.params, shared)
+    assert fitter.fit_results[ONE_SITE]['fit_settings']['shared_smax'] is True
+    fitter.restore_fit_result(ONE_SITE, shared_smax=False)
+    assert fitter.shared_smax is False
+    np.testing.assert_array_equal(fitter.params, per_trace)
+    assert len(fitter.fit_result_history[ONE_SITE]) == 2
+
+
+def test_restore_selects_time_limit_and_its_fitted_subset(fitter):
+    fitter.fit_one_site_dissociation(time_limit=60)
+    params = fitter.params.copy()
+    subset = copy.deepcopy(fitter.time_disso_lst_subset)
+    fitter.fit_one_site_dissociation(time_limit=200)
+    fitter.restore_fit_result('one_site_dissociation', time_limit=60)
+    assert fitter.fit_settings['time_limit'] == 60
+    np.testing.assert_array_equal(fitter.params, params)
+    np.testing.assert_array_equal(fitter.time_disso_lst_subset, subset)
+
+
+def test_restore_requires_unique_matching_arguments(fitter):
+    fitter.fit_one_site_assoc_and_disso(shared_smax=True, fixed_t0=True)
+    fixed = fitter.params.copy()
+    fitter.fit_one_site_assoc_and_disso(shared_smax=True, fixed_t0=False)
+    active = fitter.params.copy()
+
+    with pytest.raises(ValueError, match='Multiple saved fits'):
+        fitter.restore_fit_result(ONE_SITE, shared_smax=True)
+    with pytest.raises(ValueError, match='No saved fit'):
+        fitter.restore_fit_result(ONE_SITE, shared_smax=False)
+    with pytest.raises(TypeError, match='Unknown fit argument'):
+        fitter.restore_fit_result(ONE_SITE, shared_smx=True)
+    np.testing.assert_array_equal(fitter.params, active)
+
+    fitter.restore_fit_result(ONE_SITE, shared_smax=True, fixed_t0=True)
+    assert fitter.fixed_t0 is True
+    np.testing.assert_array_equal(fitter.params, fixed)
+
+
+def test_named_result_arguments_are_checked_without_selecting_another_fit(fitter):
+    fitter.fit_one_site_assoc_and_disso(shared_smax=True)
+    fitter.save_fit_result('shared', shared_smax=True)
+    fitter.fit_one_site_assoc_and_disso(shared_smax=False)
+    with pytest.raises(ValueError, match='differs from the fitted value'):
+        fitter.restore_fit_result('shared', shared_smax=False)
+    assert fitter.shared_smax is False
+    fitter.restore_fit_result('shared', shared_smax=True)
+    assert fitter.shared_smax is True
+
+
+def test_refit_replaces_only_its_configuration_and_clear_retains_all(fitter):
+    fitter.fit_one_site_assoc_and_disso(shared_smax=True)
+    shared = fitter.params.copy()
+    fitter.fit_one_site_assoc_and_disso(shared_smax=False)
+    fitter.fit_one_site_assoc_and_disso(shared_smax=False)
+    assert len(fitter.fit_result_history[ONE_SITE]) == 2
+    fitter.clear_fittings()
+    fitter.restore_fit_result(ONE_SITE, shared_smax=True)
+    np.testing.assert_array_equal(fitter.params, shared)
+    assert len(fitter.fit_result_history[ONE_SITE]) == 2

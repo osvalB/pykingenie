@@ -120,14 +120,35 @@ correlations, bounds and any calculated confidence intervals or leave-one-out
 results. Failed fits do not replace saved results.
 Internal fits used only to find initial guesses do not replace saved models.
 
-The latest successful fit replaces the entry for that model. To compare settings
-or repeated runs of the same model, save a named version first:
+Every model and argument combination is saved separately in `fit_result_history`.
+For example, shared and per-trace Smax fits can be restored by their arguments:
 
 ```python
-fitter.save_fit_result('one_site_shared_smax')
+fitter.fit_one_site_assoc_and_disso(shared_smax=True, fixed_t0=True)
+fitter.save_fit_result('one_site_shared_smax', shared_smax=True, fixed_t0=True)
+
 fitter.fit_one_site_assoc_and_disso(shared_smax=False)
-fitter.restore_fit_result('one_site_shared_smax')
+
+fitter.restore_fit_result(
+    'one_site_association_and_dissociation', shared_smax=True, fixed_t0=True,
+)
+assert fitter.shared_smax is True
+print(fitter.fit_settings)  # All arguments used by this fit, including defaults.
+
+# Named snapshots can also be restored directly, or checked against arguments.
+fitter.restore_fit_result('one_site_shared_smax', shared_smax=True)
 ```
+
+`save_fit_result(name, **fit_arguments)` always stores all actual fit arguments.
+Arguments supplied to save are checked against the active fit, so a result cannot
+be saved with settings different from those used to calculate it. To change an
+argument, run the fit with that argument first.
+
+`fit_results[model]` holds the latest saved snapshot at that key. Restore a model
+without arguments to use that snapshot, or supply arguments to select a unique
+configuration from `fit_result_history[model]`. Ambiguous or unmatched selections
+raise an error. Refitting an identical configuration replaces its previous result;
+use named snapshots to retain repeated runs with identical arguments.
 
 Surface result keys include `steady_state_one_site`, `one_site_association`,
 `one_site_dissociation`, `one_site_association_and_dissociation`, and
