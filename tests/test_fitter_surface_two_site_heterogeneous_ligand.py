@@ -315,3 +315,60 @@ def test_fit_two_site_heterogeneous_ligand_raises_when_grid_fits_all_fail():
             Kd1_values=[0.1],
             Kd2_values=[5.0],
         )
+
+
+# Grid search consistent with the bounds of the final fit. This test code is AI generated.
+
+def _one_to_one_fitter(Kd, koff, concs, seed):
+    """Noisy one-to-one data, fitted with the heterogeneous ligand model."""
+    from pykingenie.utils.signal_surface import (
+        one_site_association_analytical,
+        one_site_dissociation_analytical,
+    )
+    rng = np.random.default_rng(seed)
+    t_assoc = np.arange(0, 120.05, 0.5)
+    t_disso = np.arange(120.5, 360.05, 0.5)
+    assoc_lst, disso_lst = [], []
+    for conc in concs:
+        assoc = one_site_association_analytical(t_assoc, 0, 10, koff, Kd, conc, 0)
+        disso = one_site_dissociation_analytical(t_disso - t_disso[0], assoc[-1], koff, 0)
+        assoc_lst.append(assoc + rng.normal(0, 0.05, assoc.size))
+        disso_lst.append(disso + rng.normal(0, 0.05, disso.size))
+    n = len(concs)
+    fitter_surface = KineticsFitter([t_assoc] * n, assoc_lst, concs, [t_disso] * n, disso_lst,
+                                    smax_id=[0] * n, name_lst=['one_to_one'])
+    fitter_surface.get_steady_state()
+    fitter_surface.fit_steady_state()
+    return fitter_surface
+
+
+@pytest.mark.parametrize("Kd, koff, concs, seed", [
+    # The grid used to return a fraction of site 1 below 0.01, the final fit's lower bound
+    (15.0, 0.15, [1.56, 6.25, 25.0, 50.0], 0),
+    # Every concentration far above Kd: the grid used to return a Kd2 below the final
+    # fit's lower bound (10 * min(Kd1, lowest concentration / 10))
+    (1.0, 0.05, [10.0, 20.0, 40.0, 80.0], 1),
+])
+def test_heterogeneous_ligand_on_one_to_one_data(Kd, koff, concs, seed):
+    """The best grid point is always a valid start of the final fit."""
+    fitter_surface = _one_to_one_fitter(Kd, koff, concs, seed)
+    fitter_surface.fit_two_site_heterogeneous_ligand_assoc_and_disso()
+
+    # Site 1 is the one-to-one site and carries nearly all the signal
+    assert fitter_surface.Kd1 == pytest.approx(Kd, rel=0.02)
+    assert fitter_surface.k_off1 == pytest.approx(koff, rel=0.02)
+    assert 0.9 < fitter_surface.fraction_site1 <= 1.0
+
+    grid = fitter_surface.heterogeneous_ligand_grid_search
+    kd2_low = 10 * np.minimum(grid['Kd1_value'], np.min(concs) / 10)
+    assert np.all(grid['Kd2_value'] >= kd2_low)
+
+
+def test_heterogeneous_ligand_grid_requires_kd2_above_the_final_bound():
+    fitter_surface, _ = _create_heterogeneous_ligand_kinetic_fitter()
+    # Lowest concentration 0.05 µM: Kd2 must be at least 10 * min(Kd1, 0.005)
+    with pytest.raises(ValueError, match="Kd2 >= 10"):
+        fitter_surface.fit_two_site_heterogeneous_ligand_assoc_and_disso(
+            Kd1_values=[0.001, 0.002],
+            Kd2_values=[0.004, 0.005],
+        )
