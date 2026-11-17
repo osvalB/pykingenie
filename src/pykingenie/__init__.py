@@ -9,6 +9,7 @@ from .kingenie_solution import KinGenieCsvSolution
 from .kingenie_surface  import KinGenieCsv
 from .surface_csv       import SurfaceCsvExperiment
 from .biacore           import BiacoreExperiment
+from .spr_exports       import SprTextExperiment, CarterraExperiment
 
 from .utils.processing import (
     guess_experiment_name,

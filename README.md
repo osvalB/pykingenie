@@ -9,6 +9,7 @@ Welcome to **pyKinGenie**!, a python package for analysing binding kinetics data
 - Import Octet files (.frd)
 - Import Gator files (Assay_#_Channel#.csv, Setting.ini and ExperimentStep.ini)
 - Import Biacore result files (.blr)
+- Import paired X/Y SPR text exports, including Biacore T200, and Carterra row-oriented CSV exports
 - Import custom CSV files 
 - Process the traces (alignment, baseline correction)
 - Calculate binding kinetics (*k*<sub>on</sub>, *k*<sub>off</sub>, *K*<sub>D</sub>)
@@ -92,6 +93,57 @@ pyKinetics.submit_kinetics_fitting()
 fig = plot_association_dissociation(pyKinetics)
 fig.write_image('test_bli_fitted.png')
 ```
+
+## SPR sensorgram text exports
+
+`SprTextExperiment` reads text/CSV/TSV files with one named `_X` time column
+and `_Y` response column per curve. Verified examples include Biacore T200
+`Cycle=..._Fc=...` and `Cycle: ...` headers, and rstoolbox's `Run/Ch/Cy/conc`
+export. Delimiters are detected; decimal commas and gzip files are supported.
+
+```python
+from pykingenie import SprTextExperiment, CarterraExperiment
+
+spr = SprTextExperiment("t200")
+spr.read_file(
+    "sensorgrams.txt",
+    association_start=0,       # seconds on the exported time axis
+    association_end=120,
+    concentrations=[25, 50],   # one concentration per measured curve, in file order
+    concentration_unit="nM",
+    decimal=",",              # use "." for dot-decimal exports
+)
+
+carterra = CarterraExperiment("lsa")
+carterra.read_csv(
+    "sensorgrams.csv",         # Label, X1, Y1, X2, Y2, ...; one curve per row
+    association_end=120,
+    concentrations=[25, 50],
+    concentration_unit="nM",
+)
+```
+
+Supply the actual injection boundaries for your experiment: association is
+`[association_start, association_end)`, and dissociation starts at
+`association_end`. These readers represent one association/dissociation pair
+per curve; full run logs and single-cycle injection series need their own step
+metadata. File times can be seconds or minutes (`time_unit="min"`); boundaries
+are always seconds. Independent curve time grids and measured responses are
+preserved without interpolation, alignment or reference subtraction. Exported
+`fitted curve` columns are excluded; Carterra `NotFitted` rows are retained.
+For Carterra XLSX exports, save the sensorgram sheet as CSV first.
+
+Concentrations can also be a mapping from full curve labels to values. Without
+explicit concentrations, only `conc=...` labels with a known molar unit are
+converted; set `concentration_unit` to interpret unitless `conc=...` labels.
+Unresolved concentrations generate a warning and stay `NaN` in
+`ligand_conc_df`. Carterra `Conc. N` indices, bare numbers and mass units are
+never treated as molar concentrations. Supply these values before fitting.
+The common `sample_id="sample"` groups all curves as one binding interaction;
+pass a list or curve-name mapping of sample IDs for exports containing several
+interactions. The resulting experiments use the standard `KineticsAnalyzer`
+workflow shown above. Public sample provenance and licenses are recorded in
+[the fixture sources](test_files/spr_exports/SOURCES.md).
 
 ## Keeping results when changing models
 

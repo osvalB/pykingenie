@@ -105,6 +105,14 @@ pykingenie.surface\_csv module
    :show-inheritance:
    :undoc-members:
 
+pykingenie.spr\_exports module
+------------------------------
+
+.. automodule:: pykingenie.spr_exports
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 pykingenie.surface\_exp module
 ------------------------------
 
