@@ -578,3 +578,40 @@ def test_trimmed_points_are_excluded_from_comparison(fitter):
     comparison = fitter.compare_saved_fits()
     assert comparison['Reduced χ²'].iloc[0] == pytest.approx(rss / (n - 3))
     assert comparison['BIC'].iloc[0] == pytest.approx(n * np.log(rss / n) + 3 * np.log(n))
+
+
+def test_comparison_rejects_missing_parameter_count(fitter):
+    fitter.fit_one_site_dissociation()
+    fitter.save_fit_result('missing_count')
+    del fitter.fit_results['missing_count']['fit_parameter_count']
+    with pytest.raises(ValueError, match='has no parameter count'):
+        fitter.compare_saved_fits('missing_count')
+
+
+@pytest.mark.parametrize('corruption, message', [
+    ('trace_count', 'do not match the observed traces'),
+    ('point_count', 'do not match the fitted time range'),
+    ('no_predictions', 'no fitted observations'),
+])
+def test_comparison_rejects_incomplete_prediction_layouts(fitter, corruption, message):
+    fitter.fit_one_site_dissociation()
+    fitter.save_fit_result('incomplete')
+    state = fitter.fit_results['incomplete']
+    if corruption == 'trace_count':
+        state['signal_disso_fit'].pop()
+    elif corruption == 'point_count':
+        state['signal_disso_fit'][0] = state['signal_disso_fit'][0][:-1]
+    else:
+        state['signal_disso_fit'] = None
+    with pytest.raises(ValueError, match=message):
+        fitter.compare_saved_fits('incomplete')
+
+
+def test_comparison_rejects_overflow_from_finite_predictions(fitter):
+    fitter.fit_one_site_dissociation()
+    fitter.save_fit_result('overflow')
+    fitter.fit_results['overflow']['signal_disso_fit'] = [
+        np.full_like(signal, 1e200) for signal in fitter.disso_lst
+    ]
+    with np.errstate(over='ignore'), pytest.raises(ValueError, match='finite, non-negative residual'):
+        fitter.compare_saved_fits('overflow')
