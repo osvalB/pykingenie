@@ -256,6 +256,52 @@ def test_fitting_pipeline(experiment):
     assert len(analyzer.fittings) == 1
 
 
+def test_sample_plate(experiment):
+    """Rack positions as a sample plate: rows carry the rack, one entry per position."""
+    exp = experiment
+    assert exp.sample_plate_loaded
+    positions = [f'{r.replace(" ", "")}{c}' for r, c in zip(exp.sample_row, exp.sample_column)]
+    assert positions == ['R1A12'] + [f'R1C{i}' for i in range(1, 13)] + ['R2A1']
+    plate = dict(zip(positions, zip(exp.sample_type, exp.sample_id, exp.sample_conc_labeled)))
+    assert plate['R1C5'] == ('KSAMPLE', 'Streptag-Gly loop', '6.25 µM')
+    assert plate['R1C1'] == ('BUFFER', 'Streptag-Gly loop', '0 µM')
+    assert plate['R1C12'] == ('BUFFER', 'buffer', '0 µM (2 injections)')
+    assert plate['R2A1'] == ('REGENERATION', 'Regeneration 1', '14 injections')
+    assert exp.sample_conc[positions.index('R1C9')] == 100
+    assert np.isnan(exp.sample_conc[positions.index('R2A1')])
+
+
+def test_plate_plots(experiment):
+    from pykingenie import plot_plate_info
+    from pykingenie.utils import plotting_xy
+    analyzer = KineticsAnalyzer()
+    analyzer.add_experiment(experiment, 'streptavidin')
+    fig = plot_plate_info(analyzer, 'streptavidin')
+    assert list(fig.data[0].text) == [{'KSAMPLE': 'S', 'BUFFER': 'B', 'REGENERATION': 'R'}[t]
+                                      for t in experiment.sample_type]
+    assert plotting_xy.plot_plate_info(analyzer, 'streptavidin') is not None
+
+
+def test_sample_plate_builder():
+    exp = BiacoreExperiment()
+    exp._build_sample_plate([
+        {'position': 'R2B3', 'step_type': 'LOADING', 'id': 'Capture 1', 'conc': None},
+        {'position': 'R1A1', 'step_type': 'ASSOC', 'id': 'protein', 'conc': 1.0},
+        {'position': 'R1A1', 'step_type': 'ASSOC', 'id': 'protein', 'conc': 2.0},
+        {'position': 'R1A2', 'step_type': 'ASSOC', 'id': 'protein', 'conc': np.nan},
+        {'position': 'vial 7', 'step_type': 'ASSOC', 'id': 'other', 'conc': 1.0},
+    ])
+    assert list(exp.sample_row) == ['R1 A', 'R1 A', 'R2 B']
+    assert list(exp.sample_column) == [1, 2, 3]
+    assert exp.sample_type == ['KSAMPLE', 'KSAMPLE', 'LOADING']
+    assert exp.sample_conc_labeled == ['1 µM, 2 µM (2 injections)', '', '']
+    assert np.isnan(exp.sample_conc[0]) and np.isnan(exp.sample_conc[1])
+
+    empty = BiacoreExperiment()
+    empty._build_sample_plate([{'position': 'vial 7', 'step_type': 'ASSOC', 'id': 'x', 'conc': 1.0}])
+    assert not empty.sample_plate_loaded and empty.sample_row is None
+
+
 def _read_without(monkeypatch, drop):
     """Read the test file with some streams removed."""
     import pykingenie.biacore as biacore

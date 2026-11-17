@@ -52,6 +52,13 @@ _CONC_UNIT_TO_MICROMOLAR = {'M': 1e6, 'mM': 1e3, 'µM': 1.0, 'uM': 1.0, 'nM': 1e
 _INJECTION_TYPES = [('regeneration', 'KREGENERATION'), ('capture', 'LOADING'),
                     ('ligand', 'LOADING'), ('sample', 'ASSOC')]
 
+# Step type of an injection to the sample type of its rack position, as in Octet plates
+_PLATE_SAMPLE_TYPES = {'ASSOC': 'KSAMPLE', 'KREGENERATION': 'REGENERATION',
+                       'LOADING': 'LOADING', 'INJECTION': 'INJECTION'}
+
+# Rack position, e.g. 'R1C12': rack 1, row C, column 12
+_RACK_POSITION = re.compile(r'^R(\d+)([A-Z]+)(\d+)$')
+
 
 def _text(raw):
     """Decode a text stream (the software writes Windows-1252 text)."""
@@ -147,8 +154,12 @@ class BiacoreExperiment(SurfaceBasedExperiment):
     ligand_conc_df : pandas.DataFrame
         One row per sensor and association step, with the analyte concentration.
     exp_info : dict
-        Run information: instrument software, run type, sensor chip, ligand and
-        immobilization level per flow cell, and the concentration unit of the file.
+        Run information: instrument software, run type, run start and end, sensor
+        chip, ligand and immobilization level per flow cell, and the concentration
+        unit of the file.
+    sample_row, sample_column, sample_type, sample_id, sample_conc, sample_conc_labeled
+        Rack positions used by the injections, one entry per position, for
+        ``plot_plate_info``. Rows carry the rack (e.g. 'R1 C' for position R1C5).
     """
 
     def __init__(self, name='biacore'):
@@ -193,7 +204,7 @@ class BiacoreExperiment(SurfaceBasedExperiment):
 
         self.xs = [[] for _ in self.sensor_names]
         self.ys = [[] for _ in self.sensor_names]
-        steps, conc_rows = [], []
+        steps, conc_rows, injections = [], [], []
         previous_end, n_assoc, n_loading, loading_location = 0.0, 0, 0, '0'
 
         # Cycles start at their time in the run: seconds after the run start, or after
@@ -234,6 +245,12 @@ class BiacoreExperiment(SurfaceBasedExperiment):
                               'Column_location': column_location,
                               'Loading_location': loading_location if step_type == 'ASSOC' else np.nan})
 
+                if step_type in _PLATE_SAMPLE_TYPES and fields.get('p'):
+                    row = conc_rows[-1] if step_type == 'ASSOC' else {}
+                    injections.append({'position': fields['p'], 'step_type': step_type,
+                                       'id': row.get('SampleID', name),
+                                       'conc': row.get('Concentration_micromolar')})
+
                 for s, sensor in enumerate(self.sensor_names):
                     t, y, _ = curves[sensor]
                     last_step = end >= cycle_end
@@ -251,6 +268,7 @@ class BiacoreExperiment(SurfaceBasedExperiment):
         self.no_steps = len(steps)
 
         self._build_ligand_conc_df(conc_rows)
+        self._build_sample_plate(injections)
         self.create_unique_sensor_names()
         self.traces_loaded = True
 
@@ -358,4 +376,58 @@ class BiacoreExperiment(SurfaceBasedExperiment):
         df['Experiment'] = self.name
         self.ligand_conc_df = df[['Sensor', 'Analyte_location', 'Concentration_micromolar',
                                   'SampleID', 'Replicate', 'Loading_location', 'Experiment']]
+        return None
+
+    def _build_sample_plate(self, injections):
+        """
+        Rack positions used by the injections, in the form plot_plate_info expects.
+
+        One entry per position (e.g. 'R1C12'), sorted by rack, row and column. Rows are labelled
+        with their rack ('R1 C'), so positions of different racks do not overlap. A
+        position used by sample injections is 'KSAMPLE', or 'BUFFER' if all of them are
+        0 µM; regeneration and capture positions are 'REGENERATION' and 'LOADING'.
+        """
+        positions = {}
+        for injection in injections:
+            match = _RACK_POSITION.match(injection['position'])
+            if match is None:
+                continue
+            positions.setdefault(injection['position'], (match, []))[1].append(injection)
+
+        rows, columns, types, ids, concs, labels = [], [], [], [], [], []
+        def rack_order(item):
+            rack, row, column = item[1][0].groups()
+            return int(rack), row, int(column)
+
+        for position, (match, uses) in sorted(positions.items(), key=rack_order):
+            rack, row, column = match.groups()
+            sample_type = _PLATE_SAMPLE_TYPES[uses[0]['step_type']]
+            values = [u['conc'] for u in uses if u['conc'] is not None and not np.isnan(u['conc'])]
+            if sample_type == 'KSAMPLE' and values and all(v == 0 for v in values):
+                sample_type = 'BUFFER'
+
+            names = list(dict.fromkeys(u['id'] for u in uses))
+            unique_values = list(dict.fromkeys(values))
+            label = ', '.join(f'{v:g} µM' for v in unique_values)
+            if len(uses) > 1:
+                label = f'{label} ({len(uses)} injections)' if label else f'{len(uses)} injections'
+
+            rows.append(f'R{rack} {row}')
+            columns.append(int(column))
+            types.append(sample_type)
+            ids.append(', '.join(names))
+            concs.append(unique_values[0] if len(unique_values) == 1 else np.nan)
+            labels.append(label)
+
+        if not rows:
+            return None
+
+        self.sample_row = np.array(rows)
+        self.sample_column = np.array(columns)
+        self.sample_type = types
+        self.sample_id = ids
+        self.sample_conc = np.array(concs, dtype=float)
+        self.sample_conc_labeled = labels
+        self.sample_plate_loaded = True
+
         return None
