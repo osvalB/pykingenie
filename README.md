@@ -144,6 +144,8 @@ pass a list or curve-name mapping of sample IDs for exports containing several
 interactions. The resulting experiments use the standard `KineticsAnalyzer`
 workflow shown above. Public sample provenance and licenses are recorded in
 [the fixture sources](test_files/spr_exports/SOURCES.md).
+The sample data retain their upstream licenses; see
+[third-party notices](THIRD_PARTY_NOTICES.md) for attribution and reuse terms.
 
 ## Keeping results when changing models
 
