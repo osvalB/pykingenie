@@ -146,6 +146,9 @@ workflow shown above. Public sample provenance and licenses are recorded in
 [the fixture sources](test_files/spr_exports/SOURCES.md).
 The sample data retain their upstream licenses; see
 [third-party notices](THIRD_PARTY_NOTICES.md) for attribution and reuse terms.
+Independent parser comparisons and the missing-response behavior found in the
+full public rstoolbox example are documented in
+[SPR parser validation](validation/spr_parsers/README.md).
 
 ## Keeping results when changing models
 

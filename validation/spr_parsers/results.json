@@ -1,0 +1,237 @@
+{
+  "absolute_tolerance": 1e-10,
+  "reference_source_sha256": {
+    "rstoolbox": "0d8564b98946071f700fb038cd89dde1763510a05238bd7952aec174362e56cf",
+    "rki": "a39a2fb8a21b683119b20887b6fe38a61d212dc875d0bcee31a423a1637698ce"
+  },
+  "results": [
+    {
+      "curves": 2,
+      "points": 40,
+      "max_absolute_error": {
+        "time": 0.0,
+        "response": 0.0
+      },
+      "case": "rstoolbox fixture",
+      "status": "match",
+      "input_sha256": "08bb1a05e0bcedffb1c43e2e954c7350b0d10bbb3ef422ba8a8fd3766c0de16c",
+      "original_input_sha256": "08bb1a05e0bcedffb1c43e2e954c7350b0d10bbb3ef422ba8a8fd3766c0de16c",
+      "reference_input_sha256": "08bb1a05e0bcedffb1c43e2e954c7350b0d10bbb3ef422ba8a8fd3766c0de16c",
+      "normalization": null,
+      "reference": {
+        "reference": "rstoolbox.io.read_SPR",
+        "version": "1.0.1",
+        "numpy": "1.26.4",
+        "pandas": "1.5.3",
+        "source_sha256": "0d8564b98946071f700fb038cd89dde1763510a05238bd7952aec174362e56cf",
+        "fitted_curves_excluded": 1,
+        "incomplete_pairs": {}
+      }
+    },
+    {
+      "curves": 2,
+      "points": 40,
+      "max_absolute_error": {
+        "time": 0.0,
+        "response": 0.0
+      },
+      "case": "rstoolbox TSV variant",
+      "status": "match",
+      "input_sha256": "beefd44bad8d5e22e5d69673991a743b3c98783d00b4f01d53c363eccd65ef3e",
+      "original_input_sha256": "beefd44bad8d5e22e5d69673991a743b3c98783d00b4f01d53c363eccd65ef3e",
+      "reference_input_sha256": "beefd44bad8d5e22e5d69673991a743b3c98783d00b4f01d53c363eccd65ef3e",
+      "normalization": null,
+      "reference": {
+        "reference": "rstoolbox.io.read_SPR",
+        "version": "1.0.1",
+        "numpy": "1.26.4",
+        "pandas": "1.5.3",
+        "source_sha256": "0d8564b98946071f700fb038cd89dde1763510a05238bd7952aec174362e56cf",
+        "fitted_curves_excluded": 1,
+        "incomplete_pairs": {}
+      }
+    },
+    {
+      "curves": 2,
+      "points": 40,
+      "max_absolute_error": {
+        "time": 0.0,
+        "response": 0.0
+      },
+      "case": "rstoolbox gzip variant",
+      "status": "match",
+      "input_sha256": "8c2e4f653b29150232cef1f8f255fca904cf29f7172843789462bbf4d9513b37",
+      "original_input_sha256": "8c2e4f653b29150232cef1f8f255fca904cf29f7172843789462bbf4d9513b37",
+      "reference_input_sha256": "8c2e4f653b29150232cef1f8f255fca904cf29f7172843789462bbf4d9513b37",
+      "normalization": null,
+      "reference": {
+        "reference": "rstoolbox.io.read_SPR",
+        "version": "1.0.1",
+        "numpy": "1.26.4",
+        "pandas": "1.5.3",
+        "source_sha256": "0d8564b98946071f700fb038cd89dde1763510a05238bd7952aec174362e56cf",
+        "fitted_curves_excluded": 1,
+        "incomplete_pairs": {}
+      }
+    },
+    {
+      "curves": 2,
+      "points": 40,
+      "max_absolute_error": {
+        "time": 0.0,
+        "response": 0.0
+      },
+      "case": "rstoolbox reordered X/Y variant",
+      "status": "match",
+      "input_sha256": "381f2004ca692a987f8fec48b9930b8ac4021dd03b40c591f353e27a5049ed25",
+      "original_input_sha256": "381f2004ca692a987f8fec48b9930b8ac4021dd03b40c591f353e27a5049ed25",
+      "reference_input_sha256": "381f2004ca692a987f8fec48b9930b8ac4021dd03b40c591f353e27a5049ed25",
+      "normalization": null,
+      "reference": {
+        "reference": "rstoolbox.io.read_SPR",
+        "version": "1.0.1",
+        "numpy": "1.26.4",
+        "pandas": "1.5.3",
+        "source_sha256": "0d8564b98946071f700fb038cd89dde1763510a05238bd7952aec174362e56cf",
+        "fitted_curves_excluded": 1,
+        "incomplete_pairs": {}
+      }
+    },
+    {
+      "case": "rstoolbox full public source",
+      "status": "intentional_behavior_difference",
+      "input_sha256": "1bf92879abcbcf4d56f21d92d0570c1e9f438dc0807e5ee60aa8da729b3619e5",
+      "incomplete_pairs": {
+        "0.0585": 49,
+        "0.117": 49,
+        "0.234375": 49,
+        "0.46875": 49,
+        "0.9375": 49,
+        "1.875": 49,
+        "3.75": 49,
+        "7.5": 49,
+        "15": 49,
+        "30": 49,
+        "60": 49
+      },
+      "pykingenie": "raises ValueError for missing/non-finite measurements",
+      "error": "Non-finite measurement in curve 'Run 1; Ch 1; Cy 6; RefSub; 1kx8_d02; conc=0.0585'.",
+      "rstoolbox": "retains timestamps with NaN responses"
+    },
+    {
+      "curves": 11,
+      "points": 61851,
+      "max_absolute_error": {
+        "time": 0.0,
+        "response": 0.0
+      },
+      "case": "rstoolbox full public source / complete observations only",
+      "status": "match",
+      "input_sha256": "a4515f5f9fdbc34ecbc75b5d91422a43e4f8975384499ff1cd07b67a6ff2b64e",
+      "original_input_sha256": "1bf92879abcbcf4d56f21d92d0570c1e9f438dc0807e5ee60aa8da729b3619e5",
+      "reference_input_sha256": "1bf92879abcbcf4d56f21d92d0570c1e9f438dc0807e5ee60aa8da729b3619e5",
+      "normalization": "Removed 539 incomplete pairs; no interpolation or imputation",
+      "reference": {
+        "reference": "rstoolbox.io.read_SPR",
+        "version": "1.0.1",
+        "numpy": "1.26.4",
+        "pandas": "1.5.3",
+        "source_sha256": "0d8564b98946071f700fb038cd89dde1763510a05238bd7952aec174362e56cf",
+        "fitted_curves_excluded": 5,
+        "incomplete_pairs": {
+          "0.0585": 49,
+          "0.117": 49,
+          "0.234375": 49,
+          "0.46875": 49,
+          "0.9375": 49,
+          "1.875": 49,
+          "3.75": 49,
+          "7.5": 49,
+          "15": 49,
+          "30": 49,
+          "60": 49
+        }
+      }
+    },
+    {
+      "curves": 2,
+      "points": 78,
+      "max_absolute_error": {
+        "time": 0.0,
+        "response": 0.0
+      },
+      "case": "Biacore fixture / original R importer",
+      "status": "match",
+      "input_sha256": "e6ddecabae78091f962b5b3adcc88782468a7655f87c9949605e7af20284972b",
+      "original_input_sha256": "e6ddecabae78091f962b5b3adcc88782468a7655f87c9949605e7af20284972b",
+      "reference_input_sha256": "e6ddecabae78091f962b5b3adcc88782468a7655f87c9949605e7af20284972b",
+      "normalization": null,
+      "reference": {
+        "reference": "RKI binDataImport_final.R: original raw import through outputHu",
+        "version": "R version 4.5.1 (2025-06-13)",
+        "packages": {
+          "readxl": "1.4.5",
+          "dplyr": "1.1.4",
+          "tidyr": "1.3.1",
+          "jsonlite": "2.0.0"
+        }
+      }
+    },
+    {
+      "curves": 68,
+      "points": 75043,
+      "max_absolute_error": {
+        "time": 0.0,
+        "response": 0.0
+      },
+      "case": "Biacore full source / original R importer",
+      "status": "match",
+      "input_sha256": "0bf881f731c4bf9fd93185f42d825b82ff358b0ff37809f22aefde9850971364",
+      "original_input_sha256": "0bf881f731c4bf9fd93185f42d825b82ff358b0ff37809f22aefde9850971364",
+      "reference_input_sha256": "0bf881f731c4bf9fd93185f42d825b82ff358b0ff37809f22aefde9850971364",
+      "normalization": null,
+      "reference": {
+        "reference": "RKI binDataImport_final.R: original raw import through outputHu",
+        "version": "R version 4.5.1 (2025-06-13)",
+        "packages": {
+          "readxl": "1.4.5",
+          "dplyr": "1.1.4",
+          "tidyr": "1.3.1",
+          "jsonlite": "2.0.0"
+        }
+      }
+    },
+    {
+      "curves": 3,
+      "points": 1602,
+      "max_absolute_error": {
+        "time": 0.0,
+        "response": 0.0
+      },
+      "case": "Carterra CSV / original workbook via readxl",
+      "status": "match",
+      "input_sha256": "9795667be5fec07fbc2133974f5a85e9d4354ca168e5e3e89b9a0de8d553f6d9",
+      "original_input_sha256": "9795667be5fec07fbc2133974f5a85e9d4354ca168e5e3e89b9a0de8d553f6d9",
+      "reference_input_sha256": "8a940a49b1dacafd7f918e155caa59339214c2d31042c434063788e155df73a7",
+      "normalization": null,
+      "reference": {
+        "reference": "readxl::read_excel: first three native Carterra workbook rows",
+        "version": "R version 4.5.1 (2025-06-13)",
+        "packages": {
+          "readxl": "1.4.5",
+          "dplyr": "1.1.4",
+          "tidyr": "1.3.1",
+          "jsonlite": "2.0.0"
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "Concentration labels are matched without assuming a molar unit.",
+    "rstoolbox drops run/channel/cycle metadata; full labels cannot be compared.",
+    "RKI comparison runs its unchanged raw-import section, not the full script.",
+    "Carterra comparison uses readxl, not the Mathematica SPR parser.",
+    "Injection boundaries and inferred concentrations have no external oracle.",
+    "Duke Cycle/sample export has no executed domain-specific reference parser."
+  ]
+}
