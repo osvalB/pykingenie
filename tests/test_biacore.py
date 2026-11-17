@@ -350,3 +350,111 @@ def test_not_a_biacore_file(tmp_path):
     empty.write_bytes(b'not a compound file' * 40)
     with pytest.raises(ValueError, match="signature"):
         exp.read_blr(str(empty))
+
+
+# Compound file structures not used by the test file, and more broken files
+
+def _directory_entry(data):
+    """Offset of the first directory entry, and the sector size."""
+    sector_size = 1 << struct.unpack_from('<H', data, 0x1E)[0]
+    first_dir_sector = struct.unpack_from('<I', data, 0x30)[0]
+    return (first_dir_sector + 1) * sector_size, sector_size
+
+
+@pytest.mark.parametrize("n_difat", [1, 2])
+def test_fat_sectors_listed_in_a_difat_sector(streams, n_difat):
+    """Files with more than 109 FAT sectors list the rest in DIFAT sectors.
+
+    With n_difat = 2 the header claims one DIFAT sector more than the chain holds;
+    reading stops at the end of the chain.
+    """
+    with open(BLR_FILE, 'rb') as f:
+        data = bytearray(f.read())
+    _, sector_size = _directory_entry(data)
+    n_fat = struct.unpack_from('<I', data, 0x2C)[0]
+
+    # Move the last FAT sector number from the header to a new DIFAT sector at the end
+    last_fat = struct.unpack_from('<I', data, 0x4C + 4 * (n_fat - 1))[0]
+    struct.pack_into('<I', data, 0x4C + 4 * (n_fat - 1), 0xFFFFFFFF)
+    difat_index = len(data) // sector_size - 1
+    entries = [last_fat] + [0xFFFFFFFF] * (sector_size // 4 - 2) + [0xFFFFFFFE]
+    data += struct.pack(f'<{len(entries)}I', *entries)
+    struct.pack_into('<II', data, 0x44, difat_index, n_difat)
+
+    assert _read_compound_bytes(bytes(data)) == streams
+
+
+@pytest.mark.parametrize("offset, fmt, value, message", [
+    (0x42, '<B', 1, "no root entry"),                      # root entry stored as a storage
+    (0x4C, '<I', 10 ** 6, "outside the directory"),        # root child index past the end
+    (128 + 0x78, '<Q', 1000, "shorter than its declared size"),  # 14-byte stream claims 1000 bytes
+])
+def test_broken_directory(offset, fmt, value, message):
+    with open(BLR_FILE, 'rb') as f:
+        data = bytearray(f.read())
+    start, _ = _directory_entry(data)
+    struct.pack_into(fmt, data, start + offset, value)
+    with pytest.raises(ValueError, match=message):
+        _read_compound_bytes(bytes(data))
+
+
+# Biacore files with unexpected content
+
+def _read_changed(monkeypatch, change):
+    """Read the test file after changing its streams."""
+    import pykingenie.biacore as biacore
+    original = biacore.read_compound_file
+    monkeypatch.setattr(biacore, 'read_compound_file', lambda path: change(dict(original(path))))
+    exp = BiacoreExperiment()
+    exp.read_blr(BLR_FILE)
+    return exp
+
+
+def test_no_cycles(monkeypatch):
+    with pytest.raises(ValueError, match="No cycles"):
+        _read_changed(monkeypatch, lambda s: {k: v for k, v in s.items() if not k.startswith('_Cycle')})
+
+
+def test_unknown_concentration_unit(monkeypatch):
+    def change(s):
+        s['FileTag'] = b'ConcUnit=furlong'
+        return s
+    with pytest.warns(UserWarning, match="Unknown concentration unit"):
+        exp = _read_changed(monkeypatch, change)
+    # Read as µM
+    assert exp.ligand_conc_df['Concentration_micromolar'].max() == 100
+
+
+def test_curve_without_data_in_one_cycle(monkeypatch):
+    """A curve with no data points is skipped, so the cycle no longer has every sensor."""
+    prefix = '_Cycle 2/_Window 1/_Curve 2/'
+
+    def change(s):
+        return {k: v for k, v in s.items()
+                if not (k.startswith(prefix) and ('Segment' in k or k.endswith('XYData')))}
+    with pytest.raises(ValueError, match="Cycle 2 has curves"):
+        _read_changed(monkeypatch, change)
+
+
+def _with_steps(monkeypatch, change_type):
+    """Read the test file with the step types changed by change_type(type)."""
+    original = BiacoreExperiment._cycle_steps
+    monkeypatch.setattr(BiacoreExperiment, '_cycle_steps', staticmethod(
+        lambda events, cycle_end: [(start, end, change_type(step_type), name, fields)
+                                   for start, end, step_type, name, fields in original(events, cycle_end)]))
+    exp = BiacoreExperiment()
+    exp.read_blr(BLR_FILE)
+    return exp
+
+
+def test_no_sample_injections(monkeypatch):
+    with pytest.raises(ValueError, match="No sample injections"):
+        _with_steps(monkeypatch, lambda step_type: 'INJECTION' if step_type == 'ASSOC' else step_type)
+
+
+def test_loading_steps(monkeypatch):
+    """Loading steps are numbered and give the loading location of the steps after them."""
+    exp = _with_steps(monkeypatch, lambda step_type: 'LOADING' if step_type == 'KREGENERATION' else step_type)
+    loading = exp.df_steps[exp.df_steps['Type'] == 'LOADING']
+    assert len(loading) > 0
+    assert loading['Column_location'].tolist() == [str(i + 1) for i in range(len(loading))]

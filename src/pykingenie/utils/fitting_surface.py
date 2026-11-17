@@ -96,7 +96,10 @@ def guess_initial_signal(assoc_time_lst, assoc_signal_lst, time_limit=30, mask_l
 
             a0, a1, kobs = fit_params
 
-            s0s.append(a0 + a1)
+            # fit_single_exponential starts the time at the first point it is given.
+            # Extrapolate back to the start of the step if the first points were left
+            # out (t[0] > 0); otherwise this is a0 + a1.
+            s0s.append(a0 + a1 * np.exp(kobs * t[0]))
 
         except:
 

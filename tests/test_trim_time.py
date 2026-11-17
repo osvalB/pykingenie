@@ -242,3 +242,14 @@ def test_generate_fittings_trim_time():
 
     analyzer.generate_fittings(df)
     assert list(analyzer.fittings.values())[0].trim_time == 0
+
+
+def test_initial_signal_guess_skips_trimmed_points():
+    """The initial signal is extrapolated to the start of the step from the points kept."""
+    from pykingenie.utils.fitting_surface import guess_initial_signal
+    t = np.arange(100.0, 130.0, 0.1)  # a step that does not start at zero
+    y = 2 + 3 * (1 - np.exp(-0.2 * (t - t[0])))
+    y_spike = y + 5 * (t - t[0] < 1)
+    mask = trim_masks([t], 1)
+    assert guess_initial_signal([t], [y_spike], mask_lst=mask)[0] == pytest.approx(2, abs=1e-3)
+    assert abs(guess_initial_signal([t], [y_spike])[0] - 2) > 0.1
