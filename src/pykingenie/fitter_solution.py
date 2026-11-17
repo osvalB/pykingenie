@@ -167,6 +167,7 @@ class KineticsFitterSolution(KineticsFitterGeneral):
 
         self.k_obs            = k_obs
         self.signal_assoc_fit = y_pred
+        self.fit_parameter_count = 3 * len(self.assoc_lst)  # Offset, amplitude, rate per trace.
 
         self.group_k_obs_by_protein_concentration()
 
@@ -244,6 +245,7 @@ class KineticsFitterSolution(KineticsFitterGeneral):
         self.k_obs_1 = k_obs_1
         self.k_obs_2 = k_obs_2
         self.signal_assoc_fit = y_pred
+        self.fit_parameter_count = 5 * len(self.assoc_lst)  # Offset, two amplitudes and two rates per trace.
 
         self.k_obs_1_err = k_obs_1_err
         self.k_obs_2_err = k_obs_2_err

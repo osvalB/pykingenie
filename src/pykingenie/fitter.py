@@ -7,6 +7,10 @@ from inspect import signature
 import numpy as np
 import pandas as pd
 
+from .utils.fit_results import (
+    fitting_data_fingerprint, saved_fit_residuals, saved_fit_statistics,
+)
+
 
 def _same_fit_argument(left, right):
     """Compare scalar or array-valued fit arguments without ambiguous truth values."""
@@ -43,12 +47,16 @@ def store_fit_result(model, **variants):
             self._save_active_fit_result()
             previous = self._capture_fit_state()
             previous_key = self.active_fit_result
+            data_fingerprint = fitting_data_fingerprint(self)
             self._fit_in_progress = True
             try:
                 self._clear_active_fit_state()
                 value = method(self, *args, **kwargs)
                 self.fit_model = key
                 self.fit_settings = copy.deepcopy(settings)
+                self.fit_data_fingerprint = data_fingerprint
+                if self.params is not None:
+                    self.fit_parameter_count = int(np.size(self.params))
                 if not hasattr(self, 'model'):
                     self.model = key
                 self.active_fit_result = key
@@ -69,6 +77,8 @@ def update_fit_result(method):
     """Keep the active snapshot current after optional diagnostics are added."""
     @wraps(method)
     def wrapped(self, *args, **kwargs):
+        if not self._fit_in_progress and self.active_fit_result is not None:
+            self.validate_fit_result()
         value = method(self, *args, **kwargs)
         if not self._fit_in_progress:
             self._save_active_fit_result()
@@ -92,6 +102,7 @@ class KineticsFitterGeneral:
     )
     _fit_output_attributes = (
         'model', 'fit_model', 'fit_settings', 'signal_ss_fit', 'signal_assoc_fit',
+        'fit_data_fingerprint', 'fit_parameter_count',
         'signal_disso_fit', 'fit_params_kinetics', 'fit_params_ss',
         'fit_params_kinetics_correlation', 'fit_params_ss_correlation',
         'fit_params_kinetics_error', 'fit_params_kinetics_ci95',
@@ -183,7 +194,10 @@ class KineticsFitterGeneral:
         self.clear_fittings()
 
     def _save_active_fit_result(self):
-        if self.active_fit_result is not None:
+        # A data edit must allow a fresh fit without resaving stale predictions
+        # under a new data identity. The old snapshot stays bound to its inputs.
+        if (self.active_fit_result is not None and
+                getattr(self, 'fit_data_fingerprint', None) == fitting_data_fingerprint(self)):
             self.save_fit_result()
 
     def save_fit_result(self, name=None, **fit_arguments):
@@ -216,6 +230,7 @@ class KineticsFitterGeneral:
         key = self.active_fit_result if name is None else name
         if not isinstance(key, str) or not key:
             raise ValueError('The fit result name must be a non-empty string.')
+        self.validate_fit_result()
         self._validate_fit_arguments(self.fit_settings, fit_arguments)
         snapshot = self._capture_fit_state()
         history = self.fit_result_history.setdefault(self.fit_model, [])
@@ -238,25 +253,8 @@ class KineticsFitterGeneral:
                     f'{name}={value!r} differs from the fitted value '
                     f'{settings[name]!r}. Run a new fit to change its arguments.')
 
-    def restore_fit_result(self, name, **fit_arguments):
-        """Restore a saved result for plotting, export or further diagnostics.
-
-        Switching to another result saves changes to the current one first.
-        Restoring the active result discards its unsaved edits. Restored arrays
-        and tables are copied, so editing them cannot change the saved snapshot.
-        Raises KeyError if ``name`` has not been saved on this fitter.
-
-        Parameters
-        ----------
-        name : str
-            Model key or explicitly saved name.
-        **fit_arguments
-            Select a saved configuration of this model, for example
-            shared_smax=True and fixed_t0=False. Unspecified arguments may be
-            omitted if the selection is unique. Raises ValueError when no
-            configuration matches or the selection is ambiguous. With no
-            arguments, restores the latest snapshot at the given key.
-        """
+    def _select_fit_result(self, name, fit_arguments):
+        """Select a saved snapshot without changing the active result or archive."""
         if name not in self.fit_results and name not in self.fit_result_history:
             raise KeyError(f'Unknown fit result: {name!r}')
 
@@ -273,10 +271,62 @@ class KineticsFitterGeneral:
                 raise ValueError(
                     f'Multiple saved fits for {name!r} match {fit_arguments!r}. '
                     'Specify more fitting arguments or restore a named result.')
-            state = copy.deepcopy(matches[0])
+            return matches[0]
+        state = self.fit_results[name]
+        self._validate_fit_arguments(state['fit_settings'], fit_arguments)
+        return state
+
+    def _validate_fit_data(self, state, current_fingerprint=None):
+        fingerprint = state.get('fit_data_fingerprint')
+        if fingerprint is None:
+            raise ValueError('Saved fit has no data fingerprint. Run the fit again before using it.')
+        if fingerprint != (current_fingerprint or fitting_data_fingerprint(self)):
+            raise ValueError(
+                'Fitting data have changed since this result was fitted. '
+                'Restore the original traces, times, concentrations, grouping and trimming, or run a new fit.')
+
+    def validate_fit_result(self, name=None, **fit_arguments):
+        """Check that a saved or active fit belongs to this fitter's current data.
+
+        Returns True for a matching dataset. Raises ValueError for changed data
+        or missing validation metadata, without modifying the result or archive.
+        Name and fitting arguments select results as in restore_fit_result().
+        With no name, validates the active result.
+        """
+        if name is None:
+            if self.active_fit_result is None:
+                raise ValueError('No active fit result to validate. Run a fit first.')
+            self._validate_fit_arguments(self.fit_settings, fit_arguments)
+            state = {'fit_data_fingerprint': getattr(self, 'fit_data_fingerprint', None)}
         else:
-            state = copy.deepcopy(self.fit_results[name])
-            self._validate_fit_arguments(state['fit_settings'], fit_arguments)
+            state = self._select_fit_result(name, fit_arguments)
+        self._validate_fit_data(state)
+        return True
+
+    def restore_fit_result(self, name, **fit_arguments):
+        """Restore a saved result for plotting, export or further diagnostics.
+
+        Switching to another result saves changes to the current one first.
+        Restoring the active result discards its unsaved edits. Restored arrays
+        and tables are copied, so editing them cannot change the saved snapshot.
+        Raises KeyError if ``name`` has not been saved on this fitter.
+        Changed traces, times, concentrations, grouping or trimming raise ValueError
+        before the active result or archive is changed.
+
+        Parameters
+        ----------
+        name : str
+            Model key or explicitly saved name.
+        **fit_arguments
+            Select a saved configuration of this model, for example
+            shared_smax=True and fixed_t0=False. Unspecified arguments may be
+            omitted if the selection is unique. Raises ValueError when no
+            configuration matches or the selection is ambiguous. With no
+            arguments, restores the latest snapshot at the given key.
+        """
+        state = self._select_fit_result(name, fit_arguments)
+        self._validate_fit_data(state)
+        state = copy.deepcopy(state)
 
         if name != self.active_fit_result or fit_arguments:
             self._save_active_fit_result()
@@ -284,6 +334,69 @@ class KineticsFitterGeneral:
         self.active_fit_result = name
         if fit_arguments:
             self.fit_results[name] = copy.deepcopy(state)
+
+    def compare_saved_fits(self, names=None, sort_by=None):
+        """Compare saved fits of the same observations, optionally sorted by BIC.
+
+        Parameters
+        ----------
+        names : sequence of str or str, optional
+            Saved result keys/names to compare. With None, include each stored
+            model/argument configuration once, without duplicating named aliases.
+        sort_by : str or None, optional
+            With None (default), preserve the selected result order. With 'BIC',
+            sort by increasing BIC, preserving order for equal scores.
+
+        Returns
+        -------
+        pandas.DataFrame
+            Model, Fit settings, Parameter count, Reduced χ² and BIC columns,
+            indexed by Result. Lower BIC is preferred. Empty archives return
+            an empty table with these columns.
+
+        Notes
+        -----
+        Fits are unweighted: reduced chi squared is RSS/(n-k), assuming unit
+        observation variance. BIC is n*log(RSS/n) + k*log(n). k counts all free
+        parameters, including amplitudes, offsets and per-trace parameters. n is the actual
+        fitted point count. Requires n > k, finite predictions, unchanged input
+        data and identical fitted observations/time ranges across selected fits.
+        This method does not refit or restore any result.
+        """
+        if sort_by not in (None, 'BIC'):
+            raise ValueError("sort_by must be None or 'BIC'.")
+        if names is None:
+            selected = [(f'{model} [{i + 1}]', state)
+                        for model, history in self.fit_result_history.items()
+                        for i, state in enumerate(history)]
+        else:
+            if isinstance(names, str):
+                names = [names]
+            selected = [(name, self._select_fit_result(name, {})) for name in names]
+
+        rows = []
+        observation_fingerprint = None
+        current_fingerprint = fitting_data_fingerprint(self)
+        for name, state in selected:
+            self._validate_fit_data(state, current_fingerprint)
+            rss, n, fingerprint = saved_fit_residuals(self, state)
+            if observation_fingerprint is not None and fingerprint != observation_fingerprint:
+                raise ValueError(
+                    'Saved fits use different observations or time ranges. '
+                    'Select results fitted to the same observations using names.')
+            observation_fingerprint = fingerprint
+            k = state.get('fit_parameter_count')
+            if k is None:
+                raise ValueError(f'Saved fit {name!r} has no parameter count. Run the fit again.')
+            redchi, bic = saved_fit_statistics(rss, n, k)
+            rows.append({
+                'Result': name, 'Model': state['fit_model'],
+                'Fit settings': copy.deepcopy(state['fit_settings']),
+                'Parameter count': k, 'Reduced χ²': redchi, 'BIC': bic,
+            })
+        columns = ['Result', 'Model', 'Fit settings', 'Parameter count', 'Reduced χ²', 'BIC']
+        comparison = pd.DataFrame(rows, columns=columns).set_index('Result')
+        return comparison if sort_by is None else comparison.sort_values('BIC', kind='stable')
 
     def clear_fittings(self):
         """
