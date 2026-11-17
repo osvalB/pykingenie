@@ -93,6 +93,79 @@ fig = plot_association_dissociation(pyKinetics)
 fig.write_image('test_bli_fitted.png')
 ```
 
+## Keeping results when changing models
+
+Each fitter automatically keeps successful model results in `fit_results`.
+This works for direct fitting calls and fits submitted through `KineticsAnalyzer`.
+The usual attributes, such as `fit_params_kinetics` and `signal_assoc_fit`,
+continue to describe the active result.
+
+```python
+fitter = next(iter(pyKinetics.fittings.values()))
+fitter.fit_one_site_assoc_and_disso()
+one_site = fitter.active_fit_result
+
+fitter.fit_two_site_assoc_and_disso()
+
+# Read the previous model without changing the active result.
+previous_parameters = fitter.fit_results[one_site]['fit_params_kinetics']
+print(list(fitter.fit_results))
+
+# Restore its parameters, fitted curves, settings and diagnostics for plotting/export.
+fitter.restore_fit_result(one_site)
+fig = plot_association_dissociation(pyKinetics)
+```
+
+Snapshots are independent copies of fitted arrays and tables, including errors,
+correlations, bounds and any calculated confidence intervals or leave-one-out
+results. Failed fits do not replace saved results.
+Internal fits used only to find initial guesses do not replace saved models.
+
+Every model and argument combination is saved separately in `fit_result_history`.
+For example, shared and per-trace Smax fits can be restored by their arguments:
+
+```python
+fitter.fit_one_site_assoc_and_disso(shared_smax=True, fixed_t0=True)
+fitter.save_fit_result('one_site_shared_smax', shared_smax=True, fixed_t0=True)
+
+fitter.fit_one_site_assoc_and_disso(shared_smax=False)
+
+fitter.restore_fit_result(
+    'one_site_association_and_dissociation', shared_smax=True, fixed_t0=True,
+)
+assert fitter.shared_smax is True
+print(fitter.fit_settings)  # All arguments used by this fit, including defaults.
+
+# Named snapshots can also be restored directly, or checked against arguments.
+fitter.restore_fit_result('one_site_shared_smax', shared_smax=True)
+```
+
+`save_fit_result(name, **fit_arguments)` always stores all actual fit arguments.
+Arguments supplied to save are checked against the active fit, so a result cannot
+be saved with settings different from those used to calculate it. To change an
+argument, run the fit with that argument first.
+
+`fit_results[model]` holds the latest saved snapshot at that key. Restore a model
+without arguments to use that snapshot, or supply arguments to select a unique
+configuration from `fit_result_history[model]`. Ambiguous or unmatched selections
+raise an error. Refitting an identical configuration replaces its previous result;
+use named snapshots to retain repeated runs with identical arguments.
+
+Surface result keys include `steady_state_one_site`, `one_site_association`,
+`one_site_dissociation`, `one_site_association_and_dissociation`, and
+`two_site_association_and_dissociation`. Mass transport uses
+`one_site_mass_transport`; fitted cooperativity uses `two_site_cooperative` or
+`steady_state_two_site_cooperative`. Induced fit uses `one_site_if_assoc_and_disso`
+or `one_site_if_variable_signal` when fitting the signal ratio. Heterogeneous
+ligand fits use `two_site_heterogeneous_ligand_association_and_dissociation` or
+`steady_state_two_site_heterogeneous_ligand`. Solution result keys are
+`single_exponential`, `double_exponential`, `one_binding_site`, `induced_fit`,
+and `conformational_selection`. Each snapshot records the call options in
+`fit_settings`; `active_fit_result` gives the current key.
+
+History belongs to each fitter and is kept in memory. `clear_fittings()` clears
+the active fit while keeping saved results available for restoration.
+
 ## XY plotting
 
 An alternative implementation uses [Reflex XY](https://reflex.dev/docs/xy/).

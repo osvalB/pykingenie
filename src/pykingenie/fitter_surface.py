@@ -39,7 +39,7 @@ from .utils.processing      import (
 
 from .utils.math import  get_desired_rss, correlation_from_covariance
 
-from .fitter import KineticsFitterGeneral
+from .fitter import KineticsFitterGeneral, store_fit_result, update_fit_result
 
 
 def _leave_one_out_parameters(params, low_bounds, high_bounds, smax_ids, omitted,
@@ -173,7 +173,7 @@ class KineticsFitter(KineticsFitterGeneral):
         if trim_time < 0:
             raise ValueError("trim_time must be zero or positive.")
 
-        super().__init__
+        super().__init__()
 
         self.names            = name_lst
         self.assoc_lst        = association_signal_lst
@@ -390,6 +390,7 @@ class KineticsFitter(KineticsFitterGeneral):
             self.fit_params_kinetics_correlation = corr
         return None
 
+    @store_fit_result('steady_state_one_site')
     def fit_steady_state_one_site(self):
 
         """
@@ -517,6 +518,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         raise ValueError("Unknown steady-state model: " + model)
 
+    @store_fit_result('steady_state_two_site_heterogeneous_ligand')
     def fit_steady_state_two_site_heterogeneous_ligand(self):
         """
         Fit the steady-state signal to a 2:1 heterogeneous ligand model.
@@ -615,6 +617,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         return None
 
+    @store_fit_result('steady_state_two_site', fit_sigma='steady_state_two_site_cooperative')
     def fit_steady_state_two_site(self, fit_sigma=False):
 
         """
@@ -798,6 +801,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         return p0, low_bounds, high_bounds
 
+    @store_fit_result('one_site_association')
     def fit_one_site_association(self, shared_smax=True, calc_loo=False):
         """
         Fit the association curves using the one-site binding model.
@@ -879,6 +883,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         return  None
 
+    @update_fit_result
     def one_site_association_loo(self):
         """
         Calculate leave-one-out (LOO) estimates for Kd and k_off.
@@ -976,6 +981,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         return None
 
+    @store_fit_result('one_site_dissociation')
     def fit_one_site_dissociation(self, time_limit=0, calc_loo=False):
         """
         Fit the dissociation curves using the one-site binding model.
@@ -1064,6 +1070,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         return  None
 
+    @update_fit_result
     def one_site_dissociation_loo(self):
         """Estimate dissociation-rate uncertainty by doing n-fits and leaving out each curve at a time.
 
@@ -1131,6 +1138,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         return None
 
+    @update_fit_result
     def fit_single_exponentials(self):
         """
         Fit single exponentials to the association signals.
@@ -1212,6 +1220,7 @@ class KineticsFitter(KineticsFitterGeneral):
             candidates.append(p)
         return candidates
 
+    @store_fit_result('one_site_association_and_dissociation', fit_ktr='one_site_mass_transport')
     def fit_one_site_assoc_and_disso(self,shared_smax=True,fixed_t0=True,fit_ktr=False,calc_loo=False):
 
         """
@@ -1403,6 +1412,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         return  None
 
+    @update_fit_result
     def one_site_assoc_and_disso_loo(self):
         """Estimate one-site kinetic parameter uncertainty by leave-one-out fits.
 
@@ -1535,6 +1545,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         return None
 
+    @store_fit_result('two_site_association_and_dissociation', fit_sigma='two_site_cooperative')
     def fit_two_site_assoc_and_disso(self, shared_smax=True, fixed_t0=True, fit_sigma=False, calc_loo=False):
 
         """
@@ -1754,6 +1765,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         return None
 
+    @update_fit_result
     def two_site_assoc_and_disso_loo(self):
         """Estimate two-site kinetic parameter uncertainty by leave-one-out fits.
 
@@ -1872,6 +1884,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         return None
 
+    @store_fit_result('two_site_heterogeneous_ligand_association_and_dissociation')
     def fit_two_site_heterogeneous_ligand_assoc_and_disso(
         self,
         shared_smax=True,
@@ -2139,6 +2152,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         return None
 
+    @update_fit_result
     def two_site_heterogeneous_ligand_assoc_and_disso_loo(self):
         """Estimate heterogeneous-ligand fit uncertainty by doing n-fits leaving out one curve at a time.
 
@@ -2260,6 +2274,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         return None
 
+    @update_fit_result
     def calculate_ci95(self, shared_smax=None, fixed_t0=None, fit_ktr=None):
         """
         Calculate 95% confidence intervals for the fitted parameters.
@@ -2377,6 +2392,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         return  None
 
+    @store_fit_result('one_site_if_assoc_and_disso', fit_signal_ratio='one_site_if_variable_signal')
     def fit_one_site_if_assoc_and_disso(self, shared_smax=True, calc_loo=False,
                                         fit_signal_ratio=False,
                                         signal_ratio_bounds=(1e-1, 1e1)):
@@ -2625,6 +2641,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
         return None
 
+    @update_fit_result
     def one_site_if_assoc_and_disso_loo(self):
         """Estimate induced-fit parameter uncertainty by leave-one-out refitting.
 

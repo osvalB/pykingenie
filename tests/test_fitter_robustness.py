@@ -248,7 +248,11 @@ def test_induced_fit_raises_without_grid_start(monkeypatch):
         raise RuntimeError("Optimal parameters not found")
 
     fitter.fit_one_site_assoc_and_disso(shared_smax=True)  # starting values, before patching
-    monkeypatch.setattr(fitter, "fit_one_site_assoc_and_disso", lambda **kwargs: None)
+    # Public fits clear active outputs before starting; supply the saved
+    # initializer when skipping the one-site optimization in this test.
+    initial_result = fitter.active_fit_result
+    monkeypatch.setattr(fitter, "fit_one_site_assoc_and_disso",
+                        lambda **kwargs: fitter.restore_fit_result(initial_result))
     monkeypatch.setattr(fitter_surface, "fit_induced_fit_sites_assoc_and_disso", always_fail)
     with pytest.raises(RuntimeError, match="could not be fitted from any starting point"):
         fitter.fit_one_site_if_assoc_and_disso(shared_smax=True)

@@ -17,7 +17,7 @@ from .utils.fitting_solution import (
     fit_conformational_selection_solution
 )
 
-from .fitter import KineticsFitterGeneral
+from .fitter import KineticsFitterGeneral, store_fit_result
 
 class KineticsFitterSolution(KineticsFitterGeneral):
     """
@@ -132,6 +132,7 @@ class KineticsFitterSolution(KineticsFitterGeneral):
 
         return None
 
+    @store_fit_result('single_exponential')
     def fit_single_exponentials(self):
 
         """
@@ -206,6 +207,7 @@ class KineticsFitterSolution(KineticsFitterGeneral):
 
         return None
 
+    @store_fit_result('double_exponential')
     def fit_double_exponentials(self, min_log_k=-4, max_log_k=4, log_k_points=22):
 
         """
@@ -296,6 +298,7 @@ class KineticsFitterSolution(KineticsFitterGeneral):
 
         return None
 
+    @store_fit_result('one_binding_site')
     def fit_one_binding_site(
             self,fit_signal_E=False,
             fit_signal_S=False,
@@ -511,6 +514,7 @@ class KineticsFitterSolution(KineticsFitterGeneral):
 
         return None
 
+    @store_fit_result('induced_fit')
     def fit_induced_fit(self,
                         fit_signal_E=False,
                         fit_signal_S=False,
@@ -699,6 +703,7 @@ class KineticsFitterSolution(KineticsFitterGeneral):
 
         return None
 
+    @store_fit_result('conformational_selection')
     def fit_conformational_selection(
             self,
             fit_signal_E=False,
