@@ -166,6 +166,57 @@ and `conformational_selection`. Each snapshot records the call options in
 History belongs to each fitter and is kept in memory. `clear_fittings()` clears
 the active fit while keeping saved results available for restoration.
 
+## Validating and comparing saved fits
+
+Every fit records a fingerprint of its input traces, time arrays, concentrations,
+Smax grouping, trimming, and single-cycle setting. Restore, save, and diagnostics validate
+this fingerprint before using a result. Changing preprocessing or data selection
+raises `ValueError` when an earlier result is used. Restore the original inputs
+to use that result again, or run a new fit on the changed data. Display names and
+equivalent list/array containers do not affect validation.
+
+```python
+fitter.validate_fit_result()  # Check the active result; returns True or raises.
+fitter.validate_fit_result('one_site_shared_smax', shared_smax=True)
+
+fitter.fit_one_site_assoc_and_disso(shared_smax=True)
+fitter.save_fit_result('shared')
+fitter.fit_one_site_assoc_and_disso(shared_smax=False)
+fitter.save_fit_result('per_trace')
+
+comparison = fitter.compare_saved_fits(['shared', 'per_trace'])
+print(comparison)
+# Optional ranking, best BIC first:
+ranked = fitter.compare_saved_fits(['shared', 'per_trace'], sort_by='BIC')
+```
+
+The comparison table has `Model`, `Fit settings`, `Parameter count`, `Reduced χ²`,
+and `BIC` columns, indexed by saved result name. The selected order is preserved
+by default; `sort_by='BIC'` sorts increasingly, preserving ties. Lower BIC is
+preferred. With no names, `compare_saved_fits()` includes each
+stored model/argument configuration once, without duplicating named aliases.
+The comparison reads saved results without changing the active fit.
+
+All selected results must belong to the current dataset and use exactly the same
+fitted observations and time ranges. For example, compare association/dissociation
+models together, steady-state models together, or dissociation-only fits with the
+same time window. Select compatible saved names when the archive contains mixed
+regions. Missing or non-finite predictions and non-positive residual degrees of
+freedom raise `ValueError`.
+
+For these unweighted fits, reduced chi squared is `RSS / (n - k)`, assuming unit
+observation variance. `n` counts the actual fitted points after trimming or time
+limits, and `k` counts every
+free parameter, including amplitudes, offsets, time offsets, and parameters fitted
+per trace. A single exponential has three parameters per trace; a double
+exponential has five. BIC is:
+
+```text
+BIC = n * log(RSS / n) + k * log(n)
+```
+
+A perfect fit has zero reduced chi squared and BIC of negative infinity.
+
 ## XY plotting
 
 An alternative implementation uses [Reflex XY](https://reflex.dev/docs/xy/).

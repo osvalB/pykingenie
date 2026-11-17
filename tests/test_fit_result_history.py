@@ -345,3 +345,236 @@ def test_refit_replaces_only_its_configuration_and_clear_retains_all(fitter):
     fitter.restore_fit_result(ONE_SITE, shared_smax=True)
     np.testing.assert_array_equal(fitter.params, shared)
     assert len(fitter.fit_result_history[ONE_SITE]) == 2
+
+
+@pytest.mark.parametrize('attribute', [
+    'assoc_lst', 'disso_lst', 'time_assoc_lst', 'time_disso_lst',
+    'lig_conc_lst', 'smax_id', 'is_single_cycle', 'trim_time',
+])
+def test_validation_rejects_changed_data_before_restore_or_save(fitter, attribute):
+    fitter.fit_one_site_assoc_and_disso()
+    fitter.save_fit_result('original')
+    params = fitter.params.copy()
+    fingerprint = fitter.fit_results['original']['fit_data_fingerprint']
+    if attribute == 'is_single_cycle':
+        fitter.is_single_cycle = True
+    elif attribute == 'trim_time':
+        fitter.trim_time += 1
+    elif attribute in ('lig_conc_lst', 'smax_id'):
+        getattr(fitter, attribute)[0] += 1
+    else:
+        getattr(fitter, attribute)[0][0] += 1
+
+    for operation in (
+        lambda: fitter.validate_fit_result('original'),
+        lambda: fitter.restore_fit_result('original'),
+        lambda: fitter.save_fit_result('stale'),
+        fitter.create_fitting_bounds_table,
+        fitter.compare_saved_fits,
+    ):
+        with pytest.raises(ValueError, match='Fitting data have changed'):
+            operation()
+    assert fitter.active_fit_result == ONE_SITE
+    np.testing.assert_array_equal(fitter.params, params)
+    assert 'stale' not in fitter.fit_results
+    assert fitter.fit_results['original']['fit_data_fingerprint'] == fingerprint
+
+
+def test_validation_accepts_equivalent_containers_and_recovered_data(fitter):
+    fitter.fit_one_site_assoc_and_disso()
+    fitter.assoc_lst = [trace.tolist() for trace in fitter.assoc_lst]
+    fitter.lig_conc_lst = np.asarray(fitter.lig_conc_lst)
+    fitter.names = ['renamed'] * 4
+    assert fitter.validate_fit_result() is True
+    assert fitter.validate_fit_result(ONE_SITE, shared_smax=True) is True
+    original = fitter.assoc_lst[0][0]
+    fitter.assoc_lst[0][0] += 1
+    with pytest.raises(ValueError, match='Fitting data have changed'):
+        fitter.restore_fit_result(ONE_SITE)
+    fitter.assoc_lst[0][0] = original
+    fitter.restore_fit_result(ONE_SITE)
+    assert fitter.validate_fit_result() is True
+
+
+def test_refitting_new_data_does_not_relabel_old_snapshot(fitter):
+    fitter.fit_one_site_assoc_and_disso()
+    fitter.save_fit_result('old_data')
+    fingerprint = fitter.fit_results['old_data']['fit_data_fingerprint']
+    fitter.assoc_lst[0] = fitter.assoc_lst[0] + 0.001
+    fitter.fit_one_site_assoc_and_disso()
+    assert fitter.validate_fit_result() is True
+    assert fitter.fit_data_fingerprint != fingerprint
+    assert fitter.fit_results['old_data']['fit_data_fingerprint'] == fingerprint
+    with pytest.raises(ValueError, match='Fitting data have changed'):
+        fitter.restore_fit_result('old_data')
+
+
+def test_validation_rejects_legacy_results_without_fingerprints(fitter):
+    with pytest.raises(ValueError, match='No active fit'):
+        fitter.validate_fit_result()
+    fitter.fit_one_site_dissociation()
+    fitter.save_fit_result('legacy')
+    del fitter.fit_results['legacy']['fit_data_fingerprint']
+    with pytest.raises(ValueError, match='no data fingerprint'):
+        fitter.restore_fit_result('legacy')
+
+
+def test_comparison_scores_and_optional_bic_sorting_preserve_active_fit(fitter):
+    import math
+
+    fitter.fit_one_site_assoc_and_disso(shared_smax=True)
+    fitter.save_fit_result('shared')
+    fitter.fit_one_site_assoc_and_disso(shared_smax=False)
+    fitter.save_fit_result('per_trace')
+    active = fitter.active_fit_result
+    params = fitter.params.copy()
+    comparison = fitter.compare_saved_fits(['shared', 'per_trace'])
+    assert list(comparison.index) == ['shared', 'per_trace']
+    assert list(fitter.compare_saved_fits(['per_trace', 'shared']).index) == ['per_trace', 'shared']
+    ranked = fitter.compare_saved_fits(['per_trace', 'shared'], sort_by='BIC')
+    assert ranked['BIC'].is_monotonic_increasing
+    pd.testing.assert_frame_equal(ranked, comparison.sort_values('BIC', kind='stable'))
+    assert comparison['Parameter count'].to_dict() == {'shared': 3, 'per_trace': 6}
+    for name in comparison.index:
+        state = fitter.fit_results[name]
+        observed = np.concatenate(fitter.assoc_lst + fitter.disso_lst)
+        predicted = np.concatenate(state['signal_assoc_fit'] + state['signal_disso_fit'])
+        rss = np.sum((observed - predicted) ** 2)
+        n, k = len(observed), len(state['params'])
+        expected_bic = n * math.log(rss / n) + k * math.log(n)
+        assert comparison.loc[name, 'Reduced χ²'] == pytest.approx(rss / (n - k))
+        assert comparison.loc[name, 'BIC'] == pytest.approx(expected_bic)
+    assert fitter.active_fit_result == active
+    np.testing.assert_array_equal(fitter.params, params)
+
+
+def test_default_comparison_includes_each_configuration_once(fitter):
+    fitter.fit_one_site_assoc_and_disso(shared_smax=True)
+    fitter.save_fit_result('alias')
+    fitter.fit_one_site_assoc_and_disso(shared_smax=False)
+    comparison = fitter.compare_saved_fits()
+    assert len(comparison) == 2
+    assert set(comparison['Parameter count']) == {3, 6}
+    comparison.iloc[0]['Fit settings']['shared_smax'] = 'changed'
+    assert all(isinstance(state['fit_settings']['shared_smax'], bool)
+               for state in fitter.fit_result_history[ONE_SITE])
+
+
+def test_comparison_refuses_different_regions_or_time_limits(fitter):
+    fitter.fit_one_site_assoc_and_disso()
+    fitter.fit_one_site_dissociation(time_limit=100)
+    fitter.save_fit_result('short')
+    fitter.fit_one_site_dissociation(time_limit=200)
+    fitter.save_fit_result('long')
+    with pytest.raises(ValueError, match='different observations or time ranges'):
+        fitter.compare_saved_fits([ONE_SITE, 'short'])
+    with pytest.raises(ValueError, match='different observations or time ranges'):
+        fitter.compare_saved_fits(['short', 'long'])
+    state = fitter.fit_results['short']
+    n = sum(len(time) for time in state['time_disso_lst_subset'])
+    rss = sum(np.sum((observed[time < time.min() + 100] - predicted) ** 2)
+              for observed, time, predicted in zip(
+                  fitter.disso_lst, fitter.time_disso_lst, state['signal_disso_fit']))
+    comparison = fitter.compare_saved_fits('short')
+    assert comparison.loc['short', 'Reduced χ²'] == pytest.approx(rss / (n - 5))
+
+
+def test_comparison_rejects_missing_or_invalid_predictions(fitter):
+    fitter.fit_one_site_dissociation()
+    fitter.save_fit_result('missing')
+    fitter.fit_results['missing']['signal_disso_fit'][0] = None
+    with pytest.raises(ValueError, match='missing predictions'):
+        fitter.compare_saved_fits('missing')
+    fitter.save_fit_result('invalid')
+    fitter.fit_results['invalid']['signal_disso_fit'][0][0] = np.nan
+    with pytest.raises(ValueError, match='non-finite'):
+        fitter.compare_saved_fits('invalid')
+
+
+def test_empty_comparison_has_expected_columns(fitter):
+    comparison = fitter.compare_saved_fits()
+    assert comparison.empty
+    assert comparison.columns.tolist() == [
+        'Model', 'Fit settings', 'Parameter count', 'Reduced χ²', 'BIC',
+    ]
+
+
+@pytest.mark.parametrize('method, kwargs, parameter_count', [
+    ('fit_single_exponentials', {}, 6),
+    ('fit_double_exponentials', {'min_log_k': -3, 'max_log_k': 0, 'log_k_points': 8}, 10),
+])
+def test_solution_comparison_counts_offsets_amplitudes_and_rates(method, kwargs, parameter_count):
+    t = np.linspace(0, 50, 80)
+    concentrations = [0.5, 1.0]
+    signals = [2 * (1 - np.exp(-0.05 * c * t)) for c in concentrations]
+    if method == 'fit_double_exponentials':
+        signals = [1 + 1.5 * np.exp(-0.02 * c * t) + 0.8 * np.exp(-0.2 * c * t)
+                   for c in concentrations]
+    solution = KineticsFitterSolution('sample', signals, concentrations, [1] * 2, [t] * 2)
+    getattr(solution, method)(**kwargs)
+    comparison = solution.compare_saved_fits()
+    assert comparison['Parameter count'].iloc[0] == parameter_count
+    rss = sum(np.sum((observed - predicted) ** 2)
+              for observed, predicted in zip(solution.assoc_lst, solution.signal_assoc_fit))
+    assert comparison['Reduced χ²'].iloc[0] == pytest.approx(rss / (160 - parameter_count))
+    solution.prot_conc[0] = 2
+    with pytest.raises(ValueError, match='Fitting data have changed'):
+        solution.restore_fit_result(solution.active_fit_result)
+
+
+def test_steady_state_comparison_uses_steady_state_points(fitter):
+    fitter.names = ['sample']
+    fitter.fit_steady_state_one_site()
+    comparison = fitter.compare_saved_fits()
+    observed = np.concatenate(fitter.signal_ss)
+    predicted = np.concatenate(fitter.signal_ss_fit)
+    rss = np.sum((observed - predicted) ** 2)
+    assert comparison['Parameter count'].iloc[0] == 2
+    assert comparison['Reduced χ²'].iloc[0] == pytest.approx(rss / (4 - 2))
+
+
+def test_comparison_counts_fitted_time_offset_and_rejects_nonpositive_dof(fitter):
+    fitter.fit_one_site_assoc_and_disso(fixed_t0=False)
+    assert fitter.compare_saved_fits()['Parameter count'].iloc[0] == 4
+    fitter.save_fit_result('no_degrees_of_freedom')
+    state = fitter.fit_results['no_degrees_of_freedom']
+    state['fit_parameter_count'] = 400
+    with pytest.raises(ValueError, match='more observations than fitted parameters'):
+        fitter.compare_saved_fits('no_degrees_of_freedom')
+
+
+def test_comparison_handles_perfect_fit_without_runtime_warnings(fitter):
+    fitter.fit_one_site_dissociation()
+    fitter.save_fit_result('perfect')
+    state = fitter.fit_results['perfect']
+    state['signal_disso_fit'] = copy.deepcopy(fitter.disso_lst)
+    with np.errstate(all='raise'):
+        comparison = fitter.compare_saved_fits('perfect')
+    assert comparison.loc['perfect', 'Reduced χ²'] == 0
+    assert comparison.loc['perfect', 'BIC'] == -np.inf
+
+
+def test_bic_sorting_preserves_ties_and_rejects_unknown_scores(fitter):
+    fitter.fit_one_site_assoc_and_disso()
+    fitter.save_fit_result('first')
+    fitter.save_fit_result('second')
+    assert list(fitter.compare_saved_fits(['second', 'first'], sort_by='BIC').index) == ['second', 'first']
+    with pytest.raises(ValueError, match='sort_by must be'):
+        fitter.compare_saved_fits(sort_by='unknown')
+
+
+def test_trimmed_points_are_excluded_from_comparison(fitter):
+    fitter.trim_time = 20
+    fitter.fit_one_site_assoc_and_disso()
+    rss, n = 0, 0
+    for observed, times, predictions in (
+        (fitter.assoc_lst, fitter.time_assoc_lst, fitter.signal_assoc_fit),
+        (fitter.disso_lst, fitter.time_disso_lst, fitter.signal_disso_fit),
+    ):
+        for y, t, prediction in zip(observed, times, predictions):
+            keep = t - t[0] >= fitter.trim_time
+            rss += np.sum((y[keep] - prediction[keep]) ** 2)
+            n += keep.sum()
+    comparison = fitter.compare_saved_fits()
+    assert comparison['Reduced χ²'].iloc[0] == pytest.approx(rss / (n - 3))
+    assert comparison['BIC'].iloc[0] == pytest.approx(n * np.log(rss / n) + 3 * np.log(n))
