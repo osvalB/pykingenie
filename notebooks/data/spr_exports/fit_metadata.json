@@ -106,7 +106,7 @@
     "bulk_shift": false,
     "analyte": "AE.A244",
     "ligand": "CH31 10µg/ml",
-    "protocol": "Non-regenerative Carterra Block 1/A1/ROI 1; worksheet rows 10–14; author report concentrations 62.5,125,250,500,1000 nM; All Concentrations entries 9–13",
+    "protocol": "All 13 injections from Block 1/A1/ROI 1 imported as one sequence; source rows 2–14. Published comparison selects injections 9–13 (worksheet rows 10–14).",
     "source_sheet_row": {
       "Incl.": "Y",
       "Block/Chip/Tray": "1,2,3,4",
@@ -176,6 +176,24 @@
         1140
       ]
     },
-    "trim_time": 0
+    "trim_time": 0,
+    "cycle_concentrations": [
+      0.000244,
+      0.000488,
+      0.000977,
+      0.0019500000000000001,
+      0.00391,
+      0.00781,
+      0.015600000000000001,
+      0.0313,
+      0.0625,
+      0.125,
+      0.25,
+      0.5,
+      1.0
+    ],
+    "cycle_duration_seconds": 1140,
+    "cycle_duration_source": "Nominal Baseline + Association + Dissociation from the source sheet; reconstructed protocol clock, not an absolute injection log",
+    "cycle_clock_verified": false
   }
 }

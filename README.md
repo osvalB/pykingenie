@@ -125,9 +125,13 @@ carterra.read_csv(
 
 Supply the actual injection boundaries for your experiment: association is
 `[association_start, association_end)`, and dissociation starts at
-`association_end`. These readers represent one association/dissociation pair
-per curve; full run logs and single-cycle injection series need their own step
-metadata. File times can be seconds or minutes (`time_unit="min"`); boundaries
+`association_end`. By default, these readers represent one association/
+dissociation pair per curve. For Carterra rows representing consecutive
+injections on one physical sensor, pass `single_cycle=True` and an explicit
+`cycle_duration` in seconds. The importer translates row clocks into one
+sequence and folds each following baseline into the preceding dissociation.
+Rows must be in acquisition order and must not overlap on the resulting clock.
+No cycle period, grouping or absolute acquisition time is inferred. File times can be seconds or minutes (`time_unit="min"`); boundaries
 are always seconds. Independent curve time grids and measured responses are
 preserved without interpolation, alignment or reference subtraction. Exported
 `fitted curve` columns are excluded; Carterra `NotFitted` rows are retained.
@@ -176,8 +180,11 @@ a copy before fitting and keeps the raw import plot.
 The rstoolbox and binning notebooks demonstrate import only. See
 [SPR fits with published comparisons](notebooks/SPR_FITTING.md) for the API calls,
 source reports and remaining differences in fitting setup. Both Duke examples
-use the same five concentration curves and nominal protocol windows as the
-author reports, verified against their original sensorgram figures.
+select the same five concentration curves as the author reports, verified
+against their original sensorgram figures. Carterra imports all 13 injections
+as one sequence so alignment does not reset each injection; its continuous fit
+also includes the intervening baseline washes. The nominal cycle period is
+reconstructed from the source sheet and is stated explicitly in the notebook.
 
 ## Detecting input formats
 

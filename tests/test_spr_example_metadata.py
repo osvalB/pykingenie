@@ -89,17 +89,22 @@ def test_imported_five_curves_match_published_selection_and_windows(
         path,
         association_start=metadata["association_start"],
         association_end=metadata["association_end"],
-        concentrations=metadata["concentrations"],
+        concentrations=metadata.get("cycle_concentrations", metadata["concentrations"]),
         concentration_unit="uM",
     )
-    assert (
-        experiment.no_sensors == metadata["literature_reference"]["curves_fitted"] == 5
+    indices = (
+        np.asarray(metadata["source_concentration_entries_one_based"]) - 1
+        if key == "carterra_rows"
+        else np.arange(5)
     )
+    assert len(indices) == metadata["literature_reference"]["curves_fitted"] == 5
+    assert experiment.no_sensors == (13 if key == "carterra_rows" else 5)
     np.testing.assert_allclose(
         metadata["literature_reference"]["concentrations_nM"], published_nm
     )
     np.testing.assert_allclose(
-        experiment.ligand_conc_df["Concentration_micromolar"] * 1000, published_nm
+        experiment.ligand_conc_df["Concentration_micromolar"].iloc[indices] * 1000,
+        published_nm,
     )
     assert (
         metadata["trim_time"]

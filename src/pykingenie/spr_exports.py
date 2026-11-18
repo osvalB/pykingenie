@@ -52,7 +52,9 @@ def _number(value, decimal, name):
     try:
         result = float(value.strip().replace(decimal, "."))
     except ValueError as error:
-        raise ValueError(f"Non-numeric measurement in curve {name!r}: {value!r}.") from error
+        raise ValueError(
+            f"Non-numeric measurement in curve {name!r}: {value!r}."
+        ) from error
     if not np.isfinite(result):
         raise ValueError(f"Non-finite measurement in curve {name!r}.")
     return result
@@ -77,7 +79,9 @@ def _trace(name, points, decimal):
 def _find_header(lines, predicate):
     for i, line in enumerate(lines):
         for delimiter in ("\t", ",", ";"):
-            fields = [field.strip() for field in next(csv.reader([line], delimiter=delimiter))]
+            fields = [
+                field.strip() for field in next(csv.reader([line], delimiter=delimiter))
+            ]
             while fields and not fields[-1]:
                 fields.pop()
             if predicate(fields):
@@ -97,7 +101,9 @@ def _rows(lines, start, delimiter, width):
 def _paired_columns(file, decimal, encoding):
     lines = _text_lines(file, encoding)
     start, delimiter, header = _find_header(
-        lines, lambda fields: len(fields) >= 2 and all(_AXIS.fullmatch(field) for field in fields)
+        lines,
+        lambda fields: len(fields) >= 2
+        and all(_AXIS.fullmatch(field) for field in fields),
     )
     pairs = {}
     for index, column in enumerate(header):
@@ -112,7 +118,9 @@ def _paired_columns(file, decimal, encoding):
     if not pairs:
         raise ValueError("The export contains no measured sensorgrams.")
     if any(set(axes) != {"X", "Y"} for axes in pairs.values()):
-        raise ValueError("Each measured curve must have exactly one X and one Y column.")
+        raise ValueError(
+            "Each measured curve must have exactly one X and one Y column."
+        )
     rows = list(_rows(lines, start + 1, delimiter, len(header)))
     return [
         _trace(name, [(row[axes["X"]], row[axes["Y"]]) for row in rows], decimal)
@@ -174,11 +182,18 @@ class _SensorgramExport(SurfaceBasedExperiment):
             raise ValueError("decimal must be '.' or ','.")
         if time_unit not in _TIME_UNITS:
             raise ValueError("time_unit must be 's' or 'min'.")
-        if concentration_unit is not None and concentration_unit not in _CONCENTRATION_UNITS:
-            raise ValueError("Unsupported concentration unit; use M, mM, uM, µM, nM or pM.")
+        if (
+            concentration_unit is not None
+            and concentration_unit not in _CONCENTRATION_UNITS
+        ):
+            raise ValueError(
+                "Unsupported concentration unit; use M, mM, uM, µM, nM or pM."
+            )
         start, end = float(association_start), float(association_end)
         if not np.isfinite([start, end]).all() or end <= start:
-            raise ValueError("Association boundaries must be finite, with end greater than start.")
+            raise ValueError(
+                "Association boundaries must be finite, with end greater than start."
+            )
         traces = reader(file, decimal, encoding)
         names = [trace.name for trace in traces]
         samples = _values_per_curve(sample_id, names, "sample_id")
@@ -186,10 +201,13 @@ class _SensorgramExport(SurfaceBasedExperiment):
             raise ValueError("sample_id values must be non-empty strings.")
         if concentrations is not None:
             if isinstance(concentrations, (str, bytes)):
-                raise ValueError("concentrations must be a sequence or curve-name mapping.")
+                raise ValueError(
+                    "concentrations must be a sequence or curve-name mapping."
+                )
             values = _values_per_curve(concentrations, names, "concentrations")
             conc = (
-                np.asarray(values, dtype=float) * _CONCENTRATION_UNITS[concentration_unit or "uM"]
+                np.asarray(values, dtype=float)
+                * _CONCENTRATION_UNITS[concentration_unit or "uM"]
             )
             if conc.ndim != 1:
                 raise ValueError("concentrations must contain one scalar per curve.")
@@ -237,7 +255,10 @@ class _SensorgramExport(SurfaceBasedExperiment):
                 "Name": ["Baseline", "Association", "Dissociation"],
                 "Type": ["BASELINE", "ASSOC", "DISASSOC"],
                 "Start": [
-                    min(start, *(trace.time[0] * _TIME_UNITS[time_unit] for trace in traces)),
+                    min(
+                        start,
+                        *(trace.time[0] * _TIME_UNITS[time_unit] for trace in traces),
+                    ),
                     start,
                     end,
                 ],
@@ -341,14 +362,32 @@ class CarterraExperiment(_SensorgramExport):
         sample_id="sample",
         decimal=".",
         encoding="utf-8-sig",
+        single_cycle=False,
+        cycle_duration=None,
     ):
         """Read Carterra CSV with caller-supplied phase boundaries in seconds.
 
         Concentrations and sample_id follow SprTextExperiment.read_file().
         Original row labels and each curve's time grid are retained. Labels
         marked NotFitted remain measured data and are included in the import.
+
+        With single_cycle=True, rows must be consecutive injections on one
+        physical sensor, in acquisition order. Supply cycle_duration in seconds:
+        each row's exported clock is translated by this period. This timing is
+        caller supplied, not inferred from labels or signal shape. Rows must not
+        overlap on the resulting clock. The next row's pre-association baseline
+        extends the preceding dissociation, yielding BASELINE, ASSOC, DISASSOC,
+        ASSOC, DISASSOC, ... . This lets align_association preserve occupied
+        states after the first injection and lets the existing fitter carry the
+        bound state between injections. No response is shifted or interpolated
+        during import. Different physical sensors need separate imports.
         """
-        self._load(
+        if not isinstance(single_cycle, (bool, np.bool_)):
+            raise ValueError("single_cycle must be a boolean.")
+        if not single_cycle and cycle_duration is not None:
+            raise ValueError("cycle_duration requires single_cycle=True.")
+        target = CarterraExperiment(self.name) if single_cycle else self
+        target._load(
             file,
             _carterra_rows,
             association_end,
@@ -360,3 +399,87 @@ class CarterraExperiment(_SensorgramExport):
             decimal,
             encoding,
         )
+        if single_cycle:
+            target._combine_cycles(cycle_duration)
+            # Keep the existing import intact if sequence validation fails.
+            self.__dict__.update(target.__dict__)
+
+    def _combine_cycles(self, cycle_duration):
+        """Represent row-wise injections as one sensor with alternating steps."""
+        try:
+            period = float(cycle_duration)
+        except (TypeError, ValueError) as error:
+            raise ValueError(
+                "single_cycle requires a positive cycle_duration in seconds."
+            ) from error
+        if not np.isfinite(period) or period <= 0:
+            raise ValueError(
+                "single_cycle requires a positive cycle_duration in seconds."
+            )
+        if self.ligand_conc_df.SampleID.nunique() != 1:
+            raise ValueError(
+                "A single-cycle import must contain one sample_id on one sensor."
+            )
+        if not np.isfinite(self.ligand_conc_df.Concentration_micromolar).all():
+            raise ValueError("Provide concentrations for every single-cycle injection.")
+
+        times = [
+            [phase + i * period for phase in curve] for i, curve in enumerate(self.xs)
+        ]
+        clock = np.concatenate([np.concatenate(curve) for curve in times])
+        if not np.all(np.diff(clock) > 0):
+            raise ValueError(
+                "Single-cycle rows overlap in time; check cycle_duration and row order."
+            )
+
+        start = self.exp_info["association_start_seconds"]
+        end = self.exp_info["association_end_seconds"]
+        xs, ys = [times[0][0]], [self.ys[0][0].copy()]
+        steps = [
+            {
+                "Name": "Baseline",
+                "Type": "BASELINE",
+                "Start": self.df_steps.Start.iloc[0],
+                "Column_location": "0",
+                "Loading_location": np.nan,
+            }
+        ]
+        for i, (time, signal) in enumerate(zip(times, self.ys)):
+            if i:
+                # With no analyte present, the next baseline belongs to the
+                # preceding dissociation, not a fresh empty-surface baseline.
+                xs[-1] = np.concatenate([xs[-1], time[0]])
+                ys[-1] = np.concatenate([ys[-1], signal[0]])
+            xs.extend([time[1], time[2]])
+            ys.extend([signal[1].copy(), signal[2].copy()])
+            for name, kind, boundary in [
+                ("Association", "ASSOC", start),
+                ("Dissociation", "DISASSOC", end),
+            ]:
+                steps.append(
+                    {
+                        "Name": f"{name} {i + 1}",
+                        "Type": kind,
+                        "Start": i * period + boundary,
+                        "Column_location": str(i + 1),
+                        "Loading_location": "0" if kind == "ASSOC" else np.nan,
+                    }
+                )
+
+        labels = self.sensor_names.copy()
+        count = len(labels)
+        sensor = "single_cycle"
+        self.sensor_names, self.no_sensors, self.no_steps = [sensor], 1, len(steps)
+        self.xs, self.ys = [xs], [ys]
+        self.df_steps = pd.DataFrame(steps)
+        self.df_steps.insert(0, "#Step", np.arange(len(steps)) + 1)
+        self.ligand_conc_df["Source_curve"] = labels
+        self.ligand_conc_df["Sensor"] = sensor
+        self.ligand_conc_df["Analyte_location"] = [str(i + 1) for i in range(count)]
+        self.exp_info.update(
+            single_cycle=True,
+            cycle_duration_seconds=period,
+            cycle_order=labels,
+            cycle_count=count,
+        )
+        self.create_unique_sensor_names()

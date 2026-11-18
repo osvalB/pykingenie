@@ -13,9 +13,12 @@ fit_experiment.align_association(inplace=True, npoints=10)
 fit_analyzer = KineticsAnalyzer()
 fit_analyzer.add_experiment(fit_experiment, fit_experiment.name)
 fit_analyzer.merge_ligand_conc_df()
-fit_analyzer.generate_fittings(
-    fit_analyzer.combined_ligand_conc_df.copy(), trim_time=0,
-)
+selected_curves = fit_analyzer.combined_ligand_conc_df.copy()
+if fit_experiment.exp_info.get("single_cycle"):
+    selected_curves["Select"] = selected_curves["Analyte_location"].astype(int).isin(
+        fit_metadata["source_concentration_entries_one_based"]
+    )
+fit_analyzer.generate_fittings(selected_curves, trim_time=0)
 fit_analyzer.submit_steady_state_fitting()
 fitter = next(iter(fit_analyzer.fittings.values()))
 fitter.fit_one_site_assoc_and_disso(shared_smax=False, calc_loo=False)
@@ -33,7 +36,7 @@ and calculates percentage differences. The fitted plot uses the existing
 | Notebook | Published Kd | pyKinGenie Kd | Scope |
 | --- | ---: | ---: | --- |
 | [14: Biacore T200](14_biacore_cycle_sample_import.ipynb) | 65.74 nM | approximately 71.80 nM | One-site/local Smax; the standard method does not include the author's independent association RI offsets. |
-| [15: Carterra](15_carterra_csv_import.ipynb) | 14.29 nM | approximately 47.38 nM | One-site/local Smax on separately aligned exported curves; the full non-regenerative history and absolute prebound signal are not reconstructed. |
+| [15: Carterra](15_carterra_csv_import.ipynb) | 14.29 nM | approximately 16.42 nM | Native single-cycle/local Smax; first selected initial signal estimated by the library, later states carried from preceding dissociations. |
 
 Both notebooks now use the **same five concentrations and curve identities**
 as page 1 of the author sensorgram reports. T200 uses cycles 18–22 at
@@ -46,9 +49,10 @@ windows: T200 baseline −60–0 s, association 0–180 s and dissociation 180�
 Carterra baseline 0–120 s, association 120–420 s and dissociation 420–1140 s.
 No curves are selected merely for having a large response. These comparisons
 still have differences in fitting setup and are not exact reproductions of the
-published fits. Carterra in particular does **not** reproduce the published
-kinetics with this standard workflow. No custom correction is added to force
-agreement.
+published fits. Carterra now uses the standard single-cycle workflow described
+below. Its Kd is approximately 15% above the reference, rather than the previous
+3.3-fold discrepancy from treating every injection as a new zero-start curve.
+No custom fitter or forward model is introduced.
 
 [Notebook 12](12_spr_paired_run_import.ipynb) and
 [notebook 13](13_biacore_cycle_fc_import.ipynb) remain import-only examples.
@@ -57,21 +61,59 @@ No model searches, rankings, sensitivity analyses or leave-one-out fits are run.
 ## Preprocessing
 
 The fitting copy uses the existing `align_association(inplace=True, npoints=10)`
-method to subtract the mean of the last 10 pre-association points from every
-phase. The raw imported experiment and its plot remain unchanged.
+method on a copy. T200 aligns each independent curve. Carterra aligns only the
+first baseline of its single-cycle sequence: the existing method skips later
+associations directly following a dissociation. Its raw imported responses
+and relative occupied signals are preserved.
 `generate_fittings(..., trim_time=0)` fits all retained association and
 dissociation points, matching **Asso. Skip = 0** and **Disso. Skip = 0** in the
 source sheets. All imported observations retain their native sampling. No
-custom thinning, interpolation, smoothing, median-baseline correction, bulk-offset
-fit or occupied-state
-correction is applied.
+custom thinning, interpolation, smoothing, median-baseline correction or
+bulk-offset fitting is applied.
 
-The library's `get_step_xy` supplies step-relative times and the existing
-one-site fitter handles the model evaluation and initial signals. These calls
-are used as implemented; the notebooks do not replace the fitter's clock or
-state handling. Export tails beyond the source sheet's nominal protocol are
-excluded when preparing the data excerpts, with omission counts recorded in the
-manifest. The plot's display point budget does not change fitted observations.
+### Carterra single-cycle import
+
+The notebook imports **all 13 injections** on the physical sensor, then selects
+source concentration entries 9–13 for the five-curve published comparison:
+
+```python
+experiment.read_csv(
+    data_file,
+    association_start=120,
+    association_end=420,
+    concentrations=fit_metadata["cycle_concentrations"],
+    concentration_unit="uM",
+    sample_id=fit_metadata["analyte"],
+    single_cycle=True,
+    cycle_duration=fit_metadata["cycle_duration_seconds"],
+)
+```
+
+This produces one sensor and 27 steps, alternating association and dissociation
+after the first baseline. Original row labels remain in `Source_curve`, and
+concentrations map to unique `Analyte_location` values. The next injection's
+baseline is part of the preceding zero-analyte dissociation. This preserves the
+clock and continued dissociation up to the following association.
+
+The notebook calls `align_association` on this full sequence and passes a
+selection table with only injections 9–13 selected to `generate_fittings`.
+It asserts `fitter.is_single_cycle` and that every subsequent selected association
+is continuous with the preceding dissociation. The existing one-site fitter
+estimates the first selected injection's nonzero initial signal, since earlier
+injections are outside the fit, and carries the fitted bound state forward
+for later injections. The fitting algorithm is unchanged.
+
+**Timing assumption:** 1140 s is the source sheet's nominal baseline +
+association + fitted dissociation duration. It reconstructs a protocol clock;
+it is not an original absolute acquisition log. Supply the actual cycle period
+when known. Original export tails after each row's 1140 s window are omitted.
+Following baselines are included as inter-injection wash observations in the
+continuous fit, beyond the author's per-row fitted dissociation interval.
+Initial-state estimation and local-capacity handling also differ from the
+published implementation, so agreement is not an exact reproduction.
+
+The fitted plot uses pyKinGenie's standard plotting function on this shared
+clock. Its display point budget does not change fitted observations.
 
 The T200 source contains missing/non-finite pairs: 179 in cycle 18, 9 in cycle 19
 and 8 in cycle 21. Those unavailable observations remain gaps; no interpolation

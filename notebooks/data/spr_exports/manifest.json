@@ -140,16 +140,72 @@
       "file": "carterra_rows.csv",
       "source": "Example Exported Data - Carterra.xlsx",
       "source_sha256": "8a940a49b1dacafd7f918e155caa59339214c2d31042c434063788e155df73a7",
-      "output_sha256": "cc2f48e11f0522f91a08a955414a94c71acd1ad21b1828087bd8061340becbd7",
+      "output_sha256": "f485a5067392e3c352ca1d5a293dc4070d5a432ab5824482d5f203fb15fec1d7",
       "worksheet_rows_one_based": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
         10,
         11,
         12,
         13,
         14
       ],
-      "selection": "Author report page 1: five fitted concentrations, Block 1 / A1 / ROI 1",
+      "selection": "All 13 injections for single-cycle import; fit the five published concentrations (injections 9–13)",
       "curves": [
+        {
+          "label": "[Ligand 1-AE.A244 Conc. 13] [NotFitted]",
+          "points": 520,
+          "missing_pairs_removed": 0,
+          "window_pairs_omitted": 14
+        },
+        {
+          "label": "[Ligand 1-AE.A244 Conc. 12] [NotFitted]",
+          "points": 521,
+          "missing_pairs_removed": 0,
+          "window_pairs_omitted": 13
+        },
+        {
+          "label": "[Ligand 1-AE.A244 Conc. 11] [NotFitted]",
+          "points": 520,
+          "missing_pairs_removed": 0,
+          "window_pairs_omitted": 14
+        },
+        {
+          "label": "[Ligand 1-AE.A244 Conc. 10] [NotFitted]",
+          "points": 520,
+          "missing_pairs_removed": 0,
+          "window_pairs_omitted": 13
+        },
+        {
+          "label": "[Ligand 1-AE.A244 Conc. 9] [NotFitted]",
+          "points": 511,
+          "missing_pairs_removed": 0,
+          "window_pairs_omitted": 14
+        },
+        {
+          "label": "[Ligand 1-AE.A244 Conc. 8] [NotFitted]",
+          "points": 519,
+          "missing_pairs_removed": 0,
+          "window_pairs_omitted": 14
+        },
+        {
+          "label": "[Ligand 1-AE.A244 Conc. 7] [NotFitted]",
+          "points": 521,
+          "missing_pairs_removed": 0,
+          "window_pairs_omitted": 13
+        },
+        {
+          "label": "[Ligand 1-AE.A244 Conc. 6] [NotFitted]",
+          "points": 520,
+          "missing_pairs_removed": 0,
+          "window_pairs_omitted": 13
+        },
         {
           "label": "[Ligand 1-AE.A244 Conc. 5] [NotFitted]",
           "points": 519,
@@ -200,7 +256,14 @@
           500.0,
           1000.0
         ]
-      }
+      },
+      "published_fit_worksheet_rows_one_based": [
+        10,
+        11,
+        12,
+        13,
+        14
+      ]
     }
   ]
 }
