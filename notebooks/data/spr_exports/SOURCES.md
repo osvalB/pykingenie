@@ -82,14 +82,34 @@ The T200 selected cycles map to concentration-list entries 6–8. The Carterra
 selected worksheet rows 9, 12, 14 map by row position to ascending entries
 8, 11, 13, following the original author's importer layout. Literal `Conc. N`
 labels are not used to guess molar concentrations. See
-[fitting methods and conclusions](../../SPR_FITTING.md) for the complete
-mapping, occupied-state treatment, conditional rankings and limitations.
+[fits with published comparisons](../../SPR_FITTING.md) for the complete
+mapping, occupied-state treatment, reference reports and comparison scope.
 The derived tables/plots and numerical reports in `fits/` retain the
 corresponding source-data credits and licenses. No fitted values replace the
 measured data files.
-Before fitting, each notebook calls `align_association` on a separate copy,
+Before fitting, each Duke notebook calls `align_association` on a separate copy,
 subtracting the mean of the last 10 pre-association points. This transformation
 is recorded in the numerical reports; it does not modify these source excerpts.
+
+## Published reference fitting reports
+
+The following **unmodified** author output reports come from the same pinned
+Duke revision as the data and sample sheets. They retain **CC BY 4.0**, Kan Li
+and S Moses Dennison, Duke University, with the [retained license](../../../test_files/spr_exports/TitrationAnalysis-LICENSE).
+The normalized `literature_reference` fields in `fit_metadata.json` select one
+report row and retain its kon, koff and Kd values; they are adaptations of these
+reports. Only the corresponding one-site/local-Rmax fits are demonstrated.
+
+| Original report | Pinned source | SHA-256 |
+| --- | --- | --- |
+| `metadata/Titration Analysis_T200_Report_Example.csv` | [Duke T200 report](https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20T200/Titration%20Analysis_T200_Report_Example.csv) | `cb144fadd6e8be97f6ebdaf5786bc7221ae54291859a5308a0d12f11340b0e5d` |
+| `metadata/Titration Analysis_Carterra_Report_Example.csv` | [Duke Carterra report](https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20Carterra/Titration%20Analysis_Carterra_Report_Example.csv) | `bd623cfc2f903ff0afbb3b844e624c2591a66a89ffd05dfc91073daca3b99cc3` |
+
+Use T200 Chip 1 / Channel 2 / fitting #1, and Carterra Block 1 / A1 / ROI 1 /
+fitting #1. The author reports fit five curves; the teaching notebooks fit three
+selected curves. Preprocessing and the selected concentrations differ, so these
+are comparisons of the same source experiments rather than exact reproductions.
+Reference publication: [Li et al., TitrationAnalysis](https://doi.org/10.12688/gatesopenres.14743.2).
 
 The original license audit, including TitrationAnalysis's later CC BY 4.0
 license and older conflicting citation metadata, is recorded in the

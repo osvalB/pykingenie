@@ -10,10 +10,10 @@ from full-resolution selections of these same sources and retain the respective
 data licenses below. Each
 notebook credits its source and links the retained license and transformations.
 The fitted plots, numerical fit reports and metadata tables retain the same
-source-data credits. The original Duke companion workbooks in
-`notebooks/data/spr_exports/metadata/` and their normalized rows in
+source-data credits. The original Duke companion workbooks and published
+reference CSV reports in `notebooks/data/spr_exports/metadata/` and their normalized rows in
 `fit_metadata.json` are also CC BY 4.0, Kan Li and S Moses Dennison, Duke
-University. The workbooks are unmodified; selection, unit conversion and
+University. The workbooks and reference reports are unmodified; selection, unit conversion and
 fitting changes are described in the teaching-data source notes.
 
 The four filenames in the table exist both as small regression fixtures in

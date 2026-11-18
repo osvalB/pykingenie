@@ -1,14 +1,6 @@
 {
-  "case": "carterra_rows",
-  "assessment": {
-    "Verdict": "Use a one-site description; do not trust precise intrinsic kinetic constants from these three curves.",
-    "Reasons": [
-      "Use the verified concentrations and retain nonzero pre-association occupancy; the run was not regenerated.",
-      "One-site with local Rmax wins; adding transport does not improve the residuals and its transport parameter is unidentifiable.",
-      "Halving dissociation increases Kd by 67% and koff by 53%, far beyond the nominal iid intervals.",
-      "Only about 5% of the signal dissociates in the available window; longer dissociation, more concentrations and controls are needed for precise constants."
-    ]
-  },
+  "model": "one_site",
+  "local_rmax": true,
   "metadata": {
     "file": "carterra_rows.csv",
     "concentrations": [
@@ -55,6 +47,25 @@
     "sources": [
       "https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20Carterra/Example%20Data%20Info%20Sheet%20-%20Carterra.xlsx"
     ],
+    "literature_reference": {
+      "model": "1:1 Langmuir with local Rmax",
+      "paper_doi": "10.12688/gatesopenres.14743.2",
+      "source_url": "https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20Carterra/Titration%20Analysis_Carterra_Report_Example.csv",
+      "local_file": "metadata/Titration Analysis_Carterra_Report_Example.csv",
+      "source_sha256": "bd623cfc2f903ff0afbb3b844e624c2591a66a89ffd05dfc91073daca3b99cc3",
+      "row_identity": {
+        "Block": "1",
+        "Well": "A1",
+        "ROI": "1",
+        "Fitting#": "1"
+      },
+      "curves_fitted": 5,
+      "parameters_molar": {
+        "kon": 5161.17784918819,
+        "koff": 7.37342131097028e-05,
+        "Kd": 1.4286315113380675e-08
+      }
+    },
     "association_alignment": {
       "method": "align_association",
       "npoints": 10,
@@ -65,225 +76,72 @@
       }
     }
   },
-  "comparison": [
-    {
-      "Model": "one_site",
-      "Rmax": "local",
-      "Parameters": 5,
-      "Points": 1365,
-      "Reduced χ² (unit variance)": 2.3292008022919264,
-      "RMSE": 1.5233741927777495,
-      "BIC": 1185.2272740170665,
-      "ΔBIC": 0.0,
-      "Jacobian condition": 51.30348189016532,
-      "Max |parameter correlation|": 0.9876838679605,
-      "Near bounds": "",
-      "Converged starts": "8/8"
-    },
-    {
-      "Model": "mass_transport",
-      "Rmax": "local",
-      "Parameters": 6,
-      "Points": 1365,
-      "Reduced χ² (unit variance)": 2.3309165072262625,
-      "RMSE": 1.5233747800135435,
-      "BIC": 1192.4472360947575,
-      "ΔBIC": 7.21996207769098,
-      "Jacobian condition": 68.1611460301591,
-      "Max |parameter correlation|": 0.928201406851172,
-      "Near bounds": "Ktr",
-      "Converged starts": "8/8"
-    },
-    {
-      "Model": "one_site",
-      "Rmax": "shared",
-      "Parameters": 3,
-      "Points": 1365,
-      "Reduced χ² (unit variance)": 2.44451666056424,
-      "RMSE": 1.561775943109346,
-      "BIC": 1238.7551538935504,
-      "ΔBIC": 53.527879876483894,
-      "Jacobian condition": 28.605786226753054,
-      "Max |parameter correlation|": 0.9816537317070257,
-      "Near bounds": "",
-      "Converged starts": "8/8"
-    },
-    {
-      "Model": "mass_transport",
-      "Rmax": "shared",
-      "Parameters": 4,
-      "Points": 1365,
-      "Reduced χ² (unit variance)": 2.4463133104548707,
-      "RMSE": 1.5617761128795733,
-      "BIC": 1245.974360361212,
-      "ΔBIC": 60.74708634414537,
-      "Jacobian condition": 58.68288748125566,
-      "Max |parameter correlation|": 0.9784646547597192,
-      "Near bounds": "Ktr",
-      "Converged starts": "8/8"
-    }
-  ],
   "parameters": [
     {
-      "Parameter": "Kd",
-      "Unit": "µM",
-      "Estimate": 0.017623533050859664,
-      "Conditional 95% lower": 0.016318703172697572,
-      "Conditional 95% upper": 0.01903269603643393
+      "Parameter": "kon",
+      "Unit": "M⁻¹ s⁻¹",
+      "Estimate": 4281.923192441518
     },
     {
-      "Parameter": "k_off",
-      "Unit": "1/s",
-      "Estimate": 7.546261490323563e-05,
-      "Conditional 95% lower": 7.20069166613657e-05,
-      "Conditional 95% upper": 7.908415624591523e-05
+      "Parameter": "koff",
+      "Unit": "s⁻¹",
+      "Estimate": 7.546261490323563e-05
+    },
+    {
+      "Parameter": "Kd",
+      "Unit": "nM",
+      "Estimate": 17.623533050859663
     },
     {
       "Parameter": "Rmax_1",
       "Unit": "RU",
-      "Estimate": 191.90967811076266,
-      "Conditional 95% lower": 182.94230791954976,
-      "Conditional 95% upper": 201.31660615527224
+      "Estimate": 191.90967811076266
     },
     {
       "Parameter": "Rmax_2",
       "Unit": "RU",
-      "Estimate": 201.88636718118676,
-      "Conditional 95% lower": 195.94781237924056,
-      "Conditional 95% upper": 208.00490068617384
+      "Estimate": 201.88636718118676
     },
     {
       "Parameter": "Rmax_3",
       "Unit": "RU",
-      "Estimate": 220.90139014399549,
-      "Conditional 95% lower": 218.60804018673008,
-      "Conditional 95% upper": 223.21879893286655
-    },
-    {
-      "Parameter": "k_on",
-      "Unit": "1/(µM·s)",
-      "Estimate": 0.004281923192441518,
-      "Conditional 95% lower": null,
-      "Conditional 95% upper": null
+      "Estimate": 220.90139014399549
     }
   ],
-  "residuals": [
+  "literature_comparison": [
     {
-      "Curve": "[Ligand 1-AE.A244 Conc. 6] [NotFitted]",
-      "Points": 462,
-      "RMSE": 1.3852632992544254,
-      "Lag-1 residual correlation": 0.36718145540389596,
-      "Baseline noise estimate": 1.110329674161583,
-      "RMSE / baseline noise": 1.2476144081265292
+      "Parameter": "kon",
+      "Unit": "M⁻¹ s⁻¹",
+      "Published": 5161.17784918819,
+      "This notebook": 4281.923192441518,
+      "Difference (%)": -17.03593021668438
     },
     {
-      "Curve": "[Ligand 1-AE.A244 Conc. 3] [NotFitted]",
-      "Points": 452,
-      "RMSE": 1.705842347178056,
-      "Lag-1 residual correlation": 0.5266513175977393,
-      "Baseline noise estimate": 1.2282982641461995,
-      "RMSE / baseline noise": 1.3887851159374562
+      "Parameter": "koff",
+      "Unit": "s⁻¹",
+      "Published": 7.37342131097028e-05,
+      "This notebook": 7.546261490323563e-05,
+      "Difference (%)": 2.344097428640479
     },
     {
-      "Curve": "[Ligand 1-AE.A244 53 µg/ml] [NotFitted]",
-      "Points": 451,
-      "RMSE": 1.4634362617859271,
-      "Lag-1 residual correlation": 0.4143015577906621,
-      "Baseline noise estimate": 1.6570347856931256,
-      "RMSE / baseline noise": 0.8831656851269917
+      "Parameter": "Kd",
+      "Unit": "nM",
+      "Published": 14.286315113380674,
+      "This notebook": 17.623533050859663,
+      "Difference (%)": 23.35954310816877
     }
   ],
-  "sensitivity": [
-    {
-      "Perturbation": "trim 6 s",
-      "RMSE": 1.5191670480021173,
-      "Kd": 0.9909181708053001,
-      "k_off": 0.9944830569876829
-    },
-    {
-      "Perturbation": "trim 10 s",
-      "RMSE": 1.5083569735645197,
-      "Kd": 0.9674874112787432,
-      "k_off": 0.9792511830358726
-    },
-    {
-      "Perturbation": "5 s observation spacing",
-      "RMSE": 1.527231448313028,
-      "Kd": 0.9989072359192318,
-      "k_off": 1.0145365505088748
-    },
-    {
-      "Perturbation": "half dissociation window",
-      "RMSE": 1.5698256722307187,
-      "Kd": 1.6701345654945834,
-      "k_off": 1.5255782207503172
-    },
-    {
-      "Perturbation": "event times -1 s",
-      "RMSE": 1.515283475042584,
-      "Kd": 1.0320809232162782,
-      "k_off": 0.9983594988612469
-    },
-    {
-      "Perturbation": "event times +1 s",
-      "RMSE": 1.5364387354468219,
-      "Kd": 0.9748470763880078,
-      "k_off": 1.0048502760859441
-    }
-  ],
-  "all_candidate_parameters": [
-    {
-      "model": "one_site",
-      "local_rmax": true,
-      "params": {
-        "Kd": 0.017623533050859664,
-        "k_off": 7.546261490323563e-05,
-        "Rmax_1": 191.90967811076266,
-        "Rmax_2": 201.88636718118676,
-        "Rmax_3": 220.90139014399549
-      }
-    },
-    {
-      "model": "mass_transport",
-      "local_rmax": true,
-      "params": {
-        "Kd": 0.01762351388576013,
-        "k_off": 7.546267513902938e-05,
-        "Ktr": 237431.5199418455,
-        "Rmax_1": 191.90988065205144,
-        "Rmax_2": 201.88641274064847,
-        "Rmax_3": 220.90134779887381
-      }
-    },
-    {
-      "model": "one_site",
-      "local_rmax": false,
-      "params": {
-        "Kd": 0.02348738101217716,
-        "k_off": 8.244982897165496e-05,
-        "Rmax_1": 232.43574980550773
-      }
-    },
-    {
-      "model": "mass_transport",
-      "local_rmax": false,
-      "params": {
-        "Kd": 0.02348731674896227,
-        "k_off": 8.244985096074695e-05,
-        "Ktr": 237431.517461475,
-        "Rmax_1": 232.4356216807143
-      }
-    }
-  ],
-  "failures": [],
+  "observations": 1365,
+  "fitted_parameters": 5,
+  "rmse": 1.5233741927777495,
   "settings": {
     "seed": 2918,
-    "multi_starts": 8,
+    "starts_tried": 8,
+    "starts_converged": 8,
     "transition_guard_seconds": 3,
     "minimum_spacing_seconds": 1,
     "scipy": "1.18.1",
-    "numpy": "2.5.4",
-    "bic": "n*log(RSS/n)+k*log(n); conditional independent equal-variance errors",
-    "intervals": "Local iid Jacobian intervals, not calibrated for correlated residuals"
-  }
+    "numpy": "2.5.4"
+  },
+  "scope": "Same source dataset and one-site/local-Rmax model; three selected curves versus five in the published report. Not an exact reproduction."
 }
