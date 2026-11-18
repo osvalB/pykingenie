@@ -5,7 +5,7 @@
     "Reasons": [
       "Molar concentrations and event durations come from the original sample sheet; association-only RI terms are fitted and counted.",
       "The local-capacity two-population model wins among the tested models, but its residuals remain strongly correlated and exceed baseline noise.",
-      "Halving dissociation changes the dominant Kd by 18% and koff by 19%; shifting events -1 s changes the minor-population Kd by 28%.",
+      "Halving dissociation changes the dominant Kd by 22% and koff by 23%; shifting events -1 s changes the minor-population Kd by 27%.",
       "Treat the dominant slow component as provisional. Do not infer two molecular site classes or quote the iid least-squares intervals as validated uncertainty."
     ]
   },
@@ -54,7 +54,16 @@
     "source_sha256": "469af4090726a5d230bbe119ba769b5d17b3b9a5f9bc8edc1913d060c4a571ba",
     "sources": [
       "https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20T200/Example%20T200%20Data%20Info%20Sheet.xlsx"
-    ]
+    ],
+    "association_alignment": {
+      "method": "align_association",
+      "npoints": 10,
+      "offsets_by_sensor": {
+        "Cycle: 20  AE.A244  50 µg": 0.041199736,
+        "Cycle: 21  AE.A244  100 µ": 0.30247071999999997,
+        "Cycle: 22  AE.A244  200 µ": 0.48154174000000005
+      }
+    }
   },
   "comparison": [
     {
@@ -62,12 +71,12 @@
       "Rmax": "local",
       "Parameters": 11,
       "Points": 2313,
-      "Reduced χ² (unit variance)": 0.017467529864463496,
-      "RMSE": 0.1318501385475847,
-      "BIC": -9287.479865692902,
+      "Reduced χ² (unit variance)": 0.016015741030480878,
+      "RMSE": 0.12625202776413355,
+      "BIC": -9488.182734106149,
       "ΔBIC": 0.0,
-      "Jacobian condition": 268.0098669454674,
-      "Max |parameter correlation|": 0.9971467896918237,
+      "Jacobian condition": 277.5922944418627,
+      "Max |parameter correlation|": 0.9971679805251775,
       "Near bounds": "",
       "Converged starts": "8/8"
     },
@@ -76,12 +85,12 @@
       "Rmax": "local",
       "Parameters": 10,
       "Points": 2313,
-      "Reduced χ² (unit variance)": 0.02189388795278348,
-      "RMSE": 0.14764563029997016,
-      "BIC": -8771.798664904445,
-      "ΔBIC": 515.6812007884564,
-      "Jacobian condition": 227.24230497402877,
-      "Max |parameter correlation|": 0.9986163316894864,
+      "Reduced χ² (unit variance)": 0.017930620046715133,
+      "RMSE": 0.13361548934014394,
+      "BIC": -9233.699307180534,
+      "ΔBIC": 254.48342692561528,
+      "Jacobian condition": 225.99594780991606,
+      "Max |parameter correlation|": 0.99866034634034,
       "Near bounds": "",
       "Converged starts": "8/8"
     },
@@ -90,12 +99,12 @@
       "Rmax": "local",
       "Parameters": 8,
       "Points": 2313,
-      "Reduced χ² (unit variance)": 0.17594124659011662,
-      "RMSE": 0.41872749677368115,
-      "BIC": -3965.1242101868447,
-      "ΔBIC": 5322.355655506057,
-      "Jacobian condition": 101.83946167573102,
-      "Max |parameter correlation|": 0.9975039371867779,
+      "Reduced χ² (unit variance)": 0.1835330724379483,
+      "RMSE": 0.42766608991809557,
+      "BIC": -3867.412058538905,
+      "ΔBIC": 5620.770675567244,
+      "Jacobian condition": 101.97528626974888,
+      "Max |parameter correlation|": 0.9975504464052279,
       "Near bounds": "",
       "Converged starts": "8/8"
     },
@@ -104,12 +113,12 @@
       "Rmax": "local",
       "Parameters": 9,
       "Points": 2313,
-      "Reduced χ² (unit variance)": 0.1760180653991195,
-      "RMSE": 0.4187280384724839,
-      "BIC": -3957.3719249712703,
-      "ΔBIC": 5330.107940721631,
-      "Jacobian condition": 329.47036943684503,
-      "Max |parameter correlation|": 0.9959848761764583,
+      "Reduced χ² (unit variance)": 0.18361293282454216,
+      "RMSE": 0.4276663250889742,
+      "BIC": -3859.663214069224,
+      "ΔBIC": 5628.519520036925,
+      "Jacobian condition": 330.31816239387683,
+      "Max |parameter correlation|": 0.9959773025194182,
       "Near bounds": "Ktr",
       "Converged starts": "8/8"
     },
@@ -118,12 +127,12 @@
       "Rmax": "shared",
       "Parameters": 9,
       "Points": 2313,
-      "Reduced χ² (unit variance)": 0.2517933412391669,
-      "RMSE": 0.500812939740755,
-      "BIC": -3129.266940588031,
-      "ΔBIC": 6158.21292510487,
-      "Jacobian condition": 10400.665514071292,
-      "Max |parameter correlation|": 0.9995277867239751,
+      "Reduced χ² (unit variance)": 0.2881990995831179,
+      "RMSE": 0.5357963253965777,
+      "BIC": -2816.9127529861967,
+      "ΔBIC": 6671.269981119953,
+      "Jacobian condition": 7489.537020661273,
+      "Max |parameter correlation|": 0.9989113825135963,
       "Near bounds": "",
       "Converged starts": "8/8"
     },
@@ -132,12 +141,12 @@
       "Rmax": "shared",
       "Parameters": 8,
       "Points": 2313,
-      "Reduced χ² (unit variance)": 0.6154040072663866,
-      "RMSE": 0.783119085624502,
-      "BIC": -1068.9501537719702,
-      "ΔBIC": 8218.529711920932,
-      "Jacobian condition": 159.45567765380818,
-      "Max |parameter correlation|": 0.9677639699620008,
+      "Reduced χ² (unit variance)": 0.6703434300938602,
+      "RMSE": 0.8173279057245969,
+      "BIC": -871.1627741297754,
+      "ΔBIC": 8617.019959976373,
+      "Jacobian condition": 151.9975963510278,
+      "Max |parameter correlation|": 0.9627897064107398,
       "Near bounds": "",
       "Converged starts": "8/8"
     },
@@ -146,12 +155,12 @@
       "Rmax": "shared",
       "Parameters": 6,
       "Points": 2313,
-      "Reduced χ² (unit variance)": 0.782458311871624,
-      "RMSE": 0.8834186938390124,
-      "BIC": -526.9427390142101,
-      "ΔBIC": 8760.537126678691,
-      "Jacobian condition": 78.53431012722939,
-      "Max |parameter correlation|": 0.9838383105573648,
+      "Reduced χ² (unit variance)": 0.8464838898303364,
+      "RMSE": 0.9188515016446431,
+      "BIC": -345.024075950746,
+      "ΔBIC": 9143.158658155404,
+      "Jacobian condition": 77.20917511577059,
+      "Max |parameter correlation|": 0.9834374214447233,
       "Near bounds": "",
       "Converged starts": "8/8"
     },
@@ -160,12 +169,12 @@
       "Rmax": "shared",
       "Parameters": 7,
       "Points": 2313,
-      "Reduced χ² (unit variance)": 0.7828086015987024,
-      "RMSE": 0.8834248870368928,
-      "BIC": -519.1640079391169,
-      "ΔBIC": 8768.315857753785,
-      "Jacobian condition": 178.28385282804942,
-      "Max |parameter correlation|": 0.9862601682881119,
+      "Reduced χ² (unit variance)": 0.8468621942580031,
+      "RMSE": 0.9188575916064537,
+      "BIC": -337.2471151982541,
+      "ΔBIC": 9150.935618907895,
+      "Jacobian condition": 176.52140245633902,
+      "Max |parameter correlation|": 0.9860684194171486,
       "Near bounds": "Ktr",
       "Converged starts": "8/8"
     }
@@ -174,91 +183,91 @@
     {
       "Parameter": "Kd1",
       "Unit": "µM",
-      "Estimate": 0.048397004801992556,
-      "Conditional 95% lower": 0.04771920112760759,
-      "Conditional 95% upper": 0.04908443600177933
+      "Estimate": 0.049005556406154255,
+      "Conditional 95% lower": 0.04832386901874559,
+      "Conditional 95% upper": 0.04969686011161832
     },
     {
       "Parameter": "k_off1",
       "Unit": "1/s",
-      "Estimate": 8.064572901366772e-05,
-      "Conditional 95% lower": 7.954988834649815e-05,
-      "Conditional 95% upper": 8.175666545020646e-05
+      "Estimate": 8.063020895114891e-05,
+      "Conditional 95% lower": 7.956534799727142e-05,
+      "Conditional 95% upper": 8.17093214464277e-05
     },
     {
       "Parameter": "Kd2",
       "Unit": "µM",
-      "Estimate": 1.4687329503155062,
-      "Conditional 95% lower": 1.4059320299990519,
-      "Conditional 95% upper": 1.5343390955706062
+      "Estimate": 1.8622653733503227,
+      "Conditional 95% lower": 1.7854736910049134,
+      "Conditional 95% upper": 1.942359799671825
     },
     {
       "Parameter": "k_off2",
       "Unit": "1/s",
-      "Estimate": 0.01729041773652845,
-      "Conditional 95% lower": 0.016787457379574534,
-      "Conditional 95% upper": 0.017808447029471156
+      "Estimate": 0.017348407988580884,
+      "Conditional 95% lower": 0.016874235342772343,
+      "Conditional 95% upper": 0.017835905072117467
     },
     {
       "Parameter": "fraction",
       "Unit": "dimensionless",
-      "Estimate": 0.9618657532565336,
-      "Conditional 95% lower": 0.9610644497511496,
-      "Conditional 95% upper": 0.9626670567619176
+      "Estimate": 0.9570940739644453,
+      "Conditional 95% lower": 0.9561795240422796,
+      "Conditional 95% upper": 0.9580086238866111
     },
     {
       "Parameter": "Rmax_1",
       "Unit": "RU",
-      "Estimate": 148.02405896315835,
-      "Conditional 95% lower": 147.23806920350154,
-      "Conditional 95% upper": 148.81424451202665
+      "Estimate": 150.02320183398948,
+      "Conditional 95% lower": 149.24624499142695,
+      "Conditional 95% upper": 150.80420341439608
     },
     {
       "Parameter": "Rmax_2",
       "Unit": "RU",
-      "Estimate": 139.75879228773545,
-      "Conditional 95% lower": 139.11319371545295,
-      "Conditional 95% upper": 140.40738696344567
+      "Estimate": 140.95057419952948,
+      "Conditional 95% lower": 140.3132503984057,
+      "Conditional 95% upper": 141.59079282082405
     },
     {
       "Parameter": "Rmax_3",
       "Unit": "RU",
-      "Estimate": 141.49076746146864,
-      "Conditional 95% lower": 140.99993239106604,
-      "Conditional 95% upper": 141.9833111785511
+      "Estimate": 142.3625816500665,
+      "Conditional 95% lower": 141.87526092993173,
+      "Conditional 95% upper": 142.851576245426
     },
     {
       "Parameter": "RI_1",
       "Unit": "RU",
-      "Estimate": -0.2619315367059219,
-      "Conditional 95% lower": -0.30176337360912425,
-      "Conditional 95% upper": -0.22209969980271954
+      "Estimate": -0.22664209378979208,
+      "Conditional 95% lower": -0.26321663222189035,
+      "Conditional 95% upper": -0.19006755535769385
     },
     {
       "Parameter": "RI_2",
       "Unit": "RU",
-      "Estimate": -0.9389767334836328,
-      "Conditional 95% lower": -0.9856740221414618,
-      "Conditional 95% upper": -0.8922794448258037
+      "Estimate": -1.0294347618775106,
+      "Conditional 95% lower": -1.0730852781233862,
+      "Conditional 95% upper": -0.985784245631635
     },
     {
       "Parameter": "RI_3",
       "Unit": "RU",
-      "Estimate": -2.1511146315699023,
-      "Conditional 95% lower": -2.219686116115968,
-      "Conditional 95% upper": -2.0825431470238365
+      "Estimate": -2.3539013792156354,
+      "Conditional 95% lower": -2.418305602999617,
+      "Conditional 95% upper": -2.2894971554316537
     },
     {
       "Parameter": "k_on1",
       "Unit": "1/(µM·s)",
-      "Estimate": 0.001666337190568195,
+      "Estimate": 0.001645327894716509,
       "Conditional 95% lower": null,
       "Conditional 95% upper": null
     },
     {
       "Parameter": "k_on2",
       "Unit": "1/(µM·s)",
-      "Estimate": 0.011772335966735279,
+      "Estimate": 0.009315755013674607,
       "Conditional 95% lower": null,
       "Conditional 95% upper": null
     }
@@ -267,82 +276,82 @@
     {
       "Curve": "Cycle: 20  AE.A244  50 µg",
       "Points": 771,
-      "RMSE": 0.12027177919885704,
-      "Lag-1 residual correlation": 0.9837541339505713,
-      "Baseline noise estimate": 0.019259100020172053,
-      "RMSE / baseline noise": 6.2449324772644585
+      "RMSE": 0.11580383303279013,
+      "Lag-1 residual correlation": 0.9823800965817934,
+      "Baseline noise estimate": 0.01925910002017205,
+      "RMSE / baseline noise": 6.012941046647911
     },
     {
       "Curve": "Cycle: 21  AE.A244  100 µ",
       "Points": 771,
-      "RMSE": 0.0917560395360581,
-      "Lag-1 residual correlation": 0.9428321488205692,
-      "Baseline noise estimate": 0.018012595038617737,
-      "RMSE / baseline noise": 5.0939933607200745
+      "RMSE": 0.10310521916923564,
+      "Lag-1 residual correlation": 0.9545717586008714,
+      "Baseline noise estimate": 0.01801259503861776,
+      "RMSE / baseline noise": 5.724062465635027
     },
     {
       "Curve": "Cycle: 22  AE.A244  200 µ",
       "Points": 771,
-      "RMSE": 0.17108157540205948,
-      "Lag-1 residual correlation": 0.9841090183061691,
-      "Baseline noise estimate": 0.02354711848014293,
-      "RMSE / baseline noise": 7.265499409039412
+      "RMSE": 0.15419957710267626,
+      "Lag-1 residual correlation": 0.9807705564831061,
+      "Baseline noise estimate": 0.023547118480142966,
+      "RMSE / baseline noise": 6.548554008114034
     }
   ],
   "sensitivity": [
     {
       "Perturbation": "trim 6 s",
-      "RMSE": 0.12902911568892741,
-      "Kd1": 0.9896336843324721,
-      "k_off1": 0.9975840148995092,
-      "Kd2": 0.9837534139977606,
-      "k_off2": 0.9896232152467391,
-      "fraction": 1.0001558487147197
+      "RMSE": 0.12378172542238594,
+      "Kd1": 0.9897166947028553,
+      "k_off1": 0.9959811749572398,
+      "Kd2": 0.9844905528491702,
+      "k_off2": 0.9820223060122146,
+      "fraction": 1.0004166194129902
     },
     {
       "Perturbation": "trim 10 s",
-      "RMSE": 0.12510312748928806,
-      "Kd1": 0.9775274692258813,
-      "k_off1": 0.9921270309964533,
-      "Kd2": 0.9554261101940648,
-      "k_off2": 0.9655812398650684,
-      "fraction": 1.0007992493825064
+      "RMSE": 0.11940150857297213,
+      "Kd1": 0.9780831809732441,
+      "k_off1": 0.9890878451260879,
+      "Kd2": 0.9546087577307742,
+      "k_off2": 0.9507253817944478,
+      "fraction": 1.0014862790353705
     },
     {
       "Perturbation": "5 s observation spacing",
-      "RMSE": 0.13329799830666222,
-      "Kd1": 1.005553279978309,
-      "k_off1": 1.0020731139887697,
-      "Kd2": 1.0101082776331491,
-      "k_off2": 1.0064921454845641,
-      "fraction": 0.9998441939620182
+      "RMSE": 0.12678912248835472,
+      "Kd1": 1.0030458035329641,
+      "k_off1": 1.002732706937715,
+      "Kd2": 1.0037020864876187,
+      "k_off2": 1.0111111560078645,
+      "fraction": 0.9997016667568354
     },
     {
       "Perturbation": "half dissociation window",
-      "RMSE": 0.13821307993804366,
-      "Kd1": 1.1781740183625613,
-      "k_off1": 1.1913911156114048,
-      "Kd2": 0.8866979743567265,
-      "k_off2": 1.1066780923250212,
-      "fraction": 1.0040827533564254
+      "RMSE": 0.13334395529387663,
+      "Kd1": 1.2180222847901925,
+      "k_off1": 1.2303236819366767,
+      "Kd2": 0.9251127033934647,
+      "k_off2": 1.1560667694272648,
+      "fraction": 1.0045888117459967
     },
     {
       "Perturbation": "event times -1 s",
-      "RMSE": 0.12257853399225313,
-      "Kd1": 1.0030417720889913,
-      "k_off1": 0.9967767847041793,
-      "Kd2": 1.2836713342039223,
-      "k_off2": 1.0095153743547651,
-      "fraction": 0.9941607876521138
+      "RMSE": 0.12297421427510541,
+      "Kd1": 1.0008009521589487,
+      "k_off1": 0.9969546944778149,
+      "Kd2": 1.2710314274554737,
+      "k_off2": 1.011759929872785,
+      "fraction": 0.9928823594912779
     },
     {
       "Perturbation": "event times +1 s",
-      "RMSE": 0.14598131341767723,
-      "Kd1": 0.9928512688599677,
-      "k_off1": 1.001459859356343,
-      "Kd2": 0.772540132155663,
-      "k_off2": 0.9891279479497077,
-      "fraction": 1.0046290150980208
+      "RMSE": 0.1356063423739667,
+      "Kd1": 0.9968833050336152,
+      "k_off1": 1.002956955511762,
+      "Kd2": 0.783656932299468,
+      "k_off2": 0.9903005441462694,
+      "fraction": 1.0056500076420427
     }
   ],
   "all_candidate_parameters": [
@@ -350,116 +359,116 @@
       "model": "heterogeneous",
       "local_rmax": true,
       "params": {
-        "Kd1": 0.048397004801992556,
-        "k_off1": 8.064572901366772e-05,
-        "Kd2": 1.4687329503155062,
-        "k_off2": 0.01729041773652845,
-        "fraction": 0.9618657532565336,
-        "Rmax_1": 148.02405896315835,
-        "Rmax_2": 139.75879228773545,
-        "Rmax_3": 141.49076746146864,
-        "RI_1": -0.2619315367059219,
-        "RI_2": -0.9389767334836328,
-        "RI_3": -2.1511146315699023
+        "Kd1": 0.049005556406154255,
+        "k_off1": 8.063020895114891e-05,
+        "Kd2": 1.8622653733503227,
+        "k_off2": 0.017348407988580884,
+        "fraction": 0.9570940739644453,
+        "Rmax_1": 150.02320183398948,
+        "Rmax_2": 140.95057419952948,
+        "Rmax_3": 142.3625816500665,
+        "RI_1": -0.22664209378979208,
+        "RI_2": -1.0294347618775106,
+        "RI_3": -2.3539013792156354
       }
     },
     {
       "model": "induced_fit",
       "local_rmax": true,
       "params": {
-        "k_on": 0.0018016743091274737,
-        "k_off": 0.005423178132267713,
-        "k_c": 0.019377223311196515,
-        "k_rev": 0.0004143220300111188,
-        "Rmax_1": 166.79288777361475,
-        "Rmax_2": 155.87749637240483,
-        "Rmax_3": 154.91934252942931,
-        "RI_1": -0.16186317733002775,
-        "RI_2": -0.9861370897664853,
-        "RI_3": -2.3573460736494507
+        "k_on": 0.0017667092932022242,
+        "k_off": 0.004510910155733821,
+        "k_c": 0.017613074079959757,
+        "k_rev": 0.00043451343560604714,
+        "Rmax_1": 166.104411803213,
+        "Rmax_2": 154.73391347864134,
+        "Rmax_3": 153.83944251228417,
+        "RI_1": -0.15802126464320515,
+        "RI_2": -1.0546142598919408,
+        "RI_3": -2.4577754744347806
       }
     },
     {
       "model": "one_site",
       "local_rmax": true,
       "params": {
-        "Kd": 0.06460934630486682,
-        "k_off": 0.00011993382442758607,
-        "Rmax_1": 132.52816890306076,
-        "Rmax_2": 126.57142739859107,
-        "Rmax_3": 130.783620787543,
-        "RI_1": 1.0268458724329004,
-        "RI_2": 0.7397904599083077,
-        "RI_3": -0.4249900125414932
+        "Kd": 0.06603178906492657,
+        "k_off": 0.00012177234293463787,
+        "Rmax_1": 132.99766703582995,
+        "Rmax_2": 126.5113598447259,
+        "Rmax_3": 130.57927206935474,
+        "RI_1": 0.9786528045572375,
+        "RI_2": 0.5939764735797087,
+        "RI_3": -0.5977992669866018
       }
     },
     {
       "model": "mass_transport",
       "local_rmax": true,
       "params": {
-        "Kd": 0.06460848414133658,
-        "k_off": 0.00011993455238146576,
-        "Ktr": 15653.509164067278,
-        "Rmax_1": 132.52747157871974,
-        "Rmax_2": 126.57066056285892,
-        "Rmax_3": 130.78291550317192,
-        "RI_1": 1.0268564658244403,
-        "RI_2": 0.7398029641760923,
-        "RI_3": -0.4249980570750324
+        "Kd": 0.06603090077930611,
+        "k_off": 0.00012177309183259824,
+        "Ktr": 15568.50403494213,
+        "Rmax_1": 132.99694986259937,
+        "Rmax_2": 126.51057452028365,
+        "Rmax_3": 130.57855234533199,
+        "RI_1": 0.9786632742114572,
+        "RI_2": 0.5939883023627828,
+        "RI_3": -0.5978089549247224
       }
     },
     {
       "model": "heterogeneous",
       "local_rmax": false,
       "params": {
-        "Kd1": 0.013116502779694146,
-        "k_off1": 7.563688271845331e-05,
-        "Kd2": 0.5089209962994229,
-        "k_off2": 0.00015170685405726462,
-        "fraction": 0.06820330494359839,
-        "Rmax_1": 400.12528100159483,
-        "RI_1": 0.6520733826701961,
-        "RI_2": -0.2203025673709968,
-        "RI_3": 0.40181452050000216
+        "Kd1": 0.00961919129085455,
+        "k_off1": 5.8633269128953565e-05,
+        "Kd2": 0.4427938212602685,
+        "k_off2": 0.0001603797749167976,
+        "fraction": 0.07222563616843769,
+        "Rmax_1": 346.25530421208276,
+        "RI_1": 0.6093637534879373,
+        "RI_2": -0.4116325628889618,
+        "RI_3": 0.15231086673508976
       }
     },
     {
       "model": "induced_fit",
       "local_rmax": false,
       "params": {
-        "k_on": 0.0019976212109770316,
-        "k_off": 0.003971063490119329,
-        "k_c": 0.017217204634180187,
-        "k_rev": 0.0004784526470466117,
-        "Rmax_1": 141.87975375936918,
-        "RI_1": 0.5284383646570698,
-        "RI_2": -1.6534319421942,
-        "RI_3": -2.8641847311912567
+        "k_on": 0.0019664457668941084,
+        "k_off": 0.0031674811969338375,
+        "k_c": 0.015179999220140647,
+        "k_rev": 0.0005014801594099752,
+        "Rmax_1": 140.53153771976034,
+        "RI_1": 0.5689931925368803,
+        "RI_2": -1.7420936600402213,
+        "RI_3": -2.9610098960721793
       }
     },
     {
       "model": "one_site",
       "local_rmax": false,
       "params": {
-        "Kd": 0.06825648372821481,
-        "k_off": 0.00011991037315100956,
-        "Rmax_1": 134.30082558661934,
-        "RI_1": 1.6660688859177946,
-        "RI_2": 0.3180792762131962,
-        "RI_3": 0.1888530851325651
+        "Kd": 0.06905435436780828,
+        "k_off": 0.00012177532254356146,
+        "Rmax_1": 133.33843532214388,
+        "RI_1": 1.6381235717570948,
+        "RI_2": 0.1165162457369456,
+        "RI_3": -0.06759803274329083
       }
     },
     {
       "model": "mass_transport",
       "local_rmax": false,
       "params": {
-        "Kd": 0.06825567171699075,
-        "k_off": 0.00011991112017248993,
-        "Ktr": 15653.509182056394,
-        "Rmax_1": 134.30016470927785,
-        "RI_1": 1.6660848160131378,
-        "RI_2": 0.3180922743892072,
-        "RI_3": 0.18885553447688186
+        "Kd": 0.06905352976337084,
+        "k_off": 0.00012177607535591821,
+        "Ktr": 15568.50477841945,
+        "Rmax_1": 133.33778098036296,
+        "RI_1": 1.638139641899469,
+        "RI_2": 0.11652940905624577,
+        "RI_3": -0.06759541269164536
       }
     }
   ],

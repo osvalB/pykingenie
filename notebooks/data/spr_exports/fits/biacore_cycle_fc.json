@@ -28,7 +28,15 @@
     "protocol": "Binning protocol; inferred early episode only. Fit empirical rates, not kon, koff or Kd for the complete run.",
     "sources": [
       "https://github.com/RKI-ZBS/SPR_kinetics_binning/blob/ceaae964586dcbb00ac53bcae301bc097d92f3f4/Binning/Binning_Raw_Inspector_T200/input/2022-05-10_Kurven_Binning_huCapRaw.txt"
-    ]
+    ],
+    "association_alignment": {
+      "method": "align_association",
+      "npoints": 10,
+      "offsets_by_sensor": {
+        "Cycle=1_Fc=4-3": 232.2488,
+        "Cycle=2_Fc=4-3": 466.712
+      }
+    }
   },
   "comparison": [
     {
@@ -36,12 +44,12 @@
       "Rmax": "local",
       "Parameters": 7,
       "Points": 386,
-      "Reduced χ² (unit variance)": 274.5925490230023,
-      "RMSE": 16.41989316037814,
-      "BIC": 2202.1279187226946,
+      "Reduced χ² (unit variance)": 274.30235017378874,
+      "RMSE": 16.41121431285481,
+      "BIC": 2201.719764934429,
       "ΔBIC": 0.0,
-      "Jacobian condition": 227392.50348973225,
-      "Max |parameter correlation|": 0.9999999997475996,
+      "Jacobian condition": 962619.0083350757,
+      "Max |parameter correlation|": 0.9999999999859175,
       "Near bounds": "",
       "Converged starts": "8/8"
     },
@@ -50,12 +58,12 @@
       "Rmax": "local",
       "Parameters": 4,
       "Points": 386,
-      "Reduced χ² (unit variance)": 407.47043914761247,
-      "RMSE": 20.081034523904087,
-      "BIC": 2339.6502775856734,
-      "ΔBIC": 137.52235886297876,
-      "Jacobian condition": 4.054401797495037,
-      "Max |parameter correlation|": 0.7462490529528049,
+      "Reduced χ² (unit variance)": 407.15065078728384,
+      "RMSE": 20.073153042283074,
+      "BIC": 2339.3472205817416,
+      "ΔBIC": 137.62745564731267,
+      "Jacobian condition": 4.054157192196994,
+      "Max |parameter correlation|": 0.7461870714079422,
       "Near bounds": "",
       "Converged starts": "8/8"
     },
@@ -64,12 +72,12 @@
       "Rmax": "local",
       "Parameters": 6,
       "Points": 386,
-      "Reduced χ² (unit variance)": 408.2493203741782,
-      "RMSE": 20.047530421875667,
-      "BIC": 2350.272837061648,
-      "ΔBIC": 148.14491833895318,
-      "Jacobian condition": 4.086081018646993,
-      "Max |parameter correlation|": 0.8155229517770372,
+      "Reduced χ² (unit variance)": 407.98745841260364,
+      "RMSE": 20.041099881185186,
+      "BIC": 2350.0251669657573,
+      "ΔBIC": 148.3054020313284,
+      "Jacobian condition": 4.084972477182961,
+      "Max |parameter correlation|": 0.8154295559325462,
       "Near bounds": "",
       "Converged starts": "8/8"
     }
@@ -78,125 +86,125 @@
     {
       "Parameter": "k_obs1",
       "Unit": "1/s",
-      "Estimate": 0.031303069881236656,
-      "Conditional 95% lower": 8.052066109079754e-270,
-      "Conditional 95% upper": 1.2169326117238031e+266
+      "Estimate": 0.03130530038085406,
+      "Conditional 95% lower": 1e-300,
+      "Conditional 95% upper": 1e+300
     },
     {
       "Parameter": "k_decay1",
       "Unit": "1/s",
-      "Estimate": 0.001073918909242353,
-      "Conditional 95% lower": 0.000898945546280329,
-      "Conditional 95% upper": 0.0012829495939998094
+      "Estimate": 0.0010738327312698023,
+      "Conditional 95% lower": 0.0008989292108986386,
+      "Conditional 95% upper": 0.0012827670085318729
     },
     {
       "Parameter": "k_obs2",
       "Unit": "1/s",
-      "Estimate": 0.03130444760060128,
+      "Estimate": 0.031305625812712914,
       "Conditional 95% lower": 1e-300,
       "Conditional 95% upper": 1e+300
     },
     {
       "Parameter": "k_decay2",
       "Unit": "1/s",
-      "Estimate": 0.13795502255629324,
-      "Conditional 95% lower": 0.0831700078206023,
-      "Conditional 95% upper": 0.22882753948464823
+      "Estimate": 0.13792617669921173,
+      "Conditional 95% lower": 0.0831710917879623,
+      "Conditional 95% upper": 0.2287288745392608
     },
     {
       "Parameter": "fraction",
       "Unit": "dimensionless",
-      "Estimate": 0.949081589665414,
-      "Conditional 95% lower": -51.6005132454359,
-      "Conditional 95% upper": 53.49867642476672
+      "Estimate": 0.9490866743662416,
+      "Conditional 95% lower": -221.37682844629248,
+      "Conditional 95% upper": 223.27500179502496
     },
     {
       "Parameter": "Rmax_1",
       "Unit": "RU",
-      "Estimate": 1262.9691099779957,
-      "Conditional 95% lower": 1247.175334034331,
-      "Conditional 95% upper": 1278.9628925700854
+      "Estimate": 1262.828477852254,
+      "Conditional 95% lower": 1247.0473497242685,
+      "Conditional 95% upper": 1278.8093129160245
     },
     {
       "Parameter": "Rmax_2",
       "Unit": "RU",
-      "Estimate": 1165.3563442685113,
-      "Conditional 95% lower": 1150.7436236877625,
-      "Conditional 95% upper": 1180.1546245155275
+      "Estimate": 1165.5905523562217,
+      "Conditional 95% lower": 1150.9850943021747,
+      "Conditional 95% upper": 1180.381346785192
     }
   ],
   "residuals": [
     {
       "Curve": "Cycle=1_Fc=4-3",
       "Points": 193,
-      "RMSE": 17.634309365452964,
-      "Lag-1 residual correlation": 0.9981812219344341,
+      "RMSE": 17.646982859806965,
+      "Lag-1 residual correlation": 0.9981849002367513,
       "Baseline noise estimate": 0.012580296993748076,
-      "RMSE / baseline noise": 1401.7403066252361
+      "RMSE / baseline noise": 1402.7477148255591
     },
     {
       "Curve": "Cycle=2_Fc=4-3",
       "Points": 193,
-      "RMSE": 15.108173814196196,
-      "Lag-1 residual correlation": 0.9982877905503128,
+      "RMSE": 15.074478644071919,
+      "Lag-1 residual correlation": 0.9982810769541957,
       "Baseline noise estimate": 0.055562978389049035,
-      "RMSE / baseline noise": 271.9107983810652
+      "RMSE / baseline noise": 271.3043663448208
     }
   ],
   "sensitivity": [
     {
       "Perturbation": "trim 6 s",
-      "RMSE": 14.810722834587786,
-      "k_obs1": 1.0029684872692517,
-      "k_decay1": 0.9649194408987303,
-      "k_obs2": 1.0029650778211672,
-      "k_decay2": 0.855508056132505,
-      "fraction": 0.9975705517426742
+      "RMSE": 14.803329640672558,
+      "k_obs1": 1.0029638473147602,
+      "k_decay1": 0.9648889958403654,
+      "k_obs2": 1.0030162908541391,
+      "k_decay2": 0.855469375925601,
+      "fraction": 0.997569036640823
     },
     {
       "Perturbation": "trim 10 s",
-      "RMSE": 12.590181370716575,
-      "k_obs1": 1.0116216377218477,
-      "k_decay1": 0.9160442657453653,
-      "k_obs2": 1.0114886620732273,
-      "k_decay2": 0.7022701428097431,
-      "fraction": 0.9948101589953993
+      "RMSE": 12.58407480642933,
+      "k_obs1": 1.011608347494832,
+      "k_decay1": 0.9160109389426538,
+      "k_obs2": 1.0116118545359085,
+      "k_decay2": 0.7022716940098332,
+      "fraction": 0.9948086864872812
     },
     {
       "Perturbation": "5 s observation spacing",
-      "RMSE": 18.657023091502875,
-      "k_obs1": 0.9928692466841509,
-      "k_decay1": 1.0322291613663985,
-      "k_obs2": 0.9927784870609945,
-      "k_decay2": 1.243143218780777,
-      "fraction": 1.001317329075699
+      "RMSE": 18.6466054701961,
+      "k_obs1": 0.9928683493979484,
+      "k_decay1": 1.0321936080954566,
+      "k_obs2": 0.9928829860419086,
+      "k_decay2": 1.2429419118419598,
+      "fraction": 1.0013160785769435
     },
     {
       "Perturbation": "half dissociation window",
-      "RMSE": 18.384729851169006,
-      "k_obs1": 0.9994246597334769,
-      "k_decay1": 1.3967299208347,
-      "k_obs2": 0.9993802115916756,
-      "k_decay2": 1.8529497720952173,
-      "fraction": 1.0143689737974273
+      "RMSE": 18.374940614972942,
+      "k_obs1": 0.9994314788562465,
+      "k_decay1": 1.396989075131743,
+      "k_obs2": 0.9991898472082994,
+      "k_decay2": 1.8539640707117002,
+      "fraction": 1.014376753963774
     },
     {
       "Perturbation": "event times -1 s",
-      "RMSE": 22.624942599387317,
-      "k_obs1": 0.943153092331069,
-      "k_decay1": 0.9814612947200858,
-      "k_obs2": 0.9429788721012874,
-      "k_decay2": 0.8942665314076451,
-      "fraction": 0.9951635960548256
+      "RMSE": 22.616283309009336,
+      "k_obs1": 0.9431529423144639,
+      "k_decay1": 0.9814744836620543,
+      "k_obs2": 0.9430155456842844,
+      "k_decay2": 0.8943208023504253,
+      "fraction": 0.9951648364219016
     },
     {
       "Perturbation": "event times +1 s",
-      "RMSE": 10.665335705431598,
-      "k_obs1": 1.0586190424389104,
-      "k_decay1": 1.0000735997066004,
-      "k_obs2": 1.0586041669388806,
-      "k_decay2": 1.0367088611113409,
-      "fraction": 1.0032760021891236
+      "RMSE": 10.656516315890663,
+      "k_obs1": 1.0586172512172942,
+      "k_decay1": 1.0000765176735646,
+      "k_obs2": 1.058607853774706,
+      "k_decay2": 1.0366949166493868,
+      "fraction": 1.0032761202699438
     }
   ],
   "all_candidate_parameters": [
@@ -204,35 +212,35 @@
       "model": "double_exp",
       "local_rmax": true,
       "params": {
-        "k_obs1": 0.031303069881236656,
-        "k_decay1": 0.001073918909242353,
-        "k_obs2": 0.03130444760060128,
-        "k_decay2": 0.13795502255629324,
-        "fraction": 0.949081589665414,
-        "Rmax_1": 1262.9691099779957,
-        "Rmax_2": 1165.3563442685113
+        "k_obs1": 0.03130530038085406,
+        "k_decay1": 0.0010738327312698023,
+        "k_obs2": 0.031305625812712914,
+        "k_decay2": 0.13792617669921173,
+        "fraction": 0.9490866743662416,
+        "Rmax_1": 1262.828477852254,
+        "Rmax_2": 1165.5905523562217
       }
     },
     {
       "model": "single_exp_shared_rates",
       "local_rmax": true,
       "params": {
-        "k_obs_1": 0.032433978518987994,
-        "k_decay_1": 0.0018121085401687006,
-        "Rmax_1": 1243.4504614908058,
-        "Rmax_2": 1147.3367237333966
+        "k_obs_1": 0.03243599955237306,
+        "k_decay_1": 0.001811959776484925,
+        "Rmax_1": 1243.3166383869393,
+        "Rmax_2": 1147.571754630932
       }
     },
     {
       "model": "single_exp",
       "local_rmax": true,
       "params": {
-        "k_obs_1": 0.03266331786413908,
-        "k_decay_1": 0.0017768509627143173,
-        "k_obs_2": 0.03216568108207569,
-        "k_decay_2": 0.0018537279880964561,
-        "Rmax_1": 1241.039370682595,
-        "Rmax_2": 1149.9865149245609
+        "k_obs_1": 0.03265948238139919,
+        "k_decay_1": 0.0017771342322627276,
+        "k_obs_2": 0.03217463500062676,
+        "k_decay_2": 0.0018530419259676992,
+        "Rmax_1": 1240.9563369172756,
+        "Rmax_2": 1150.1643558580643
       }
     }
   ],

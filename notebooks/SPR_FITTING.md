@@ -14,9 +14,9 @@ identical observations**. It does not establish the molecular mechanism.
 | Notebook / data | Best candidate | Fit RMSE | Decision |
 | --- | --- | --- | --- |
 | [12: rstoolbox paired Run/Ch/Cy](12_spr_paired_run_import.ipynb) | Two independent ligand populations, local Rmax | 0.645 exported response units | Do not trust quantitative kinetic parameters: concentration units and events are unverified, residuals are strongly structured, and the second affinity is unstable. |
-| [13: Biacore Cycle/Fc binning](13_biacore_cycle_fc_import.ipynb) | Empirical double exponential, local amplitudes, early episode only | 16.42 RU | No defensible binding constants or two-component interpretation. The full multi-event run is not a single kinetic experiment. |
-| [14: Biacore Cycle/sample T200](14_biacore_cycle_sample_import.ipynb) | Two independent ligand populations, local Rmax and local association RI offsets | 0.132 RU | Good descriptive fit; dominant slow kinetics are provisional. Two molecular site classes and the nominal parameter precision are not established. |
-| [15: Carterra](15_carterra_csv_import.ipynb) | One site, local Rmax, measured occupied initial state | 1.523 RU | Useful approximate one-site description; precise intrinsic constants are not reliable from these three curves. |
+| [13: Biacore Cycle/Fc binning](13_biacore_cycle_fc_import.ipynb) | Empirical double exponential, local amplitudes, early episode only | 16.41 RU | No defensible binding constants or two-component interpretation. The full multi-event run is not a single kinetic experiment. |
+| [14: Biacore Cycle/sample T200](14_biacore_cycle_sample_import.ipynb) | Two independent ligand populations, local Rmax and local association RI offsets | 0.126 RU | Good descriptive fit; dominant slow kinetics are provisional. Two molecular site classes and the nominal parameter precision are not established. |
+| [15: Carterra](15_carterra_csv_import.ipynb) | One site, local Rmax, occupied initial state in aligned response coordinates | 1.523 RU | Useful approximate one-site description; precise intrinsic constants are not reliable from these three curves. |
 
 The numerical audit reports are [paired Run/Ch/Cy](data/spr_exports/fits/paired_run.json),
 [Cycle/Fc](data/spr_exports/fits/biacore_cycle_fc.json),
@@ -25,10 +25,10 @@ The numerical audit reports are [paired Run/Ch/Cy](data/spr_exports/fits/paired_
 
 ## What determines these decisions
 
-**rstoolbox.** The best two-population fit has affinities about 0.616 and 120
+**rstoolbox.** The best two-population fit has affinities about 0.625 and 136
 in the **exported concentration-label scale**, not verified µM or nM. Its second
-affinity has a nominal interval about 22–666 and almost perfectly correlated
-parameters. Halving dissociation changes that affinity by about 92-fold and
+affinity has a nominal interval about 20–920 and almost perfectly correlated
+parameters. Halving dissociation changes that affinity by about 81-fold and
 drives the population fraction toward its lower bound. Residual lag-1
 correlations exceed 0.99 and RMSE is about 34–56 times the baseline noise
 estimate. A visually close overlay and a large BIC advantage cannot validate
@@ -43,13 +43,13 @@ inferred events by one second changes RMSE markedly. Its empirical decay
 constants are not established koff values, and there is no kon or Kd estimate.
 
 **T200 Cycle/sample.** Verified concentrations are 0.8868, 1.774, 3.547 µM.
-The dominant population (~96% of capacity) has Kd ~48.4 nM and
-koff ~8.1×10⁻⁵ s⁻¹; the minor component has Kd ~1.47 µM and
+The dominant population (~96% of capacity) has Kd ~49.0 nM and
+koff ~8.1×10⁻⁵ s⁻¹; the minor component has Kd ~1.86 µM and
 koff ~0.0173 s⁻¹. These are conditional estimates. All three concentrations
 are well above the dominant Kd, limiting affinity information. Halving the
-dissociation window increases dominant Kd and koff by ~18% and ~19%; a −1 s
-event shift changes the minor-population Kd by ~28%. Residual correlations
-remain 0.94–0.98 and RMSE is 5–7 times the baseline noise estimate. The minor
+dissociation window increases dominant Kd and koff by ~22% and ~23%; a −1 s
+event shift changes the minor-population Kd by ~27%. Residual correlations
+remain 0.95–0.98 and RMSE is about 6–7 times the baseline noise estimate. The minor
 component could absorb systematic effects; its presence is not proof of a
 second molecular binding site.
 
@@ -87,13 +87,16 @@ checksums and CC BY 4.0 attribution in the [source notes](data/spr_exports/SOURC
 - rstoolbox and Cycle/Fc timings are inferred from the curves and marked
   **unverified**. No physical concentration unit is invented for either file.
 
-The Carterra surface is already occupied before injection. Its median signal
-over 90–115 s is retained as the initial bound signal, with zero additional
-background assumed. Unknown background and uncertainty in this initial estimate
-are limitations. Starting every selected injection at zero would change the
-physical experiment. Hidden-state models would require the complete preceding
-injection history or additional initial-state allocation parameters, so only
-one-site and lumped transport are compared for this subset.
+The Carterra surface is treated as occupied before injection. Its original
+median signal over 90–115 s is retained as the physical initial bound signal,
+with zero additional background assumed. `align_association` changes the
+response coordinate by subtracting the last-10-baseline mean; the model
+subtracts that same offset from its physical response. Thus the fitted plot
+starts near zero without treating the surface as empty. Unknown background
+and uncertainty in this initial estimate are limitations. Hidden-state models
+would require the complete preceding injection history or additional
+initial-state allocation parameters, so only one-site and lumped transport
+are compared for this subset.
 
 ## Reproducible method
 
@@ -103,13 +106,31 @@ production fitter API so occupied initial states, true event clocks, RI terms,
 and masks are explicit. The analytical mass-transport model is the lumped
 quasi-steady model already implemented by pyKinGenie.
 
-All candidates for a given file share the same observations, backgrounds,
+Before every fit, the notebook makes a deep copy of the imported experiment
+and calls **`fit_experiment.align_association(inplace=True, npoints=10)`**.
+For each sensor this subtracts the mean of the last 10 baseline observations
+from baseline, association and dissociation. The alignment uses native
+observations, so its averaging duration depends on the sampling interval.
+Original times and the raw import plot are preserved. The notebook displays
+the removed offsets and verifies a zero mean over those aligned baseline
+points. The offsets are saved in each audit report under
+`metadata.association_alignment`. All sensitivity runs retain this alignment.
+
+The helper does not apply another baseline subtraction to the aligned copy.
+Regenerated/unknown-regeneration series assume zero initial bound signal
+after alignment. For non-regenerated Carterra, the original physical initial
+occupancy is reconstructed by adding the alignment offset back to the median
+aligned signal over 90–115 s; predictions then subtract the alignment offset.
+Capacities and their optimizer bounds remain in physical bound-response units.
+
+All candidates for a given file share the same observations, alignment offsets,
 initial-state estimates, event times, and equal response-error weighting. A
 three-second guard excludes transition points. At most one **original** point
-per one-second interval is fitted, without averaging, interpolation or filtering.
+per one-second interval is fitted, without averaging the fitted observations,
+interpolation or filtering.
 Carterra's slower native observations are retained. Discarding oversampled
 points does not make the remaining errors independent. Pre-injection points
-estimate fixed background/initial signal and are not scored. Every fitted
+estimate fixed alignment offsets/initial signal and are not scored. Every fitted
 rate, fraction, capacity and RI offset is counted in k. Fixed input estimates
 are not counted as fitted parameters, making rankings conditional on them.
 

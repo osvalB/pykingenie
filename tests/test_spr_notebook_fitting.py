@@ -3,6 +3,7 @@
 import hashlib
 import importlib.util
 import json
+from copy import deepcopy
 from pathlib import Path
 import sys
 from types import SimpleNamespace
@@ -10,6 +11,8 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 from scipy.integrate import solve_ivp
+
+from pykingenie import CarterraExperiment, SprTextExperiment
 
 ROOT = Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location(
@@ -124,3 +127,80 @@ def test_verified_concentrations_match_author_list_and_original_workbook(
     np.testing.assert_allclose(
         metadata["concentrations"], np.array(molar)[entries] * 1e6
     )
+
+
+@pytest.mark.parametrize("family", ["one_site", "mass_transport"])
+def test_carterra_alignment_preserves_occupied_state_and_fit_residuals(family):
+    folder = ROOT / "notebooks/data/spr_exports"
+    metadata = json.loads((folder / "fit_metadata.json").read_text())["carterra_rows"]
+    experiment = CarterraExperiment()
+    experiment.read_csv(
+        folder / metadata["file"],
+        association_start=120,
+        association_end=420,
+        concentrations=metadata["concentrations"],
+        concentration_unit="uM",
+    )
+    aligned = deepcopy(experiment)
+    offsets = {
+        name: float(np.mean(experiment.ys[i][0][-10:]))
+        for i, name in enumerate(experiment.sensor_names)
+    }
+    aligned.align_association(inplace=True, npoints=10)
+    aligned_meta = dict(
+        metadata,
+        association_alignment={
+            "method": "align_association",
+            "npoints": 10,
+            "offsets_by_sensor": offsets,
+        },
+    )
+    raw_traces, raw_meta = fitting.prepare(experiment, metadata)
+    aligned_traces, aligned_meta = fitting.prepare(aligned, aligned_meta)
+    params = dict(Kd=0.02, k_off=8e-5, Ktr=0.1, Rmax_1=220)
+    for i, (raw, trace) in enumerate(zip(raw_traces, aligned_traces)):
+        offset = offsets[trace.name]
+        assert abs(np.mean(aligned.ys[i][0][-10:])) < 1e-10
+        assert trace.initial == pytest.approx(raw.initial)
+        assert trace.initial > 0
+        assert trace.alignment_offset == offset
+        np.testing.assert_array_equal(trace.time, raw.time)
+        np.testing.assert_allclose(trace.response, raw.response - offset)
+        time = trace.time[trace.indices]
+        original = fitting.predict(raw, raw_meta, family, False, params, i, time=time)
+        shifted = fitting.predict(
+            trace, aligned_meta, family, False, params, i, time=time
+        )
+        np.testing.assert_allclose(shifted, original - offset, atol=1e-10)
+        np.testing.assert_allclose(
+            trace.response[trace.indices] - shifted,
+            raw.response[raw.indices] - original,
+            atol=1e-10,
+        )
+
+
+def test_aligned_regenerated_data_are_not_baseline_subtracted_twice():
+    folder = ROOT / "notebooks/data/spr_exports"
+    metadata = json.loads((folder / "fit_metadata.json").read_text())[
+        "biacore_cycle_sample"
+    ]
+    experiment = SprTextExperiment()
+    experiment.read_file(
+        folder / metadata["file"],
+        association_start=0,
+        association_end=180,
+        concentrations=metadata["concentrations"],
+        concentration_unit="uM",
+    )
+    offsets = {
+        name: float(np.mean(experiment.ys[i][0][-10:]))
+        for i, name in enumerate(experiment.sensor_names)
+    }
+    experiment.align_association(inplace=True, npoints=10)
+    metadata["association_alignment"] = {"offsets_by_sensor": offsets}
+    traces, _ = fitting.prepare(experiment, metadata)
+    for i, trace in enumerate(traces):
+        np.testing.assert_array_equal(trace.response, np.concatenate(experiment.ys[i]))
+        assert trace.initial == 0
+        assert trace.background == 0
+        assert trace.alignment_offset == 0

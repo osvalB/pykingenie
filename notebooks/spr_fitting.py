@@ -27,6 +27,7 @@ class Trace:
     initial: float
     concentration: float | None
     indices: np.ndarray
+    alignment_offset: float = 0.0
 
 
 def prepare(
@@ -44,8 +45,19 @@ def prepare(
         lo, hi = meta["baseline_window"]
         baseline = float(np.median(raw[(t >= lo) & (t <= hi)]))
         occupied = metadata["regenerated"] is False
-        background = 0.0 if occupied else baseline
-        initial = baseline if occupied else 0.0
+        alignment = metadata.get("association_alignment")
+        if alignment:
+            # The notebook already called align_association. Do not subtract
+            # another baseline estimate. Occupancy and plotted response have
+            # different zeroes for a non-regenerated surface.
+            removed = alignment["offsets_by_sensor"][name]
+            background = 0.0
+            initial = baseline + removed if occupied else 0.0
+            alignment_offset = removed if occupied else 0.0
+        else:
+            background = 0.0 if occupied else baseline
+            initial = baseline if occupied else 0.0
+            alignment_offset = 0.0
         selected = []
         for mask in [
             (t >= start + trim) & (t <= end - trim),
@@ -68,6 +80,7 @@ def prepare(
                 initial,
                 concentration,
                 np.asarray(selected, dtype=int),
+                alignment_offset,
             )
         )
     return traces, meta
@@ -76,7 +89,9 @@ def prepare(
 def _parameters(family, local, traces, meta):
     c = np.asarray(meta["concentrations"] or [1.0])
     cscale = float(np.median(c))
-    max_response = max(float(np.max(t.response[t.indices])) for t in traces)
+    max_response = max(
+        float(np.max(t.response[t.indices] + t.alignment_offset)) for t in traces
+    )
     off = 1e-3 if not meta["molar_concentrations_verified"] else 1e-4
     kd = cscale / (5 if not meta["molar_concentrations_verified"] else 15)
     spec = []
@@ -111,7 +126,9 @@ def _parameters(family, local, traces, meta):
         add("fraction", 0.5, 0.01, 0.99, log=False)
     for i in range(len(traces) if local else 1):
         selected = [traces[i]] if local else traces
-        ymax = max(float(np.max(t.response[t.indices])) for t in selected)
+        ymax = max(
+            float(np.max(t.response[t.indices] + t.alignment_offset)) for t in selected
+        )
         low = max(max(t.initial for t in selected) + 0.05, ymax * 0.2, 0.1)
         add(f"Rmax_{i + 1}", max(ymax * 1.5, low * 1.1), low, max_response * 100)
     if meta["bulk_shift"]:
@@ -210,7 +227,7 @@ def predict(trace, meta, family, local, params, i, time=None):
     out = np.full(time.shape, np.nan)
     out[assoc] = a[1:-1] + params.get(f"RI_{i + 1}", 0)
     out[disso] = d[1:]
-    return out
+    return out - trace.alignment_offset
 
 
 def _canonical(spec, q, family):
@@ -564,7 +581,11 @@ def plot_fit(analysis):
         axis.grid(alpha=0.15)
     axes[0].set(
         title=f'Lowest conditional BIC: {best["family"]}, {"local" if best["local"] else "shared"} Rmax',
-        ylabel="Measured response",
+        ylabel=(
+            "Association-aligned response"
+            if meta.get("association_alignment")
+            else "Measured response"
+        ),
     )
     axes[0].legend(frameon=False)
     axes[1].axhline(0, color="black", linewidth=0.8)

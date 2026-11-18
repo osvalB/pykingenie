@@ -87,6 +87,9 @@ mapping, occupied-state treatment, conditional rankings and limitations.
 The derived tables/plots and numerical reports in `fits/` retain the
 corresponding source-data credits and licenses. No fitted values replace the
 measured data files.
+Before fitting, each notebook calls `align_association` on a separate copy,
+subtracting the mean of the last 10 pre-association points. This transformation
+is recorded in the numerical reports; it does not modify these source excerpts.
 
 The original license audit, including TitrationAnalysis's later CC BY 4.0
 license and older conflicting citation metadata, is recorded in the

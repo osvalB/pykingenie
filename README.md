@@ -173,6 +173,8 @@ The Duke examples use their original companion sample sheets for concentrations
 and phase timing. The rstoolbox units and binning event times remain unverified.
 See [SPR fitting methods and conclusions](notebooks/SPR_FITTING.md) for the
 selected models and why a lower BIC alone does not validate kinetic constants.
+Each notebook calls `align_association(inplace=True, npoints=10)` on a copy
+before fitting, records its subtracted offsets, and keeps the raw import plot.
 
 ## Detecting input formats
 
