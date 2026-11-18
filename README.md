@@ -186,6 +186,16 @@ as one sequence so alignment does not reset each injection; its continuous fit
 also includes the intervening baseline washes. The nominal cycle period is
 reconstructed from the source sheet and is stated explicitly in the notebook.
 
+An [advanced Carterra example](notebooks/16_carterra_global_smax.ipynb) fits all
+13 injections with one global Smax and computes leave-one-injection-out parameter
+sensitivity using the existing fitter. The five-injection/local-Smax notebook
+above remains the primary literature comparison. The advanced example changes
+both the concentration selection and the capacity assumption. All Carterra fits
+are conditional on the reconstructed 1140 s cycle period; the absolute injection
+clock has not been verified. Leave-one-out SD describes the spread of deletion
+estimates, rather than a confidence interval. After a deletion creates a gap,
+the fitter estimates the next association's initial response from its observations.
+
 ## Detecting input formats
 
 `detect_file_format` inspects file contents to select an input reader. All three

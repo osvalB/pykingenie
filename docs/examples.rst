@@ -11,7 +11,13 @@ and simulating and visualizing binding kinetics models with PyKinGenie.
    Paired Run/Ch/Cy CSV <notebooks/12_spr_paired_run_import>
    Biacore Cycle/Fc TSV with decimal commas <notebooks/13_biacore_cycle_fc_import>
    Biacore Cycle/sample TSV <notebooks/14_biacore_cycle_sample_import>
-   Carterra row-oriented CSV <notebooks/15_carterra_csv_import>
+   Carterra CSV: five-injection literature comparison <notebooks/15_carterra_csv_import>
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Advanced SPR fitting example:
+
+   Carterra: 13 injections, global Smax and leave-one-out sensitivity <notebooks/16_carterra_global_smax>
 
 .. toctree::
    :maxdepth: 1

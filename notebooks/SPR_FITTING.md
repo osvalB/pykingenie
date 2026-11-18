@@ -4,7 +4,7 @@ The Duke T200 and Carterra notebooks call pyKinGenie's standard one-site fitter
 and show its actual output beside the published values. There is no separate
 notebook fitting implementation, optimizer or forward model.
 
-The fitting sequence in both notebooks is:
+The fitting sequence in the two five-curve literature comparisons is:
 
 ```python
 fit_experiment = deepcopy(experiment)
@@ -38,6 +38,11 @@ and calculates percentage differences. The fitted plot uses the existing
 | [14: Biacore T200](14_biacore_cycle_sample_import.ipynb) | 65.74 nM | approximately 71.80 nM | One-site/local Smax; the standard method does not include the author's independent association RI offsets. |
 | [15: Carterra](15_carterra_csv_import.ipynb) | 14.29 nM | approximately 16.42 nM | Native single-cycle/local Smax; first selected initial signal estimated by the library, later states carried from preceding dissociations. |
 
+**Carterra timing limitation:** the cycle period of 1140 s reconstructs a
+nominal protocol clock from the source sheet. An absolute injection log was
+not available. Carterra kinetic results are conditional on that period and
+are comparisons with the published values, rather than exact reproductions.
+
 Both notebooks now use the **same five concentrations and curve identities**
 as page 1 of the author sensorgram reports. T200 uses cycles 18–22 at
 **221.7, 443.4, 886.8, 1774, 3547 nM**. Carterra uses worksheet rows 10–14,
@@ -49,14 +54,52 @@ windows: T200 baseline −60–0 s, association 0–180 s and dissociation 180�
 Carterra baseline 0–120 s, association 120–420 s and dissociation 420–1140 s.
 No curves are selected merely for having a large response. These comparisons
 still have differences in fitting setup and are not exact reproductions of the
-published fits. Carterra now uses the standard single-cycle workflow described
-below. Its Kd is approximately 15% above the reference, rather than the previous
-3.3-fold discrepancy from treating every injection as a new zero-start curve.
-No custom fitter or forward model is introduced.
+published fits. Carterra uses the standard single-cycle workflow described
+below, giving a Kd approximately 15% above the reference.
 
 [Notebook 12](12_spr_paired_run_import.ipynb) and
 [notebook 13](13_biacore_cycle_fc_import.ipynb) remain import-only examples.
-No model searches, rankings, sensitivity analyses or leave-one-out fits are run.
+No model searches or rankings are run. The two five-curve literature comparisons
+do not run leave-one-out fits. A separate advanced example is described below.
+
+## Advanced Carterra example: all 13 injections and global Smax
+
+[Notebook 16](16_carterra_global_smax.ipynb) retains the same imported sensor,
+one-time baseline alignment and reconstructed clock, and selects all 13
+injections from 0.244 to 1000 nM. It calls the existing fitter with:
+
+```python
+selected_curves["Select"] = True
+fit_analyzer.generate_fittings(selected_curves, trim_time=0)
+fit_analyzer.submit_steady_state_fitting()
+fitter = next(iter(fit_analyzer.fittings.values()))
+fitter.fit_one_site_assoc_and_disso(shared_smax=True, calc_loo=True)
+```
+
+The global-Smax fit has three parameters and gives approximately Kd 22.36 nM,
+koff 8.581e-5 s^-1 and Smax 224.18 RU. It changes both the injection selection
+and the capacity assumption from the published five-injection/local-Rmax fit.
+[Notebook 15](15_carterra_csv_import.ipynb) remains the primary literature
+comparison. Systematic deviations in the global-Smax fit and the unverified
+absolute clock limit interpretation of its kinetic constants.
+
+The native leave-one-out method omits each injection's association and
+dissociation observations and refits the remaining 12 with a shared Smax.
+It retains Kd and koff estimates, their means and their population SDs
+(`ddof=0`). The notebook shows the native result table, every omitted injection,
+and unit-converted summaries with derived kon. All 13 refits succeed; their
+Kd mean is 23.59 nM with SD 2.62 nM. Smax estimates from individual deletion
+refits are not retained by the native method.
+
+Deleting an injection creates a gap in the single-cycle history. The fitter
+estimates the next retained association's initial response from the first
+30 s of that association, falling back to the first observed response if the
+estimate fails. It holds this initial response fixed during the kinetic refit,
+then resumes state propagation. In particular, omitting injection 1 does not
+force injection 2 to start at zero or shift it to the beginning of the clock.
+The observed data are unchanged. These SDs measure deletion sensitivity;
+they are neither jackknife standard errors nor confidence intervals, and
+they are not held-out prediction errors.
 
 ## Preprocessing
 

@@ -5,6 +5,8 @@ import csv
 import numpy as np
 import pytest
 
+import pykingenie.fitter_surface as fitter_surface
+import pykingenie.utils.fitting_surface as fitting_surface
 from pykingenie import CarterraExperiment, KineticsAnalyzer
 from pykingenie.utils.processing import detect_time_list_continuos
 
@@ -105,6 +107,74 @@ def test_existing_fitter_recovers_single_cycle_parameters(tmp_path):
     assert fitter.Kd == pytest.approx(0.2, rel=0.05)
     assert fitter.k_off == pytest.approx(0.02, rel=0.05)
     assert fitter.Smax[0] == pytest.approx(10, rel=0.05)
+    assert fitter.signal_assoc_fit[0][0] == pytest.approx(0)
+    for association, previous_dissociation in zip(
+        fitter.signal_assoc_fit[1:], fitter.signal_disso_fit
+    ):
+        assert association[0] == pytest.approx(previous_dissociation[-1], abs=1e-12)
+
+
+def test_leave_one_out_estimates_state_after_missing_injections(tmp_path, monkeypatch):
+    """Deleting observations must not reset an occupied surface to zero."""
+    path = tmp_path / "cycles.csv"
+    _, concentrations, _ = write_cycles(path)
+    experiment = read_cycles(path, concentrations)
+    experiment.align_association(inplace=True)
+    analyzer = KineticsAnalyzer()
+    analyzer.add_experiment(experiment, experiment.name)
+    analyzer.merge_ligand_conc_df()
+    analyzer.generate_fittings(analyzer.combined_ligand_conc_df.copy())
+    analyzer.submit_steady_state_fitting()
+    fitter = next(iter(analyzer.fittings.values()))
+    fitter.fit_one_site_assoc_and_disso(shared_smax=True, calc_loo=False)
+
+    native_fit = fitter_surface.fit_one_site_assoc_and_disso
+    native_guess = fitting_surface.guess_initial_signal
+    refits = []
+    guessed_starts = []
+
+    def record_guess(times, signals, **kwargs):
+        guessed_starts.extend(t[0] for t in times)
+        return native_guess(times, signals, **kwargs)
+
+    def record_fit(**kwargs):
+        result = native_fit(**kwargs)
+        refits.append((kwargs, result))
+        return result
+
+    monkeypatch.setattr(fitting_surface, "guess_initial_signal", record_guess)
+    monkeypatch.setattr(fitter_surface, "fit_one_site_assoc_and_disso", record_fit)
+    fitter.one_site_assoc_and_disso_loo()
+
+    assert len(refits) == len(fitter.Kd_loo) == len(fitter.k_off_loo) == 3
+    np.testing.assert_allclose(
+        guessed_starts, [fitter.time_assoc_lst[1][0], fitter.time_assoc_lst[2][0]]
+    )
+    for omitted, (inputs, result) in enumerate(refits):
+        retained = [i for i in range(3) if i != omitted]
+        np.testing.assert_allclose(
+            [t[0] for t in inputs["assoc_time_lst"]],
+            [fitter.time_assoc_lst[i][0] for i in retained],
+        )
+        params, _, associations, dissociations = result
+        np.testing.assert_allclose(params, [0.2, 0.02, 10], rtol=0.05)
+        continuity = detect_time_list_continuos(
+            inputs["assoc_time_lst"], inputs["disso_time_lst"]
+        )
+        for i, continuous in enumerate(continuity):
+            if not continuous:
+                # First omission: injection 2 needs a nonzero estimated start.
+                # Middle omission: injection 3 needs one, even with injection 1 retained.
+                assert associations[i][0] > 0.5
+                assert associations[i][0] == pytest.approx(
+                    inputs["assoc_signal_lst"][i][0], rel=0.01
+                )
+            elif i == 0:
+                assert associations[i][0] == pytest.approx(0)
+            else:
+                assert associations[i][0] == pytest.approx(
+                    dissociations[i - 1][-1], abs=1e-12
+                )
 
 
 @pytest.mark.parametrize("period", [None, 0, -1, np.nan, "unknown", 10])
