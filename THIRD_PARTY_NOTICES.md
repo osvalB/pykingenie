@@ -5,6 +5,10 @@ MIT license does not replace the CC BY 4.0 license on the TitrationAnalysis data
 These are modified excerpts of public examples; their inclusion does not imply
 endorsement by their authors or instrument manufacturers.
 
+The rendered sensorgrams and data tables in import notebooks 12–15 are derived
+from these same fixtures and retain the respective data licenses below. Each
+notebook credits its source and links the retained license and transformations.
+
 | Files in `test_files/spr_exports/` | Origin and credit | License and retained notice |
 | --- | --- | --- |
 | `paired_run.csv` | [rstoolbox](https://github.com/lpdi-epfl/rstoolbox), copyright (c) 2017 Jaume Bonet | MIT; [full notice](test_files/spr_exports/rstoolbox-LICENSE) |

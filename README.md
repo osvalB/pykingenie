@@ -150,6 +150,20 @@ Independent parser comparisons and the missing-response behavior found in the
 full public rstoolbox example are documented in
 [SPR parser validation](validation/spr_parsers/README.md).
 
+Executed import examples, with sensorgram plots and available metadata:
+
+| Input file | Notebook |
+| --- | --- |
+| `paired_run.csv` | [Run/Ch/Cy paired export](notebooks/12_spr_paired_run_import.ipynb) |
+| `biacore_cycle_fc.tsv` | [Biacore Cycle/Fc export](notebooks/13_biacore_cycle_fc_import.ipynb) |
+| `biacore_cycle_sample.tsv` | [Biacore Cycle/sample export](notebooks/14_biacore_cycle_sample_import.ipynb) |
+| `carterra_rows.csv` | [Carterra CSV export](notebooks/15_carterra_csv_import.ipynb) |
+
+These curve exports have no plate-well coordinates. The notebooks display the
+available curve labels and draw a plate layout only if plate metadata exists.
+Example phase boundaries are illustrative; use verified injection timing and
+concentrations before fitting your data.
+
 ## Keeping results when changing models
 
 Each fitter automatically keeps successful model results in `fit_results`.
