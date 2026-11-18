@@ -1,0 +1,250 @@
+{
+  "case": "biacore_cycle_fc",
+  "assessment": {
+    "Verdict": "Do not trust binding constants or the two-component interpretation.",
+    "Reasons": [
+      "This is a multi-event binning protocol with no concentration metadata; only the early inferred episode is fitted.",
+      "The two association rates coalesce and their confidence intervals are effectively unbounded.",
+      "Large, smooth residuals persist despite a lower BIC. Small shifts of the inferred event times change the error markedly.",
+      "Empirical k_obs / decay rates are not kon, koff or Kd for the complete run."
+    ]
+  },
+  "metadata": {
+    "file": "biacore_cycle_fc.tsv",
+    "concentrations": null,
+    "concentration_unit": null,
+    "molar_concentrations_verified": false,
+    "association_start": 30,
+    "association_end": 150,
+    "fit_end": 230,
+    "timing_verified": false,
+    "baseline_window": [
+      1,
+      25
+    ],
+    "initial_occupancy": "background subtracted for early-cycle descriptive fit only",
+    "regenerated": null,
+    "bulk_shift": false,
+    "protocol": "Binning protocol; inferred early episode only. Fit empirical rates, not kon, koff or Kd for the complete run.",
+    "sources": [
+      "https://github.com/RKI-ZBS/SPR_kinetics_binning/blob/ceaae964586dcbb00ac53bcae301bc097d92f3f4/Binning/Binning_Raw_Inspector_T200/input/2022-05-10_Kurven_Binning_huCapRaw.txt"
+    ]
+  },
+  "comparison": [
+    {
+      "Model": "double_exp",
+      "Rmax": "local",
+      "Parameters": 7,
+      "Points": 386,
+      "Reduced χ² (unit variance)": 274.5925490230023,
+      "RMSE": 16.41989316037814,
+      "BIC": 2202.1279187226946,
+      "ΔBIC": 0.0,
+      "Jacobian condition": 227392.50348973225,
+      "Max |parameter correlation|": 0.9999999997475996,
+      "Near bounds": "",
+      "Converged starts": "8/8"
+    },
+    {
+      "Model": "single_exp_shared_rates",
+      "Rmax": "local",
+      "Parameters": 4,
+      "Points": 386,
+      "Reduced χ² (unit variance)": 407.47043914761247,
+      "RMSE": 20.081034523904087,
+      "BIC": 2339.6502775856734,
+      "ΔBIC": 137.52235886297876,
+      "Jacobian condition": 4.054401797495037,
+      "Max |parameter correlation|": 0.7462490529528049,
+      "Near bounds": "",
+      "Converged starts": "8/8"
+    },
+    {
+      "Model": "single_exp",
+      "Rmax": "local",
+      "Parameters": 6,
+      "Points": 386,
+      "Reduced χ² (unit variance)": 408.2493203741782,
+      "RMSE": 20.047530421875667,
+      "BIC": 2350.272837061648,
+      "ΔBIC": 148.14491833895318,
+      "Jacobian condition": 4.086081018646993,
+      "Max |parameter correlation|": 0.8155229517770372,
+      "Near bounds": "",
+      "Converged starts": "8/8"
+    }
+  ],
+  "parameters": [
+    {
+      "Parameter": "k_obs1",
+      "Unit": "1/s",
+      "Estimate": 0.031303069881236656,
+      "Conditional 95% lower": 8.052066109079754e-270,
+      "Conditional 95% upper": 1.2169326117238031e+266
+    },
+    {
+      "Parameter": "k_decay1",
+      "Unit": "1/s",
+      "Estimate": 0.001073918909242353,
+      "Conditional 95% lower": 0.000898945546280329,
+      "Conditional 95% upper": 0.0012829495939998094
+    },
+    {
+      "Parameter": "k_obs2",
+      "Unit": "1/s",
+      "Estimate": 0.03130444760060128,
+      "Conditional 95% lower": 1e-300,
+      "Conditional 95% upper": 1e+300
+    },
+    {
+      "Parameter": "k_decay2",
+      "Unit": "1/s",
+      "Estimate": 0.13795502255629324,
+      "Conditional 95% lower": 0.0831700078206023,
+      "Conditional 95% upper": 0.22882753948464823
+    },
+    {
+      "Parameter": "fraction",
+      "Unit": "dimensionless",
+      "Estimate": 0.949081589665414,
+      "Conditional 95% lower": -51.6005132454359,
+      "Conditional 95% upper": 53.49867642476672
+    },
+    {
+      "Parameter": "Rmax_1",
+      "Unit": "RU",
+      "Estimate": 1262.9691099779957,
+      "Conditional 95% lower": 1247.175334034331,
+      "Conditional 95% upper": 1278.9628925700854
+    },
+    {
+      "Parameter": "Rmax_2",
+      "Unit": "RU",
+      "Estimate": 1165.3563442685113,
+      "Conditional 95% lower": 1150.7436236877625,
+      "Conditional 95% upper": 1180.1546245155275
+    }
+  ],
+  "residuals": [
+    {
+      "Curve": "Cycle=1_Fc=4-3",
+      "Points": 193,
+      "RMSE": 17.634309365452964,
+      "Lag-1 residual correlation": 0.9981812219344341,
+      "Baseline noise estimate": 0.012580296993748076,
+      "RMSE / baseline noise": 1401.7403066252361
+    },
+    {
+      "Curve": "Cycle=2_Fc=4-3",
+      "Points": 193,
+      "RMSE": 15.108173814196196,
+      "Lag-1 residual correlation": 0.9982877905503128,
+      "Baseline noise estimate": 0.055562978389049035,
+      "RMSE / baseline noise": 271.9107983810652
+    }
+  ],
+  "sensitivity": [
+    {
+      "Perturbation": "trim 6 s",
+      "RMSE": 14.810722834587786,
+      "k_obs1": 1.0029684872692517,
+      "k_decay1": 0.9649194408987303,
+      "k_obs2": 1.0029650778211672,
+      "k_decay2": 0.855508056132505,
+      "fraction": 0.9975705517426742
+    },
+    {
+      "Perturbation": "trim 10 s",
+      "RMSE": 12.590181370716575,
+      "k_obs1": 1.0116216377218477,
+      "k_decay1": 0.9160442657453653,
+      "k_obs2": 1.0114886620732273,
+      "k_decay2": 0.7022701428097431,
+      "fraction": 0.9948101589953993
+    },
+    {
+      "Perturbation": "5 s observation spacing",
+      "RMSE": 18.657023091502875,
+      "k_obs1": 0.9928692466841509,
+      "k_decay1": 1.0322291613663985,
+      "k_obs2": 0.9927784870609945,
+      "k_decay2": 1.243143218780777,
+      "fraction": 1.001317329075699
+    },
+    {
+      "Perturbation": "half dissociation window",
+      "RMSE": 18.384729851169006,
+      "k_obs1": 0.9994246597334769,
+      "k_decay1": 1.3967299208347,
+      "k_obs2": 0.9993802115916756,
+      "k_decay2": 1.8529497720952173,
+      "fraction": 1.0143689737974273
+    },
+    {
+      "Perturbation": "event times -1 s",
+      "RMSE": 22.624942599387317,
+      "k_obs1": 0.943153092331069,
+      "k_decay1": 0.9814612947200858,
+      "k_obs2": 0.9429788721012874,
+      "k_decay2": 0.8942665314076451,
+      "fraction": 0.9951635960548256
+    },
+    {
+      "Perturbation": "event times +1 s",
+      "RMSE": 10.665335705431598,
+      "k_obs1": 1.0586190424389104,
+      "k_decay1": 1.0000735997066004,
+      "k_obs2": 1.0586041669388806,
+      "k_decay2": 1.0367088611113409,
+      "fraction": 1.0032760021891236
+    }
+  ],
+  "all_candidate_parameters": [
+    {
+      "model": "double_exp",
+      "local_rmax": true,
+      "params": {
+        "k_obs1": 0.031303069881236656,
+        "k_decay1": 0.001073918909242353,
+        "k_obs2": 0.03130444760060128,
+        "k_decay2": 0.13795502255629324,
+        "fraction": 0.949081589665414,
+        "Rmax_1": 1262.9691099779957,
+        "Rmax_2": 1165.3563442685113
+      }
+    },
+    {
+      "model": "single_exp_shared_rates",
+      "local_rmax": true,
+      "params": {
+        "k_obs_1": 0.032433978518987994,
+        "k_decay_1": 0.0018121085401687006,
+        "Rmax_1": 1243.4504614908058,
+        "Rmax_2": 1147.3367237333966
+      }
+    },
+    {
+      "model": "single_exp",
+      "local_rmax": true,
+      "params": {
+        "k_obs_1": 0.03266331786413908,
+        "k_decay_1": 0.0017768509627143173,
+        "k_obs_2": 0.03216568108207569,
+        "k_decay_2": 0.0018537279880964561,
+        "Rmax_1": 1241.039370682595,
+        "Rmax_2": 1149.9865149245609
+      }
+    }
+  ],
+  "failures": [],
+  "settings": {
+    "seed": 2918,
+    "multi_starts": 8,
+    "transition_guard_seconds": 3,
+    "minimum_spacing_seconds": 1,
+    "scipy": "1.18.1",
+    "numpy": "2.5.4",
+    "bic": "n*log(RSS/n)+k*log(n); conditional independent equal-variance errors",
+    "intervals": "Local iid Jacobian intervals, not calibrated for correlated residuals"
+  }
+}

@@ -151,7 +151,8 @@ full public rstoolbox example are documented in
 [SPR parser validation](validation/spr_parsers/README.md).
 
 Executed import examples use full-resolution, representative curves from
-`notebooks/data/spr_exports/`, with sensorgram plots and available metadata:
+`notebooks/data/spr_exports/`, with sensorgram plots, available metadata, model
+comparisons, residuals, parameter diagnostics and explicit fit assessments:
 
 | Input file | Notebook |
 | --- | --- |
@@ -168,8 +169,10 @@ it does not represent a single association/dissociation experiment.
 
 These curve exports have no plate-well coordinates. The notebooks display the
 available curve labels and draw a plate layout only if plate metadata exists.
-Example phase boundaries are illustrative; use verified injection timing and
-concentrations before fitting your data.
+The Duke examples use their original companion sample sheets for concentrations
+and phase timing. The rstoolbox units and binning event times remain unverified.
+See [SPR fitting methods and conclusions](notebooks/SPR_FITTING.md) for the
+selected models and why a lower BIC alone does not validate kinetic constants.
 
 ## Detecting input formats
 

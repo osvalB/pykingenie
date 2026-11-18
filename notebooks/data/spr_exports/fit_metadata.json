@@ -1,0 +1,142 @@
+{
+  "paired_run": {
+    "file": "paired_run.csv",
+    "concentrations": [
+      15,
+      30,
+      60
+    ],
+    "concentration_unit": "exported concentration-label units (unverified)",
+    "molar_concentrations_verified": false,
+    "association_start": 0,
+    "association_end": 120,
+    "fit_end": 530,
+    "timing_verified": false,
+    "baseline_window": [
+      -30,
+      -5
+    ],
+    "initial_occupancy": "zero after pre-injection background subtraction",
+    "regenerated": null,
+    "bulk_shift": false,
+    "protocol": "Unverified run metadata; compare shapes in the exported concentration scale only",
+    "sources": [
+      "https://github.com/lpdi-epfl/rstoolbox/blob/2bfc9be5ec6111603fb78700f201b80331ef0132/notebook/data/example03/spr_data.txt"
+    ]
+  },
+  "biacore_cycle_fc": {
+    "file": "biacore_cycle_fc.tsv",
+    "concentrations": null,
+    "concentration_unit": null,
+    "molar_concentrations_verified": false,
+    "association_start": 30,
+    "association_end": 150,
+    "fit_end": 230,
+    "timing_verified": false,
+    "baseline_window": [
+      1,
+      25
+    ],
+    "initial_occupancy": "background subtracted for early-cycle descriptive fit only",
+    "regenerated": null,
+    "bulk_shift": false,
+    "protocol": "Binning protocol; inferred early episode only. Fit empirical rates, not kon, koff or Kd for the complete run.",
+    "sources": [
+      "https://github.com/RKI-ZBS/SPR_kinetics_binning/blob/ceaae964586dcbb00ac53bcae301bc097d92f3f4/Binning/Binning_Raw_Inspector_T200/input/2022-05-10_Kurven_Binning_huCapRaw.txt"
+    ]
+  },
+  "biacore_cycle_sample": {
+    "file": "biacore_cycle_sample.tsv",
+    "concentrations": [
+      0.8868,
+      1.774,
+      3.547
+    ],
+    "concentration_unit": "µM",
+    "molar_concentrations_verified": true,
+    "association_start": 0,
+    "association_end": 180,
+    "fit_end": 780,
+    "timing_verified": true,
+    "baseline_window": [
+      -50,
+      -5
+    ],
+    "initial_occupancy": "zero after pre-injection background subtraction",
+    "regenerated": true,
+    "bulk_shift": true,
+    "analyte": "AE.A244",
+    "ligand": "CH31",
+    "protocol": "Regenerated Biacore T200 cycles 20–22; metadata All Concentrations entries 6–8, converted M→µM",
+    "source_sheet_row": {
+      "Incl.": "Y",
+      "Block/Chip/Tray": 1,
+      "Position/Channel/Sensor": 2,
+      "Analyte": "AE.A244",
+      "Ligand": "CH31",
+      "Baseline": 60,
+      "Association": 180,
+      "Dissociation": 600,
+      "Asso. Skip": 0,
+      "Disso. Skip": 0,
+      "All Concentrations": "2.771E-08, 5.543E-08, 1.109E-07, 2.217E-07, 4.434E-07, 8.868E-07, 1.774E-06, 3.547E-06",
+      "Incl. Conc.": "All",
+      "Bulkshift": "Y",
+      "Regen.": "Y",
+      "Bsl Start": -60,
+      "Bass Corr": "N",
+      "Global Rmax": "N"
+    },
+    "source_sha256": "469af4090726a5d230bbe119ba769b5d17b3b9a5f9bc8edc1913d060c4a571ba",
+    "sources": [
+      "https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20T200/Example%20T200%20Data%20Info%20Sheet.xlsx"
+    ]
+  },
+  "carterra_rows": {
+    "file": "carterra_rows.csv",
+    "concentrations": [
+      0.0313,
+      0.25,
+      1.0
+    ],
+    "concentration_unit": "µM",
+    "molar_concentrations_verified": true,
+    "association_start": 120,
+    "association_end": 420,
+    "fit_end": 1140,
+    "timing_verified": true,
+    "baseline_window": [
+      90,
+      115
+    ],
+    "initial_occupancy": "measured nonzero pre-association occupancy retained",
+    "regenerated": false,
+    "bulk_shift": false,
+    "analyte": "AE.A244",
+    "ligand": "CH31 10µg/ml",
+    "protocol": "Non-regenerative Carterra series; source worksheet rows 9,12,14 match ascending All Concentrations entries 8,11,13 (not literal Conc.N)",
+    "source_sheet_row": {
+      "Incl.": "Y",
+      "Block/Chip/Tray": "1,2,3,4",
+      "Position/Channel/Sensor": "A1",
+      "Analyte": "AE.A244",
+      "Ligand": "CH31 10µg/ml",
+      "Baseline": 120,
+      "Association": 300,
+      "Dissociation": 720,
+      "Asso. Skip": 0,
+      "Disso. Skip": 0,
+      "All Concentrations": "2.44E-10, 4.88E-10, 9.77E-10, 1.95E-09, 3.91E-09, 7.81E-09, 1.56E-08, 3.13E-08, 6.25E-08, 1.25E-07, 2.50E-07, 5.00E-07, 1.00E-06",
+      "Incl. Conc.": "6.25E-08, 1.25E-07, 2.50E-07, 5.00E-07, 1.00E-06",
+      "Bulkshift": "N",
+      "Regen.": "N",
+      "Bsl Start": 0,
+      "Base Corr": "Y",
+      "Global Rmax": "N"
+    },
+    "source_sha256": "6688322663cba3a0c4f55e83e1a0b4f9a7a75f8efff72494fa2717464049c7e2",
+    "sources": [
+      "https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20Carterra/Example%20Data%20Info%20Sheet%20-%20Carterra.xlsx"
+    ]
+  }
+}

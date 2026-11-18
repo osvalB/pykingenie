@@ -57,9 +57,36 @@ are also retained without resetting them to zero.
 
 Concentration labels are copied verbatim. Unitless `conc=...` labels, Carterra
 `Conc. N` indices, mass units, and truncated unit strings do not establish µM.
-No plate-well mapping or injection-event timing is inferred. API phase
-boundaries shown in the notebooks are illustrative and do not affect the
-concatenated raw sensorgram plots.
+No plate-well mapping is inferred. The Duke notebooks now use the original
+companion metadata below for molar concentrations and event timing; rstoolbox
+and binning timing remains explicitly provisional. Import partitions do not
+affect the concatenated raw sensorgram plots.
+
+## Companion metadata used for fitting
+
+Two original workbooks from the same pinned Duke revision are included
+**unmodified** in `metadata/`. They retain **CC BY 4.0**, Kan Li and S Moses
+Dennison, Duke University, and the [full retained license](../../../test_files/spr_exports/TitrationAnalysis-LICENSE).
+Redistribution and adaptation are permitted with attribution and an indication
+of changes. The normalized [fit_metadata.json](fit_metadata.json) is an adaptation:
+it selects the relevant author rows, converts M to µM, maps selected curve
+positions to concentrations, and records fitting windows and assumptions.
+The original workbooks are not required at notebook runtime.
+
+| Unmodified workbook | Original pinned source | SHA-256 |
+| --- | --- | --- |
+| `metadata/Example T200 Data Info Sheet.xlsx` | [Duke T200 sample sheet](https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20T200/Example%20T200%20Data%20Info%20Sheet.xlsx) | `469af4090726a5d230bbe119ba769b5d17b3b9a5f9bc8edc1913d060c4a571ba` |
+| `metadata/Example Data Info Sheet - Carterra.xlsx` | [Duke Carterra sample sheet](https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20Carterra/Example%20Data%20Info%20Sheet%20-%20Carterra.xlsx) | `6688322663cba3a0c4f55e83e1a0b4f9a7a75f8efff72494fa2717464049c7e2` |
+
+The T200 selected cycles map to concentration-list entries 6–8. The Carterra
+selected worksheet rows 9, 12, 14 map by row position to ascending entries
+8, 11, 13, following the original author's importer layout. Literal `Conc. N`
+labels are not used to guess molar concentrations. See
+[fitting methods and conclusions](../../SPR_FITTING.md) for the complete
+mapping, occupied-state treatment, conditional rankings and limitations.
+The derived tables/plots and numerical reports in `fits/` retain the
+corresponding source-data credits and licenses. No fitted values replace the
+measured data files.
 
 The original license audit, including TitrationAnalysis's later CC BY 4.0
 license and older conflicting citation metadata, is recorded in the
