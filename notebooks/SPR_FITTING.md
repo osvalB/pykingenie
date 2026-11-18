@@ -29,10 +29,14 @@ DOI [10.12688/gatesopenres.14743.2](https://doi.org/10.12688/gatesopenres.14743.
 The exact numeric comparisons use the authors' published example CSVs at
 pinned revision `cb8112503658d24c4c6576503243fa506bf99e27`:
 
-- [T200 author report](https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20T200/Titration%20Analysis_T200_Report_Example.csv).
-- [Carterra author report](https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20Carterra/Titration%20Analysis_Carterra_Report_Example.csv).
+- **T200:** [parameter values (CSV)](https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20T200/Titration%20Analysis_T200_Report_Example.csv),
+  [parameter table (PDF)](https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20T200/Titration%20Analysis_T200_Report_Example.pdf), and
+  [original fitted-sensorgram figures (PDF)](https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20T200/Titration%20Analysis_T200_Sensorgram_Example.pdf).
+- **Carterra:** [parameter values (CSV)](https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20Carterra/Titration%20Analysis_Carterra_Report_Example.csv),
+  [parameter table (PDF)](https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20Carterra/Titration%20Analysis_Carterra_Report_Example.pdf), and
+  [original fitted-sensorgram figures (PDF)](https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20Carterra/Titration%20Analysis_Carterra_Sensorgram_Example.pdf).
 
-Unmodified copies are included in `data/spr_exports/metadata/`, with CC BY 4.0
+Unmodified CSV copies are included in `data/spr_exports/metadata/`, with CC BY 4.0
 attribution, exact paths and SHA-256 hashes in the [source notes](data/spr_exports/SOURCES.md).
 [fit_metadata.json](data/spr_exports/fit_metadata.json) identifies each report
 row and its parameters in molar units. The original companion sample sheets
