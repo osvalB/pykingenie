@@ -1,15 +1,22 @@
 # Third-party sample data
 
-The SPR test fixtures listed below retain their upstream licenses. The project's
+The SPR sample files listed below retain their upstream licenses. The project's
 MIT license does not replace the CC BY 4.0 license on the TitrationAnalysis data.
 These are modified excerpts of public examples; their inclusion does not imply
 endorsement by their authors or instrument manufacturers.
 
 The rendered sensorgrams and data tables in import notebooks 12–15 are derived
-from these same fixtures and retain the respective data licenses below. Each
+from full-resolution selections of these same sources and retain the respective
+data licenses below. Each
 notebook credits its source and links the retained license and transformations.
 
-| Files in `test_files/spr_exports/` | Origin and credit | License and retained notice |
+The four filenames in the table exist both as small regression fixtures in
+`test_files/spr_exports/` and as representative teaching selections in
+`notebooks/data/spr_exports/`. The same source credits and license terms apply
+to both. The teaching selections, omissions and source checksums are detailed
+in their own [source notes](notebooks/data/spr_exports/SOURCES.md).
+
+| Files in both sample directories | Origin and credit | License and retained notice |
 | --- | --- | --- |
 | `paired_run.csv` | [rstoolbox](https://github.com/lpdi-epfl/rstoolbox), copyright (c) 2017 Jaume Bonet | MIT; [full notice](test_files/spr_exports/rstoolbox-LICENSE) |
 | `biacore_cycle_fc.tsv` | [SPR_kinetics_binning](https://github.com/RKI-ZBS/SPR_kinetics_binning), copyright (c) 2024 SternDan | MIT; [full notice](test_files/spr_exports/SPR_kinetics_binning-LICENSE) |

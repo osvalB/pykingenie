@@ -1,0 +1,138 @@
+{
+  "examples": [
+    {
+      "file": "paired_run.csv",
+      "source": "notebook/data/example03/spr_data.txt",
+      "source_sha256": "1bf92879abcbcf4d56f21d92d0570c1e9f438dc0807e5ee60aa8da729b3619e5",
+      "output_sha256": "7e04e006db3e0b0ff98d2cc172c3ba963c5756de8a92feb11194cac2a852b259",
+      "source_columns_zero_based": [
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "selection": "Higher-response series",
+      "curves": [
+        {
+          "label": "Run 1; Ch 1; Cy 14; RefSub; 1kx8_d02; conc=15",
+          "points": 5621,
+          "missing_pairs_removed": 49
+        },
+        {
+          "label": "Run 1; Ch 1; Cy 15; RefSub; 1kx8_d02; conc=30",
+          "points": 5621,
+          "missing_pairs_removed": 49
+        },
+        {
+          "label": "Run 1; Ch 1; Cy 16; RefSub; 1kx8_d02; conc=60",
+          "points": 5621,
+          "missing_pairs_removed": 49
+        }
+      ],
+      "no_downsampling": true,
+      "no_interpolation_or_smoothing": true,
+      "source_url": "https://github.com/lpdi-epfl/rstoolbox/blob/2bfc9be5ec6111603fb78700f201b80331ef0132/notebook/data/example03/spr_data.txt",
+      "license": "MIT"
+    },
+    {
+      "file": "biacore_cycle_fc.tsv",
+      "source": "Binning/Binning_Raw_Inspector_T200/input/2022-05-10_Kurven_Binning_huCapRaw.txt",
+      "source_sha256": "0bf881f731c4bf9fd93185f42d825b82ff358b0ff37809f22aefde9850971364",
+      "output_sha256": "58afd2c85f19641dc40aee12746f150273995a6ae0043bf18e50b76d7b24cb33",
+      "source_columns_zero_based": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "selection": "Complete original binning cycles 1 and 2",
+      "curves": [
+        {
+          "label": "Cycle=1_Fc=4-3",
+          "points": 1105,
+          "missing_pairs_removed": 0
+        },
+        {
+          "label": "Cycle=2_Fc=4-3",
+          "points": 1104,
+          "missing_pairs_removed": 0
+        }
+      ],
+      "no_downsampling": true,
+      "no_interpolation_or_smoothing": true,
+      "source_url": "https://github.com/RKI-ZBS/SPR_kinetics_binning/blob/ceaae964586dcbb00ac53bcae301bc097d92f3f4/Binning/Binning_Raw_Inspector_T200/input/2022-05-10_Kurven_Binning_huCapRaw.txt",
+      "license": "MIT"
+    },
+    {
+      "file": "biacore_cycle_sample.tsv",
+      "source": "Example Files - T200/Example T200 Chip 1 Channel 2.txt",
+      "source_sha256": "0361356ba6cb7be1a7f38ab9c5c5976407af0b78791bb9fad0a780dbc4751aa0",
+      "output_sha256": "72a59dabd2cae9976fd4ed74c90cccb365812f818c5f3d60411288e714fd588c",
+      "source_columns_zero_based": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "selection": "Higher-response series",
+      "curves": [
+        {
+          "label": "Cycle: 20  AE.A244  50 µg",
+          "points": 8404,
+          "missing_pairs_removed": 0
+        },
+        {
+          "label": "Cycle: 21  AE.A244  100 µ",
+          "points": 8395,
+          "missing_pairs_removed": 8
+        },
+        {
+          "label": "Cycle: 22  AE.A244  200 µ",
+          "points": 8402,
+          "missing_pairs_removed": 0
+        }
+      ],
+      "no_downsampling": true,
+      "no_interpolation_or_smoothing": true,
+      "source_url": "https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20T200/Example%20T200%20Chip%201%20Channel%202.txt",
+      "license": "CC-BY-4.0"
+    },
+    {
+      "file": "carterra_rows.csv",
+      "source": "Example Exported Data - Carterra.xlsx",
+      "source_sha256": "8a940a49b1dacafd7f918e155caa59339214c2d31042c434063788e155df73a7",
+      "output_sha256": "ad288c26667f8ef83463a1d28b2e0e0c6f1de789cd9132570bebbc32e542f232",
+      "worksheet_rows_one_based": [
+        9,
+        12,
+        14
+      ],
+      "selection": "Three higher-response curves from the same Ligand 1 / AE.A244 interaction",
+      "curves": [
+        {
+          "label": "[Ligand 1-AE.A244 Conc. 6] [NotFitted]",
+          "points": 533,
+          "missing_pairs_removed": 0
+        },
+        {
+          "label": "[Ligand 1-AE.A244 Conc. 3] [NotFitted]",
+          "points": 523,
+          "missing_pairs_removed": 0
+        },
+        {
+          "label": "[Ligand 1-AE.A244 53 µg/ml] [NotFitted]",
+          "points": 522,
+          "missing_pairs_removed": 0
+        }
+      ],
+      "no_downsampling": true,
+      "no_interpolation_or_smoothing": true,
+      "source_url": "https://github.com/DukeCHSI/TitrationAnalysis/tree/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20Carterra",
+      "license": "CC-BY-4.0"
+    }
+  ]
+}

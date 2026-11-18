@@ -150,7 +150,8 @@ Independent parser comparisons and the missing-response behavior found in the
 full public rstoolbox example are documented in
 [SPR parser validation](validation/spr_parsers/README.md).
 
-Executed import examples, with sensorgram plots and available metadata:
+Executed import examples use full-resolution, representative curves from
+`notebooks/data/spr_exports/`, with sensorgram plots and available metadata:
 
 | Input file | Notebook |
 | --- | --- |
@@ -158,6 +159,12 @@ Executed import examples, with sensorgram plots and available metadata:
 | `biacore_cycle_fc.tsv` | [Biacore Cycle/Fc export](notebooks/13_biacore_cycle_fc_import.ipynb) |
 | `biacore_cycle_sample.tsv` | [Biacore Cycle/sample export](notebooks/14_biacore_cycle_sample_import.ipynb) |
 | `carterra_rows.csv` | [Carterra CSV export](notebooks/15_carterra_csv_import.ipynb) |
+
+The [teaching-data sources](notebooks/data/spr_exports/SOURCES.md) record curve
+selection, full-resolution point counts, licenses, and explicit missing-pair
+handling. The small files in `test_files/spr_exports/` remain parser regression
+fixtures. The Cycle/Fc example displays full binning cycles plus a display zoom;
+it does not represent a single association/dissociation experiment.
 
 These curve exports have no plate-well coordinates. The notebooks display the
 available curve labels and draw a plate layout only if plate metadata exists.
