@@ -2,6 +2,8 @@
   "biacore_cycle_sample": {
     "file": "biacore_cycle_sample.tsv",
     "concentrations": [
+      0.2217,
+      0.4434,
       0.8868,
       1.774,
       3.547
@@ -15,7 +17,7 @@
     "bulk_shift": true,
     "analyte": "AE.A244",
     "ligand": "CH31",
-    "protocol": "Regenerated Biacore T200 cycles 20–22; metadata All Concentrations entries 6–8, converted M→µM",
+    "protocol": "Regenerated Biacore T200 cycles 18–22; author report concentrations 221.7,443.4,886.8,1774,3547 nM; All Concentrations entries 4–8",
     "source_sheet_row": {
       "Incl.": "Y",
       "Block/Chip/Tray": 1,
@@ -55,14 +57,44 @@
         "kon": 1812.098520356821,
         "koff": 0.00011911969721158095,
         "Kd": 6.573577312348616e-08
-      }
-    }
+      },
+      "concentrations_nM": [
+        221.70000000000002,
+        443.40000000000003,
+        886.8000000000001,
+        1774.0,
+        3547.0
+      ],
+      "sensorgram_pdf_url": "https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20T200/Titration%20Analysis_T200_Sensorgram_Example.pdf",
+      "sensorgram_pdf_sha256": "67554318c653a4a905c2398ede451525ad2a3b050584bf81fd2382e4a64f5764",
+      "sensorgram_pdf_page": 1
+    },
+    "source_concentration_entries_one_based": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "fitting_window_seconds": {
+      "association": [
+        0,
+        180
+      ],
+      "dissociation": [
+        180,
+        780
+      ]
+    },
+    "trim_time": 0
   },
   "carterra_rows": {
     "file": "carterra_rows.csv",
     "concentrations": [
-      0.0313,
+      0.0625,
+      0.125,
       0.25,
+      0.5,
       1.0
     ],
     "concentration_unit": "µM",
@@ -74,7 +106,7 @@
     "bulk_shift": false,
     "analyte": "AE.A244",
     "ligand": "CH31 10µg/ml",
-    "protocol": "Non-regenerative Carterra series; source worksheet rows 9,12,14 match ascending All Concentrations entries 8,11,13 (not literal Conc.N)",
+    "protocol": "Non-regenerative Carterra Block 1/A1/ROI 1; worksheet rows 10–14; author report concentrations 62.5,125,250,500,1000 nM; All Concentrations entries 9–13",
     "source_sheet_row": {
       "Incl.": "Y",
       "Block/Chip/Tray": "1,2,3,4",
@@ -115,7 +147,35 @@
         "kon": 5161.17784918819,
         "koff": 7.37342131097028e-05,
         "Kd": 1.4286315113380675e-08
-      }
-    }
+      },
+      "concentrations_nM": [
+        62.5,
+        125.0,
+        250.0,
+        500.0,
+        1000.0
+      ],
+      "sensorgram_pdf_url": "https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20Carterra/Titration%20Analysis_Carterra_Sensorgram_Example.pdf",
+      "sensorgram_pdf_sha256": "5d9b59d18d673245aa1fdd9a78f3b65205218ed3779290552bd746f36f047c79",
+      "sensorgram_pdf_page": 1
+    },
+    "source_concentration_entries_one_based": [
+      9,
+      10,
+      11,
+      12,
+      13
+    ],
+    "fitting_window_seconds": {
+      "association": [
+        120,
+        420
+      ],
+      "dissociation": [
+        420,
+        1140
+      ]
+    },
+    "trim_time": 0
   }
 }

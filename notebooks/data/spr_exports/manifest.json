@@ -69,8 +69,12 @@
       "file": "biacore_cycle_sample.tsv",
       "source": "Example Files - T200/Example T200 Chip 1 Channel 2.txt",
       "source_sha256": "0361356ba6cb7be1a7f38ab9c5c5976407af0b78791bb9fad0a780dbc4751aa0",
-      "output_sha256": "72a59dabd2cae9976fd4ed74c90cccb365812f818c5f3d60411288e714fd588c",
+      "output_sha256": "16c7bbe4ca4a3f84cf173cf8b82627c7fac5c9922c133c531174b0cdc5e09988",
       "source_columns_zero_based": [
+        6,
+        7,
+        8,
+        9,
         10,
         11,
         12,
@@ -78,61 +82,125 @@
         14,
         15
       ],
-      "selection": "Higher-response series",
+      "selection": "Author report page 1: five fitted concentrations, cycles 18–22",
       "curves": [
         {
+          "label": "Cycle: 18  AE.A244  12.5",
+          "points": 8221,
+          "missing_pairs_removed": 179,
+          "window_pairs_omitted": 3
+        },
+        {
+          "label": "Cycle: 19  AE.A244  25 µg",
+          "points": 8391,
+          "missing_pairs_removed": 9,
+          "window_pairs_omitted": 4
+        },
+        {
           "label": "Cycle: 20  AE.A244  50 µg",
-          "points": 8404,
-          "missing_pairs_removed": 0
+          "points": 8400,
+          "missing_pairs_removed": 0,
+          "window_pairs_omitted": 4
         },
         {
           "label": "Cycle: 21  AE.A244  100 µ",
-          "points": 8395,
-          "missing_pairs_removed": 8
+          "points": 8392,
+          "missing_pairs_removed": 8,
+          "window_pairs_omitted": 3
         },
         {
           "label": "Cycle: 22  AE.A244  200 µ",
-          "points": 8402,
-          "missing_pairs_removed": 0
+          "points": 8400,
+          "missing_pairs_removed": 0,
+          "window_pairs_omitted": 2
         }
       ],
       "no_downsampling": true,
       "no_interpolation_or_smoothing": true,
       "source_url": "https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20T200/Example%20T200%20Chip%201%20Channel%202.txt",
-      "license": "CC-BY-4.0"
+      "license": "CC-BY-4.0",
+      "retained_time_window_seconds": [
+        -60,
+        780
+      ],
+      "selection_evidence": {
+        "sensorgram_pdf_url": "https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20T200/Titration%20Analysis_T200_Sensorgram_Example.pdf",
+        "sensorgram_pdf_sha256": "67554318c653a4a905c2398ede451525ad2a3b050584bf81fd2382e4a64f5764",
+        "sensorgram_pdf_page": 1,
+        "concentrations_nM": [
+          221.70000000000002,
+          443.40000000000003,
+          886.8000000000001,
+          1774.0,
+          3547.0
+        ]
+      }
     },
     {
       "file": "carterra_rows.csv",
       "source": "Example Exported Data - Carterra.xlsx",
       "source_sha256": "8a940a49b1dacafd7f918e155caa59339214c2d31042c434063788e155df73a7",
-      "output_sha256": "ad288c26667f8ef83463a1d28b2e0e0c6f1de789cd9132570bebbc32e542f232",
+      "output_sha256": "cc2f48e11f0522f91a08a955414a94c71acd1ad21b1828087bd8061340becbd7",
       "worksheet_rows_one_based": [
-        9,
+        10,
+        11,
         12,
+        13,
         14
       ],
-      "selection": "Three higher-response curves from the same Ligand 1 / AE.A244 interaction",
+      "selection": "Author report page 1: five fitted concentrations, Block 1 / A1 / ROI 1",
       "curves": [
         {
-          "label": "[Ligand 1-AE.A244 Conc. 6] [NotFitted]",
-          "points": 533,
-          "missing_pairs_removed": 0
+          "label": "[Ligand 1-AE.A244 Conc. 5] [NotFitted]",
+          "points": 519,
+          "missing_pairs_removed": 0,
+          "window_pairs_omitted": 13
+        },
+        {
+          "label": "[Ligand 1-AE.A244 Conc. 4] [NotFitted]",
+          "points": 517,
+          "missing_pairs_removed": 0,
+          "window_pairs_omitted": 14
         },
         {
           "label": "[Ligand 1-AE.A244 Conc. 3] [NotFitted]",
-          "points": 523,
-          "missing_pairs_removed": 0
+          "points": 510,
+          "missing_pairs_removed": 0,
+          "window_pairs_omitted": 13
+        },
+        {
+          "label": "[Ligand 1-AE.A244 Conc. 2] [NotFitted]",
+          "points": 510,
+          "missing_pairs_removed": 0,
+          "window_pairs_omitted": 13
         },
         {
           "label": "[Ligand 1-AE.A244 53 µg/ml] [NotFitted]",
-          "points": 522,
-          "missing_pairs_removed": 0
+          "points": 509,
+          "missing_pairs_removed": 0,
+          "window_pairs_omitted": 13
         }
       ],
       "no_downsampling": true,
       "no_interpolation_or_smoothing": true,
       "source_url": "https://github.com/DukeCHSI/TitrationAnalysis/tree/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20Carterra",
-      "license": "CC-BY-4.0"
+      "license": "CC-BY-4.0",
+      "retained_time_window_seconds": [
+        0,
+        1140
+      ],
+      "selection_evidence": {
+        "sensorgram_pdf_url": "https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20Carterra/Titration%20Analysis_Carterra_Sensorgram_Example.pdf",
+        "sensorgram_pdf_sha256": "5d9b59d18d673245aa1fdd9a78f3b65205218ed3779290552bd746f36f047c79",
+        "sensorgram_pdf_page": 1,
+        "concentrations_nM": [
+          62.5,
+          125.0,
+          250.0,
+          500.0,
+          1000.0
+        ]
+      }
     }
   ]
 }

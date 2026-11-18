@@ -3,9 +3,12 @@
 These files are full-resolution selections for import notebooks 12–15. They are
 separate from the small regression fixtures in
 [`test_files/spr_exports/`](../../../test_files/spr_exports/SOURCES.md).
-Curves were selected to show clear measured responses, not to estimate model
-recovery or summarize the original experiments. No curve is simulated, smoothed,
-fitted, baseline-subtracted, or resampled.
+The rstoolbox and binning selections show clear measured responses. The two
+Duke selections contain the exact five concentration curves identified on page 1
+of the authors' sensorgram reports, within their nominal protocol windows.
+These examples do not estimate model recovery or summarize all source
+experiments. No curve is simulated, smoothed, fitted, baseline-subtracted, or
+resampled.
 
 The [manifest](manifest.json) records the original source hashes, exact selected
 columns/rows, retained labels, per-curve counts, missing-pair omissions and output
@@ -17,13 +20,15 @@ all values match exactly.
 | --- | --- | --- | --- | --- |
 | `paired_run.csv` | [rstoolbox, notebook/data/example03/spr_data.txt](https://github.com/lpdi-epfl/rstoolbox/blob/2bfc9be5ec6111603fb78700f201b80331ef0132/notebook/data/example03/spr_data.txt) | Measured cycles 14–16, `conc=15`, `30`, `60`; zero-based columns 16–21 | 5,621 / 5,621 / 5,621 | MIT, copyright (c) 2017 Jaume Bonet; [retained license](../../../test_files/spr_exports/rstoolbox-LICENSE) |
 | `biacore_cycle_fc.tsv` | [RKI-ZBS, Biacore T200 binning export](https://github.com/RKI-ZBS/SPR_kinetics_binning/blob/ceaae964586dcbb00ac53bcae301bc097d92f3f4/Binning/Binning_Raw_Inspector_T200/input/2022-05-10_Kurven_Binning_huCapRaw.txt) | Complete cycles 1 and 2, flow-cell pair 4-3; zero-based columns 0–3 | 1,105 / 1,104 | MIT, copyright (c) 2024 SternDan; [retained license](../../../test_files/spr_exports/SPR_kinetics_binning-LICENSE) |
-| `biacore_cycle_sample.tsv` | [Duke TitrationAnalysis, Example T200 Chip 1 Channel 2.txt](https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20T200/Example%20T200%20Chip%201%20Channel%202.txt) | Measured cycles 20–22, verbatim labels `50 µg`, `100 µ`, `200 µ`; zero-based columns 10–15 | 8,404 / 8,395 / 8,402 | CC BY 4.0, Kan Li and S Moses Dennison, Duke University; [retained license](../../../test_files/spr_exports/TitrationAnalysis-LICENSE) |
-| `carterra_rows.csv` | [Duke TitrationAnalysis, original Carterra workbook](https://github.com/DukeCHSI/TitrationAnalysis/tree/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20Carterra) | Worksheet rows 9, 12, 14 (one-based), Ligand 1 / AE.A244: `Conc. 6`, `Conc. 3`, `53 µg/ml` | 533 / 523 / 522 | CC BY 4.0, Kan Li and S Moses Dennison, Duke University; [retained license](../../../test_files/spr_exports/TitrationAnalysis-LICENSE) |
+| `biacore_cycle_sample.tsv` | [Duke TitrationAnalysis, Example T200 Chip 1 Channel 2.txt](https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20T200/Example%20T200%20Chip%201%20Channel%202.txt) | Author report cycles 18–22, 221.7–3547 nM; zero-based columns 6–15; window −60–780 s | 8,221 / 8,391 / 8,400 / 8,392 / 8,400 | CC BY 4.0, Kan Li and S Moses Dennison, Duke University; [retained license](../../../test_files/spr_exports/TitrationAnalysis-LICENSE) |
+| `carterra_rows.csv` | [Duke TitrationAnalysis, original Carterra workbook](https://github.com/DukeCHSI/TitrationAnalysis/tree/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20Carterra) | Author report worksheet rows 10–14 (one-based), Block 1/A1/ROI 1, 62.5–1000 nM; window 0–1140 s | 519 / 517 / 510 / 510 / 509 | CC BY 4.0, Kan Li and S Moses Dennison, Duke University; [retained license](../../../test_files/spr_exports/TitrationAnalysis-LICENSE) |
 
 ## Transformations and missing observations
 
 - Paired text files retain every finite source observation in the selected
-  curves, in the original order. No finite measurement is removed. Entirely
+  curves and stated windows, in the original order. The rstoolbox and binning
+  selections retain their full available time ranges; the Duke examples retain
+  their author-specified protocol windows. Entirely
   empty rows outside those curves are omitted. Column labels have outer
   whitespace trimmed. Exports use UTF-8 BOM and LF line endings; decimal commas
   remain unchanged in the Cycle/Fc TSV. Empty trailing TSV fields are omitted
@@ -35,13 +40,19 @@ all values match exactly.
   the corresponding sampling gap. Its behavior on the unmodified source still
   raises an error, as recorded in the original
   [reference comparison](../../../validation/spr_parsers/README.md).
-- The Duke Cycle/sample source has **eight missing/non-finite pairs in cycle
-  21**; only those pairs are omitted. Cycles 20 and 22 have no such omissions.
+- The Duke Cycle/sample source has **196 missing/non-finite pairs** in the
+  five selected curves: **179 in cycle 18, 9 in cycle 19, 0 in cycle 20,
+  8 in cycle 21, 0 in cycle 22**. Only these unavailable pairs are cleared.
+  Additionally, **16 finite observations outside −60–780 s** are omitted
+  (3 / 4 / 4 / 3 / 2 per curve). These are protocol-window exclusions, not
+  downsampling; all finite in-window values are retained unchanged.
 - The Carterra archive parts are joined, and cached worksheet values from
   `Example Exported Data - Carterra.xlsx` are converted to CSV. The original
   `Label, X1, Y1, ..., X534, Y534` header and selected row labels are retained.
   Spreadsheet cell coordinates are respected when preserving blank pairs.
-  No observation from the three selected rows is removed.
+  For worksheet rows 10–14, all finite observations in 0–1140 s are retained.
+  **66 observations after 1140 s** are omitted (13 / 14 / 13 / 13 / 13 per row)
+  to match the nominal protocol end. No in-window observation is removed.
 - No missing response is interpolated, replaced by zero, or assigned a fitted
   value. Notebook plots break lines across gaps exceeding three median sampling
   intervals. The Cycle/Fc notebook's zoom changes display limits only; the full
@@ -78,9 +89,9 @@ The original workbooks are not required at notebook runtime.
 | `metadata/Example T200 Data Info Sheet.xlsx` | [Duke T200 sample sheet](https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20T200/Example%20T200%20Data%20Info%20Sheet.xlsx) | `469af4090726a5d230bbe119ba769b5d17b3b9a5f9bc8edc1913d060c4a571ba` |
 | `metadata/Example Data Info Sheet - Carterra.xlsx` | [Duke Carterra sample sheet](https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20Carterra/Example%20Data%20Info%20Sheet%20-%20Carterra.xlsx) | `6688322663cba3a0c4f55e83e1a0b4f9a7a75f8efff72494fa2717464049c7e2` |
 
-The T200 selected cycles map to concentration-list entries 6–8. The Carterra
-selected worksheet rows 9, 12, 14 map by row position to ascending entries
-8, 11, 13, following the original author's importer layout. Literal `Conc. N`
+The T200 selected cycles 18–22 map to concentration-list entries **4–8**.
+The Carterra selected worksheet rows **10–14** map by row position to ascending
+entries **9–13**, following the original author's importer layout. Literal `Conc. N`
 labels are not used to guess molar concentrations. See
 [fits with published comparisons](../../SPR_FITTING.md) for the complete
 mapping, existing pyKinGenie fitting API, reference reports and comparison scope.
@@ -105,9 +116,13 @@ reports. Only the corresponding one-site/local-Rmax fits are demonstrated.
 | `metadata/Titration Analysis_Carterra_Report_Example.csv` | [Duke Carterra report](https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20Carterra/Titration%20Analysis_Carterra_Report_Example.csv) | `bd623cfc2f903ff0afbb3b844e624c2591a66a89ffd05dfc91073daca3b99cc3` |
 
 Use T200 Chip 1 / Channel 2 / fitting #1, and Carterra Block 1 / A1 / ROI 1 /
-fitting #1. The author reports fit five curves; the teaching notebooks fit three
-selected curves. Preprocessing and the selected concentrations differ, so these
-are comparisons of the same source experiments rather than exact reproductions.
+fitting #1. Both notebooks now fit the **same five concentration curves** as
+those reports, verified from the legends on **page 1** of the original sensorgram
+PDFs and the companion concentration lists. The manifest records the PDF URLs,
+SHA-256 hashes, page and selected concentrations. Association/dissociation
+windows and zero skipped seconds also match the source sheets. Alignment,
+sampling and fitting-state/bulk-shift settings still differ, so these are
+comparisons of the same source experiments rather than exact reproductions.
 Reference publication: [Li et al., TitrationAnalysis](https://doi.org/10.12688/gatesopenres.14743.2).
 
 The original license audit, including TitrationAnalysis's later CC BY 4.0

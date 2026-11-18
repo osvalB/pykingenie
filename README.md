@@ -172,10 +172,12 @@ These curve exports have no plate-well coordinates. The notebooks display the
 available curve labels and draw a plate layout only if plate metadata exists.
 The Duke examples use their original companion sample sheets for concentrations
 and phase timing. Each calls `align_association(inplace=True, npoints=10)` on
-a copy before fitting, records its offsets, and keeps the raw import plot.
+a copy before fitting and keeps the raw import plot.
 The rstoolbox and binning notebooks demonstrate import only. See
 [SPR fits with published comparisons](notebooks/SPR_FITTING.md) for the API calls,
-source reports and differences in curve selection and fitting setup.
+source reports and remaining differences in fitting setup. Both Duke examples
+use the same five concentration curves and nominal protocol windows as the
+author reports, verified against their original sensorgram figures.
 
 ## Detecting input formats
 

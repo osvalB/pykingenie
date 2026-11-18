@@ -14,7 +14,7 @@ fit_analyzer = KineticsAnalyzer()
 fit_analyzer.add_experiment(fit_experiment, fit_experiment.name)
 fit_analyzer.merge_ligand_conc_df()
 fit_analyzer.generate_fittings(
-    fit_analyzer.combined_ligand_conc_df.copy(), trim_time=3,
+    fit_analyzer.combined_ligand_conc_df.copy(), trim_time=0,
 )
 fit_analyzer.submit_steady_state_fitting()
 fitter = next(iter(fit_analyzer.fittings.values()))
@@ -32,13 +32,20 @@ and calculates percentage differences. The fitted plot uses the existing
 
 | Notebook | Published Kd | pyKinGenie Kd | Scope |
 | --- | ---: | ---: | --- |
-| [14: Biacore T200](14_biacore_cycle_sample_import.ipynb) | 65.74 nM | approximately 70.65 nM | One-site/local Smax; the standard method does not include the author's independent association RI offsets. |
-| [15: Carterra](15_carterra_csv_import.ipynb) | 14.29 nM | approximately 51.93 nM | One-site/local Smax on separately aligned exported curves; the full non-regenerative history and absolute prebound signal are not reconstructed. |
+| [14: Biacore T200](14_biacore_cycle_sample_import.ipynb) | 65.74 nM | approximately 71.80 nM | One-site/local Smax; the standard method does not include the author's independent association RI offsets. |
+| [15: Carterra](15_carterra_csv_import.ipynb) | 14.29 nM | approximately 47.38 nM | One-site/local Smax on separately aligned exported curves; the full non-regenerative history and absolute prebound signal are not reconstructed. |
 
-The author reports use five curves; the notebooks retain their three
-representative imported curves. The standard fitting results replace the
-previous custom-helper results. These are comparisons of the same source
-experiments with differences in fitting setup, not exact reproductions of the
+Both notebooks now use the **same five concentrations and curve identities**
+as page 1 of the author sensorgram reports. T200 uses cycles 18–22 at
+**221.7, 443.4, 886.8, 1774, 3547 nM**. Carterra uses worksheet rows 10–14,
+Block 1/A1/ROI 1, at **62.5, 125, 250, 500, 1000 nM**. The selections were
+verified against the original PDF figures and companion concentration lists.
+
+The data excerpts retain every finite point in the corresponding protocol
+windows: T200 baseline −60–0 s, association 0–180 s and dissociation 180–780 s;
+Carterra baseline 0–120 s, association 120–420 s and dissociation 420–1140 s.
+No curves are selected merely for having a large response. These comparisons
+still have differences in fitting setup and are not exact reproductions of the
 published fits. Carterra in particular does **not** reproduce the published
 kinetics with this standard workflow. No custom correction is added to force
 agreement.
@@ -52,18 +59,24 @@ No model searches, rankings, sensitivity analyses or leave-one-out fits are run.
 The fitting copy uses the existing `align_association(inplace=True, npoints=10)`
 method to subtract the mean of the last 10 pre-association points from every
 phase. The raw imported experiment and its plot remain unchanged.
-`generate_fittings(..., trim_time=3)` uses the library's masks to exclude the
-first three seconds of each association and dissociation. All other imported
-observations retain their native sampling. No custom thinning, interpolation,
-smoothing, median-baseline correction, bulk-offset fit or occupied-state
+`generate_fittings(..., trim_time=0)` fits all retained association and
+dissociation points, matching **Asso. Skip = 0** and **Disso. Skip = 0** in the
+source sheets. All imported observations retain their native sampling. No
+custom thinning, interpolation, smoothing, median-baseline correction, bulk-offset
+fit or occupied-state
 correction is applied.
 
 The library's `get_step_xy` supplies step-relative times and the existing
 one-site fitter handles the model evaluation and initial signals. These calls
 are used as implemented; the notebooks do not replace the fitter's clock or
-state handling. All imported post-association observations are available to the
-fitter, including any export tail beyond the source sheet's nominal protocol.
-The plot's display point budget does not change the fitted observations.
+state handling. Export tails beyond the source sheet's nominal protocol are
+excluded when preparing the data excerpts, with omission counts recorded in the
+manifest. The plot's display point budget does not change fitted observations.
+
+The T200 source contains missing/non-finite pairs: 179 in cycle 18, 9 in cycle 19
+and 8 in cycle 21. Those unavailable observations remain gaps; no interpolation
+is applied. Missing-pair and window-omission counts are documented in the
+[source notes](data/spr_exports/SOURCES.md) and manifest.
 
 ## Published values and figures
 
