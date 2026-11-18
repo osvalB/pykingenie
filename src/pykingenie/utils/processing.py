@@ -3,6 +3,8 @@
 import re
 import math
 import itertools
+from pathlib import Path
+from os import PathLike
 
 import numpy  as np
 import pandas as pd
@@ -154,11 +156,15 @@ def combine_dicts(list_dicts):
 
 def guess_experiment_type(files):
     """
-    Given file paths, try to guess if they correspond to surface-based or solution-based binding experiments.
+    Guess surface- versus solution-based data, preserving the surface fallback.
+
+    Use ``pykingenie.detect_file_format`` to choose a specific input reader.
+    This legacy helper only returns ``surface`` or ``solution``; unrecognized
+    or missing inputs keep its historical ``surface`` default.
 
     Parameters
     ----------
-    files : str or list
+    files : str, path-like, or list
         Path or list of paths to the experiment files.
         
     Returns
@@ -168,28 +174,27 @@ def guess_experiment_type(files):
     """
 
     # convert to list if it is a string
-    if isinstance(files, str):
+    if isinstance(files, (str, PathLike)):
         files = [files]
 
     for file in files:
-        # Edited with AI assistance: Biacore result files (.blr) are surface-based
-        if file.endswith('.frd') or file.lower().endswith('.blr'):
+        if Path(file).suffix.lower() in ('.frd', '.blr'):
             return 'surface'
 
     for file in files:
-        if 'ExperimentStep.ini' in file:
+        if Path(file).name.casefold() == 'experimentstep.ini':
             return 'surface'
 
-    for file in files:
-        if file.endswith('.csv'):
+    # Import lazily: experiment modules also import processing helpers.
+    from ..file_detection import detect_file_format
 
-            # Find if we have a line with the protein concentration
-            with open(file, 'r') as f:
-                first_line = f.read().splitlines()[0]
-                if 'Protein_concentration_micromolar' in first_line:
-                    return 'solution'
-                else:
-                    return 'surface'
+    for file in files:
+        if Path(file).is_file():
+            detected = detect_file_format(file)
+            if detected == 'kingenie_solution':
+                return 'solution'
+            if detected != 'unknown':
+                return 'surface'
 
     return 'surface'
 

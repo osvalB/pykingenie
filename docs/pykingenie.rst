@@ -17,6 +17,14 @@ Subpackages
 Submodules
 ----------
 
+pykingenie.file\_detection module
+----------------------------------------
+
+.. automodule:: pykingenie.file_detection
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 pykingenie.biacore module
 -------------------------
 

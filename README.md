@@ -164,6 +164,50 @@ available curve labels and draw a plate layout only if plate metadata exists.
 Example phase boundaries are illustrative; use verified injection timing and
 concentrations before fitting your data.
 
+## Detecting input formats
+
+`detect_file_format` inspects file contents to select an input reader. All three
+paired-column SPR variants share `SprTextExperiment`; Carterra's row-oriented
+layout is detected separately:
+
+```python
+from pathlib import Path
+from pykingenie import detect_file_format
+
+for file in sorted(Path("test_files/spr_exports").glob("*")):
+    if file.suffix in {".csv", ".tsv"}:
+        print(file.name, detect_file_format(file))
+# biacore_cycle_fc.tsv spr_text
+# biacore_cycle_sample.tsv spr_text
+# carterra_rows.csv carterra_csv
+# paired_run.csv spr_text
+```
+
+| Detected identifier | Reader |
+| --- | --- |
+| `spr_text` | `SprTextExperiment.read_file` |
+| `carterra_csv` | `CarterraExperiment.read_csv` |
+| `octet_frd` | `OctetExperiment.read_sensor_data` |
+| `biacore_blr` | `BiacoreExperiment.read_blr` |
+| `gator_csv`, `gator_steps`, `gator_settings`, `gator_zip` | `GatorExperiment.read_all_gator_data` with the complete file set or archive |
+| `kingenie_surface` | `KinGenieCsv.read_csv` |
+| `kingenie_solution` | `KinGenieCsvSolution.read_csv` |
+| `surface_csv_steps`, `surface_csv_traces` | `SurfaceCsvExperiment.read_files` with both files |
+
+Text detection searches the first 64 KiB of uncompressed content, handles
+metadata preambles, BOMs, Windows-1252 text, gzip, and comma/tab/semicolon
+delimiters. Native Biacore and Gator archives are checked for their internal
+structure. Renaming a file does not change its content-based identifier.
+Detection identifies the layout; the reader still validates the measurements
+and requires its normal arguments, including decimal conventions, injection
+boundaries, concentrations and companion files where applicable.
+
+Ambiguous or unsupported inputs return `unknown`, including generic two-column
+`Time,Signal` data and native XLSX files. Choose the reader explicitly for such
+inputs. Missing/inaccessible files raise the normal filesystem error.
+`guess_experiment_type` remains the compatible surface/solution helper, with its
+historical `surface` fallback; use `detect_file_format` for reader selection.
+
 ## Keeping results when changing models
 
 Each fitter automatically keeps successful model results in `fit_results`.
