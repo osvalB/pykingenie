@@ -152,8 +152,8 @@ full public rstoolbox example are documented in
 
 Executed import examples use full-resolution, representative curves from
 `notebooks/data/spr_exports/`, with sensorgram plots and available metadata.
-The Duke T200 and Carterra examples additionally fit the published one-site
-model and compare its parameters with the authors' reference reports:
+The Duke T200 and Carterra examples additionally use pyKinGenie's existing
+one-site fitter and compare its output with the authors' reference reports:
 
 | Input file | Notebook |
 | --- | --- |
@@ -174,8 +174,8 @@ The Duke examples use their original companion sample sheets for concentrations
 and phase timing. Each calls `align_association(inplace=True, npoints=10)` on
 a copy before fitting, records its offsets, and keeps the raw import plot.
 The rstoolbox and binning notebooks demonstrate import only. See
-[SPR fits with published comparisons](notebooks/SPR_FITTING.md) for the retained
-one-site models, source reports and differences in curve selection.
+[SPR fits with published comparisons](notebooks/SPR_FITTING.md) for the API calls,
+source reports and differences in curve selection and fitting setup.
 
 ## Detecting input formats
 

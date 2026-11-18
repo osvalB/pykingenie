@@ -10,13 +10,7 @@
     "molar_concentrations_verified": true,
     "association_start": 0,
     "association_end": 180,
-    "fit_end": 780,
     "timing_verified": true,
-    "baseline_window": [
-      -50,
-      -5
-    ],
-    "initial_occupancy": "zero after pre-injection background subtraction",
     "regenerated": true,
     "bulk_shift": true,
     "analyte": "AE.A244",
@@ -75,13 +69,7 @@
     "molar_concentrations_verified": true,
     "association_start": 120,
     "association_end": 420,
-    "fit_end": 1140,
     "timing_verified": true,
-    "baseline_window": [
-      90,
-      115
-    ],
-    "initial_occupancy": "measured nonzero pre-association occupancy retained",
     "regenerated": false,
     "bulk_shift": false,
     "analyte": "AE.A244",

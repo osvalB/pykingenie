@@ -70,7 +70,7 @@ Dennison, Duke University, and the [full retained license](../../../test_files/s
 Redistribution and adaptation are permitted with attribution and an indication
 of changes. The normalized [fit_metadata.json](fit_metadata.json) is an adaptation:
 it selects the relevant author rows, converts M to µM, maps selected curve
-positions to concentrations, and records fitting windows and assumptions.
+positions to concentrations, and records import phase times and source settings.
 The original workbooks are not required at notebook runtime.
 
 | Unmodified workbook | Original pinned source | SHA-256 |
@@ -83,13 +83,12 @@ selected worksheet rows 9, 12, 14 map by row position to ascending entries
 8, 11, 13, following the original author's importer layout. Literal `Conc. N`
 labels are not used to guess molar concentrations. See
 [fits with published comparisons](../../SPR_FITTING.md) for the complete
-mapping, occupied-state treatment, reference reports and comparison scope.
-The derived tables/plots and numerical reports in `fits/` retain the
-corresponding source-data credits and licenses. No fitted values replace the
-measured data files.
+mapping, existing pyKinGenie fitting API, reference reports and comparison scope.
+The derived notebook tables and plots retain the corresponding source-data
+credits and licenses. No fitted values replace the measured data files.
 Before fitting, each Duke notebook calls `align_association` on a separate copy,
 subtracting the mean of the last 10 pre-association points. This transformation
-is recorded in the numerical reports; it does not modify these source excerpts.
+is shown explicitly in the notebooks; it does not modify these source excerpts.
 
 ## Published reference fitting reports
 

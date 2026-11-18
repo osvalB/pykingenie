@@ -9,7 +9,7 @@ The rendered sensorgrams and data tables in import notebooks 12–15 are derived
 from full-resolution selections of these same sources and retain the respective
 data licenses below. Each
 notebook credits its source and links the retained license and transformations.
-The fitted plots, numerical fit reports and metadata tables retain the same
+The fitted plots, notebook result tables and metadata tables retain the same
 source-data credits. The original Duke companion workbooks and published
 reference CSV reports in `notebooks/data/spr_exports/metadata/` and their normalized rows in
 `fit_metadata.json` are also CC BY 4.0, Kan Li and S Moses Dennison, Duke
