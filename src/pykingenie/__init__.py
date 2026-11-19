@@ -9,7 +9,8 @@ from .kingenie_solution import KinGenieCsvSolution
 from .kingenie_surface  import KinGenieCsv
 from .surface_csv       import SurfaceCsvExperiment
 from .biacore           import BiacoreExperiment
-from .spr_exports       import SprTextExperiment, CarterraExperiment
+from .spr_text          import SprTextExperiment
+from .carterra          import CarterraExperiment
 from .file_detection    import detect_file_format
 
 from .utils.processing import (

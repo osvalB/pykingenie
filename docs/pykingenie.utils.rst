@@ -81,6 +81,14 @@ pykingenie.utils.processing module
    :show-inheritance:
    :undoc-members:
 
+pykingenie.utils.sensorgram\_text module
+----------------------------------------
+
+.. automodule:: pykingenie.utils.sensorgram_text
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 pykingenie.utils.signal\_solution module
 ----------------------------------------
 
