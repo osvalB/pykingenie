@@ -115,12 +115,15 @@ the cycle period (Baseline + Association + Dissociation = 1140 s), and selects
 concentration entries 9–13 for the five-curve published comparison:
 
 ```python
-experiment.read_csv(
+experiment = pyKinetics.load(
     data_file,
     info=data_folder / "metadata" / "Example Data Info Sheet - Carterra.xlsx",
     single_cycle=True,
 )
 ```
+
+`load` detects the Carterra layout and passes the options to
+`CarterraExperiment.read_csv`.
 
 This produces one sensor and 27 steps, alternating association and dissociation
 after the first baseline. Original row labels remain in `Source_curve`, and
