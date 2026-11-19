@@ -29,6 +29,7 @@ This importer is instrument-agnostic. It needs two plain-text files:
    interval ``[sum(step_time[:i]), sum(step_time[:i+1]))``.
 """
 
+import csv
 import re
 import warnings
 
@@ -36,6 +37,7 @@ import numpy  as np
 import pandas as pd
 
 from .surface_exp import SurfaceBasedExperiment
+from .utils.text_io import DELIMITERS, read_delimited_table
 
 # Map common step type names to the internal codes used by pykingenie
 STEP_TYPE_MAP = {
@@ -123,14 +125,6 @@ def _is_numeric_row(fields):
         return False
 
 
-def _detect_delimiter(line):
-    """Guess the delimiter of a line (tab, semicolon or comma)."""
-    for delim in ['\t', ';', ',']:
-        if delim in line:
-            return delim
-    return ','
-
-
 def read_traces_file(file):
     """
     Read a column-formatted traces file (time in the first column, one sensor per column).
@@ -155,21 +149,32 @@ def read_traces_file(file):
     delimiter      = ','
 
     for i, line in enumerate(lines):
-        delim = _detect_delimiter(line)
-        if _is_numeric_row(line.split(delim)):
-            first_data_idx = i
-            delimiter      = delim
+        for delim in DELIMITERS:
+            fields = next(csv.reader([line], delimiter=delim, skipinitialspace=True))
+            if _is_numeric_row(fields):
+                first_data_idx = i
+                delimiter = delim
+                break
+        if first_data_idx is not None:
             break
 
     if first_data_idx is None:
         raise ValueError(f"No numeric data found in the traces file: {file}")
 
     if first_data_idx > 0:
-        header = [h.strip() for h in lines[first_data_idx - 1].split(delimiter)]
+        header = [
+            h.strip() for h in next(csv.reader(
+                [lines[first_data_idx - 1]], delimiter=delimiter, skipinitialspace=True
+            ))
+        ]
     else:
         header = None
 
-    rows = [l.split(delimiter) for l in lines[first_data_idx:] if l.strip() != '']
+    rows = [
+        row for row in csv.reader(
+            lines[first_data_idx:], delimiter=delimiter, skipinitialspace=True
+        ) if any(field.strip() for field in row)
+    ]
     n_cols = len(rows[0])
     rows   = [r[:n_cols] + [''] * (n_cols - len(r)) for r in rows]
 
@@ -202,7 +207,7 @@ def read_steps_file(file):
         DataFrame with standardised columns: 'Name', 'Time', 'Type' (internal code),
         'Location' and, if present, 'Concentration' and 'SampleID'.
     """
-    df = pd.read_csv(file, sep=None, engine='python', encoding='utf-8-sig')
+    df = read_delimited_table(file)
 
     # Drop fully empty rows/columns (e.g. trailing tabs or blank lines)
     df = df.dropna(axis=0, how='all').dropna(axis=1, how='all')

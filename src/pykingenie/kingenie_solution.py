@@ -4,6 +4,7 @@ import pandas as pd
 import numpy  as np
 
 from .solution_exp import SolutionBasedExp
+from .utils.text_io import read_delimited_table
 
 class KinGenieCsvSolution(SolutionBasedExp):
     """
@@ -57,6 +58,9 @@ class KinGenieCsvSolution(SolutionBasedExp):
             
         Notes
         -----
+        Comma, semicolon and tab separators are detected automatically, with
+        standard CSV quoting and decimal-point numeric values.
+
         The CSV file should have the following columns:
         - Time: time points of the simulation
         - Signal: signal values at each time point
@@ -77,7 +81,7 @@ class KinGenieCsvSolution(SolutionBasedExp):
         - self.conc_df: DataFrame with concentration information
         """
 
-        df = pd.read_csv(file)
+        df = read_delimited_table(file)
 
         # Validate the input file
         # Check we have at least 2 columns, time versus signal

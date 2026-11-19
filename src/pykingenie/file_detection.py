@@ -9,6 +9,7 @@ import zipfile
 import zlib
 
 from .utils.compound_file import SIGNATURE, read_compound_file
+from .utils.text_io import DELIMITERS
 
 __all__ = ["detect_file_format"]
 
@@ -24,7 +25,9 @@ def _table_format(fields):
         return None
     if fields[0] == "Label":
         expected = ["Label"] + [
-            f"{axis}{i}" for i in range(1, (len(fields) + 1) // 2) for axis in ("X", "Y")
+            f"{axis}{i}"
+            for i in range(1, (len(fields) + 1) // 2)
+            for axis in ("X", "Y")
         ]
         return "carterra_csv" if len(fields) >= 3 and fields == expected else None
     matches = [_AXIS.fullmatch(field) for field in fields]
@@ -35,7 +38,9 @@ def _table_format(fields):
             if not name or axis in pairs.setdefault(name, set()):
                 return None
             pairs[name].add(axis)
-        return "spr_text" if all(axes == {"X", "Y"} for axes in pairs.values()) else None
+        return (
+            "spr_text" if all(axes == {"X", "Y"} for axes in pairs.values()) else None
+        )
     names = {re.sub(r"\s+", " ", field).casefold() for field in fields}
     if {"time", "signal", "smax", "analyte_concentration_micromolar_constant"} <= names:
         return "kingenie_surface"
@@ -117,8 +122,10 @@ def detect_file_format(file):
     if "[BasicInformation]" in text and "PreExperiment=" in text:
         return "gator_settings"
     for line in text.splitlines():
-        for delimiter in ("\t", ",", ";"):
-            fields = next(csv.reader([line], delimiter=delimiter))
+        for delimiter in DELIMITERS:
+            fields = next(
+                csv.reader([line], delimiter=delimiter, skipinitialspace=True)
+            )
             result = _table_format(fields)
             if result:
                 return result

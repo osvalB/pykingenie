@@ -95,6 +95,22 @@ fig = plot_association_dissociation(pyKinetics)
 fig.write_image('test_bli_fitted.png')
 ```
 
+## Delimited text inputs
+
+KinGenie surface and solution CSVs, Gator sensor CSVs, generic surface steps and
+traces, and the SPR readers below automatically recognize **commas, semicolons,
+and tabs**. Each file is detected independently, so a steps file and its traces
+file can use different delimiters. No delimiter argument or file extension
+change is needed. For example, `KinGenieCsv().read_csv("simulation.csv")` accepts
+the same table saved with semicolons instead of commas.
+
+Standard CSV quotes preserve delimiters inside names and values. Spaces after
+separators are accepted, including before quoted fields. This changes field
+separation only: decimal marks are separate. For decimal-comma SPR exports,
+continue to pass `decimal=","` to `SprTextExperiment.read_file` or
+`CarterraExperiment.read_csv` and quote numeric values if the delimiter is also
+a comma. The other readers continue to expect decimal points.
+
 ## SPR sensorgram text exports
 
 `SprTextExperiment` reads text/CSV/TSV files with one named `_X` time column

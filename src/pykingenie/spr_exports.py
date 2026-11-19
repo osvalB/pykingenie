@@ -15,6 +15,7 @@ import numpy as np
 import pandas as pd
 
 from .surface_exp import SurfaceBasedExperiment
+from .utils.text_io import DELIMITERS
 
 __all__ = ["SprTextExperiment", "CarterraExperiment"]
 
@@ -78,9 +79,12 @@ def _trace(name, points, decimal):
 
 def _find_header(lines, predicate):
     for i, line in enumerate(lines):
-        for delimiter in ("\t", ",", ";"):
+        for delimiter in DELIMITERS:
             fields = [
-                field.strip() for field in next(csv.reader([line], delimiter=delimiter))
+                field.strip()
+                for field in next(
+                    csv.reader([line], delimiter=delimiter, skipinitialspace=True)
+                )
             ]
             while fields and not fields[-1]:
                 fields.pop()
@@ -90,7 +94,7 @@ def _find_header(lines, predicate):
 
 
 def _rows(lines, start, delimiter, width):
-    for row in csv.reader(lines[start:], delimiter=delimiter):
+    for row in csv.reader(lines[start:], delimiter=delimiter, skipinitialspace=True):
         if not any(field.strip() for field in row):
             continue
         if any(field.strip() for field in row[width:]):
@@ -315,6 +319,9 @@ class SprTextExperiment(_SensorgramExport):
     ):
         """Read paired-column text/CSV/TSV, optionally gzip compressed.
 
+        Comma, semicolon and tab delimiters are detected automatically.
+        Standard CSV quoting and spaces after delimiters are accepted.
+
         Boundaries are seconds on the exported time axis; association is
         [start, end) and dissociation starts at end. Missing baseline points
         are allowed. Concentrations are a list or curve-name mapping, in µM
@@ -366,6 +373,9 @@ class CarterraExperiment(_SensorgramExport):
         cycle_duration=None,
     ):
         """Read Carterra CSV with caller-supplied phase boundaries in seconds.
+
+        Comma, semicolon and tab delimiters are detected automatically.
+        Standard CSV quoting and spaces after delimiters are accepted.
 
         Concentrations and sample_id follow SprTextExperiment.read_file().
         Original row labels and each curve's time grid are retained. Labels
