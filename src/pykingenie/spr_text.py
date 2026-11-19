@@ -23,10 +23,10 @@ A TitrationAnalysis Data Info Sheet (``info=``, see ``pykingenie.info_sheet``)
 can supply the timing, concentrations and ``sample_id`` below.
 
 - To import: ``association_end`` and, if not 0 s, ``association_start``, in
-  seconds on the exported time axis. The same boundaries apply to every curve
-  in the file, so curves with different timing need separate imports. Also
-  ``time_unit="min"`` if time is in minutes. The decimal mark (``.`` or ``,``)
-  is detected; pass ``decimal`` only if the file uses both.
+  seconds on the exported time axis: one value for every curve, or one per
+  curve (list or curve-label mapping) when injections start at different
+  times. Also ``time_unit="min"`` if time is in minutes. The decimal mark
+  (``.`` or ``,``) is detected; pass ``decimal`` only if the file uses both.
 - To fit: one concentration per curve (``concentrations``, in µM unless
   ``concentration_unit`` is given), and ``sample_id`` to group curves of the
   same analyte (by default all curves form one group). Reference subtraction
@@ -113,8 +113,11 @@ class SprTextExperiment(SensorgramTextExperiment):
         Standard CSV quoting and spaces after delimiters are accepted.
 
         Boundaries are seconds on the exported time axis; association is
-        [start, end) and dissociation starts at end. Missing baseline points
-        are allowed. Concentrations are a list or curve-name mapping, in µM
+        [start, end) and dissociation starts at end. Each boundary is one
+        number for all curves, or a list or curve-label mapping with one
+        number per curve; with different values, exp_info keeps them under
+        association_start_seconds_by_curve and association_end_seconds_by_curve.
+        Missing baseline points are allowed. Concentrations are a list or curve-name mapping, in µM
         unless concentration_unit is supplied. Without concentrations, only
         conc= labels are used, with their own molar unit or, if they have
         none, concentration_unit; other values stay NaN with a warning.

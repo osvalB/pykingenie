@@ -25,6 +25,7 @@ __all__ = [
     "data_rows",
     "detect_decimal",
     "find_header",
+    "is_per_curve",
     "parse_trace",
     "text_lines",
     "values_per_curve",
@@ -140,6 +141,27 @@ def data_rows(lines, start, delimiter, width):
         yield row[:width] + [""] * max(0, width - len(row))
 
 
+def is_per_curve(value):
+    """Whether a setting gives one value per curve (sequence or mapping)."""
+    return isinstance(value, (dict, list, tuple, np.ndarray, pd.Series))
+
+
+def _seconds_per_curve(value, names, label):
+    if is_per_curve(value):
+        if isinstance(value, pd.Series):
+            value = value.to_dict()
+        value = values_per_curve(value, names, label)
+    else:
+        value = [value] * len(names)
+    try:
+        seconds = np.asarray(value, dtype=float)
+    except (TypeError, ValueError) as error:
+        raise ValueError(f"{label} must be numbers of seconds.") from error
+    if seconds.ndim != 1:
+        raise ValueError(f"{label} must contain one number per curve.")
+    return seconds
+
+
 def values_per_curve(value, names, label):
     if isinstance(value, dict):
         if set(value) != set(names):
@@ -151,6 +173,20 @@ def values_per_curve(value, names, label):
     if len(values) != len(names):
         raise ValueError(f"Expected {len(names)} {label} values, got {len(values)}.")
     return values
+
+
+def _check_boundaries(starts, ends, names):
+    for start, end, name in zip(starts, ends, names):
+        if not np.isfinite([start, end]).all() or end <= start:
+            where = f" (curve {name!r})" if name is not None else ""
+            raise ValueError(
+                "Association boundaries must be finite, with end greater than "
+                f"start{where}."
+            )
+
+
+def _shared(seconds):
+    return float(seconds[0]) if np.all(seconds == seconds[0]) else None
 
 
 class SensorgramTextExperiment(SurfaceBasedExperiment):
@@ -229,13 +265,14 @@ class SensorgramTextExperiment(SurfaceBasedExperiment):
             raise ValueError(
                 "Unsupported concentration unit; use M, mM, uM, µM, nM or pM."
             )
-        start, end = float(association_start), float(association_end)
-        if not np.isfinite([start, end]).all() or end <= start:
-            raise ValueError(
-                "Association boundaries must be finite, with end greater than start."
-            )
+        if not is_per_curve(association_start) and not is_per_curve(association_end):
+            # Check one shared timing before reading the file.
+            _check_boundaries([float(association_start)], [float(association_end)], [None])
         traces, decimal = reader(file, decimal, encoding)
         names = [trace.name for trace in traces]
+        starts = _seconds_per_curve(association_start, names, "association_start")
+        ends = _seconds_per_curve(association_end, names, "association_end")
+        _check_boundaries(starts, ends, names)
         samples = values_per_curve(sample_id, names, "sample_id")
         if any(not isinstance(sample, str) or not sample.strip() for sample in samples):
             raise ValueError("sample_id values must be non-empty strings.")
@@ -286,7 +323,7 @@ class SensorgramTextExperiment(SurfaceBasedExperiment):
         ):
             raise ValueError("Provided concentrations must be finite and non-negative.")
         xs, ys = [], []
-        for trace in traces:
+        for trace, start, end in zip(traces, starts, ends):
             time = trace.time * _TIME_UNITS[time_unit]
             masks = (time < start, (time >= start) & (time < end), time >= end)
             if any(mask.sum() < 2 for mask in masks[1:]):
@@ -304,13 +341,14 @@ class SensorgramTextExperiment(SurfaceBasedExperiment):
                 "#Step": [1, 2, 3],
                 "Name": ["Baseline", "Association", "Dissociation"],
                 "Type": ["BASELINE", "ASSOC", "DISASSOC"],
+                # With per-curve timing, each step starts at its earliest curve.
                 "Start": [
                     min(
-                        start,
+                        starts.min(),
                         *(trace.time[0] * _TIME_UNITS[time_unit] for trace in traces),
                     ),
-                    start,
-                    end,
+                    starts.min(),
+                    ends.min(),
                 ],
                 "Column_location": ["0", "1", "1"],
                 "Loading_location": [np.nan, "0", np.nan],
@@ -342,11 +380,15 @@ class SensorgramTextExperiment(SurfaceBasedExperiment):
             "format": self.type,
             "time_unit_in_file": time_unit,
             "decimal_in_file": decimal,
-            "association_start_seconds": start,
-            "association_end_seconds": end,
+            # None when the curves have different timing; see the _by_curve keys.
+            "association_start_seconds": _shared(starts),
+            "association_end_seconds": _shared(ends),
             "concentration_unit_in_file": concentration_unit,
             "curve_labels": names.copy(),
         }
+        if _shared(starts) is None or _shared(ends) is None:
+            self.exp_info["association_start_seconds_by_curve"] = dict(zip(names, starts.tolist()))
+            self.exp_info["association_end_seconds_by_curve"] = dict(zip(names, ends.tolist()))
         if info_record is not None:
             self.exp_info["info_sheet"] = dict(info_record)
         self.fns = [str(file)]

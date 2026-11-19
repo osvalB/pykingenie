@@ -142,7 +142,9 @@ carterra.read_csv(
 
 Supply the actual injection boundaries for your experiment: association is
 `[association_start, association_end)`, and dissociation starts at
-`association_end`. By default, these readers represent one association/
+`association_end`. For `SprTextExperiment`, each boundary can also be a list or
+curve-label mapping with one value per curve, when injections start at different
+times on the exported time axis; Carterra imports use one timing for all rows. By default, these readers represent one association/
 dissociation pair per curve. For Carterra rows representing consecutive
 injections on one physical sensor, pass `single_cycle=True` and an explicit
 `cycle_duration` in seconds. The importer translates row clocks into one

@@ -43,6 +43,7 @@ from .utils.sensorgram_text import (
     data_rows,
     detect_decimal,
     find_header,
+    is_per_curve,
     parse_trace,
     text_lines,
 )
@@ -163,6 +164,11 @@ class CarterraExperiment(SensorgramTextExperiment):
             raise ValueError("single_cycle must be a boolean.")
         if not single_cycle and cycle_duration is not None:
             raise ValueError("cycle_duration requires single_cycle=True.")
+        if is_per_curve(association_start) or is_per_curve(association_end):
+            raise ValueError(
+                "Carterra imports use one association_start and association_end "
+                "for every row."
+            )
         dilution = _dilution(top_concentration, dilution_factor, highest_last,
                              concentrations)
         settings, sheet = self._settings(
