@@ -1,4 +1,34 @@
-"""Import Carterra row-oriented CSV exports: ``Label, X1, Y1, X2, Y2, ...``."""
+"""Import Carterra row-oriented CSV exports: ``Label, X1, Y1, X2, Y2, ...``.
+
+What the file provides
+----------------------
+- One sensorgram per row: a ``Label`` and its time/response pairs, each row on
+  its own time grid. Rows marked ``NotFitted`` are still imported.
+- The row label (for example ``[Ligand 1-CH31 Conc. 13] [Fitted]``). The
+  ``Conc. N`` in it is an index, not a molar concentration.
+
+What the file does not provide
+------------------------------
+- When each injection starts and ends, or the time between injections.
+- Analyte concentrations: every concentration is ``NaN`` unless supplied.
+- Which spot/ROI the rows come from, beyond what the label says.
+- Native Carterra ``.xlsx`` files are not read: save the worksheet as CSV first.
+
+What the user must provide
+--------------------------
+- To import: ``association_end`` and, if not 0 s, ``association_start``, in
+  seconds on each row's time axis. The same boundaries apply to every row.
+  Also ``decimal=","`` for decimal-comma files and ``time_unit="min"`` if time
+  is in minutes.
+- To fit: one concentration per row (``concentrations``, in µM unless
+  ``concentration_unit`` is given), and ``sample_id`` to group rows of the
+  same analyte (by default all rows form one group).
+- For a single-cycle (titration) series on one sensor: ``single_cycle=True``,
+  ``cycle_duration`` (seconds from one injection to the next, used to rebuild
+  the run clock), rows in acquisition order, one ``sample_id`` and a
+  concentration for every row. Different sensors need separate imports.
+- Alignment is not done on import; call ``align_association`` before fitting.
+"""
 
 import numpy as np
 import pandas as pd

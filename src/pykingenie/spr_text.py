@@ -1,4 +1,34 @@
-"""Import paired-column SPR text exports (one ``_X``/``_Y`` pair per curve)."""
+"""Import paired-column SPR text exports (one ``_X``/``_Y`` pair per curve).
+
+What the file provides
+----------------------
+- One sensorgram per ``<label>_X`` / ``<label>_Y`` column pair: time and
+  response, each curve on its own time grid. Columns of fitted curves are ignored.
+- The curve label from the header (for example ``Cycle=1_Fc=4-3`` or
+  ``Run 1; Ch 1; Cy 14; conc=15``). It becomes the sensor name.
+- A concentration only when the label ends in ``conc=<value><unit>`` with a
+  molar unit (M, mM, uM, nM, pM). Other labels give ``NaN`` and a warning.
+
+What the file does not provide
+------------------------------
+- When each injection starts and ends.
+- Concentrations, in most exports.
+- Which curves belong to the same analyte, and which flow cell is the reference.
+- Plate positions, ligand loading or regeneration steps.
+
+What the user must provide
+--------------------------
+- To import: ``association_end`` and, if not 0 s, ``association_start``, in
+  seconds on the exported time axis. The same boundaries apply to every curve
+  in the file, so curves with different timing need separate imports. Also
+  ``decimal=","`` for decimal-comma files and ``time_unit="min"`` if time is
+  in minutes.
+- To fit: one concentration per curve (``concentrations``, in µM unless
+  ``concentration_unit`` is given), and ``sample_id`` to group curves of the
+  same analyte (by default all curves form one group). Reference subtraction
+  and alignment are not done on import; use ``subtraction`` and
+  ``align_association`` on the experiment.
+"""
 
 import re
 
