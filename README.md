@@ -186,14 +186,13 @@ one-site fitter and compare its output with the authors' reference reports:
 The [teaching-data sources](notebooks/data/spr_exports/SOURCES.md) record curve
 selection, full-resolution point counts, licenses, and explicit missing-pair
 handling. The small files in `test_files/spr_exports/` remain parser regression
-fixtures. The Cycle/Fc example displays full binning cycles plus a display zoom;
-it does not represent a single association/dissociation experiment.
+fixtures. The Cycle/Fc example displays full binning cycles; it does not
+represent a single association/dissociation experiment.
 
-These curve exports have no plate-well coordinates. The notebooks display the
-available curve labels and draw a plate layout only if plate metadata exists.
-The Duke examples use their original companion sample sheets for concentrations
-and phase timing. Each calls `align_association(inplace=True, npoints=10)` on
-a copy before fitting and keeps the raw import plot.
+These curve exports have no plate-well coordinates, so the notebooks do not draw
+a plate layout. The Duke examples use their original companion sample sheets for
+concentrations and phase timing. Each plots the raw import with `plot_traces_all`,
+then calls `align_association(npoints=10)` and fits through `KineticsAnalyzer`.
 The rstoolbox and binning notebooks demonstrate import only. See
 [SPR fits with published comparisons](notebooks/SPR_FITTING.md) for the API calls,
 source reports and remaining differences in fitting setup. Both Duke examples

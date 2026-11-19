@@ -4,32 +4,29 @@ The Duke T200 and Carterra notebooks call pyKinGenie's standard one-site fitter
 and show its actual output beside the published values. There is no separate
 notebook fitting implementation, optimizer or forward model.
 
-The fitting sequence in the two five-curve literature comparisons is:
+The fitting sequence in the two five-curve literature comparisons uses only
+`KineticsAnalyzer` methods:
 
 ```python
-fit_experiment = deepcopy(experiment)
-fit_experiment.align_association(inplace=True, npoints=10)
+experiment.align_association(npoints=10)
 
-fit_analyzer = KineticsAnalyzer()
-fit_analyzer.add_experiment(fit_experiment, fit_experiment.name)
-fit_analyzer.merge_ligand_conc_df()
-selected_curves = fit_analyzer.combined_ligand_conc_df.copy()
-if fit_experiment.exp_info.get("single_cycle"):
-    selected_curves["Select"] = selected_curves["Analyte_location"].astype(int).isin(
-        fit_metadata["source_concentration_entries_one_based"]
-    )
-fit_analyzer.generate_fittings(selected_curves, trim_time=0)
-fit_analyzer.submit_steady_state_fitting()
-fitter = next(iter(fit_analyzer.fittings.values()))
-fitter.fit_one_site_assoc_and_disso(shared_smax=False, calc_loo=False)
+pyKinetics.merge_ligand_conc_df()
+curves = pyKinetics.combined_ligand_conc_df
+# Carterra only: fit the five published injections of the single-cycle sequence.
+curves["Select"] = curves["Analyte_location"].astype(int).isin(
+    metadata["source_concentration_entries_one_based"])
+
+pyKinetics.generate_fittings(curves, trim_time=0)
+pyKinetics.submit_steady_state_fitting()
+pyKinetics.submit_kinetics_fitting(fitting_model="one_to_one", shared_smax=False)
+pyKinetics.get_fitting_results()
 ```
 
 `submit_steady_state_fitting` supplies the initialization required by the library.
-Only the final kinetic one-site fit is shown. Local Smax, Kd and koff come from
-`fitter.fit_params_kinetics`; the literature comparison uses `fitter.Kd` and
-`fitter.k_off`. The comparison table only converts units, derives kon = koff/Kd,
-and calculates percentage differences. The fitted plot uses the existing
-`pykingenie.plot_association_dissociation` function.
+Local Smax, Kd and koff are shown from `pyKinetics.fit_params_kinetics_all`; the
+literature comparison uses the fitter's `Kd` and `k_off`. The comparison table only
+converts units, derives kon = koff/Kd, and calculates percentage differences. The
+raw and fitted plots use `plot_traces_all` and `plot_association_dissociation`.
 
 ## Results and comparison scope
 
@@ -69,11 +66,10 @@ one-time baseline alignment and reconstructed clock, and selects all 13
 injections from 0.244 to 1000 nM. It calls the existing fitter with:
 
 ```python
-selected_curves["Select"] = True
-fit_analyzer.generate_fittings(selected_curves, trim_time=0)
-fit_analyzer.submit_steady_state_fitting()
-fitter = next(iter(fit_analyzer.fittings.values()))
-fitter.fit_one_site_assoc_and_disso(shared_smax=True, calc_loo=True)
+pyKinetics.generate_fittings(pyKinetics.combined_ligand_conc_df, trim_time=0)
+pyKinetics.submit_steady_state_fitting()
+pyKinetics.submit_kinetics_fitting(fitting_model="one_to_one", shared_smax=True)
+pyKinetics.calculate_leave_one_out_errors()
 ```
 
 The global-Smax fit has three parameters and gives approximately Kd 22.36 nM,
@@ -86,9 +82,8 @@ absolute clock limit interpretation of its kinetic constants.
 The native leave-one-out method omits each injection's association and
 dissociation observations and refits the remaining 12 with a shared Smax.
 It retains Kd and koff estimates, their means and their population SDs
-(`ddof=0`). The notebook shows the native result table, every omitted injection,
-and unit-converted summaries with derived kon. All 13 refits succeed; their
-Kd mean is 23.59 nM with SD 2.62 nM. Smax estimates from individual deletion
+(`ddof=0`). The notebook shows the native `df_fit_loo` table. All 13 refits
+succeed; their Kd mean is 23.6 nM with SD 2.62 nM. Smax estimates from individual deletion
 refits are not retained by the native method.
 
 Deleting an injection creates a gap in the single-cycle history. The fitter
