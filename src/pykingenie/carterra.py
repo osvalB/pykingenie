@@ -22,8 +22,8 @@ below.
 
 - To import: ``association_end`` and, if not 0 s, ``association_start``, in
   seconds on each row's time axis. The same boundaries apply to every row.
-  Also ``decimal=","`` for decimal-comma files and ``time_unit="min"`` if time
-  is in minutes.
+  Also ``time_unit="min"`` if time is in minutes. The decimal mark (``.`` or
+  ``,``) is detected; pass ``decimal`` only if the file uses both.
 - To fit: one concentration per row (``concentrations``, in µM unless
   ``concentration_unit`` is given), or for a dilution series just
   ``top_concentration`` and ``dilution_factor``; and ``sample_id`` to group
@@ -41,6 +41,7 @@ import pandas as pd
 from .utils.sensorgram_text import (
     SensorgramTextExperiment,
     data_rows,
+    detect_decimal,
     find_header,
     parse_trace,
     text_lines,
@@ -59,17 +60,19 @@ def _carterra_rows(file, decimal, encoding):
     ]
     if header != expected:
         raise ValueError("Carterra headers must be Label, X1, Y1, X2, Y2, ... .")
+    rows = list(data_rows(lines, start + 1, delimiter, len(header)))
+    if not rows:
+        raise ValueError("The export contains no measured sensorgrams.")
+    decimal = detect_decimal((cell for row in rows for cell in row[1:]), decimal)
     traces = []
     names = set()
-    for row in data_rows(lines, start + 1, delimiter, len(header)):
+    for row in rows:
         name = row[0].strip()
         if not name or name in names:
             raise ValueError("Carterra curve labels must be non-empty and unique.")
         names.add(name)
         traces.append(parse_trace(name, zip(row[1::2], row[2::2]), decimal))
-    if not traces:
-        raise ValueError("The export contains no measured sensorgrams.")
-    return traces
+    return traces, decimal
 
 
 def _dilution(top_concentration, dilution_factor, highest_last, concentrations):
@@ -113,7 +116,7 @@ class CarterraExperiment(SensorgramTextExperiment):
         concentration_unit=None,
         time_unit="s",
         sample_id=None,
-        decimal=".",
+        decimal=None,
         encoding="utf-8-sig",
         single_cycle=False,
         cycle_duration=None,

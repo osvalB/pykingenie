@@ -23,6 +23,7 @@ __all__ = [
     "SensorgramTextExperiment",
     "Trace",
     "data_rows",
+    "detect_decimal",
     "find_header",
     "parse_trace",
     "text_lines",
@@ -56,6 +57,34 @@ def text_lines(file, encoding):
     opener = gzip.open if str(file).lower().endswith(".gz") else open
     with opener(file, "rt", encoding=encoding, newline="") as stream:
         return stream.read().splitlines()
+
+
+_DECIMAL_POINT = re.compile(r"^[+-]?(?:\d+\.\d*|\.\d+)(?:[eE][+-]?\d+)?$")
+_DECIMAL_COMMA = re.compile(r"^[+-]?(?:\d+,\d*|,\d+)(?:[eE][+-]?\d+)?$")
+
+
+def detect_decimal(cells, decimal=None):
+    """Return the decimal mark of the measurements, or check the one given.
+
+    ``decimal=None`` detects it from the cells: ``','`` when numbers such as
+    ``1,5`` occur, otherwise ``'.'``. Integers do not decide either way. Cells
+    using both marks are ambiguous and raise an error.
+    """
+    if decimal is not None:
+        if decimal not in (".", ","):
+            raise ValueError("decimal must be '.', ',' or None to detect it.")
+        return decimal
+    point = comma = False
+    for cell in cells:
+        cell = cell.strip()
+        point = point or bool(_DECIMAL_POINT.match(cell))
+        comma = comma or bool(_DECIMAL_COMMA.match(cell))
+        if point and comma:
+            raise ValueError(
+                "The measurements use both '.' and ',' as decimal marks; "
+                "pass decimal='.' or decimal=','."
+            )
+    return "," if comma else "."
 
 
 def _number(value, decimal, name):
@@ -191,8 +220,6 @@ class SensorgramTextExperiment(SurfaceBasedExperiment):
         info_record=None,
         dilution=None,
     ):
-        if decimal not in (".", ","):
-            raise ValueError("decimal must be '.' or ','.")
         if time_unit not in _TIME_UNITS:
             raise ValueError("time_unit must be 's' or 'min'.")
         if (
@@ -207,7 +234,7 @@ class SensorgramTextExperiment(SurfaceBasedExperiment):
             raise ValueError(
                 "Association boundaries must be finite, with end greater than start."
             )
-        traces = reader(file, decimal, encoding)
+        traces, decimal = reader(file, decimal, encoding)
         names = [trace.name for trace in traces]
         samples = values_per_curve(sample_id, names, "sample_id")
         if any(not isinstance(sample, str) or not sample.strip() for sample in samples):
@@ -314,6 +341,7 @@ class SensorgramTextExperiment(SurfaceBasedExperiment):
         self.exp_info = {
             "format": self.type,
             "time_unit_in_file": time_unit,
+            "decimal_in_file": decimal,
             "association_start_seconds": start,
             "association_end_seconds": end,
             "concentration_unit_in_file": concentration_unit,

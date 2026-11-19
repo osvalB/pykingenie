@@ -106,17 +106,18 @@ the same table saved with semicolons instead of commas.
 
 Standard CSV quotes preserve delimiters inside names and values. Spaces after
 separators are accepted, including before quoted fields. This changes field
-separation only: decimal marks are separate. For decimal-comma SPR exports,
-continue to pass `decimal=","` to `SprTextExperiment.read_file` or
-`CarterraExperiment.read_csv` and quote numeric values if the delimiter is also
-a comma. The other readers continue to expect decimal points.
+separation only: decimal marks are separate. `SprTextExperiment.read_file` and
+`CarterraExperiment.read_csv` also detect decimal commas from the measurements;
+pass `decimal="."` or `decimal=","` only for a file that uses both. In a
+comma-separated file, decimal-comma values must be quoted. The other readers
+continue to expect decimal points.
 
 ## SPR sensorgram text exports
 
 `SprTextExperiment` reads text/CSV/TSV files with one named `_X` time column
 and `_Y` response column per curve. Verified examples include Biacore T200
 `Cycle=..._Fc=...` and `Cycle: ...` headers, and rstoolbox's `Run/Ch/Cy/conc`
-export. Delimiters are detected; decimal commas and gzip files are supported.
+export. Delimiters and decimal commas are detected; gzip files are supported.
 
 ```python
 from pykingenie import SprTextExperiment, CarterraExperiment
@@ -128,7 +129,6 @@ spr.read_file(
     association_end=120,
     concentrations=[25, 50],   # one concentration per measured curve, in file order
     concentration_unit="nM",
-    decimal=",",              # use "." for dot-decimal exports
 )
 
 carterra = CarterraExperiment("lsa")

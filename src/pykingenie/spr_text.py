@@ -25,8 +25,8 @@ can supply the timing, concentrations and ``sample_id`` below.
 - To import: ``association_end`` and, if not 0 s, ``association_start``, in
   seconds on the exported time axis. The same boundaries apply to every curve
   in the file, so curves with different timing need separate imports. Also
-  ``decimal=","`` for decimal-comma files and ``time_unit="min"`` if time is
-  in minutes.
+  ``time_unit="min"`` if time is in minutes. The decimal mark (``.`` or ``,``)
+  is detected; pass ``decimal`` only if the file uses both.
 - To fit: one concentration per curve (``concentrations``, in µM unless
   ``concentration_unit`` is given), and ``sample_id`` to group curves of the
   same analyte (by default all curves form one group). Reference subtraction
@@ -39,6 +39,7 @@ import re
 from .utils.sensorgram_text import (
     SensorgramTextExperiment,
     data_rows,
+    detect_decimal,
     find_header,
     parse_trace,
     text_lines,
@@ -73,10 +74,13 @@ def _paired_columns(file, decimal, encoding):
             "Each measured curve must have exactly one X and one Y column."
         )
     rows = list(data_rows(lines, start + 1, delimiter, len(header)))
-    return [
+    columns = [index for axes in pairs.values() for index in axes.values()]
+    decimal = detect_decimal((row[i] for row in rows for i in columns), decimal)
+    traces = [
         parse_trace(name, [(row[axes["X"]], row[axes["Y"]]) for row in rows], decimal)
         for name, axes in pairs.items()
     ]
+    return traces, decimal
 
 
 class SprTextExperiment(SensorgramTextExperiment):
@@ -99,7 +103,7 @@ class SprTextExperiment(SensorgramTextExperiment):
         concentration_unit=None,
         time_unit="s",
         sample_id=None,
-        decimal=".",
+        decimal=None,
         encoding="utf-8-sig",
         info=None,
     ):
@@ -113,9 +117,11 @@ class SprTextExperiment(SensorgramTextExperiment):
         are allowed. Concentrations are a list or curve-name mapping, in µM
         unless concentration_unit is supplied. Without concentrations, only
         conc= labels are used, with their own molar unit or, if they have
-        none, concentration_unit; other values stay NaN with a warning. sample_id accepts a common string or one value per
-        curve (list or mapping), to distinguish different binding interactions.
-        time_unit describes the file ('s' or 'min'); decimal is '.' or ','.
+        none, concentration_unit; other values stay NaN with a warning.
+        sample_id accepts a common string or one value per curve (list or
+        mapping), to distinguish different binding interactions. time_unit
+        describes the file ('s' or 'min'). decimal is detected from the
+        measurements ('.' or ','); pass decimal='.' or ',' to set it.
         encoding can be changed for older instrument exports. No times, units
         or concentrations are inferred from signal shape or curve position.
 
