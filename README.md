@@ -274,14 +274,39 @@ metadata preambles, BOMs, Windows-1252 text, gzip, and comma/tab/semicolon
 delimiters. Native Biacore and Gator archives are checked for their internal
 structure. Renaming a file does not change its content-based identifier.
 Detection identifies the layout; the reader still validates the measurements
-and requires its normal arguments, including decimal conventions, injection
-boundaries, concentrations and companion files where applicable.
+and requires its normal arguments, such as injection boundaries,
+concentrations and companion files where applicable.
 
 Ambiguous or unsupported inputs return `unknown`, including generic two-column
 `Time,Signal` data and native XLSX files. Choose the reader explicitly for such
 inputs. Missing/inaccessible files raise the normal filesystem error.
 `guess_experiment_type` remains the compatible surface/solution helper, with its
 historical `surface` fallback; use `detect_file_format` for reader selection.
+
+### Loading files without choosing the reader
+
+`KineticsAnalyzer.load` runs `detect_file_format`, calls the reader from the
+table above and adds the experiment to the analyzer:
+
+```python
+from pathlib import Path
+from pykingenie import KineticsAnalyzer
+
+pyKinetics = KineticsAnalyzer()
+octet = pyKinetics.load(sorted(Path("octet_run").glob("*.frd")) + ["octet_run/ExpMethod.fmf"])
+blr = pyKinetics.load("run.blr")
+spr = pyKinetics.load("sensorgrams.txt", association_end=180, concentrations=[0.1, 0.2])
+```
+
+The files must form one experiment of one format: all `.frd` files of an Octet
+run (with optional `.fmf` plate files), a Gator zip or its `.ini` files and
+sensor CSVs, a steps file plus a traces file, or one file of the other formats.
+Keyword options go to the reader; only the SPR text, Carterra and steps/traces
+readers take them. The experiment is named after the Octet run or the file
+(numbered if the name is already used), unless `name=` is given. Unknown or
+mixed files raise an error listing the format detected for each file; load
+those with their experiment class. A Gator zip is extracted next to itself, as
+`GatorExperiment.read_all_gator_data` does.
 
 ## Keeping results when changing models
 

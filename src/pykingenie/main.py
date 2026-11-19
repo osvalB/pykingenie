@@ -76,6 +76,39 @@ class KineticsAnalyzer:
 
         return None
 
+    def load(self, files, name=None, **options):
+        """
+        Read input files with the reader their format needs and add the experiment.
+
+        The format of each file is found with ``detect_file_format``; the files
+        must form one experiment of one format (for example all the ``.frd``
+        files of an Octet run, or one SPR export). Keyword options go to that
+        reader, such as ``association_end``, ``concentrations`` or ``info`` for
+        SPR text and Carterra exports.
+
+        Parameters
+        ----------
+        files : str, path-like or list
+            Path or paths of one experiment.
+        name : str, optional
+            Experiment name. By default the Octet run name or the file name,
+            numbered if another experiment already uses it. An explicit name
+            replaces an experiment of the same name, as ``add_experiment`` does.
+        **options
+            Passed to the reader (``SprTextExperiment.read_file``,
+            ``CarterraExperiment.read_csv`` or ``SurfaceCsvExperiment.read_files``).
+
+        Returns
+        -------
+        object
+            The experiment that was read and added.
+        """
+        from .loader import load_experiment
+
+        experiment = load_experiment(files, name, taken=self.experiment_names, **options)
+        self.add_experiment(experiment, experiment.name)
+        return experiment
+
     def collapse_solution_experiments(self,new_name='Experiment'):
 
         """

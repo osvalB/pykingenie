@@ -81,6 +81,14 @@ pykingenie.kingenie\_surface module
    :show-inheritance:
    :undoc-members:
 
+pykingenie.loader module
+------------------------
+
+.. automodule:: pykingenie.loader
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 pykingenie.main module
 ----------------------
 
