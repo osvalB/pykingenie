@@ -212,6 +212,28 @@ clock has not been verified. Leave-one-out SD describes the spread of deletion
 estimates, rather than a confidence interval. After a deletion creates a gap,
 the fitter estimates the next association's initial response from its observations.
 
+### Settings from a TitrationAnalysis Data Info Sheet
+
+These exports lack injection timing and molar concentrations. If you have the
+TitrationAnalysis *Data Info Sheet* for the run (`.xlsx`, CSV or TSV), pass it as
+`info=` and both readers take the association window, concentrations, analyte
+(`sample_id`) and, for Carterra single-cycle imports, the cycle period from it:
+
+```python
+from pykingenie import CarterraExperiment, read_info_sheet
+
+carterra = CarterraExperiment("lsa")
+carterra.read_csv("sensorgrams.csv", info="Data Info Sheet.xlsx", single_cycle=True)
+```
+
+`association_start` is `Bsl Start` + `Baseline`, `association_end` adds
+`Association`, and `cycle_duration` is `Baseline` + `Association` + `Dissociation`.
+Concentrations missing from the sheet's `Incl. Conc.` start unselected in the
+`Select` column used for fitting. Arguments you pass explicitly take precedence.
+If the sheet's included rows differ, pass one row: `info=read_info_sheet(path).iloc[0]`.
+The full row is kept in `exp_info["info_sheet"]`, including the skip times to use
+as `trim_time`.
+
 ## Detecting input formats
 
 `detect_file_format` inspects file contents to select an input reader. All three

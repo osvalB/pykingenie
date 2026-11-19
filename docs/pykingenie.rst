@@ -129,6 +129,14 @@ pykingenie.carterra module
    :show-inheritance:
    :undoc-members:
 
+pykingenie.info\_sheet module
+-----------------------------
+
+.. automodule:: pykingenie.info_sheet
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 pykingenie.surface\_exp module
 ------------------------------
 

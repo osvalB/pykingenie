@@ -11,6 +11,7 @@ from .surface_csv       import SurfaceCsvExperiment
 from .biacore           import BiacoreExperiment
 from .spr_text          import SprTextExperiment
 from .carterra          import CarterraExperiment
+from .info_sheet        import read_info_sheet
 from .file_detection    import detect_file_format
 
 from .utils.processing import (

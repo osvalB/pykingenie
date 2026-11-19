@@ -1,7 +1,8 @@
 """Shared parsing for sensorgram text exports (paired-column SPR and Carterra).
 
 These exports contain sensorgrams, rather than a complete instrument run log.
-Injection boundaries must be supplied by the caller. Responses and individual
+Injection boundaries must be supplied by the caller, directly or through a
+TitrationAnalysis Data Info Sheet (``info=``). Responses and individual
 time grids are retained without interpolation or subtraction.
 """
 
@@ -14,6 +15,7 @@ import warnings
 import numpy as np
 import pandas as pd
 
+from ..info_sheet import info_settings
 from ..surface_exp import SurfaceBasedExperiment
 from .text_io import DELIMITERS
 
@@ -130,6 +132,44 @@ class SensorgramTextExperiment(SurfaceBasedExperiment):
     caller-supplied boundaries; responses and time grids are kept unchanged.
     """
 
+    @staticmethod
+    def _settings(
+        info,
+        *,
+        association_start,
+        association_end,
+        concentrations,
+        concentration_unit,
+        sample_id,
+    ):
+        """Combine an info sheet with explicit arguments; explicit values win."""
+        sheet = info_settings(info) if info is not None else {}
+        from_info = concentrations is None and "concentrations" in sheet
+        if from_info and concentration_unit is not None:
+            raise ValueError(
+                "concentration_unit applies only to concentrations you pass; "
+                "info-sheet concentrations are already molar."
+            )
+        settings = {
+            "association_start": association_start
+            if association_start is not None
+            else sheet.get("association_start", 0),
+            "association_end": association_end
+            if association_end is not None
+            else sheet.get("association_end"),
+            "concentrations": sheet["concentrations"] if from_info else concentrations,
+            "concentration_unit": "uM" if from_info else concentration_unit,
+            "sample_id": sample_id
+            if sample_id is not None
+            else sheet.get("sample_id", "sample"),
+            "concentrations_from_info": from_info,
+            "included": sheet.get("included_concentrations"),
+            "info_record": sheet.get("record"),
+        }
+        if settings["association_end"] is None:
+            raise ValueError("Provide association_end, or an info sheet with info=.")
+        return settings, sheet
+
     def _load(
         self,
         file,
@@ -142,6 +182,9 @@ class SensorgramTextExperiment(SurfaceBasedExperiment):
         sample_id,
         decimal,
         encoding,
+        concentrations_from_info=False,
+        included=None,
+        info_record=None,
     ):
         if decimal not in (".", ","):
             raise ValueError("decimal must be '.' or ','.")
@@ -168,6 +211,12 @@ class SensorgramTextExperiment(SurfaceBasedExperiment):
             if isinstance(concentrations, (str, bytes)):
                 raise ValueError(
                     "concentrations must be a sequence or curve-name mapping."
+                )
+            if concentrations_from_info and len(concentrations) != len(names):
+                raise ValueError(
+                    f"The info sheet lists {len(concentrations)} concentrations but "
+                    f"the file has {len(names)} curves. Pass concentrations= with "
+                    "one value per curve."
                 )
             values = values_per_curve(concentrations, names, "concentrations")
             conc = (
@@ -242,6 +291,17 @@ class SensorgramTextExperiment(SurfaceBasedExperiment):
                 "Experiment": self.name,
             }
         )
+        if included is not None:
+            # Curves outside the info sheet's "Incl. Conc." start unselected.
+            selected = [bool(np.isclose(c, included, rtol=1e-6, atol=0).any()) for c in conc]
+            if not any(selected):
+                warnings.warn(
+                    "No curve matches the info sheet's included concentrations; "
+                    "all curves are selected.",
+                    UserWarning,
+                )
+                selected = [True] * len(names)
+            self.ligand_conc_df["Select"] = selected
         self.exp_info = {
             "format": self.type,
             "time_unit_in_file": time_unit,
@@ -250,6 +310,8 @@ class SensorgramTextExperiment(SurfaceBasedExperiment):
             "concentration_unit_in_file": concentration_unit,
             "curve_labels": names.copy(),
         }
+        if info_record is not None:
+            self.exp_info["info_sheet"] = dict(info_record)
         self.fns = [str(file)]
         self.create_unique_sensor_names()
         self.traces_loaded = True

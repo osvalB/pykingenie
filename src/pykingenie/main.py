@@ -194,8 +194,12 @@ class KineticsAnalyzer:
         dfs = [exp.ligand_conc_df for exp in self.experiments.values()]
         df  = pd.concat(dfs, ignore_index=True)
 
-        # Add a 'Select' column with all values set to True
-        df['Select'] = True
+        # Select every curve, unless an import already marked some (for
+        # example from an info sheet's included concentrations).
+        if 'Select' in df.columns:
+            df['Select'] = df['Select'].astype('boolean').fillna(True).astype(bool)
+        else:
+            df['Select'] = True
 
         columns_to_convert     = ["Analyte_location", "Loading_location", "Replicate"]
         df[columns_to_convert] = df[columns_to_convert].apply(lambda col: col.astype(int))

@@ -18,6 +18,9 @@ What the file does not provide
 
 What the user must provide
 --------------------------
+A TitrationAnalysis Data Info Sheet (``info=``, see ``pykingenie.info_sheet``)
+can supply the timing, concentrations and ``sample_id`` below.
+
 - To import: ``association_end`` and, if not 0 s, ``association_start``, in
   seconds on the exported time axis. The same boundaries apply to every curve
   in the file, so curves with different timing need separate imports. Also
@@ -89,14 +92,15 @@ class SprTextExperiment(SensorgramTextExperiment):
         self,
         file,
         *,
-        association_end,
-        association_start=0,
+        association_end=None,
+        association_start=None,
         concentrations=None,
         concentration_unit=None,
         time_unit="s",
-        sample_id="sample",
+        sample_id=None,
         decimal=".",
         encoding="utf-8-sig",
+        info=None,
     ):
         """Read paired-column text/CSV/TSV, optionally gzip compressed.
 
@@ -113,16 +117,26 @@ class SprTextExperiment(SensorgramTextExperiment):
         time_unit describes the file ('s' or 'min'); decimal is '.' or ','.
         encoding can be changed for older instrument exports. No times, units
         or concentrations are inferred from signal shape or curve position.
+
+        info is a TitrationAnalysis Data Info Sheet path, or one row of
+        read_info_sheet(). It supplies the association boundaries, the molar
+        concentrations and sample_id (the analyte); arguments you pass take
+        precedence. Without info, association_start defaults to 0 s and
+        sample_id to "sample".
         """
+        settings, _ = self._settings(
+            info,
+            association_start=association_start,
+            association_end=association_end,
+            concentrations=concentrations,
+            concentration_unit=concentration_unit,
+            sample_id=sample_id,
+        )
         self._load(
             file,
             _paired_columns,
-            association_end,
-            association_start,
-            concentrations,
-            concentration_unit,
-            time_unit,
-            sample_id,
-            decimal,
-            encoding,
+            time_unit=time_unit,
+            decimal=decimal,
+            encoding=encoding,
+            **settings,
         )

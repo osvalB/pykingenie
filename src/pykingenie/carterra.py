@@ -16,6 +16,10 @@ What the file does not provide
 
 What the user must provide
 --------------------------
+A TitrationAnalysis Data Info Sheet (``info=``, see ``pykingenie.info_sheet``)
+can supply the timing, concentrations, ``sample_id`` and ``cycle_duration``
+below.
+
 - To import: ``association_end`` and, if not 0 s, ``association_start``, in
   seconds on each row's time axis. The same boundaries apply to every row.
   Also ``decimal=","`` for decimal-comma files and ``time_unit="min"`` if time
@@ -81,16 +85,17 @@ class CarterraExperiment(SensorgramTextExperiment):
         self,
         file,
         *,
-        association_end,
-        association_start=0,
+        association_end=None,
+        association_start=None,
         concentrations=None,
         concentration_unit=None,
         time_unit="s",
-        sample_id="sample",
+        sample_id=None,
         decimal=".",
         encoding="utf-8-sig",
         single_cycle=False,
         cycle_duration=None,
+        info=None,
     ):
         """Read Carterra CSV with caller-supplied phase boundaries in seconds.
 
@@ -111,23 +116,36 @@ class CarterraExperiment(SensorgramTextExperiment):
         states after the first injection and lets the existing fitter carry the
         bound state between injections. No response is shifted or interpolated
         during import. Different physical sensors need separate imports.
+
+        info is a TitrationAnalysis Data Info Sheet path, or one row of
+        read_info_sheet(). It supplies the association boundaries, the molar
+        concentrations, sample_id (the analyte) and, with single_cycle=True,
+        cycle_duration = Baseline + Association + Dissociation. Arguments you
+        pass take precedence. Without info, association_start defaults to 0 s
+        and sample_id to "sample".
         """
         if not isinstance(single_cycle, (bool, np.bool_)):
             raise ValueError("single_cycle must be a boolean.")
         if not single_cycle and cycle_duration is not None:
             raise ValueError("cycle_duration requires single_cycle=True.")
+        settings, sheet = self._settings(
+            info,
+            association_start=association_start,
+            association_end=association_end,
+            concentrations=concentrations,
+            concentration_unit=concentration_unit,
+            sample_id=sample_id,
+        )
+        if cycle_duration is None:
+            cycle_duration = sheet.get("cycle_duration")
         target = CarterraExperiment(self.name) if single_cycle else self
         target._load(
             file,
             _carterra_rows,
-            association_end,
-            association_start,
-            concentrations,
-            concentration_unit,
-            time_unit,
-            sample_id,
-            decimal,
-            encoding,
+            time_unit=time_unit,
+            decimal=decimal,
+            encoding=encoding,
+            **settings,
         )
         if single_cycle:
             target._combine_cycles(cycle_duration)
