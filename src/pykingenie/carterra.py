@@ -25,8 +25,9 @@ below.
   Also ``decimal=","`` for decimal-comma files and ``time_unit="min"`` if time
   is in minutes.
 - To fit: one concentration per row (``concentrations``, in µM unless
-  ``concentration_unit`` is given), and ``sample_id`` to group rows of the
-  same analyte (by default all rows form one group).
+  ``concentration_unit`` is given), or for a dilution series just
+  ``top_concentration`` and ``dilution_factor``; and ``sample_id`` to group
+  rows of the same analyte (by default all rows form one group).
 - For a single-cycle (titration) series on one sensor: ``single_cycle=True``,
   ``cycle_duration`` (seconds from one injection to the next, used to rebuild
   the run clock), rows in acquisition order, one ``sample_id`` and a
@@ -71,6 +72,27 @@ def _carterra_rows(file, decimal, encoding):
     return traces
 
 
+def _dilution(top_concentration, dilution_factor, highest_last, concentrations):
+    """Validate the dilution-series arguments; None when they are not used."""
+    if top_concentration is None and dilution_factor is None:
+        return None
+    if top_concentration is None or dilution_factor is None:
+        raise ValueError("A dilution series needs both top_concentration and dilution_factor.")
+    if concentrations is not None:
+        raise ValueError("Pass either concentrations or a dilution series, not both.")
+    if not isinstance(highest_last, (bool, np.bool_)):
+        raise ValueError("highest_last must be a boolean.")
+    try:
+        top, factor = float(top_concentration), float(dilution_factor)
+    except (TypeError, ValueError) as error:
+        raise ValueError("top_concentration and dilution_factor must be numbers.") from error
+    if not np.isfinite(top) or top <= 0:
+        raise ValueError("top_concentration must be positive and finite.")
+    if not np.isfinite(factor) or factor <= 1:
+        raise ValueError("dilution_factor must be greater than 1.")
+    return top, factor, bool(highest_last)
+
+
 class CarterraExperiment(SensorgramTextExperiment):
     """Carterra row-oriented CSV export: Label, X1, Y1, X2, Y2, ... .
 
@@ -96,6 +118,9 @@ class CarterraExperiment(SensorgramTextExperiment):
         single_cycle=False,
         cycle_duration=None,
         info=None,
+        top_concentration=None,
+        dilution_factor=None,
+        highest_last=True,
     ):
         """Read Carterra CSV with caller-supplied phase boundaries in seconds.
 
@@ -123,11 +148,20 @@ class CarterraExperiment(SensorgramTextExperiment):
         cycle_duration = Baseline + Association + Dissociation. Arguments you
         pass take precedence. Without info, association_start defaults to 0 s
         and sample_id to "sample".
+
+        For a dilution series, pass top_concentration (in concentration_unit,
+        µM by default) and dilution_factor instead of concentrations: row k
+        from the highest gets top_concentration / dilution_factor**k. By
+        default the highest concentration is the last row, as in a titration
+        run from low to high; set highest_last=False if it is the first row.
+        The series is assigned by row order only, not from the labels.
         """
         if not isinstance(single_cycle, (bool, np.bool_)):
             raise ValueError("single_cycle must be a boolean.")
         if not single_cycle and cycle_duration is not None:
             raise ValueError("cycle_duration requires single_cycle=True.")
+        dilution = _dilution(top_concentration, dilution_factor, highest_last,
+                             concentrations)
         settings, sheet = self._settings(
             info,
             association_start=association_start,
@@ -135,6 +169,7 @@ class CarterraExperiment(SensorgramTextExperiment):
             concentrations=concentrations,
             concentration_unit=concentration_unit,
             sample_id=sample_id,
+            dilution=dilution,
         )
         if cycle_duration is None:
             cycle_duration = sheet.get("cycle_duration")

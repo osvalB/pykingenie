@@ -141,10 +141,13 @@ class SensorgramTextExperiment(SurfaceBasedExperiment):
         concentrations,
         concentration_unit,
         sample_id,
+        dilution=None,
     ):
         """Combine an info sheet with explicit arguments; explicit values win."""
         sheet = info_settings(info) if info is not None else {}
-        from_info = concentrations is None and "concentrations" in sheet
+        from_info = (
+            concentrations is None and dilution is None and "concentrations" in sheet
+        )
         if from_info and concentration_unit is not None:
             raise ValueError(
                 "concentration_unit applies only to concentrations you pass; "
@@ -163,6 +166,7 @@ class SensorgramTextExperiment(SurfaceBasedExperiment):
             if sample_id is not None
             else sheet.get("sample_id", "sample"),
             "concentrations_from_info": from_info,
+            "dilution": dilution,
             "included": sheet.get("included_concentrations"),
             "info_record": sheet.get("record"),
         }
@@ -185,6 +189,7 @@ class SensorgramTextExperiment(SurfaceBasedExperiment):
         concentrations_from_info=False,
         included=None,
         info_record=None,
+        dilution=None,
     ):
         if decimal not in (".", ","):
             raise ValueError("decimal must be '.' or ','.")
@@ -207,6 +212,10 @@ class SensorgramTextExperiment(SurfaceBasedExperiment):
         samples = values_per_curve(sample_id, names, "sample_id")
         if any(not isinstance(sample, str) or not sample.strip() for sample in samples):
             raise ValueError("sample_id values must be non-empty strings.")
+        if dilution is not None:
+            top, factor, highest_last = dilution
+            steps = np.arange(len(names))
+            concentrations = list(top / factor ** (steps[::-1] if highest_last else steps))
         if concentrations is not None:
             if isinstance(concentrations, (str, bytes)):
                 raise ValueError(

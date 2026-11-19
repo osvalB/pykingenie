@@ -160,6 +160,9 @@ converted; set `concentration_unit` to interpret unitless `conc=...` labels.
 Unresolved concentrations generate a warning and stay `NaN` in
 `ligand_conc_df`. Carterra `Conc. N` indices, bare numbers and mass units are
 never treated as molar concentrations. Supply these values before fitting.
+For a Carterra dilution series, `top_concentration=1, dilution_factor=2` replaces
+the list: the last row gets the top concentration and each earlier row is diluted
+once more (`highest_last=False` if the top concentration is the first row).
 The common `sample_id="sample"` groups all curves as one binding interaction;
 pass a list or curve-name mapping of sample IDs for exports containing several
 interactions. The resulting experiments use the standard `KineticsAnalyzer`
