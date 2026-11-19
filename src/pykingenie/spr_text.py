@@ -6,8 +6,9 @@ What the file provides
   response, each curve on its own time grid. Columns of fitted curves are ignored.
 - The curve label from the header (for example ``Cycle=1_Fc=4-3`` or
   ``Run 1; Ch 1; Cy 14; conc=15``). It becomes the sensor name.
-- A concentration only when the label ends in ``conc=<value><unit>`` with a
-  molar unit (M, mM, uM, nM, pM). Other labels give ``NaN`` and a warning.
+- A concentration only when the label ends in ``conc=<value>``, with a molar
+  unit (M, mM, uM, nM, pM) in the label or given as ``concentration_unit``.
+  Other labels give ``NaN`` and a warning.
 
 What the file does not provide
 ------------------------------
@@ -111,8 +112,8 @@ class SprTextExperiment(SensorgramTextExperiment):
         [start, end) and dissociation starts at end. Missing baseline points
         are allowed. Concentrations are a list or curve-name mapping, in µM
         unless concentration_unit is supplied. Without concentrations, only
-        explicit conc= labels with a known unit are used; other values stay
-        NaN with a warning. sample_id accepts a common string or one value per
+        conc= labels are used, with their own molar unit or, if they have
+        none, concentration_unit; other values stay NaN with a warning. sample_id accepts a common string or one value per
         curve (list or mapping), to distinguish different binding interactions.
         time_unit describes the file ('s' or 'min'); decimal is '.' or ','.
         encoding can be changed for older instrument exports. No times, units
