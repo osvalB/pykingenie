@@ -11,18 +11,16 @@ The fitting sequence in the two five-curve literature comparisons uses only
 experiment.align_association(npoints=10)
 
 pyKinetics.merge_ligand_conc_df()
-curves = pyKinetics.combined_ligand_conc_df
-# Carterra only: fit the five published injections of the single-cycle sequence.
-curves["Select"] = curves["Analyte_location"].astype(int).isin(
-    metadata["source_concentration_entries_one_based"])
-
-pyKinetics.generate_fittings(curves, trim_time=0)
+pyKinetics.generate_fittings(pyKinetics.combined_ligand_conc_df, trim_time=0)
 pyKinetics.submit_steady_state_fitting()
 pyKinetics.submit_kinetics_fitting(fitting_model="one_to_one", shared_smax=False)
 pyKinetics.get_fitting_results()
 ```
 
-`submit_steady_state_fitting` supplies the initialization required by the library.
+Both notebooks import with the companion Data Info Sheet (`info=`), which supplies
+the timing, molar concentrations and analyte. For Carterra, its *Incl. Conc.* column
+pre-selects the five published injections (`Select` column), so no manual selection
+is needed. `submit_steady_state_fitting` supplies the initialization required by the library.
 Local Smax, Kd and koff are shown from `pyKinetics.fit_params_kinetics_all`; the
 literature comparison uses the fitter's `Kd` and `k_off`. The comparison table only
 converts units, derives kon = koff/Kd, and calculates percentage differences. The
@@ -111,19 +109,16 @@ bulk-offset fitting is applied.
 
 ### Carterra single-cycle import
 
-The notebook imports **all 13 injections** on the physical sensor, then selects
-source concentration entries 9–13 for the five-curve published comparison:
+The notebook imports **all 13 injections** on the physical sensor. The Data Info
+Sheet supplies association 120–420 s, the 13 molar concentrations, the analyte and
+the cycle period (Baseline + Association + Dissociation = 1140 s), and selects
+concentration entries 9–13 for the five-curve published comparison:
 
 ```python
 experiment.read_csv(
     data_file,
-    association_start=120,
-    association_end=420,
-    concentrations=fit_metadata["cycle_concentrations"],
-    concentration_unit="uM",
-    sample_id=fit_metadata["analyte"],
+    info=data_folder / "metadata" / "Example Data Info Sheet - Carterra.xlsx",
     single_cycle=True,
-    cycle_duration=fit_metadata["cycle_duration_seconds"],
 )
 ```
 
