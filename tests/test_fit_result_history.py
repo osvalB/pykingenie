@@ -231,6 +231,20 @@ def test_analyzer_updates_archived_bounds_and_kobs(fitter):
     assert set(fitter.fit_results) == {ONE_SITE, 'one_site_dissociation'}
 
 
+def test_analyzer_can_skip_kobs(fitter):
+    # This test is AI generated.
+    analyzer = KineticsAnalyzer()
+    analyzer.add_fitting(fitter, 'sample')
+    good, bad = analyzer.submit_kinetics_fitting(shared_smax=True, compute_k_obs=False)
+    assert good == [fitter] and bad == []
+    assert not hasattr(fitter, 'k_obs')
+    assert 'k_obs' not in fitter.fit_results[ONE_SITE]
+    # Computed later on request, and saved with the active result
+    fitter.fit_single_exponentials()
+    assert len(fitter.k_obs) == 4
+    np.testing.assert_array_equal(fitter.fit_results[ONE_SITE]['k_obs'], fitter.k_obs)
+
+
 def test_solution_models_preserve_results_on_the_same_fitter():
     t = np.linspace(0, 50, 80)
     concentrations = [0.5, 1.0, 2.0]

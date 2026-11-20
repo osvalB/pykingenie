@@ -385,3 +385,163 @@ def test_fit_one_site_assoc_and_disso_ktr_single_cycle_recovers_parameters():
     assert np.isclose(ktr_fit, ktr_true, rtol=0.05, atol=0)
     assert np.isclose(smax_fit, smax_true, rtol=0.05, atol=0)
     assert np.allclose(np.concatenate(fitted_assoc), np.concatenate(assoc_s), rtol=1e-2, atol=0)
+
+
+def test_fit_single_exponential_fast_matches_general():
+    # This test is AI generated.
+    from pykingenie.utils.fitting_general import fit_single_exponential
+    from pykingenie.utils.fitting_surface import fit_single_exponential_fast
+
+    rng = np.random.default_rng(0)
+    t = np.linspace(5, 605, 1200)  # does not start at zero
+    for k_obs in (1e-3, 0.02, 0.5):
+        y = 0.1 + 1.5 * (1 - np.exp(-k_obs * (t - t[0]))) + rng.normal(0, 0.01, t.size)
+        expected, _, expected_y = fit_single_exponential(y, t)
+        fast, _, fast_y = fit_single_exponential_fast(y, t)
+        np.testing.assert_allclose(fast, expected, rtol=1e-6)
+        np.testing.assert_allclose(fast_y, expected_y, rtol=1e-6, atol=1e-9)
+
+
+def test_fit_single_exponential_fast_skips_rates_too_slow_to_resolve():
+    # This test is AI generated.
+    from pykingenie.utils.fitting_surface import fit_single_exponential_fast
+
+    # At k_obs = 1e-8 the exponential is constant over 100 s, so a0 and a1 cannot be
+    # told apart: those grid points are skipped and the fit uses the others.
+    t = np.linspace(0, 100, 300)
+    y = 0.2 + 1.0 * np.exp(-0.05 * t)
+    fit_params, _, fit_y = fit_single_exponential_fast(y, t, min_log_k=-8)
+    np.testing.assert_allclose(fit_params, [0.2, 1.0, 0.05], rtol=1e-6)
+    np.testing.assert_allclose(fit_y, y, atol=1e-9)
+
+
+def test_fit_single_exponential_fast_raises_without_a_time_range():
+    # This test is AI generated.
+    from pykingenie.utils.fitting_surface import fit_single_exponential_fast
+
+    with pytest.raises(RuntimeError, match='well-posed'):
+        fit_single_exponential_fast(np.ones(5), np.zeros(5))
+
+
+def _numeric_jacobian(f, params, rel_step=1e-6):
+    params = np.asarray(params, dtype=float)
+    columns = []
+    for k in range(params.size):
+        step = rel_step * max(abs(params[k]), 1e-3)
+        up, down = params.copy(), params.copy()
+        up[k] += step
+        down[k] -= step
+        columns.append((f(1, *up) - f(1, *down)) / (2 * step))
+    return np.column_stack(columns)
+
+
+def _one_site_traces(continuous):
+    # This function is AI generated.
+    from pykingenie.utils.signal_surface import (
+        one_site_association_analytical, one_site_dissociation_analytical)
+    concs = [0.05, 0.2, 0.8]
+    assoc_t, assoc_y, disso_t, disso_y = [], [], [], []
+    start = 0.0
+    for c in concs:
+        ta = start + np.linspace(0, 200, 120)
+        td = ta[-1] + np.linspace(1, 300, 150)
+        ya = one_site_association_analytical(ta - ta[0], 0, 2.0, 0.01, 0.1, c)
+        yd = one_site_dissociation_analytical(td - td[0], ya[-1], 0.01)
+        assoc_t.append(ta); assoc_y.append(ya); disso_t.append(td); disso_y.append(yd)
+        # Non-continuous runs leave a gap before the next association
+        start = td[-1] + (1 if continuous else 50)
+    return assoc_y, assoc_t, concs, disso_y, disso_t
+
+
+@pytest.mark.parametrize('continuous', [True, False])
+@pytest.mark.parametrize('shared_smax', [True, False])
+@pytest.mark.parametrize('fixed_t0', [True, False])
+@pytest.mark.parametrize('fixed', [None, 'Kd', 'koff'])
+def test_one_site_assoc_and_disso_analytic_jacobian(monkeypatch, continuous, shared_smax,
+                                                    fixed_t0, fixed):
+    # This test is AI generated.
+    import pykingenie.utils.fitting_surface as fs
+
+    captured = {}
+    real = fs.curve_fit_log_scale
+
+    def capture(f, x, y, p0, bounds, jac=None, **kwargs):
+        captured['f'], captured['jac'] = f, jac
+        return real(f, x, y, p0=p0, bounds=bounds, jac=jac, **kwargs)
+
+    monkeypatch.setattr(fs, 'curve_fit_log_scale', capture)
+
+    assoc_y, assoc_t, concs, disso_y, disso_t = _one_site_traces(continuous)
+    smax_idx = [0, 0, 0]
+    n_smax = 1 if shared_smax else 3
+    p = ([] if fixed == 'Kd' else [0.12]) + ([] if fixed == 'koff' else [0.012])
+    p += [] if fixed_t0 else [0.5]
+    p += [1.8 + 0.1 * k for k in range(n_smax)]
+    low = [x / 10 if x > 0 else -5 for x in p]
+    high = [x * 10 for x in p]
+
+    fs.fit_one_site_assoc_and_disso(
+        assoc_y, assoc_t, concs, disso_y, disso_t, p, low, high,
+        smax_idx=smax_idx, shared_smax=shared_smax, fixed_t0=fixed_t0,
+        fixed_Kd=fixed == 'Kd', Kd_value=0.1,
+        fixed_koff=fixed == 'koff', koff_value=0.01)
+
+    analytic = captured['jac'](1, *p)
+    numeric = _numeric_jacobian(captured['f'], p)
+    np.testing.assert_allclose(analytic, numeric, rtol=1e-5, atol=1e-7)
+
+
+@pytest.mark.parametrize('fixed_t0', [True, False])
+@pytest.mark.parametrize('fixed_koff', [True, False])
+def test_one_site_dissociation_analytic_jacobian(monkeypatch, fixed_t0, fixed_koff):
+    # This test is AI generated.
+    import pykingenie.utils.fitting_surface as fs
+
+    captured = {}
+    real = fs.curve_fit
+
+    def capture(f, x, y, p0, bounds, jac=None, **kwargs):
+        captured['f'], captured['jac'] = f, jac
+        return real(f, x, y, p0=p0, bounds=bounds, jac=jac, **kwargs)
+
+    monkeypatch.setattr(fs, 'curve_fit', capture)
+
+    _, _, _, disso_y, disso_t = _one_site_traces(True)
+    p = ([] if fixed_koff else [0.012]) + ([] if fixed_t0 else [0.5]) + [1.0, 1.5, 1.9]
+    low = [x / 10 for x in p]
+    high = [x * 10 for x in p]
+
+    fs.fit_one_site_dissociation(disso_y, disso_t, p, low, high,
+                                 fixed_t0=fixed_t0, fixed_koff=fixed_koff, koff_value=0.01)
+
+    analytic = captured['jac'](1, *p)
+    numeric = _numeric_jacobian(captured['f'], p)
+    np.testing.assert_allclose(analytic, numeric, rtol=1e-5, atol=1e-7)
+
+
+def test_one_site_assoc_and_disso_jacobian_with_trimmed_points(monkeypatch):
+    # This test is AI generated.
+    import pykingenie.utils.fitting_surface as fs
+
+    captured = {}
+    real = fs.curve_fit_log_scale
+
+    def capture(f, x, y, p0, bounds, jac=None, **kwargs):
+        captured['f'], captured['jac'], captured['n'] = f, jac, len(y)
+        return real(f, x, y, p0=p0, bounds=bounds, jac=jac, **kwargs)
+
+    monkeypatch.setattr(fs, 'curve_fit_log_scale', capture)
+
+    assoc_y, assoc_t, concs, disso_y, disso_t = _one_site_traces(True)
+    assoc_masks = [t - t[0] >= 10 for t in assoc_t]
+    disso_masks = [t - t[0] >= 5 for t in disso_t]
+    p = [0.12, 0.012, 1.8]
+    fs.fit_one_site_assoc_and_disso(
+        assoc_y, assoc_t, concs, disso_y, disso_t, p,
+        [x / 10 for x in p], [x * 10 for x in p],
+        smax_idx=[0, 0, 0], shared_smax=True,
+        assoc_mask_lst=assoc_masks, disso_mask_lst=disso_masks)
+
+    analytic = captured['jac'](1, *p)
+    assert analytic.shape == (captured['n'], len(p))
+    np.testing.assert_allclose(analytic, _numeric_jacobian(captured['f'], p), rtol=1e-5, atol=1e-7)

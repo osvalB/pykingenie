@@ -655,7 +655,8 @@ class KineticsAnalyzer:
                                 fixed_t0=True,
                                 Kd1_values=None,
                                 Kd2_values=None,
-                                fit_signal_ratio=False):
+                                fit_signal_ratio=False,
+                                compute_k_obs=True):
         """
         Fit models to surface-based kinetics data.
 
@@ -684,6 +685,13 @@ class KineticsAnalyzer:
             different signal than the intermediate complex (ALint) by fitting their
             ratio. A is the analyte and L the immobilised ligand. Ignored by
             the other models. Default is False.
+        compute_k_obs : bool, optional
+            For the one_to_one model fitted to the association, or to the
+            association and dissociation, also fit a single exponential to each
+            association trace and store the observed rates in ``k_obs``. The
+            kinetic fit does not use them, so False makes the fit faster. They can
+            still be computed later with ``fit_single_exponentials()``. Ignored by
+            the other models. Default is True.
 
         Returns
         -------
@@ -706,14 +714,16 @@ class KineticsAnalyzer:
 
                 if fitting_model == 'one_to_one' and fitting_region == 'association_dissociation':
                     kf.fit_one_site_assoc_and_disso(shared_smax=shared_smax)
-                    kf.fit_single_exponentials()
+                    if compute_k_obs:
+                        kf.fit_single_exponentials()
 
                 if fitting_model == 'one_to_one_mtl' and fitting_region == 'association_dissociation':
                     kf.fit_one_site_assoc_and_disso(shared_smax=shared_smax, fit_ktr=True)
 
                 if fitting_model == 'one_to_one' and fitting_region == 'association':
                     kf.fit_one_site_association(shared_smax=shared_smax)
-                    kf.fit_single_exponentials()
+                    if compute_k_obs:
+                        kf.fit_single_exponentials()
 
                 if fitting_model == 'one_to_one' and fitting_region == 'dissociation':
                     kf.fit_one_site_dissociation()

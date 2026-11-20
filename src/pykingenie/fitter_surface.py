@@ -22,11 +22,11 @@ from .utils.fitting_surface import (
     one_site_assoc_and_disso_asymmetric_ci95,
     one_site_assoc_and_disso_asymmetric_ci95_koff,
     trim_masks,
-    get_smax_upper_bound_factor
+    get_smax_upper_bound_factor,
+    fit_single_exponential_fast
 )
 
 from .utils.fitting_general import (
-    fit_single_exponential,
     re_fit,
     re_fit_2
 )
@@ -1178,7 +1178,7 @@ class KineticsFitter(KineticsFitterGeneral):
             # A curve that a single exponential cannot describe keeps k_obs = NaN,
             # so this diagnostic never invalidates the kinetic fit before it.
             try:
-                fit_params, _, _ = fit_single_exponential(y, t)
+                fit_params, _, _ = fit_single_exponential_fast(y, t)
             except RuntimeError:
                 continue
 

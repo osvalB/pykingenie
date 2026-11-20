@@ -28,7 +28,9 @@ from .signal_surface import (
 
 from .math import get_rss
 
-from .fitting_general import fit_single_exponential, curve_fit_log_scale
+from .fitting_general import curve_fit_log_scale
+
+from .math import single_exponential
 
 from scipy.optimize import curve_fit
 from scipy.optimize import minimize_scalar, brentq
@@ -50,8 +52,69 @@ __all__ = [
     'fit_one_site_assoc_and_disso_ktr',
     'one_site_assoc_and_disso_asymmetric_ci95',
     'one_site_assoc_and_disso_asymmetric_ci95_koff',
-    'get_smax_upper_bound_factor'
+    'get_smax_upper_bound_factor',
+    'fit_single_exponential_fast'
 ]
+
+def fit_single_exponential_fast(y, t, min_log_k=-5, max_log_k=5, log_k_points=50):
+    """
+    Fit a single exponential y = a0 + a1 * exp(-k_obs * t) to a signal.
+
+    Gives the same result as fitting_general.fit_single_exponential, faster. Both
+    try a grid of k_obs values and refine the best one with a nonlinear fit. With
+    k_obs fixed, the model is linear in a0 and a1, so here each grid point is
+    solved in closed form instead of with curve_fit.
+
+    Parameters
+    ----------
+    y : np.ndarray
+        Signal values.
+    t : np.ndarray
+        Time values.
+    min_log_k : float, optional
+        Minimum log10 k_obs of the grid, default is -5.
+    max_log_k : float, optional
+        Maximum log10 k_obs of the grid, default is 5.
+    log_k_points : int, optional
+        Number of grid points, default is 50.
+
+    Returns
+    -------
+    np.ndarray
+        Fitted parameters (a0, a1, k_obs).
+    np.ndarray
+        Covariance matrix of the fitted parameters.
+    np.ndarray
+        Fitted y values.
+    """
+    # This function is AI generated.
+    y = np.asarray(y, dtype=float)
+    t = np.asarray(t, dtype=float)
+    t = t - np.min(t)
+    n = len(t)
+    sum_y = np.sum(y)
+
+    best_rss, best_p0 = np.inf, None
+    for k_obs in np.logspace(min_log_k, max_log_k, log_k_points):
+        e = np.exp(-k_obs * t)
+        sum_e, sum_ee, sum_ey = np.sum(e), np.dot(e, e), np.dot(e, y)
+        det = n * sum_ee - sum_e ** 2
+        # e is (almost) constant: a0 and a1 cannot be told apart
+        if det <= 1e-12 * n * sum_ee:
+            continue
+        a1 = (n * sum_ey - sum_e * sum_y) / det
+        a0 = (sum_y - a1 * sum_e) / n
+        rss = np.sum((y - a0 - a1 * e) ** 2)
+        if rss < best_rss:
+            best_rss, best_p0 = rss, [a0, a1, k_obs]
+
+    if best_p0 is None:
+        raise RuntimeError('No k_obs in the grid gives a well-posed fit.')
+
+    fit_params, cov = curve_fit(single_exponential, t, y, p0=best_p0)
+
+    return fit_params, cov, single_exponential(t, *fit_params)
+
 
 def guess_initial_signal(assoc_time_lst, assoc_signal_lst, time_limit=30, mask_lst=None):
     """
@@ -93,13 +156,11 @@ def guess_initial_signal(assoc_time_lst, assoc_signal_lst, time_limit=30, mask_l
             y = y[t < time_limit]
             t = t[t < time_limit]
 
-            a0,a1,kobs = fit_single_exponential(y,t)
-
-            fit_params, _, _ = fit_single_exponential(y,t)
+            fit_params, _, _ = fit_single_exponential_fast(y,t)
 
             a0, a1, kobs = fit_params
 
-            # fit_single_exponential starts the time at the first point it is given.
+            # fit_single_exponential_fast starts the time at the first point it is given.
             # Extrapolate back to the start of the step if the first points were left
             # out (t[0] > 0); otherwise this is a0 + a1.
             s0s.append(a0 + a1 * np.exp(kobs * t[0]))
@@ -244,6 +305,32 @@ def _fit_points(fit_fx, all_signal, mask):
         return fit_fx(x, *args)[mask]
 
     return fit_fx_points, all_signal[mask]
+
+
+def _jac_points(jac_fx, mask):
+    """
+    The Jacobian restricted to the points to fit, matching _fit_points.
+
+    Parameters
+    ----------
+    jac_fx : callable
+        Jacobian, jac_fx(x, *params), with one row per point of all_signal.
+    mask : np.ndarray or None
+        Points to fit, from _concat_masks. None fits every point.
+
+    Returns
+    -------
+    callable
+        Jacobian with one row per point to fit.
+    """
+    # This function is AI generated.
+    if mask is None:
+        return jac_fx
+
+    def jac_fx_points(x, *args):
+        return jac_fx(x, *args)[mask]
+
+    return jac_fx_points
 
 
 def _initial_occupancy_guess(signals, masks, trace, capacity_signal):
@@ -817,12 +904,35 @@ def fit_one_site_dissociation(signal_lst, time_lst,
             out[_offsets[_k]:_offsets[_k + 1]] = one_site_dissociation_analytical(t, s0, Koff, t0)
         return out
 
+    # Edited with AI assistance: analytic Jacobian of s0 * exp(-koff * (t + t0)), so
+    # each iteration needs no extra model evaluations for finite differences.
+    def jac_fx(dummyVariable, *args):
+        """Derivatives of the global dissociation model with respect to the fitted parameters."""
+        Koff = koff_value if fixed_koff else args[0]
+        t0 = args[1 - sum([fixed_koff])] if not fixed_t0 else 0
+        s0_start = 2 - sum([fixed_koff, fixed_t0])
+        s0_vals = args[s0_start:] if fit_s0 else s0_all
+
+        jac = np.zeros((_total, len(args)))
+        for _k, (t, s0) in enumerate(zip(time_lst, s0_vals)):
+            rows = slice(_offsets[_k], _offsets[_k + 1])
+            decay = np.exp(-Koff * (t + t0))
+            if not fixed_koff:
+                jac[rows, 0] = -(t + t0) * s0 * decay
+            if not fixed_t0:
+                jac[rows, s0_start - 1] = -Koff * s0 * decay
+            if fit_s0:
+                jac[rows, s0_start + _k] = decay
+        return jac
+
     # Edited with AI assistance: optional masks of the points to fit (trim_time).
-    fit_fx_points, signal_points = _fit_points(fit_fx, all_signal, _concat_masks([mask_lst], [signal_lst]))
+    mask = _concat_masks([mask_lst], [signal_lst])
+    fit_fx_points, signal_points = _fit_points(fit_fx, all_signal, mask)
 
     global_fit_params, cov = curve_fit(fit_fx_points, 1, signal_points,
                                        p0=initial_parameters,
-                                       bounds=(low_bounds, high_bounds))
+                                       bounds=(low_bounds, high_bounds),
+                                       jac=_jac_points(jac_fx, mask))
 
     predicted_curve = fit_fx(1, *global_fit_params)
 
@@ -944,51 +1054,116 @@ def fit_one_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
     for _k in range(_n_traces):
         _d_offsets[_k + 1] = _d_offsets[_k] + _d_lengths[_k]
 
-    def fit_fx(dummyVariable, *args):
-        """Evaluate the global one-site association and dissociation model."""
+    # Edited with AI assistance: the model and its analytic Jacobian share one
+    # evaluation. The optimizer asks for the Jacobian at the point where it has just
+    # evaluated the model, so the exponentials of that call are kept and reused.
+    # An association that starts where the previous dissociation ended inherits the
+    # derivatives of that signal.
+    t_rel_assoc = [t - t[0] for t in time_lst_assoc]
+    i_kd   = None if fixed_Kd else 0
+    i_koff = None if fixed_koff else 1 - sum([fixed_Kd])
+    _last  = {'args': None}
+
+    def evaluate(args):
+        """Model values, and per trace the terms the Jacobian needs."""
+        if _last['args'] == args:
+            return _last['out'], _last['terms']
+
         Kd   = Kd_value if fixed_Kd else args[0]
         Koff = koff_value if fixed_koff else args[1 - sum([fixed_Kd])]
 
         out = np.empty(_total)
+        terms = []
         prev_disso_end = 0.0
 
         for i in range(_n_traces):
-            t_assoc = time_lst_assoc[i]
-            t_dissoc = time_lst_disso[i]
             analyte_conc = analyte_conc_lst[i]
 
             t0    = args[start + smax_idx[i]] if not fixed_t0 else 0
             s_max = args[start+smax_idx[i]+n_t0s] if shared_smax else args[start + i + n_t0s]
 
             if np.logical_or(i == 0, initial_signal_at_zero[i]) and continuos_time[i]:
-                s0 = 0
+                s0, chained = 0, False
             elif continuos_time[i]:
-                s0 = prev_disso_end
+                s0, chained = prev_disso_end, True
             else:
-                s0 = s0s[i]
+                s0, chained = s0s[i], False
 
-            y_assoc = one_site_association_analytical(t_assoc-t_assoc[0],s0,s_max,Koff,Kd,analyte_conc,t0)
+            # Same arithmetic as one_site_association_analytical and
+            # one_site_dissociation_analytical
+            tau   = t_rel_assoc[i] - t0
+            rate  = Koff * (analyte_conc + Kd) / Kd
+            s_eq  = (analyte_conc / (analyte_conc + Kd)) * s_max
+            decay = np.exp(-rate * tau)
+            y_assoc = s_eq + (s0 - s_eq) * decay
             out[_a_offsets[i]:_a_offsets[i + 1]] = y_assoc
 
-            s0_d = y_assoc[-1]
-            y_disso = one_site_dissociation_analytical(t_dissoc, s0_d, Koff)
+            s0_d    = y_assoc[-1]
+            decay_d = np.exp(-Koff * time_lst_disso[i])
+            y_disso = s0_d * decay_d
             out[_d_offsets[i]:_d_offsets[i + 1]] = y_disso
 
             prev_disso_end = y_disso[-1]
+            terms.append((tau, rate, s_eq, s0, chained, decay, s0_d, decay_d, s_max))
 
-        return out
+        _last.update(args=args, out=out, terms=terms)
+        return out, terms
+
+    def fit_fx(dummyVariable, *args):
+        """Evaluate the global one-site association and dissociation model."""
+        return evaluate(args)[0].copy()
+
+    def jac_fx(dummyVariable, *args):
+        """Derivatives of the global one-site model with respect to the fitted parameters."""
+        _, terms = evaluate(args)
+        Kd   = Kd_value if fixed_Kd else args[0]
+        Koff = koff_value if fixed_koff else args[1 - sum([fixed_Kd])]
+
+        jac = np.zeros((_total, len(args)))
+        prev_disso_grad = None
+
+        for i, (tau, rate, s_eq, s0, chained, decay, s0_d, decay_d, s_max) in enumerate(terms):
+            analyte_conc = analyte_conc_lst[i]
+            i_t0   = start + smax_idx[i] if not fixed_t0 else None
+            i_smax = start + smax_idx[i] + n_t0s if shared_smax else start + i + n_t0s
+            rows_a = slice(_a_offsets[i], _a_offsets[i + 1])
+            rows_d = slice(_d_offsets[i], _d_offsets[i + 1])
+
+            # Association: d/dp [s_eq + (s0 - s_eq) * exp(-rate * (t - t0))]
+            block = jac[rows_a]
+            if chained:
+                np.multiply(decay[:, None], prev_disso_grad, out=block)
+            amplitude = (s0 - s_eq) * decay
+            block[:, i_smax] += (1 - decay) * (analyte_conc / (analyte_conc + Kd))
+            if i_kd is not None:
+                block[:, i_kd] += ((1 - decay) * (-analyte_conc * s_max / (analyte_conc + Kd) ** 2)
+                                   + amplitude * tau * (Koff * analyte_conc / Kd ** 2))
+            if i_koff is not None:
+                block[:, i_koff] -= amplitude * tau * ((analyte_conc + Kd) / Kd)
+            if i_t0 is not None:
+                block[:, i_t0] += amplitude * rate
+
+            # Dissociation: d/dp [s0_d * exp(-koff * t)], s0_d = end of the association
+            block_d = jac[rows_d]
+            np.multiply(decay_d[:, None], block[-1], out=block_d)
+            if i_koff is not None:
+                block_d[:, i_koff] -= time_lst_disso[i] * (s0_d * decay_d)
+
+            prev_disso_grad = block_d[-1]
+
+        return jac
 
     all_signal = np.concatenate([all_signal_assoc,all_signal_disso], axis=0)
 
     # Edited with AI assistance: optional masks of the points to fit (trim_time).
-    fit_fx_points, signal_points = _fit_points(
-        fit_fx, all_signal,
-        _concat_masks([assoc_mask_lst, disso_mask_lst], [assoc_signal_lst, disso_signal_lst]))
+    mask = _concat_masks([assoc_mask_lst, disso_mask_lst], [assoc_signal_lst, disso_signal_lst])
+    fit_fx_points, signal_points = _fit_points(fit_fx, all_signal, mask)
 
     # Edited with AI assistance: positive parameters are fitted on a log scale (curve_fit_log_scale)
     global_fit_params, cov = curve_fit_log_scale(fit_fx_points, 1, signal_points,
                                                  p0=initial_parameters,
-                                                 bounds=(low_bounds, high_bounds))
+                                                 bounds=(low_bounds, high_bounds),
+                                                 jac=_jac_points(jac_fx, mask))
 
     predicted_curve = fit_fx(1, *global_fit_params)
 
