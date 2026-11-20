@@ -256,3 +256,25 @@ def test_induced_fit_raises_without_grid_start(monkeypatch):
     monkeypatch.setattr(fitter_surface, "fit_induced_fit_sites_assoc_and_disso", always_fail)
     with pytest.raises(RuntimeError, match="could not be fitted from any starting point"):
         fitter.fit_one_site_if_assoc_and_disso(shared_smax=True)
+
+
+# A trace that starts partly bound (for example after an omitted single-cycle
+# injection) is fitted with its starting state, also from the start candidates.
+def test_mass_transport_fit_recovers_initial_state_with_start_candidates():
+    Kd, koff, ktr, occupied = 0.5, 0.01, 0.05, 0.4
+    concs = [0.25, 1.0]
+    assoc, disso = [], []
+    for c, s0 in zip(concs, [0.0, occupied * SMAX]):
+        a = solve_ode_one_site_mass_transport_association(T_ASSOC, s0, c, Kd, koff, ktr, SMAX)
+        assoc.append(a)
+        disso.append(solve_ode_one_site_mass_transport_dissociation(T_DISSO - T_DISSO[0], a[-1], Kd, koff, ktr, SMAX))
+
+    params = fit_one_site_assoc_and_disso_ktr(
+        assoc, [T_ASSOC] * 2, concs, disso, [T_DISSO] * 2,
+        initial_parameters=[0.4, 0.012, 0.04, 4.5],
+        low_bounds=[1e-3, 1e-4, 1e-4, 1.0], high_bounds=[10, 1, 1, 20],
+        smax_idx=[0, 0], shared_smax=True,
+        start_candidates=[[0.6, 0.008, 0.06, 5.5]],
+        fit_initial_state_at=1)[0]
+
+    np.testing.assert_allclose(params, [Kd, koff, ktr, SMAX, occupied], rtol=1e-3)

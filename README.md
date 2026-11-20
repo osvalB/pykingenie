@@ -9,11 +9,13 @@ Welcome to **pyKinGenie**!, a python package for analysing binding kinetics data
 - Import Octet files (.frd)
 - Import Gator files (Assay_#_Channel#.csv, Setting.ini and ExperimentStep.ini)
 - Import Biacore result files (.blr)
+- Import paired X/Y SPR text exports, including Biacore T200, and Carterra row-oriented CSV exports
 - Import custom CSV files 
 - Process the traces (alignment, baseline correction)
 - Calculate binding kinetics (*k*<sub>on</sub>, *k*<sub>off</sub>, *K*<sub>D</sub>)
 - Global fitting of multiple traces
 - One-to-one, one-to-one with mass transport limitation, and one-to-one with induced fit models
+- Bivalent analyte model for surface-based binding (the analyte binds one ligand, then a second ligand with its other arm)
 
 ## Installation
 
@@ -93,6 +95,152 @@ fig = plot_association_dissociation(pyKinetics)
 fig.write_image('test_bli_fitted.png')
 ```
 
+## SPR sensorgram text exports
+
+`SprTextExperiment` reads text/CSV/TSV files with one named `_X` time column
+and `_Y` response column per curve. Verified examples include Biacore T200
+`Cycle=..._Fc=...` and `Cycle: ...` headers, and rstoolbox's `Run/Ch/Cy/conc`
+export. Delimiters are detected; decimal commas and gzip files are supported.
+
+```python
+from pykingenie import SprTextExperiment, CarterraExperiment
+
+spr = SprTextExperiment("t200")
+spr.read_file(
+    "sensorgrams.txt",
+    association_start=0,       # seconds on the exported time axis
+    association_end=120,
+    concentrations=[25, 50],   # one concentration per measured curve, in file order
+    concentration_unit="nM",
+    decimal=",",              # use "." for dot-decimal exports
+)
+
+carterra = CarterraExperiment("lsa")
+carterra.read_csv(
+    "sensorgrams.csv",         # Label, X1, Y1, X2, Y2, ...; one curve per row
+    association_end=120,
+    concentrations=[25, 50],
+    concentration_unit="nM",
+)
+```
+
+Supply the actual injection boundaries for your experiment: association is
+`[association_start, association_end)`, and dissociation starts at
+`association_end`. By default, these readers represent one association/
+dissociation pair per curve. For Carterra rows representing consecutive
+injections on one physical sensor, pass `single_cycle=True` and an explicit
+`cycle_duration` in seconds. The importer translates row clocks into one
+sequence and folds each following baseline into the preceding dissociation.
+Rows must be in acquisition order and must not overlap on the resulting clock.
+No cycle period, grouping or absolute acquisition time is inferred. File times can be seconds or minutes (`time_unit="min"`); boundaries
+are always seconds. Independent curve time grids and measured responses are
+preserved without interpolation, alignment or reference subtraction. Exported
+`fitted curve` columns are excluded; Carterra `NotFitted` rows are retained.
+For Carterra XLSX exports, save the sensorgram sheet as CSV first.
+
+Concentrations can also be a mapping from full curve labels to values. Without
+explicit concentrations, only `conc=...` labels with a known molar unit are
+converted; set `concentration_unit` to interpret unitless `conc=...` labels.
+Unresolved concentrations generate a warning and stay `NaN` in
+`ligand_conc_df`. Carterra `Conc. N` indices, bare numbers and mass units are
+never treated as molar concentrations. Supply these values before fitting.
+The common `sample_id="sample"` groups all curves as one binding interaction;
+pass a list or curve-name mapping of sample IDs for exports containing several
+interactions. The resulting experiments use the standard `KineticsAnalyzer`
+workflow shown above. Public sample provenance and licenses are recorded in
+[the fixture sources](test_files/spr_exports/SOURCES.md).
+The sample data retain their upstream licenses; see
+[third-party notices](THIRD_PARTY_NOTICES.md) for attribution and reuse terms.
+Independent parser comparisons and the missing-response behavior found in the
+full public rstoolbox example are documented in
+[SPR parser validation](validation/spr_parsers/README.md).
+
+Executed import examples use full-resolution, representative curves from
+`notebooks/data/spr_exports/`, with sensorgram plots and available metadata.
+The Duke T200 and Carterra examples additionally use pyKinGenie's existing
+one-site fitter and compare its output with the authors' reference reports:
+
+| Input file | Notebook |
+| --- | --- |
+| `paired_run.csv` | [Run/Ch/Cy paired export](notebooks/12_spr_paired_run_import.ipynb) |
+| `biacore_cycle_fc.tsv` | [Biacore Cycle/Fc export](notebooks/13_biacore_cycle_fc_import.ipynb) |
+| `biacore_cycle_sample.tsv` | [Biacore Cycle/sample export](notebooks/14_biacore_cycle_sample_import.ipynb) |
+| `carterra_rows.csv` | [Carterra CSV export](notebooks/15_carterra_csv_import.ipynb) |
+
+The [teaching-data sources](notebooks/data/spr_exports/SOURCES.md) record curve
+selection, full-resolution point counts, licenses, and explicit missing-pair
+handling. The small files in `test_files/spr_exports/` remain parser regression
+fixtures. The Cycle/Fc example displays full binning cycles plus a display zoom;
+it does not represent a single association/dissociation experiment.
+
+These curve exports have no plate-well coordinates. The notebooks display the
+available curve labels and draw a plate layout only if plate metadata exists.
+The Duke examples use their original companion sample sheets for concentrations
+and phase timing. Each calls `align_association(inplace=True, npoints=10)` on
+a copy before fitting and keeps the raw import plot.
+The rstoolbox and binning notebooks demonstrate import only. See
+[SPR fits with published comparisons](notebooks/SPR_FITTING.md) for the API calls,
+source reports and remaining differences in fitting setup. Both Duke examples
+select the same five concentration curves as the author reports, verified
+against their original sensorgram figures. Carterra imports all 13 injections
+as one sequence so alignment does not reset each injection; its continuous fit
+also includes the intervening baseline washes. The nominal cycle period is
+reconstructed from the source sheet and is stated explicitly in the notebook.
+
+An [advanced Carterra example](notebooks/16_carterra_global_smax.ipynb) fits all
+13 injections with one global Smax and computes leave-one-injection-out parameter
+sensitivity using the existing fitter. The five-injection/local-Smax notebook
+above remains the primary literature comparison. The advanced example changes
+both the concentration selection and the capacity assumption. All Carterra fits
+are conditional on the reconstructed 1140 s cycle period; the absolute injection
+clock has not been verified. Leave-one-out SD describes the spread of deletion
+estimates, rather than a confidence interval. After a deletion creates a gap,
+the fitter estimates the next association's initial response from its observations.
+
+## Detecting input formats
+
+`detect_file_format` inspects file contents to select an input reader. All three
+paired-column SPR variants share `SprTextExperiment`; Carterra's row-oriented
+layout is detected separately:
+
+```python
+from pathlib import Path
+from pykingenie import detect_file_format
+
+for file in sorted(Path("test_files/spr_exports").glob("*")):
+    if file.suffix in {".csv", ".tsv"}:
+        print(file.name, detect_file_format(file))
+# biacore_cycle_fc.tsv spr_text
+# biacore_cycle_sample.tsv spr_text
+# carterra_rows.csv carterra_csv
+# paired_run.csv spr_text
+```
+
+| Detected identifier | Reader |
+| --- | --- |
+| `spr_text` | `SprTextExperiment.read_file` |
+| `carterra_csv` | `CarterraExperiment.read_csv` |
+| `octet_frd` | `OctetExperiment.read_sensor_data` |
+| `biacore_blr` | `BiacoreExperiment.read_blr` |
+| `gator_csv`, `gator_steps`, `gator_settings`, `gator_zip` | `GatorExperiment.read_all_gator_data` with the complete file set or archive |
+| `kingenie_surface` | `KinGenieCsv.read_csv` |
+| `kingenie_solution` | `KinGenieCsvSolution.read_csv` |
+| `surface_csv_steps`, `surface_csv_traces` | `SurfaceCsvExperiment.read_files` with both files |
+
+Text detection searches the first 64 KiB of uncompressed content, handles
+metadata preambles, BOMs, Windows-1252 text, gzip, and comma/tab/semicolon
+delimiters. Native Biacore and Gator archives are checked for their internal
+structure. Renaming a file does not change its content-based identifier.
+Detection identifies the layout; the reader still validates the measurements
+and requires its normal arguments, including decimal conventions, injection
+boundaries, concentrations and companion files where applicable.
+
+Ambiguous or unsupported inputs return `unknown`, including generic two-column
+`Time,Signal` data and native XLSX files. Choose the reader explicitly for such
+inputs. Missing/inaccessible files raise the normal filesystem error.
+`guess_experiment_type` remains the compatible surface/solution helper, with its
+historical `surface` fallback; use `detect_file_format` for reader selection.
+
 ## Keeping results when changing models
 
 Each fitter automatically keeps successful model results in `fit_results`.
@@ -158,7 +306,8 @@ Surface result keys include `steady_state_one_site`, `one_site_association`,
 `steady_state_two_site_cooperative`. Induced fit uses `one_site_if_assoc_and_disso`
 or `one_site_if_variable_signal` when fitting the signal ratio. Heterogeneous
 ligand fits use `two_site_heterogeneous_ligand_association_and_dissociation` or
-`steady_state_two_site_heterogeneous_ligand`. Solution result keys are
+`steady_state_two_site_heterogeneous_ligand`. The bivalent analyte model uses
+`bivalent_analyte_association_and_dissociation`. Solution result keys are
 `single_exponential`, `double_exponential`, `one_binding_site`, `induced_fit`,
 and `conformational_selection`. Each snapshot records the call options in
 `fit_settings`; `active_fit_result` gives the current key.

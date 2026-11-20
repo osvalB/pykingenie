@@ -18,6 +18,7 @@ from .utils.fitting_surface import (
     fit_induced_fit_sites_assoc_and_disso,
     fit_one_site_assoc_and_disso_ktr,
     fit_two_site_heterogeneous_ligand_assoc_and_disso,
+    fit_bivalent_analyte_assoc_and_disso,
     one_site_assoc_and_disso_asymmetric_ci95,
     one_site_assoc_and_disso_asymmetric_ci95_koff,
     trim_masks,
@@ -33,6 +34,7 @@ from .utils.fitting_general import (
 from .utils.processing      import (
     subset_data,
     concat_signal_lst,
+    detect_time_list_continuos,
     expand_parameter_list,
     remove_at
 )
@@ -71,6 +73,13 @@ def _leave_one_out_parameters(params, low_bounds, high_bounds, smax_ids, omitted
 
     selected = [[values[i] for i in indices] for values in (params, low_bounds, high_bounds)]
     return *selected, remapped_ids, retained_groups
+
+
+def _loo_state_refit_indices(assoc_times, disso_times):
+    """Find omissions whose successor needs a new starting state at the vacated index."""
+    continuous = detect_time_list_continuos(assoc_times, disso_times)
+    return {i - 1 for i in range(1, len(continuous))
+            if continuous[i] and assoc_times[i][0] >= 2}
 
 
 class KineticsFitter(KineticsFitterGeneral):
@@ -1446,6 +1455,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
             # one ktr per Smax group - replicates with the same Smax ID share the same ktr
             ktrs_loo = [[] for _ in range(n_ktr)]
+            state_refits = _loo_state_refit_indices(self.time_assoc_lst, self.time_disso_lst)
 
         # Iterate over replicates that may share Smax ID
         for i in range(len(self.assoc_lst)):
@@ -1489,6 +1499,8 @@ class KineticsFitter(KineticsFitterGeneral):
             }
 
             fit_fx = fit_one_site_assoc_and_disso_ktr if fit_ktr else fit_one_site_assoc_and_disso
+            if fit_ktr and i in state_refits:
+                kwargs['fit_initial_state_at'] = i
 
             try:
                 # Run the fitting function on the modified lists.
@@ -1793,6 +1805,7 @@ class KineticsFitter(KineticsFitterGeneral):
         fit_sigma = self.fit_sigma
         n_fits_loo_ok = 0
         n_fits_loo_fail = 0
+        state_refits = _loo_state_refit_indices(self.time_assoc_lst, self.time_disso_lst)
 
         Kd_loo = []
         k_off_loo = []
@@ -1839,6 +1852,7 @@ class KineticsFitter(KineticsFitterGeneral):
                 'smax_idx' : temp_smax_idx,
                 'fixed_t0' : fixed_t0,
                 'fit_sigma' : fit_sigma,
+                'fit_initial_state_at': i if i in state_refits else None,
                 **self._fit_masks(temp_time_assoc_lst, temp_time_disso_lst),
             }
 
@@ -2205,6 +2219,7 @@ class KineticsFitter(KineticsFitterGeneral):
         Kd2_loo = []
         k_off2_loo = []
         fraction_site1_loo = []
+        state_refits = _loo_state_refit_indices(self.time_assoc_lst, self.time_disso_lst)
 
         for i in range(len(self.assoc_lst)):
 
@@ -2241,6 +2256,7 @@ class KineticsFitter(KineticsFitterGeneral):
                 'shared_smax': shared_smax,
                 'smax_idx': temp_smax_idx,
                 'fixed_t0': fixed_t0,
+                'fit_initial_state_at': i if i in state_refits else None,
                 **self._fit_masks(temp_time_assoc_lst, temp_time_disso_lst),
             }
 
@@ -2285,6 +2301,306 @@ class KineticsFitter(KineticsFitterGeneral):
         })
 
         self.df_fit_loo = df_fit_loo
+
+        return None
+
+    @store_fit_result('bivalent_analyte_association_and_dissociation')
+    def fit_bivalent_analyte_assoc_and_disso(self, shared_smax=True, fixed_t0=True,
+                                             ka2_rmax_values=None, kd2_factors=None,
+                                             koff1_factors=None, n_starts=3, calc_loo=False):
+        """
+        Fit the bivalent analyte model to the association and dissociation curves.
+
+        The analyte binds the immobilised ligand with one arm (Kd1, k_off1) and
+        the bound analyte binds a second ligand with its other arm (k_a2, k_d2).
+        See ode_bivalent_analyte in utils.signal_surface for the rate equations.
+
+        Both bound states give the same signal per analyte (signal = AL + AL2), and
+        Rmax is the signal with one analyte on every ligand. k_a2 and Kd2 are in the
+        units of the data (signal: RU for SPR, nm for BLI), so they depend on the
+        ligand density and are not comparable between instruments.
+
+        Avidity slows the observed dissociation, so the one-to-one fit underestimates
+        k_off1, but its association rate approximates 2 * k_on1. A grid search on
+        subsampled curves tries k_off1 starts at multiples of the one-to-one k_off,
+        with Kd1 from that association rate, and fixed k_a2 and k_d2 values. The grid
+        fits share Rmax within each Smax group and use looser solver and optimizer
+        tolerances, since they only rank starting points. All parameters are then
+        fitted from the best grid points with distinct k_a2 and k_d2 values, and the
+        fit with the lowest residual is kept.
+
+        Parameters
+        ----------
+        shared_smax : bool, optional
+            Whether to share Rmax across curves with the same Smax ID, default is True.
+        fixed_t0 : bool, optional
+            Whether to fix the time offset (t0) to zero, default is True.
+        ka2_rmax_values : list, optional
+            Grid values of k_a2 * Rmax, in 1/s: the initial rate at which a bound
+            analyte binds its second ligand on an empty surface. Default is
+            [1e-3, 1e-2, 1e-1, 1, 10].
+        kd2_factors : list, optional
+            Grid values of k_d2, as multiples of the one-to-one k_off. Default is
+            [0.1, 1, 10, 100, 1000]: with a fast second arm, k_d2 can be orders of
+            magnitude above the observed dissociation rate.
+        koff1_factors : list, optional
+            Starting values of k_off1 in the grid, as multiples of the one-to-one
+            k_off. Default is [1, 10, 100, 1000].
+        n_starts : int, optional
+            Number of grid points the final fit starts from: the best grid point for
+            each of the n_starts best (k_a2, k_d2) pairs. The fit with the lowest
+            residual is kept. Default is 3.
+        calc_loo : bool, optional
+            Whether to calculate leave-one-out errors, default is False.
+
+        Returns
+        -------
+        None
+            Updates the fitted signals, parameters (Kd1, k_off1, k_a2, k_d2, Rmax),
+            bounds and the grid search table (bivalent_analyte_grid_search).
+        """
+        # This function is AI generated.
+
+        self.clear_fittings()
+
+        if self.Kd_ss is None and not self.is_single_cycle:
+            self.fit_steady_state_one_site()
+
+        if self.smax_guesses_unq is None or self.smax_guesses_shared is None:
+            self.get_steady_state()
+
+        self.fit_one_site_assoc_and_disso(shared_smax=shared_smax, fixed_t0=True, fit_ktr=False)
+        self.model = "bivalent_analyte_association_and_dissociation"
+
+        # Without the second arm, the model is one-to-one with kon = 2 * ka1
+        koff_init = float(self.k_off)
+        kon1_init = koff_init / float(self.Kd) / 2
+        rmax_init = np.array(self.Smax, dtype=float).tolist()
+        rmax_ref = float(np.max(rmax_init))
+
+        # The grid fits one Rmax per Smax group, also when the final fit has one per
+        # curve: fewer parameters make each grid fit cheaper
+        smax_id = np.asarray(self.smax_id)
+        n_unq_smax = len(np.unique(smax_id))
+        if shared_smax:
+            rmax_grid = rmax_init
+        else:
+            rmax_grid = [float(np.mean(np.asarray(rmax_init)[smax_id == g])) for g in range(n_unq_smax)]
+
+        if ka2_rmax_values is None:
+            ka2_rmax_values = [1e-3, 1e-2, 1e-1, 1.0, 10.0]
+        if kd2_factors is None:
+            kd2_factors = [0.1, 1.0, 10.0, 100.0, 1000.0]
+        if koff1_factors is None:
+            koff1_factors = [1.0, 10.0, 100.0, 1000.0]
+
+        time_assoc_lst_subsampled = [subset_data(t) for t in self.time_assoc_lst]
+        time_disso_lst_subsampled = [subset_data(t) for t in self.time_disso_lst]
+        assoc_lst_subsampled = [subset_data(y) for y in self.assoc_lst]
+        disso_lst_subsampled = [subset_data(y) for y in self.disso_lst]
+
+        kwargs_grid = {
+            'assoc_signal_lst': assoc_lst_subsampled,
+            'assoc_time_lst': time_assoc_lst_subsampled,
+            'analyte_conc_lst': self.lig_conc_lst,
+            'disso_signal_lst': disso_lst_subsampled,
+            'disso_time_lst': time_disso_lst_subsampled,
+            'shared_smax': True,
+            'smax_idx': self.smax_id,
+            'fixed_t0': True,
+            # The grid only ranks starting points: a looser integration and
+            # optimizer tolerance make it 2-4x faster
+            'rtol': 1e-5,
+            'coarse': True,
+            **self._fit_masks(time_assoc_lst_subsampled, time_disso_lst_subsampled),
+        }
+
+        grid_rows = []
+        grid_points = []
+        for koff1_factor, ka2_rmax, kd2_factor in itertools.product(koff1_factors, ka2_rmax_values, kd2_factors):
+            koff1 = koff1_factor * koff_init
+            Kd1 = koff1 / kon1_init
+            ka2 = ka2_rmax / rmax_ref
+            kd2 = kd2_factor * koff_init
+            p0_grid = [Kd1, koff1] + rmax_grid
+            low_grid = [Kd1 / 1e3, koff1 / 1e3] + [x / 10 for x in rmax_grid]
+            high_grid = [Kd1 * 1e3, koff1 * 1e3] + [x * 10 for x in rmax_grid]
+            try:
+                params, _, fit_vals_assoc, fit_vals_disso = fit_bivalent_analyte_assoc_and_disso(
+                    **kwargs_grid,
+                    initial_parameters=p0_grid, low_bounds=low_grid, high_bounds=high_grid,
+                    fixed_ka2=True, ka2_value=ka2, fixed_kd2=True, kd2_value=kd2)
+                rss = self._grid_rss(assoc_lst_subsampled, fit_vals_assoc, time_assoc_lst_subsampled,
+                                     disso_lst_subsampled, fit_vals_disso, time_disso_lst_subsampled)
+            except Exception:
+                rss, params = np.inf, None
+            grid_rows.append({'koff1_start': koff1, 'ka2_value': ka2, 'kd2_value': kd2, 'rss': rss})
+            if params is not None and np.isfinite(rss):
+                grid_points.append((rss, ka2, kd2, np.array(params, dtype=float)))
+
+        if not grid_points:
+            raise RuntimeError("Grid search failed for all k_a2/k_d2 candidates.")
+
+        self.bivalent_analyte_grid_search = pd.DataFrame(grid_rows)
+
+        # The coarse grid can rank a point of another basin first, so the final fit
+        # starts from the best few grid points and keeps the lowest residual
+        full_fit_kwargs = dict(smax_idx=self.smax_id, shared_smax=shared_smax, fixed_t0=fixed_t0,
+                               **self._fit_masks(self.time_assoc_lst, self.time_disso_lst))
+        # Grid fits that differ only in the k_off1 start often converge to the same
+        # point, so keep the best one for each fixed (k_a2, k_d2) pair
+        starts = {}
+        for point in sorted(grid_points, key=lambda x: x[0]):
+            starts.setdefault((point[1], point[2]), point)
+        best, last_error = None, None
+        for _, ka2_init, kd2_init, grid_params in list(starts.values())[:n_starts]:
+            Kd1_0, koff1_0 = grid_params[:2]
+            rmax_0 = grid_params[2:].tolist()
+            if not shared_smax:
+                rmax_0 = [rmax_0[g] for g in smax_id]
+
+            p0 = [Kd1_0, koff1_0, ka2_init, kd2_init]
+            low_bounds = [Kd1_0 / 1e3, koff1_0 / 1e3, ka2_init / 1e4, kd2_init / 1e4]
+            high_bounds = [Kd1_0 * 1e3, koff1_0 * 1e3, ka2_init * 1e4, kd2_init * 1e4]
+
+            if not fixed_t0:
+                p0 += [0.0] * n_unq_smax
+                low_bounds += [-0.01] * n_unq_smax
+                high_bounds += [0.1] * n_unq_smax
+
+            p0 += rmax_0
+            low_bounds += [x / 10 for x in rmax_0]
+            high_bounds += [x * 10 for x in rmax_0]
+
+            try:
+                result = fit_bivalent_analyte_assoc_and_disso(
+                    self.assoc_lst, self.time_assoc_lst, self.lig_conc_lst,
+                    self.disso_lst, self.time_disso_lst,
+                    p0, low_bounds, high_bounds, **full_fit_kwargs)
+            except (RuntimeError, ValueError) as error:
+                last_error = error
+                continue
+            rss = self._grid_rss(self.assoc_lst, result[2], self.time_assoc_lst,
+                                 self.disso_lst, result[3], self.time_disso_lst)
+            if best is None or rss < best[0]:
+                best = (rss, result, p0, low_bounds, high_bounds)
+
+        if best is None:
+            raise last_error
+        _, (fit, cov, fit_vals_assoc, fit_vals_disso), p0, low_bounds, high_bounds = best
+
+        self.signal_assoc_fit = fit_vals_assoc
+        self.signal_disso_fit = fit_vals_disso
+
+        fit = np.array(fit, dtype=float)
+        self.Kd1, self.k_off1, self.k_a2, self.k_d2 = fit[:4]
+        idx = 4
+        t0_vals = None
+        if not fixed_t0:
+            t0_vals = fit[idx:idx + n_unq_smax]
+            idx += n_unq_smax
+        self.Smax = fit[idx:]
+
+        rows = len(self.Smax)
+        df_fit = pd.DataFrame({
+            'Kd1 [µM]': [self.Kd1] * rows,
+            'k_off1 [1/s]': [self.k_off1] * rows,
+            'k_a2 [1/(signal·s)]': [self.k_a2] * rows,
+            'k_d2 [1/s]': [self.k_d2] * rows,
+            'Rmax': self.Smax,
+        })
+        df_fit['(Derived) k_on1 [1/µM/s]'] = df_fit['k_off1 [1/s]'] / df_fit['Kd1 [µM]']
+        df_fit['(Derived) Kd2 [signal]'] = df_fit['k_d2 [1/s]'] / df_fit['k_a2 [1/(signal·s)]']
+
+        with np.errstate(divide='ignore', invalid='ignore'):
+            rel_error = np.sqrt(np.diag(cov)) / fit * 100
+
+        df_error = pd.DataFrame({
+            'Kd1 [µM]': [rel_error[0]] * rows,
+            'k_off1 [1/s]': [rel_error[1]] * rows,
+            'k_a2 [1/(signal·s)]': [rel_error[2]] * rows,
+            'k_d2 [1/s]': [rel_error[3]] * rows,
+            'Rmax': rel_error[idx:],
+        })
+
+        if not fixed_t0:
+            t0_err = rel_error[4:4 + n_unq_smax]
+            if shared_smax:
+                df_fit['t0'], df_error['t0'] = t0_vals, t0_err
+            else:
+                df_fit['t0'] = expand_parameter_list(t0_vals, self.smax_id)
+                df_error['t0'] = expand_parameter_list(t0_err, self.smax_id)
+
+        self.fit_params_kinetics = df_fit
+        self.fit_params_kinetics_error = df_error
+        self._add_concentrations(per_trace=not shared_smax)
+
+        self.params = fit
+        self.p0 = p0
+        self.low_bounds = low_bounds
+        self.high_bounds = high_bounds
+        labels = ['Kd1 [µM]', 'k_off1 [1/s]', 'k_a2 [1/(signal·s)]', 'k_d2 [1/s]']
+        labels += [] if fixed_t0 else self._group_labels('t0', n_unq_smax)
+        self._store_correlation(cov, labels + self._amplitude_labels('Rmax', shared_smax))
+
+        self.shared_smax = shared_smax
+        self.fixed_t0 = fixed_t0
+
+        if calc_loo:
+            self.calc_leave_one_out_errors()
+
+        return None
+
+    @update_fit_result
+    def bivalent_analyte_assoc_and_disso_loo(self):
+        """Estimate the bivalent analyte fit uncertainty by leaving out one curve at a time.
+
+        If the omitted curve feeds into another injection in a single-cycle run,
+        fit the starting bound state of that injection from the retained data.
+
+        Notes
+        -----
+        Updates Kd1_loo, k_off1_loo, k_a2_loo and k_d2_loo (lists of estimates),
+        their _mean and _std, and df_fit_loo (mean ± SD of each).
+        """
+        # This function is AI generated.
+        names = ['Kd1', 'k_off1', 'k_a2', 'k_d2']
+        columns = ['Kd1 [µM]', 'k_off1 [1/s]', 'k_a2 [1/(signal·s)]', 'k_d2 [1/s]']
+        estimates = {name: [] for name in names}
+        state_refits = _loo_state_refit_indices(self.time_assoc_lst, self.time_disso_lst)
+
+        for i in range(len(self.assoc_lst)):
+            temp_time_assoc_lst = remove_at(copy.deepcopy(self.time_assoc_lst), i)
+            temp_time_disso_lst = remove_at(copy.deepcopy(self.time_disso_lst), i)
+
+            temp_p0, temp_low_bounds, temp_high_bounds, temp_smax_idx, _ = _leave_one_out_parameters(
+                self.params, self.low_bounds, self.high_bounds, self.smax_id, i,
+                shared_smax=self.shared_smax, n_global=4,
+                group_blocks=(1,) * (not self.fixed_t0), response_width=1)
+
+            try:
+                fit_loo, _, _, _ = fit_bivalent_analyte_assoc_and_disso(
+                    remove_at(copy.deepcopy(self.assoc_lst), i), temp_time_assoc_lst,
+                    remove_at(copy.deepcopy(self.lig_conc_lst), i),
+                    remove_at(copy.deepcopy(self.disso_lst), i), temp_time_disso_lst,
+                    temp_p0, temp_low_bounds, temp_high_bounds,
+                    smax_idx=temp_smax_idx, shared_smax=self.shared_smax, fixed_t0=self.fixed_t0,
+                    fit_initial_state_at=i if i in state_refits else None,
+                    **self._fit_masks(temp_time_assoc_lst, temp_time_disso_lst))
+            except Exception:
+                continue
+            for name, value in zip(names, fit_loo[:4]):
+                estimates[name].append(value)
+
+        df_fit_loo = {}
+        for name, column in zip(names, columns):
+            values = estimates[name]
+            setattr(self, f'{name}_loo', values)
+            setattr(self, f'{name}_loo_mean', np.mean(values))
+            setattr(self, f'{name}_loo_std', np.std(values))
+            df_fit_loo[column] = [f'{np.mean(values):.2e} ± {np.std(values):.2e}']
+
+        self.df_fit_loo = pd.DataFrame(df_fit_loo)
 
         return None
 
@@ -2675,6 +2991,7 @@ class KineticsFitter(KineticsFitterGeneral):
         signal_ratio_loo = []
         n_fits_loo_ok = 0
         n_fits_loo_fail = 0
+        state_refits = _loo_state_refit_indices(self.time_assoc_lst, self.time_disso_lst)
 
         for i in range(len(self.assoc_lst)):
 
@@ -2714,6 +3031,7 @@ class KineticsFitter(KineticsFitterGeneral):
                 'shared_smax' : shared_smax,
                 'smax_idx' : temp_smax_idx,
                 'fixed_t0' : True,
+                'fit_initial_state_at': i if i in state_refits else None,
                 **self._fit_masks(temp_time_assoc_lst, temp_time_disso_lst)
             }
 
@@ -2774,6 +3092,7 @@ class KineticsFitter(KineticsFitterGeneral):
                 self.two_site_heterogeneous_ligand_assoc_and_disso_loo
             ),
             "one_site_if_assoc_and_disso": self.one_site_if_assoc_and_disso_loo,
+            "bivalent_analyte_association_and_dissociation": self.bivalent_analyte_assoc_and_disso_loo,
         }
 
         model = getattr(self, "model", None)

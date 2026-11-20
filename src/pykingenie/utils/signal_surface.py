@@ -3,7 +3,7 @@
 import numpy         as np
 import pandas        as pd
 
-from scipy.integrate import solve_ivp
+from scipy.integrate import solve_ivp, odeint
 from scipy.linalg    import solve
 from scipy.linalg    import expm
 
@@ -46,7 +46,10 @@ __all__ = [
     'solve_two_site_association',
     'solve_two_site_cooperative_association',
     'solve_two_site_dissociation',
-    'solve_two_site_cooperative_dissociation'
+    'solve_two_site_cooperative_dissociation',
+    'ode_bivalent_analyte',
+    'solve_bivalent_analyte_association',
+    'solve_bivalent_analyte_dissociation'
 ]
 
 def steady_state_one_site(C, Rmax, Kd):
@@ -1788,3 +1791,176 @@ def solve_two_site_cooperative_dissociation(time, koff, sigma, Rmax_PL=0, Rmax_L
     total_signal = signal_PL + signal_LPL
 
     return np.column_stack((total_signal, signal_PL, signal_LPL))
+
+
+# Bivalent analyte model. This section is AI generated.
+#
+# A bivalent analyte A binds the immobilised ligand L with one arm (AL), and the
+# bound analyte can bind a second, neighbouring ligand with the other arm (AL2):
+#
+#     A + L   <=> AL     ka1 [1/(µM·s)], kd1 [1/s]
+#     AL + L  <=> AL2    ka2 [1/(signal·s)], kd2 [1/s]
+#
+# Following the Biacore bivalent analyte model (and DukeCHSI/Bivalent-Analyte-Modeling),
+# with x1 = [AL] and x2 = [AL2] in signal units (RU for SPR, nm for BLI) and free
+# ligand l = Rmax - x1 - 2*x2:
+#
+#     dx1/dt = 2*ka1*C*l - kd1*x1 - (ka2*x1*l - 2*kd2*x2)
+#     dx2/dt = ka2*x1*l - 2*kd2*x2
+#
+# The factors 2 count the two arms of the analyte. Rmax is the response with every
+# ligand bound by one analyte, and the signal is x1 + x2 (one analyte per complex).
+
+def ode_bivalent_analyte(t, x, ka1, kd1, ka2, kd2, a_conc, Rmax):
+    """
+    Rates of change of the bivalent analyte complexes.
+
+    Parameters
+    ----------
+    t : float
+        Time (unused; the system is autonomous).
+    x : array_like
+        [x1, x2]: singly bound (AL) and doubly bound (AL2) analyte, in response units.
+    ka1 : float
+        Association rate constant of the first arm, 1/(µM·s).
+    kd1 : float
+        Dissociation rate constant of the first arm, 1/s.
+    ka2 : float
+        Association rate constant of the second arm, 1/(signal·s).
+    kd2 : float
+        Dissociation rate constant of the second arm, 1/s.
+    a_conc : float
+        Analyte concentration, µM (0 during dissociation).
+    Rmax : float
+        Response with every ligand bound by one analyte.
+
+    Returns
+    -------
+    list
+        [dx1/dt, dx2/dt].
+    """
+    # Python floats: arithmetic on numpy scalars made the integration ~2x slower
+    x1, x2 = x.tolist() if isinstance(x, np.ndarray) else x
+    free = Rmax - x1 - 2 * x2
+    step1 = 2 * ka1 * a_conc * free - kd1 * x1
+    step2 = ka2 * x1 * free - 2 * kd2 * x2
+    return [step1 - step2, step2]
+
+
+def _jacobian_bivalent_analyte(t, x, ka1, kd1, ka2, kd2, a_conc, Rmax):
+    """Jacobian of ode_bivalent_analyte with respect to [x1, x2]."""
+    x1, x2 = x.tolist() if isinstance(x, np.ndarray) else x
+    free = Rmax - x1 - 2 * x2
+    d_step2_dx1 = ka2 * (free - x1)
+    d_step2_dx2 = -2 * ka2 * x1 - 2 * kd2
+    return [[-2 * ka1 * a_conc - kd1 - d_step2_dx1, -4 * ka1 * a_conc - d_step2_dx2],
+            [d_step2_dx1, d_step2_dx2]]
+
+
+def _solve_bivalent_analyte(tau, x0, ka1, kd1, ka2, kd2, a_conc, Rmax, rtol=1e-8):
+    """
+    Integrate the bivalent analyte model.
+
+    Parameters
+    ----------
+    tau : np.ndarray
+        Times from the start of the step. Points before 0 keep the initial state.
+    x0 : list
+        Initial [x1, x2].
+    rtol : float, optional
+        Relative tolerance of the integration, default is 1e-8. The absolute
+        tolerance is rtol * 1e-2 * Rmax.
+
+    Returns
+    -------
+    np.ndarray
+        Array with columns [x1 + x2, x1, x2].
+    """
+    tau = np.asarray(tau, dtype=float)
+    states = np.tile(np.asarray(x0, dtype=float), (tau.size, 1))
+    after = tau >= 0
+    if np.any(after) and np.max(tau) > 0:
+        # odeint runs LSODA in compiled code; solve_ivp's Python stepping was ~10x slower
+        t_eval = np.concatenate([[0.0], tau[after]])
+        args = tuple(float(v) for v in (ka1, kd1, ka2, kd2, a_conc, Rmax))
+        out, info = odeint(ode_bivalent_analyte, x0, t_eval, args=args, Dfun=_jacobian_bivalent_analyte,
+                           tfirst=True, rtol=rtol, atol=rtol * 1e-2 * max(abs(Rmax), 1e-12),
+                           mxstep=100000, full_output=True)
+        if info['message'] != 'Integration successful.':
+            raise RuntimeError(f"The bivalent analyte model could not be solved: {info['message']}")
+        states[after] = out[1:]
+    return np.column_stack((states.sum(axis=1), states[:, 0], states[:, 1]))
+
+
+def solve_bivalent_analyte_association(time, a_conc, Kd1, koff1, ka2, kd2, Rmax,
+                                       x1_0=0.0, x2_0=0.0, t0=0, rtol=1e-8):
+    """
+    Association signal of a bivalent analyte binding an immobilised ligand.
+
+    See the description of the model above ode_bivalent_analyte.
+
+    Parameters
+    ----------
+    time : np.ndarray
+        Time array.
+    a_conc : float
+        Analyte concentration, µM.
+    Kd1 : float
+        Equilibrium dissociation constant of the first arm (kd1/ka1), µM.
+    koff1 : float
+        Dissociation rate constant of the first arm (kd1), 1/s.
+    ka2 : float
+        Association rate constant of the second arm, 1/(signal·s).
+    kd2 : float
+        Dissociation rate constant of the second arm, 1/s.
+    Rmax : float
+        Response with every ligand bound by one analyte.
+    x1_0, x2_0 : float, optional
+        Singly and doubly bound analyte at the start of the step, default is 0.
+    t0 : float, optional
+        Time offset; the association starts at time t0 after the first time
+        point, default is 0.
+    rtol : float, optional
+        Relative tolerance of the integration, default is 1e-8.
+
+    Returns
+    -------
+    np.ndarray
+        Array with columns [total_signal, signal_AL, signal_AL2].
+    """
+    time = np.asarray(time, dtype=float)
+    tau = time - np.min(time) - t0
+    return _solve_bivalent_analyte(tau, [x1_0, x2_0], koff1 / Kd1, koff1, ka2, kd2, a_conc, Rmax, rtol)
+
+
+def solve_bivalent_analyte_dissociation(time, koff1, ka2, kd2, Rmax, x1_0=0.0, x2_0=0.0, rtol=1e-8):
+    """
+    Dissociation signal of a bivalent analyte from an immobilised ligand.
+
+    Without analyte in solution, AL2 can still open one arm and rebind it, and
+    AL loses the analyte with rate kd1. See the description above ode_bivalent_analyte.
+
+    Parameters
+    ----------
+    time : np.ndarray
+        Time array; the dissociation starts at the first time point.
+    koff1 : float
+        Dissociation rate constant of the first arm (kd1), 1/s.
+    ka2 : float
+        Association rate constant of the second arm, 1/(signal·s).
+    kd2 : float
+        Dissociation rate constant of the second arm, 1/s.
+    Rmax : float
+        Response with every ligand bound by one analyte.
+    x1_0, x2_0 : float, optional
+        Singly and doubly bound analyte at the start of the dissociation.
+    rtol : float, optional
+        Relative tolerance of the integration, default is 1e-8.
+
+    Returns
+    -------
+    np.ndarray
+        Array with columns [total_signal, signal_AL, signal_AL2].
+    """
+    time = np.asarray(time, dtype=float)
+    return _solve_bivalent_analyte(time - np.min(time), [x1_0, x2_0], 0.0, koff1, ka2, kd2, 0.0, Rmax, rtol)

@@ -628,7 +628,7 @@ class KineticsAnalyzer:
         fitting_model : str, optional
             Model to fit. Options: 'one_to_one', 'one_to_one_mtl',
             'one_to_one_if', 'two_to_one', 'two_to_one_heterogeneous_ligand',
-            'heterogeneous_ligand'. Default is 'one_to_one'.
+            'heterogeneous_ligand', 'bivalent_analyte'. Default is 'one_to_one'.
         fitting_region : str, optional
             Region to fit. Options: 'association_dissociation', 'association', 'dissociation'. Default is 'association_dissociation'.
         shared_smax : bool, optional
@@ -638,7 +638,7 @@ class KineticsAnalyzer:
             Ignored for one_to_one and one_to_one_if models. Default is False.
         fixed_t0 : bool, optional
             Whether to fix t0 for association/dissociation fitting. Used by
-            the heterogeneous ligand model. Default is True.
+            the heterogeneous ligand and bivalent analyte models. Default is True.
         Kd1_values : list, optional
             Candidate Kd1 values for the heterogeneous ligand grid search.
         Kd2_values : list, optional
@@ -664,7 +664,8 @@ class KineticsAnalyzer:
             'two_to_one_heterogeneous_ligand',
             'heterogeneous_ligand',
         ]
-        if fitting_model not in ['one_to_one', 'one_to_one_mtl', 'one_to_one_if','two_to_one'] + heterogeneous_ligand_models:
+        if fitting_model not in ['one_to_one', 'one_to_one_mtl', 'one_to_one_if', 'two_to_one',
+                                 'bivalent_analyte'] + heterogeneous_ligand_models:
             raise ValueError("Unknown fitting model: " + fitting_model)
 
         successful_fits = []
@@ -704,6 +705,10 @@ class KineticsAnalyzer:
                         Kd1_values=Kd1_values,
                         Kd2_values=Kd2_values,
                     )
+
+                # Edited with AI assistance: bivalent analyte model
+                if fitting_model == 'bivalent_analyte' and fitting_region == 'association_dissociation':
+                    kf.fit_bivalent_analyte_assoc_and_disso(shared_smax=shared_smax, fixed_t0=fixed_t0)
 
                 kf.create_fitting_bounds_table()
                 successful_fits.append(kf)
