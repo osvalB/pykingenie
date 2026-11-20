@@ -132,6 +132,8 @@ def test_per_curve_injection_times_and_concentrations(tmp_path):
         ({"association_start": {"Cycle=1_Fc=2-1": STARTS, "Cycle=1_Fc=4-3": STARTS[:4]}},
          "same number of injections, one number each"),
         ({"single_cycle": "yes"}, "must be a boolean"),
+        ({"association_start": ["a"] * 5}, "must be numbers of seconds"),
+        ({"concentrations": ["a"] * 5}, "concentrations must be numbers"),
     ],
 )
 def test_invalid_single_cycle_settings(tmp_path, kwargs, message):
