@@ -357,6 +357,19 @@ def curve_fit_log_scale(f, xdata, ydata, p0, bounds, **kwargs):
     def f_log(x, *q):
         return f(x, *to_linear(q))
 
+    # Edited with AI assistance: an analytic Jacobian is converted with the chain rule,
+    # d f / d log(p) = p * d f / d p.
+    jac = kwargs.pop('jac', None)
+    if callable(jac):
+        def jac_log(x, *q):
+            p = to_linear(q)
+            jac_p = jac(x, *p)
+            jac_p *= np.where(log, p, 1.0)
+            return jac_p
+        kwargs['jac'] = jac_log
+    elif jac is not None:
+        kwargs['jac'] = jac
+
     # A p0 outside the bounds gives a q0 outside them (or nan), so curve_fit raises as before
     with np.errstate(divide='ignore', invalid='ignore'):
         q0, q_low, q_high = p0.copy(), low.copy(), high.copy()

@@ -21,11 +21,11 @@ from .utils.fitting_surface import (
     one_site_assoc_and_disso_asymmetric_ci95,
     one_site_assoc_and_disso_asymmetric_ci95_koff,
     trim_masks,
-    get_smax_upper_bound_factor
+    get_smax_upper_bound_factor,
+    fit_single_exponential_fast
 )
 
 from .utils.fitting_general import (
-    fit_single_exponential,
     re_fit,
     re_fit_2
 )
@@ -1167,7 +1167,7 @@ class KineticsFitter(KineticsFitterGeneral):
             if masks is not None:
                 y, t = y[masks[i]], t[masks[i]]
 
-            fit_params, _, _ = fit_single_exponential(y,t)
+            fit_params, _, _ = fit_single_exponential_fast(y,t)
 
             # Append the k_obs value to the list
             k_obs[i] = fit_params[2]
