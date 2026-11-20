@@ -51,13 +51,16 @@ def mtl_model(p):
 
 
 def induced_fit_model(p):
+    ratio = p.get('signal_ratio', 1.0)
+
     def assoc(t, c, state):
         m = solve_induced_fit_association(t, c, p['kon'], p['koff'], p['kc'], p['krev'],
-                                          sP1L=state[0], sP2L=state[1], smax=p['smax'])
+                                          sP1L=state[0], sP2L=state[1], smax=p['smax'], signal_ratio=ratio)
         return m[:, 0], (m[-1, 1], m[-1, 2])
     def disso(t, state):
-        s0 = state[0] + state[1]
-        m = solve_induced_fit_dissociation(t, p['koff'], p['kc'], p['krev'], s0=s0, sP2L=state[1], smax=p['smax'])
+        s0 = state[0] + ratio * state[1]
+        m = solve_induced_fit_dissociation(t, p['koff'], p['kc'], p['krev'],
+                                          s0=s0, sP2L=state[1], smax=p['smax'], signal_ratio=ratio)
         return m[:, 0], (m[-1, 1], m[-1, 2])
     return assoc, disso, (0.0, 0.0)
 
@@ -112,6 +115,12 @@ CASES = {
         fit=dict(fitting_model='one_to_one_if'),
         expected={'k_on [1/(s*µM)]': 0.2, 'k_off [1/s]': 0.02, 'k_c [1/s]': 0.005, 'k_rev [1/s]': 0.0005},
         rtol={'k_rev [1/s]': 0.2}),
+    'one_to_one_if_variable_signal': dict(
+        sim=lambda: induced_fit_model(dict(kon=0.2, koff=0.02, kc=0.005, krev=0.0005, smax=0.6, signal_ratio=1.4)),
+        fit=dict(fitting_model='one_to_one_if', fit_signal_ratio=True),
+        expected={'k_on [1/(s*µM)]': 0.2, 'k_off [1/s]': 0.02, 'k_c [1/s]': 0.005,
+                  'k_rev [1/s]': 0.0005, 'Signal ratio (AL/ALint)': 1.4},
+        rtol={'k_rev [1/s]': 0.2}),
     'two_to_one': dict(
         sim=lambda: two_site_model(dict(Kd=0.05, koff=0.01, Rmax_PL=0.35, Rmax_LPL=0.6), cooperative=False),
         fit=dict(fitting_model='two_to_one', fit_sigma=False),
@@ -134,7 +143,7 @@ CASES = {
 DEFAULT_RTOL = 0.1
 
 
-def write_single_cycle_files(folder, assoc, disso, state, seed=0):
+def write_single_cycle_files(folder, assoc, disso, state, seed=0, noise_sd=NOISE_SD):
     """Simulate a single-cycle titration and write it as steps + traces files."""
 
     steps = [('Baseline', 60, 'Baseline', 'p1A1', ''),
@@ -167,7 +176,7 @@ def write_single_cycle_files(folder, assoc, disso, state, seed=0):
         signal.append(y)
 
     signal = np.concatenate(signal)
-    signal = signal + np.random.default_rng(seed).normal(0, NOISE_SD, signal.size)
+    signal = signal + np.random.default_rng(seed).normal(0, noise_sd, signal.size)
     time = np.arange(signal.size) * DT
 
     traces_file = folder / 'traces.csv'
@@ -180,12 +189,10 @@ def write_single_cycle_files(folder, assoc, disso, state, seed=0):
     return str(steps_file), str(traces_file)
 
 
-@pytest.mark.parametrize('case', list(CASES.keys()))
-def test_single_cycle_parameter_recovery(case, tmp_path):
-
+def _fit_single_cycle(case, tmp_path, noise_sd):
     spec = CASES[case]
     assoc, disso, state0 = spec['sim']()
-    steps_file, traces_file = write_single_cycle_files(tmp_path, assoc, disso, state0)
+    steps_file, traces_file = write_single_cycle_files(tmp_path, assoc, disso, state0, noise_sd=noise_sd)
 
     exp = SurfaceCsvExperiment(case)
     exp.read_files(steps_file, traces_file)  # concentrations from the steps file
@@ -203,7 +210,13 @@ def test_single_cycle_parameter_recovery(case, tmp_path):
 
     _, failed = ka.submit_kinetics_fitting(shared_smax=True, **spec['fit'])
     assert not failed, f'{case}: fit failed'
+    return fitter
 
+
+@pytest.mark.parametrize('case', list(CASES))
+def test_single_cycle_parameter_recovery(case, tmp_path):
+    spec = CASES[case]
+    fitter = _fit_single_cycle(case, tmp_path, NOISE_SD)
     params = fitter.fit_params_kinetics.iloc[0]
 
     for name, true_value in spec['expected'].items():
@@ -216,3 +229,33 @@ def test_single_cycle_parameter_recovery(case, tmp_path):
     residuals = np.concatenate([np.concatenate(fitter.assoc_lst) - np.concatenate(fitter.signal_assoc_fit),
                                 np.concatenate(fitter.disso_lst) - np.concatenate(fitter.signal_disso_fit)])
     assert np.sqrt(np.mean(residuals ** 2)) < 2 * NOISE_SD
+
+
+@pytest.mark.parametrize('case', list(CASES))
+def test_single_cycle_leave_one_out_recovers_parameters(case, tmp_path):
+    fitter = _fit_single_cycle(case, tmp_path, noise_sd=0)
+    assert fitter.assoc_lst[1][0] > 0.01
+    fitter.calc_leave_one_out_errors()
+
+    attributes = {
+        'Kd [µM]': 'Kd_loo',
+        'k_off [1/s]': 'k_off_loo',
+        'k_on [1/(s*µM)]': 'k_on_loo',
+        'k_c [1/s]': 'k_c_loo',
+        'k_rev [1/s]': 'k_rev_loo',
+        'Signal ratio (AL/ALint)': 'signal_ratio_loo',
+        'sigma': 'sigma_loo',
+        'Kd1 [µM]': 'Kd1_loo',
+        'k_off1 [1/s]': 'k_off1_loo',
+        'Kd2 [µM]': 'Kd2_loo',
+        'k_off2 [1/s]': 'k_off2_loo',
+        'fraction_site1': 'fraction_site1_loo',
+    }
+    for name, true_value in CASES[case]['expected'].items():
+        if name == 'Ktr':
+            np.testing.assert_allclose(fitter.ktr_loo_means, [true_value], rtol=0.01)
+            assert fitter.ktr_loo_stds[0] < true_value * 0.01
+        else:
+            values = getattr(fitter, attributes[name])
+            assert len(values) == len(CONCS)
+            np.testing.assert_allclose(values, true_value, rtol=0.01)

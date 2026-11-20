@@ -75,6 +75,13 @@ def _leave_one_out_parameters(params, low_bounds, high_bounds, smax_ids, omitted
     return *selected, remapped_ids, retained_groups
 
 
+def _loo_state_refit_indices(assoc_times, disso_times):
+    """Find omissions whose successor needs a new starting state at the vacated index."""
+    continuous = detect_time_list_continuos(assoc_times, disso_times)
+    return {i - 1 for i in range(1, len(continuous))
+            if continuous[i] and assoc_times[i][0] >= 2}
+
+
 class KineticsFitter(KineticsFitterGeneral):
     """
     A class used to fit kinetics data with shared thermodynamic parameters.
@@ -1448,6 +1455,7 @@ class KineticsFitter(KineticsFitterGeneral):
 
             # one ktr per Smax group - replicates with the same Smax ID share the same ktr
             ktrs_loo = [[] for _ in range(n_ktr)]
+            state_refits = _loo_state_refit_indices(self.time_assoc_lst, self.time_disso_lst)
 
         # Iterate over replicates that may share Smax ID
         for i in range(len(self.assoc_lst)):
@@ -1491,6 +1499,8 @@ class KineticsFitter(KineticsFitterGeneral):
             }
 
             fit_fx = fit_one_site_assoc_and_disso_ktr if fit_ktr else fit_one_site_assoc_and_disso
+            if fit_ktr and i in state_refits:
+                kwargs['fit_initial_state_at'] = i
 
             try:
                 # Run the fitting function on the modified lists.
@@ -1795,6 +1805,7 @@ class KineticsFitter(KineticsFitterGeneral):
         fit_sigma = self.fit_sigma
         n_fits_loo_ok = 0
         n_fits_loo_fail = 0
+        state_refits = _loo_state_refit_indices(self.time_assoc_lst, self.time_disso_lst)
 
         Kd_loo = []
         k_off_loo = []
@@ -1841,6 +1852,7 @@ class KineticsFitter(KineticsFitterGeneral):
                 'smax_idx' : temp_smax_idx,
                 'fixed_t0' : fixed_t0,
                 'fit_sigma' : fit_sigma,
+                'fit_initial_state_at': i if i in state_refits else None,
                 **self._fit_masks(temp_time_assoc_lst, temp_time_disso_lst),
             }
 
@@ -2207,6 +2219,7 @@ class KineticsFitter(KineticsFitterGeneral):
         Kd2_loo = []
         k_off2_loo = []
         fraction_site1_loo = []
+        state_refits = _loo_state_refit_indices(self.time_assoc_lst, self.time_disso_lst)
 
         for i in range(len(self.assoc_lst)):
 
@@ -2243,6 +2256,7 @@ class KineticsFitter(KineticsFitterGeneral):
                 'shared_smax': shared_smax,
                 'smax_idx': temp_smax_idx,
                 'fixed_t0': fixed_t0,
+                'fit_initial_state_at': i if i in state_refits else None,
                 **self._fit_masks(temp_time_assoc_lst, temp_time_disso_lst),
             }
 
@@ -2553,16 +2567,9 @@ class KineticsFitter(KineticsFitterGeneral):
         names = ['Kd1', 'k_off1', 'k_a2', 'k_d2']
         columns = ['Kd1 [µM]', 'k_off1 [1/s]', 'k_a2 [1/(signal·s)]', 'k_d2 [1/s]']
         estimates = {name: [] for name in names}
-        continuous = detect_time_list_continuos(self.time_assoc_lst, self.time_disso_lst)
+        state_refits = _loo_state_refit_indices(self.time_assoc_lst, self.time_disso_lst)
 
         for i in range(len(self.assoc_lst)):
-            next_trace = i + 1
-            fit_initial_state_at = None
-            if (next_trace < len(continuous) and continuous[next_trace]
-                    and self.time_assoc_lst[next_trace][0] >= 2):
-                # After deletion, the successor occupies the omitted trace's index.
-                fit_initial_state_at = i
-
             temp_time_assoc_lst = remove_at(copy.deepcopy(self.time_assoc_lst), i)
             temp_time_disso_lst = remove_at(copy.deepcopy(self.time_disso_lst), i)
 
@@ -2578,7 +2585,7 @@ class KineticsFitter(KineticsFitterGeneral):
                     remove_at(copy.deepcopy(self.disso_lst), i), temp_time_disso_lst,
                     temp_p0, temp_low_bounds, temp_high_bounds,
                     smax_idx=temp_smax_idx, shared_smax=self.shared_smax, fixed_t0=self.fixed_t0,
-                    fit_initial_state_at=fit_initial_state_at,
+                    fit_initial_state_at=i if i in state_refits else None,
                     **self._fit_masks(temp_time_assoc_lst, temp_time_disso_lst))
             except Exception:
                 continue
@@ -2984,6 +2991,7 @@ class KineticsFitter(KineticsFitterGeneral):
         signal_ratio_loo = []
         n_fits_loo_ok = 0
         n_fits_loo_fail = 0
+        state_refits = _loo_state_refit_indices(self.time_assoc_lst, self.time_disso_lst)
 
         for i in range(len(self.assoc_lst)):
 
@@ -3023,6 +3031,7 @@ class KineticsFitter(KineticsFitterGeneral):
                 'shared_smax' : shared_smax,
                 'smax_idx' : temp_smax_idx,
                 'fixed_t0' : True,
+                'fit_initial_state_at': i if i in state_refits else None,
                 **self._fit_masks(temp_time_assoc_lst, temp_time_disso_lst)
             }
 
