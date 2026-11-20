@@ -156,6 +156,26 @@ preserved without interpolation, alignment or reference subtraction. Exported
 `fitted curve` columns are excluded; Carterra `NotFitted` rows are retained.
 For Carterra XLSX exports, save the sensorgram sheet as CSV first.
 
+For a `SprTextExperiment` curve that holds a whole single-cycle (titration)
+run, pass `single_cycle=True` and give the boundaries and concentrations per
+injection; each dissociation lasts until the next injection starts:
+
+```python
+spr.read_file(
+    "single_cycle.txt",
+    single_cycle=True,
+    association_start=[60, 360, 660, 960, 1260],   # one per injection
+    association_end=[180, 480, 780, 1080, 1380],
+    concentrations=[6.25, 12.5, 25, 50, 100],
+    concentration_unit="nM",
+    sample_id={"Cycle=1_Fc=2-1": "Fab A", "Cycle=1_Fc=4-3": "Fab B"},
+)
+```
+
+The lists apply to every curve; a curve-label mapping of lists gives each curve
+its own. Every curve needs the same number of injections and its own
+`sample_id`, so each curve is fitted on its own.
+
 Concentrations can also be a mapping from full curve labels to values. Without
 explicit concentrations, only `conc=...` labels with a known molar unit are
 converted; set `concentration_unit` to interpret unitless `conc=...` labels.

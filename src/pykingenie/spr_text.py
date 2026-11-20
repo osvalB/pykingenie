@@ -32,9 +32,23 @@ can supply the timing, concentrations and ``sample_id`` below.
   same analyte (by default all curves form one group). Reference subtraction
   and alignment are not done on import; use ``subtraction`` and
   ``align_association`` on the experiment.
+
+Multi-cycle and single-cycle kinetics
+-------------------------------------
+- Multi-cycle (the default): each curve is one cycle with one injection, so
+  each curve gets one ``association_start``/``association_end`` and one
+  concentration.
+- Single-cycle (``single_cycle=True``): each curve holds several injections of
+  increasing concentration without regeneration. ``association_start``,
+  ``association_end`` and ``concentrations`` are then lists with one value per
+  injection, shared by every curve, or curve-label mappings of such lists.
+  Each dissociation lasts until the next injection starts. Every curve needs
+  its own ``sample_id``, and the concentrations cannot come from the labels.
 """
 
 import re
+
+import numpy as np
 
 from .utils.sensorgram_text import (
     SensorgramTextExperiment,
@@ -114,6 +128,7 @@ class SprTextExperiment(SensorgramTextExperiment):
         decimal=None,
         encoding="utf-8-sig",
         info=None,
+        single_cycle=False,
     ):
         """Read paired-column text/CSV/TSV, optionally gzip compressed.
 
@@ -142,7 +157,18 @@ class SprTextExperiment(SensorgramTextExperiment):
         concentrations and sample_id (the analyte); arguments you pass take
         precedence. Without info, association_start defaults to 0 s and
         sample_id to "sample".
+
+        With single_cycle=True each curve holds several injections without
+        regeneration (single-cycle kinetics). association_start,
+        association_end and concentrations then give one value per injection:
+        a list used for every curve, or a curve-label mapping of lists. All
+        curves need the same number of injections and each curve its own
+        sample_id. The steps become BASELINE, then ASSOC and DISASSOC per
+        injection, each dissociation lasting until the next injection starts,
+        and ligand_conc_df has one row per curve and injection.
         """
+        if not isinstance(single_cycle, (bool, np.bool_)):
+            raise ValueError("single_cycle must be a boolean.")
         settings, _ = self._settings(
             info,
             association_start=association_start,
@@ -157,5 +183,6 @@ class SprTextExperiment(SensorgramTextExperiment):
             time_unit=time_unit,
             decimal=decimal,
             encoding=encoding,
+            single_cycle=bool(single_cycle),
             **settings,
         )
