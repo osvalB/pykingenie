@@ -40,6 +40,15 @@ def test_same_fit_as_curve_fit_with_a_parameter_that_can_be_negative():
     assert params[2] < 0
 
 
+def test_jacobian_method_name_is_passed_to_curve_fit():
+    # This test is AI generated.
+    """A jac given by name, not as a function, needs no conversion to the log scale."""
+    y = _noisy(_rise, 5.0, 0.05, -2.0)
+    kwargs = dict(p0=[1.0, 0.01, 0.0], bounds=([0.1, 1e-4, -10.0], [50.0, 1.0, 10.0]))
+    _assert_same_fit(curve_fit_log_scale(_rise, T, y, jac='3-point', **kwargs),
+                     curve_fit(_rise, T, y, jac='3-point', **kwargs))
+
+
 def test_parameter_with_zero_lower_bound_stays_linear():
     """A baseline whose best value is on its lower bound of zero."""
     def decay(t, a, k, c):

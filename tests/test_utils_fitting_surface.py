@@ -402,6 +402,27 @@ def test_fit_single_exponential_fast_matches_general():
         np.testing.assert_allclose(fast_y, expected_y, rtol=1e-6, atol=1e-9)
 
 
+def test_fit_single_exponential_fast_skips_rates_too_slow_to_resolve():
+    # This test is AI generated.
+    from pykingenie.utils.fitting_surface import fit_single_exponential_fast
+
+    # At k_obs = 1e-8 the exponential is constant over 100 s, so a0 and a1 cannot be
+    # told apart: those grid points are skipped and the fit uses the others.
+    t = np.linspace(0, 100, 300)
+    y = 0.2 + 1.0 * np.exp(-0.05 * t)
+    fit_params, _, fit_y = fit_single_exponential_fast(y, t, min_log_k=-8)
+    np.testing.assert_allclose(fit_params, [0.2, 1.0, 0.05], rtol=1e-6)
+    np.testing.assert_allclose(fit_y, y, atol=1e-9)
+
+
+def test_fit_single_exponential_fast_raises_without_a_time_range():
+    # This test is AI generated.
+    from pykingenie.utils.fitting_surface import fit_single_exponential_fast
+
+    with pytest.raises(RuntimeError, match='well-posed'):
+        fit_single_exponential_fast(np.ones(5), np.zeros(5))
+
+
 def _numeric_jacobian(f, params, rel_step=1e-6):
     params = np.asarray(params, dtype=float)
     columns = []
