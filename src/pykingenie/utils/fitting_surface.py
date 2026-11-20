@@ -22,6 +22,8 @@ from .signal_surface import (
     solve_two_site_cooperative_dissociation,
     solve_two_site_heterogeneous_ligand_association,
     solve_two_site_heterogeneous_ligand_dissociation,
+    solve_bivalent_analyte_association,
+    solve_bivalent_analyte_dissociation,
 )
 
 from .math import get_rss
@@ -43,6 +45,7 @@ __all__ = [
     'fit_one_site_assoc_and_disso',
     'fit_two_site_assoc_and_disso',
     'fit_two_site_heterogeneous_ligand_assoc_and_disso',
+    'fit_bivalent_analyte_assoc_and_disso',
     'fit_induced_fit_sites_assoc_and_disso',
     'fit_one_site_assoc_and_disso_ktr',
     'one_site_assoc_and_disso_asymmetric_ci95',
@@ -241,6 +244,24 @@ def _fit_points(fit_fx, all_signal, mask):
         return fit_fx(x, *args)[mask]
 
     return fit_fx_points, all_signal[mask]
+
+
+def _initial_occupancy_guess(signals, masks, trace, capacity_signal):
+    """Seed the initial occupancy from the first retained association point."""
+    signal = np.asarray(signals[trace])
+    if masks is not None:
+        signal = signal[np.asarray(masks[trace], dtype=bool)]
+    if not signal.size or capacity_signal == 0:
+        return 0.5
+    return np.clip(signal[0] / capacity_signal, 0.01, 0.99)
+
+
+def _append_initial_state_parameters(p0, lower, upper, *fractions):
+    """Add model-specific initial fractions on a linear scale with unit bounds."""
+    zeros = [0.0] * len(fractions)
+    ones = [1.0] * len(fractions)
+    return [*p0, *fractions], [*lower, *zeros], [*upper, *ones]
+
 
 def get_smax_upper_bound_factor(Kd_ss):
     """
@@ -991,7 +1012,8 @@ def fit_two_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
                                  fixed_Kd=False, Kd_value=None,
                                  fixed_koff=False, koff_value=None,
                                  fit_sigma=False,
-                                 assoc_mask_lst=None, disso_mask_lst=None):
+                                 assoc_mask_lst=None, disso_mask_lst=None,
+                                 *, fit_initial_state_at=None):
     """
     Global fit to association and dissociation traces - two-site binding model.
 
@@ -1039,6 +1061,9 @@ def fit_two_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
         Value of koff to use if fixed_koff is True.
     fit_sigma : bool, optional
         If True, fit sigma as a shared parameter for cooperativity, default is False.
+    fit_initial_state_at : int, optional
+        Association index at which to fit a new starting state. Appends the
+        fraction of bound ligand and the fraction of that ligand that is doubly bound.
     
     assoc_mask_lst, disso_mask_lst : list, optional
         Boolean array per association / dissociation trace, True for the points
@@ -1073,6 +1098,17 @@ def fit_two_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
 
     n_unq_smax = len(np.unique(smax_idx))
     n_traces = len(time_lst_assoc)
+
+    if fit_initial_state_at is not None:
+        trace = fit_initial_state_at
+        group = smax_idx[trace] if shared_smax else trace
+        n_responses = n_unq_smax if shared_smax else n_traces
+        response_index = len(initial_parameters) - 2 * n_responses + 2 * group
+        rmax_pl, rmax_lpl = initial_parameters[response_index:response_index + 2]
+        occupied = _initial_occupancy_guess(
+            assoc_signal_lst, assoc_mask_lst, trace, (rmax_pl + rmax_lpl) / 2)
+        initial_parameters, low_bounds, high_bounds = _append_initial_state_parameters(
+            initial_parameters, low_bounds, high_bounds, occupied, 0.5)
 
     continuos_time = detect_time_list_continuos(time_lst_assoc, disso_time_lst)
 
@@ -1137,9 +1173,11 @@ def fit_two_site_assoc_and_disso(assoc_signal_lst, assoc_time_lst, analyte_conc_
             t0 = t0_vals[sidx] if (t0_vals is not None) else 0.0
             t_assoc_rel = t_assoc - t_assoc[0]
 
-            if np.logical_or(i == 0, initial_signal_at_zero[i]) and continuos_time[i]:
-                fpl0, flpl0 = 0.0, 0.0
-            elif continuos_time[i]:
+            if i == fit_initial_state_at:
+                occupied, double_fraction = args[-2:]
+                fpl0 = occupied * (1 - double_fraction)
+                flpl0 = occupied * double_fraction
+            elif continuos_time[i] and not (i == 0 or initial_signal_at_zero[i]):
                 fpl0, flpl0 = prev_fpl_end, prev_flpl_end
             else:
                 fpl0, flpl0 = 0.0, 0.0
@@ -1236,6 +1274,7 @@ def fit_two_site_heterogeneous_ligand_assoc_and_disso(
     fraction_site1_value=None,
     assoc_mask_lst=None,
     disso_mask_lst=None,
+    *, fit_initial_state_at=None,
 ):
     """
     Global fit to association and dissociation traces for a 2:1 heterogeneous ligand model.
@@ -1296,6 +1335,9 @@ def fit_two_site_heterogeneous_ligand_assoc_and_disso(
         If True, keep fraction_site1 fixed to fraction_site1_value.
     fraction_site1_value : float, optional
         Value to use when fixed_fraction_site1=True.
+    fit_initial_state_at : int, optional
+        Association index at which to fit a new starting state. Appends an
+        initial occupancy fraction for each ligand population.
 
     assoc_mask_lst, disso_mask_lst : list, optional
         Boolean array per association / dissociation trace, True for the points
@@ -1328,6 +1370,15 @@ def fit_two_site_heterogeneous_ligand_assoc_and_disso(
     n_unq_smax = len(np.unique(smax_idx))
     n_traces = len(time_lst_assoc)
     n_t0s = n_unq_smax * (not fixed_t0)
+
+    if fit_initial_state_at is not None:
+        trace = fit_initial_state_at
+        group = smax_idx[trace] if shared_smax else trace
+        n_responses = n_unq_smax if shared_smax else n_traces
+        rmax = initial_parameters[-n_responses + group]
+        occupied = _initial_occupancy_guess(assoc_signal_lst, assoc_mask_lst, trace, rmax)
+        initial_parameters, low_bounds, high_bounds = _append_initial_state_parameters(
+            initial_parameters, low_bounds, high_bounds, occupied, occupied)
 
     continuos_time = detect_time_list_continuos(time_lst_assoc, disso_time_lst)
 
@@ -1395,9 +1446,11 @@ def fit_two_site_heterogeneous_ligand_assoc_and_disso(
             t0 = t0_vals[sidx] if (t0_vals is not None) else 0.0
             t_assoc_rel = t_assoc - t_assoc[0]
 
-            if np.logical_or(i == 0, initial_signal_at_zero[i]) and continuos_time[i]:
-                s1_0, s2_0 = 0.0, 0.0
-            elif continuos_time[i]:
+            if i == fit_initial_state_at:
+                occupied1, occupied2 = args[-2:]
+                s1_0 = occupied1 * Rmax * fraction_site1
+                s2_0 = occupied2 * Rmax * (1 - fraction_site1)
+            elif continuos_time[i] and not (i == 0 or initial_signal_at_zero[i]):
                 s1_0, s2_0 = prev_s1_end, prev_s2_end
             else:
                 s1_0, s2_0 = 0.0, 0.0
@@ -1474,7 +1527,8 @@ def fit_induced_fit_sites_assoc_and_disso(
     fixed_koff2=False, koff2_value=None,
     max_nfev=None,
     fit_signal_ratio=False, signal_ratio_value=1.0,
-    assoc_mask_lst=None, disso_mask_lst=None
+    assoc_mask_lst=None, disso_mask_lst=None,
+    *, fit_initial_state_at=None,
 ):
     """
     Global fit to association and dissociation traces - one-to-one binding model with induced fit.
@@ -1533,6 +1587,9 @@ def fit_induced_fit_sites_assoc_and_disso(
     signal_ratio_value : float, optional
         Signal of AL relative to ALint used if fit_signal_ratio is False,
         default is 1 (both complexes produce the same signal).
+    fit_initial_state_at : int, optional
+        Association index at which to fit a new starting state. Appends the
+        fraction of bound ligand and the fraction of that ligand in the induced state.
     
     assoc_mask_lst, disso_mask_lst : list, optional
         Boolean array per association / dissociation trace, True for the points
@@ -1566,6 +1623,16 @@ def fit_induced_fit_sites_assoc_and_disso(
     start = 4 - sum([fixed_kon1, fixed_koff1, fixed_kon2, fixed_koff2]) + bool(fit_signal_ratio)
     n_unq_smax = len(np.unique(smax_idx))
     n_t0s = n_unq_smax * (not fixed_t0)
+
+    if fit_initial_state_at is not None:
+        trace = fit_initial_state_at
+        group = smax_idx[trace] if shared_smax else trace
+        smax = initial_parameters[start + n_t0s + group]
+        ratio = initial_parameters[start - 1] if fit_signal_ratio else signal_ratio_value
+        occupied = _initial_occupancy_guess(
+            assoc_signal_lst, assoc_mask_lst, trace, smax * (1 + ratio) / 2)
+        initial_parameters, low_bounds, high_bounds = _append_initial_state_parameters(
+            initial_parameters, low_bounds, high_bounds, occupied, 0.5)
 
     # Pre-compute slice boundaries for output array
     _n_traces  = len(time_lst_assoc)
@@ -1605,15 +1672,19 @@ def fit_induced_fit_sites_assoc_and_disso(
         i = 0
         for t_assoc, t_dissoc in zip(time_lst_assoc, time_lst_disso):
 
-            # Single-cycle: continue from the previous dissociation. Otherwise start empty.
-            if continuos_time[i] and not (i == 0 or initial_signal_at_zero[i]):
-                s0, sP1L, sP2l = last
-            else:
-                sP1L, sP2l = 0, 0
-
             conc = analyte_conc_lst[i]
             t0 = 0 if fixed_t0 else args[start + smax_idx[i]]
             smax = args[start + smax_idx[i] + n_t0s] if shared_smax else args[start + i + n_t0s]
+
+            # Single-cycle: continue from the previous dissociation. Otherwise start empty.
+            if i == fit_initial_state_at:
+                occupied, induced_fraction = args[-2:]
+                sP1L = smax * occupied * (1 - induced_fraction)
+                sP2l = smax * occupied * induced_fraction
+            elif continuos_time[i] and not (i == 0 or initial_signal_at_zero[i]):
+                _, sP1L, sP2l = last
+            else:
+                sP1L, sP2l = 0, 0
 
             mat_assoc = solve_induced_fit_association(t_assoc, conc, kon1, koff1, kon2, koff2, sP1L=sP1L, sP2L=sP2l, smax=smax, t0=t0,
                                                       signal_ratio=ratio)
@@ -1667,7 +1738,8 @@ def fit_one_site_assoc_and_disso_ktr(assoc_signal_lst, assoc_time_lst, analyte_c
                                  fixed_Kd=False, Kd_value=None,
                                  fixed_koff=False, koff_value=None,
                                  start_candidates=None,
-                                 assoc_mask_lst=None, disso_mask_lst=None):
+                                 assoc_mask_lst=None, disso_mask_lst=None,
+                                 *, fit_initial_state_at=None):
     """
     Global fit to a set of association and dissociation traces - one-to-one with mass transport limitation binding model.
     
@@ -1708,6 +1780,9 @@ def fit_one_site_assoc_and_disso_ktr(assoc_signal_lst, assoc_time_lst, analyte_c
         evaluated once at each; a second fit starts from the one with the
         lowest sum of squared residuals, and the better of the two fits is
         returned, default is None.
+    fit_initial_state_at : int, optional
+        Association index at which to fit a new starting state. Appends the
+        initial fraction of bound ligand.
 
     assoc_mask_lst, disso_mask_lst : list, optional
         Boolean array per association / dissociation trace, True for the points
@@ -1743,6 +1818,16 @@ def fit_one_site_assoc_and_disso_ktr(assoc_signal_lst, assoc_time_lst, analyte_c
 
     n_t0s = len(np.unique(smax_idx))*(not fixed_t0)
     n_ktr = len(np.unique(smax_idx))
+
+    if fit_initial_state_at is not None:
+        trace = fit_initial_state_at
+        group = smax_idx[trace] if shared_smax else trace
+        smax = initial_parameters[start + n_t0s + n_ktr + group]
+        occupied = _initial_occupancy_guess(assoc_signal_lst, assoc_mask_lst, trace, smax)
+        initial_parameters, low_bounds, high_bounds = _append_initial_state_parameters(
+            initial_parameters, low_bounds, high_bounds, occupied)
+        if start_candidates:
+            start_candidates = [[*candidate, occupied] for candidate in start_candidates]
 
     # Pre-compute slice boundaries
     _n_traces  = len(time_lst_assoc)
@@ -1780,7 +1865,9 @@ def fit_one_site_assoc_and_disso_ktr(assoc_signal_lst, assoc_time_lst, analyte_c
             s_max  = args[start+smax_idx[i]+n_t0s+n_ktr] if shared_smax else args[start + i + n_t0s + n_ktr]
 
             # Single-cycle: continue from the previous dissociation. Otherwise start empty.
-            if continuos_time[i] and not (i == 0 or initial_signal_at_zero[i]):
+            if i == fit_initial_state_at:
+                s0 = s_max * args[-1]
+            elif continuos_time[i] and not (i == 0 or initial_signal_at_zero[i]):
                 s0 = prev_disso_end
             else:
                 s0 = 0.0
@@ -2107,3 +2194,185 @@ def one_site_assoc_and_disso_asymmetric_ci95_koff(koff_estimated, rss_desired,
 
     return _asymmetric_ci95_limits(fit_fixed_koff, koff_estimated, rss_desired, initial_parameters,
                                    test_factors=[1.02, 1.1, 1.5, 2, 5, 10, 25, 50, 100])
+
+
+def fit_bivalent_analyte_assoc_and_disso(
+    assoc_signal_lst, assoc_time_lst, analyte_conc_lst,
+    disso_signal_lst, disso_time_lst,
+    initial_parameters, low_bounds, high_bounds,
+    smax_idx=None,
+    shared_smax=False,
+    fixed_t0=True,
+    fixed_ka2=False, ka2_value=None,
+    fixed_kd2=False, kd2_value=None,
+    assoc_mask_lst=None, disso_mask_lst=None,
+    rtol=1e-8, coarse=False,
+    *, fit_initial_state_at=None,
+):
+    """
+    Global fit to association and dissociation traces - bivalent analyte model.
+
+    The analyte binds the immobilised ligand with one arm (Kd1, koff1) and the
+    bound analyte binds a second ligand with its other arm (ka2, kd2). See
+    ode_bivalent_analyte in signal_surface for the rate equations.
+
+    Parameter order when fitting:
+    [Kd1, koff1, ka2, kd2, (t0...), Rmax_1, Rmax_2, ...]
+    ka2 and kd2 are left out when fixed, and t0 when fixed_t0 is True
+    (one t0 per Rmax group otherwise). When fit_initial_state_at is set, the
+    fit appends the initial fraction of occupied ligand and the fraction of
+    that occupancy due to doubly bound analyte.
+
+    Parameters
+    ----------
+    assoc_signal_lst : list
+        List of association signals to fit, each signal is a numpy array.
+    assoc_time_lst : list
+        List of association time arrays.
+    analyte_conc_lst : list
+        Analyte concentration of each association trace, µM.
+    disso_signal_lst : list
+        List of dissociation signals to fit, each signal is a numpy array.
+    disso_time_lst : list
+        List of dissociation time arrays.
+    initial_parameters : list
+        Initial guess, in the order above.
+    low_bounds : list
+        Lower bounds for the parameters.
+    high_bounds : list
+        Upper bounds for the parameters.
+    smax_idx : list, optional
+        Rmax group of each trace, used if shared_smax is True.
+    shared_smax : bool, optional
+        If True, traces with the same smax_idx share Rmax, default is False.
+    fixed_t0 : bool, optional
+        If True, t0 is fixed to 0, otherwise one t0 per Rmax group is fitted,
+        default is True.
+    fixed_ka2 : bool, optional
+        If True, ka2 is fixed to ka2_value, default is False.
+    ka2_value : float, optional
+        Value of ka2 [1/(signal·s)] to use if fixed_ka2 is True.
+    fixed_kd2 : bool, optional
+        If True, kd2 is fixed to kd2_value, default is False.
+    kd2_value : float, optional
+        Value of kd2 [1/s] to use if fixed_kd2 is True.
+    assoc_mask_lst, disso_mask_lst : list, optional
+        Boolean array per association / dissociation trace, True for the points
+        to fit (see trim_masks). The model is still evaluated at every point,
+        from the first time point of each step. Default fits every point.
+    rtol : float, optional
+        Relative tolerance of the ODE integration, default is 1e-8.
+    coarse : bool, optional
+        If True, stop the optimizer at a relative change of 1e-4 and use a 1e-3
+        finite-difference step, so a looser rtol does not make the Jacobian noisy.
+        Used by the grid search, where the fit only ranks starting points.
+        Default is False.
+    fit_initial_state_at : int, optional
+        Index of an association trace whose starting state should be fitted
+        from the data, for example after an omitted single-cycle injection.
+        Initial guesses and bounds for the two additional fractions are
+        supplied automatically.
+
+    Returns
+    -------
+    list
+        Fitted parameters.
+    np.ndarray
+        Covariance matrix of the fitted parameters.
+    list
+        Fitted values for each association signal, same dimensions as assoc_signal_lst.
+    list
+        Fitted values for each dissociation signal, same dimensions as disso_signal_lst.
+    """
+    # This function is AI generated.
+    if smax_idx is None:
+        smax_idx = list(range(len(assoc_signal_lst)))
+
+    # An association that starts after a dissociation of the same cycle (single
+    # cycle kinetics) continues from the complexes left at its end
+    initial_signal_at_zero = [time[0] < 2 for time in assoc_time_lst]
+    continuos_time = detect_time_list_continuos(assoc_time_lst, disso_time_lst)
+
+    time_lst_assoc = [np.array(t, dtype=float) for t in assoc_time_lst]
+    time_lst_disso = [np.array(t, dtype=float) for t in disso_time_lst]
+
+    n_traces = len(time_lst_assoc)
+    n_t0s = len(np.unique(smax_idx)) * (not fixed_t0)
+    n_kinetic = 4 - fixed_ka2 - fixed_kd2
+    rmax_indices = n_kinetic + n_t0s + np.asarray(smax_idx if shared_smax else range(n_traces))
+
+    if fit_initial_state_at is not None:
+        if not 0 <= fit_initial_state_at < n_traces:
+            raise ValueError("fit_initial_state_at must index an association trace.")
+        trace = fit_initial_state_at
+        rmax = initial_parameters[rmax_indices[trace]]
+        # With half of the occupied ligand in AL2, the signal is 3/4 of the occupancy.
+        occupied = _initial_occupancy_guess(assoc_signal_lst, assoc_mask_lst, trace, 0.75 * rmax)
+        initial_parameters, low_bounds, high_bounds = _append_initial_state_parameters(
+            initial_parameters, low_bounds, high_bounds, occupied, 0.5)
+
+    _a_offsets = np.concatenate([[0], np.cumsum([len(t) for t in time_lst_assoc])]).astype(int)
+    _d_offsets = (_a_offsets[-1] + np.concatenate([[0], np.cumsum([len(t) for t in time_lst_disso])])).astype(int)
+    _total = _d_offsets[-1]
+
+    def fit_fx(dummyVariable, *args):
+        """Evaluate the global bivalent analyte association and dissociation model."""
+        Kd1, koff1 = args[0], args[1]
+        idx = 2
+        ka2 = ka2_value if fixed_ka2 else args[idx]
+        idx += not fixed_ka2
+        kd2 = kd2_value if fixed_kd2 else args[idx]
+
+        out = np.empty(_total)
+        previous_end = (0.0, 0.0)
+
+        for i in range(n_traces):
+            group = smax_idx[i]
+            t0 = 0.0 if fixed_t0 else args[n_kinetic + group]
+            Rmax = args[rmax_indices[i]]
+
+            if i == fit_initial_state_at:
+                occupied_fraction, double_fraction = args[-2:]
+                occupied = Rmax * occupied_fraction
+                x1_0 = occupied * (1 - double_fraction)
+                x2_0 = occupied * double_fraction / 2
+            elif continuos_time[i] and not (i == 0 or initial_signal_at_zero[i]):
+                x1_0, x2_0 = previous_end
+            else:
+                x1_0, x2_0 = 0.0, 0.0
+
+            y_assoc = solve_bivalent_analyte_association(
+                time_lst_assoc[i], analyte_conc_lst[i], Kd1, koff1, ka2, kd2, Rmax,
+                x1_0=x1_0, x2_0=x2_0, t0=t0, rtol=rtol)
+            out[_a_offsets[i]:_a_offsets[i + 1]] = y_assoc[:, 0]
+
+            y_disso = solve_bivalent_analyte_dissociation(
+                time_lst_disso[i], koff1, ka2, kd2, Rmax,
+                x1_0=y_assoc[-1, 1], x2_0=y_assoc[-1, 2], rtol=rtol)
+            out[_d_offsets[i]:_d_offsets[i + 1]] = y_disso[:, 0]
+
+            previous_end = (y_disso[-1, 1], y_disso[-1, 2])
+
+        return out
+
+    all_signal = np.concatenate([concat_signal_lst(assoc_signal_lst), concat_signal_lst(disso_signal_lst)])
+
+    fit_fx_points, signal_points = _fit_points(
+        fit_fx, all_signal,
+        _concat_masks([assoc_mask_lst, disso_mask_lst], [assoc_signal_lst, disso_signal_lst]))
+
+    # Rate constants, Kd1 and Rmax span orders of magnitude: fit them on a log scale
+    coarse_kwargs = dict(ftol=1e-4, xtol=1e-4, diff_step=1e-3) if coarse else {}
+    global_fit_params, cov = curve_fit_log_scale(
+        fit_fx_points, 1, signal_points,
+        p0=initial_parameters,
+        bounds=(low_bounds, high_bounds),
+        x_scale='jac',
+        **coarse_kwargs,
+    )
+
+    predicted = fit_fx(1, *global_fit_params)
+    fitted_values_assoc = [predicted[_a_offsets[k]:_a_offsets[k + 1]] for k in range(n_traces)]
+    fitted_values_disso = [predicted[_d_offsets[k]:_d_offsets[k + 1]] for k in range(n_traces)]
+
+    return global_fit_params, cov, fitted_values_assoc, fitted_values_disso

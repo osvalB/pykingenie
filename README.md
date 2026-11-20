@@ -14,6 +14,7 @@ Welcome to **pyKinGenie**!, a python package for analysing binding kinetics data
 - Calculate binding kinetics (*k*<sub>on</sub>, *k*<sub>off</sub>, *K*<sub>D</sub>)
 - Global fitting of multiple traces
 - One-to-one, one-to-one with mass transport limitation, and one-to-one with induced fit models
+- Bivalent analyte model for surface-based binding (the analyte binds one ligand, then a second ligand with its other arm)
 
 ## Installation
 
@@ -158,7 +159,8 @@ Surface result keys include `steady_state_one_site`, `one_site_association`,
 `steady_state_two_site_cooperative`. Induced fit uses `one_site_if_assoc_and_disso`
 or `one_site_if_variable_signal` when fitting the signal ratio. Heterogeneous
 ligand fits use `two_site_heterogeneous_ligand_association_and_dissociation` or
-`steady_state_two_site_heterogeneous_ligand`. Solution result keys are
+`steady_state_two_site_heterogeneous_ligand`. The bivalent analyte model uses
+`bivalent_analyte_association_and_dissociation`. Solution result keys are
 `single_exponential`, `double_exponential`, `one_binding_site`, `induced_fit`,
 and `conformational_selection`. Each snapshot records the call options in
 `fit_settings`; `active_fit_result` gives the current key.
