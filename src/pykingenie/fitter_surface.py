@@ -34,6 +34,7 @@ from .utils.fitting_general import (
 from .utils.processing      import (
     subset_data,
     concat_signal_lst,
+    detect_time_list_continuos,
     expand_parameter_list,
     remove_at
 )
@@ -2540,6 +2541,9 @@ class KineticsFitter(KineticsFitterGeneral):
     def bivalent_analyte_assoc_and_disso_loo(self):
         """Estimate the bivalent analyte fit uncertainty by leaving out one curve at a time.
 
+        If the omitted curve feeds into another injection in a single-cycle run,
+        fit the starting bound state of that injection from the retained data.
+
         Notes
         -----
         Updates Kd1_loo, k_off1_loo, k_a2_loo and k_d2_loo (lists of estimates),
@@ -2549,8 +2553,16 @@ class KineticsFitter(KineticsFitterGeneral):
         names = ['Kd1', 'k_off1', 'k_a2', 'k_d2']
         columns = ['Kd1 [µM]', 'k_off1 [1/s]', 'k_a2 [1/(signal·s)]', 'k_d2 [1/s]']
         estimates = {name: [] for name in names}
+        continuous = detect_time_list_continuos(self.time_assoc_lst, self.time_disso_lst)
 
         for i in range(len(self.assoc_lst)):
+            next_trace = i + 1
+            fit_initial_state_at = None
+            if (next_trace < len(continuous) and continuous[next_trace]
+                    and self.time_assoc_lst[next_trace][0] >= 2):
+                # After deletion, the successor occupies the omitted trace's index.
+                fit_initial_state_at = i
+
             temp_time_assoc_lst = remove_at(copy.deepcopy(self.time_assoc_lst), i)
             temp_time_disso_lst = remove_at(copy.deepcopy(self.time_disso_lst), i)
 
@@ -2566,6 +2578,7 @@ class KineticsFitter(KineticsFitterGeneral):
                     remove_at(copy.deepcopy(self.disso_lst), i), temp_time_disso_lst,
                     temp_p0, temp_low_bounds, temp_high_bounds,
                     smax_idx=temp_smax_idx, shared_smax=self.shared_smax, fixed_t0=self.fixed_t0,
+                    fit_initial_state_at=fit_initial_state_at,
                     **self._fit_masks(temp_time_assoc_lst, temp_time_disso_lst))
             except Exception:
                 continue

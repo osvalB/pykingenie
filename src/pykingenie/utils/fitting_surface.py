@@ -2123,6 +2123,7 @@ def fit_bivalent_analyte_assoc_and_disso(
     fixed_kd2=False, kd2_value=None,
     assoc_mask_lst=None, disso_mask_lst=None,
     rtol=1e-8, coarse=False,
+    *, fit_initial_state_at=None,
 ):
     """
     Global fit to association and dissociation traces - bivalent analyte model.
@@ -2134,7 +2135,9 @@ def fit_bivalent_analyte_assoc_and_disso(
     Parameter order when fitting:
     [Kd1, koff1, ka2, kd2, (t0...), Rmax_1, Rmax_2, ...]
     ka2 and kd2 are left out when fixed, and t0 when fixed_t0 is True
-    (one t0 per Rmax group otherwise).
+    (one t0 per Rmax group otherwise). When fit_initial_state_at is set, the
+    fit appends the initial fraction of occupied ligand and the fraction of
+    that occupancy due to doubly bound analyte.
 
     Parameters
     ----------
@@ -2180,6 +2183,11 @@ def fit_bivalent_analyte_assoc_and_disso(
         finite-difference step, so a looser rtol does not make the Jacobian noisy.
         Used by the grid search, where the fit only ranks starting points.
         Default is False.
+    fit_initial_state_at : int, optional
+        Index of an association trace whose starting state should be fitted
+        from the data, for example after an omitted single-cycle injection.
+        Initial guesses and bounds for the two additional fractions are
+        supplied automatically.
 
     Returns
     -------
@@ -2207,6 +2215,22 @@ def fit_bivalent_analyte_assoc_and_disso(
     n_traces = len(time_lst_assoc)
     n_t0s = len(np.unique(smax_idx)) * (not fixed_t0)
     n_kinetic = 4 - fixed_ka2 - fixed_kd2
+    rmax_indices = n_kinetic + n_t0s + np.asarray(smax_idx if shared_smax else range(n_traces))
+
+    if fit_initial_state_at is not None:
+        if not 0 <= fit_initial_state_at < n_traces:
+            raise ValueError("fit_initial_state_at must index an association trace.")
+        trace = fit_initial_state_at
+        signal = np.asarray(assoc_signal_lst[trace])
+        if assoc_mask_lst is not None:
+            signal = signal[np.asarray(assoc_mask_lst[trace], dtype=bool)]
+        initial_signal = signal[0] if signal.size else 0.0
+        rmax = initial_parameters[rmax_indices[trace]]
+        # With half of the occupied ligand in AL2, the signal is 3/4 of the occupancy.
+        occupied_fraction = np.clip(initial_signal / (0.75 * rmax), 0.01, 0.99)
+        initial_parameters = [*initial_parameters, occupied_fraction, 0.5]
+        low_bounds = [*low_bounds, 0.0, 0.0]
+        high_bounds = [*high_bounds, 1.0, 1.0]
 
     _a_offsets = np.concatenate([[0], np.cumsum([len(t) for t in time_lst_assoc])]).astype(int)
     _d_offsets = (_a_offsets[-1] + np.concatenate([[0], np.cumsum([len(t) for t in time_lst_disso])])).astype(int)
@@ -2226,9 +2250,14 @@ def fit_bivalent_analyte_assoc_and_disso(
         for i in range(n_traces):
             group = smax_idx[i]
             t0 = 0.0 if fixed_t0 else args[n_kinetic + group]
-            Rmax = args[n_kinetic + n_t0s + (group if shared_smax else i)]
+            Rmax = args[rmax_indices[i]]
 
-            if continuos_time[i] and not (i == 0 or initial_signal_at_zero[i]):
+            if i == fit_initial_state_at:
+                occupied_fraction, double_fraction = args[-2:]
+                occupied = Rmax * occupied_fraction
+                x1_0 = occupied * (1 - double_fraction)
+                x2_0 = occupied * double_fraction / 2
+            elif continuos_time[i] and not (i == 0 or initial_signal_at_zero[i]):
                 x1_0, x2_0 = previous_end
             else:
                 x1_0, x2_0 = 0.0, 0.0

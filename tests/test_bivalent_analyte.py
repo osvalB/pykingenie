@@ -21,37 +21,40 @@ TIME_DISSO = np.arange(182, 500.1, 2.0)
 COARSE_GRID = dict(ka2_rmax_values=[0.01, 0.1, 1.0], kd2_factors=[1.0], koff1_factors=[1.0, 10.0])
 
 
-def _simulate(p=TRUTH, noise=0.0, seed=0, rmax_values=None, single_cycle=False):
+def _simulate(p=TRUTH, noise=0.0, seed=0, rmax_values=None, single_cycle=False,
+              concentrations=CONCS, time_assoc=TIME_ASSOC, time_disso=TIME_DISSO):
     rng = np.random.default_rng(seed)
     t_assoc_lst, t_disso_lst, assoc_lst, disso_lst = [], [], [], []
     x0, offset = (0.0, 0.0), 0.0
-    for i, conc in enumerate(CONCS):
+    for i, conc in enumerate(concentrations):
         rmax = p['Rmax'] if rmax_values is None else rmax_values[i]
         if not single_cycle:
             x0 = (0.0, 0.0)
-        assoc = solve_bivalent_analyte_association(TIME_ASSOC, conc, p['Kd1'], p['koff1'],
+        assoc = solve_bivalent_analyte_association(time_assoc, conc, p['Kd1'], p['koff1'],
                                                    p['ka2'], p['kd2'], rmax, *x0)
-        disso = solve_bivalent_analyte_dissociation(TIME_DISSO, p['koff1'], p['ka2'], p['kd2'],
+        disso = solve_bivalent_analyte_dissociation(time_disso, p['koff1'], p['ka2'], p['kd2'],
                                                     rmax, *assoc[-1, 1:])
         x0 = tuple(disso[-1, 1:])
-        assoc_lst.append(assoc[:, 0] + rng.normal(0, noise, TIME_ASSOC.size))
-        disso_lst.append(disso[:, 0] + rng.normal(0, noise, TIME_DISSO.size))
-        t_assoc_lst.append(TIME_ASSOC + offset)
-        t_disso_lst.append(TIME_DISSO + offset)
+        assoc_lst.append(assoc[:, 0] + rng.normal(0, noise, time_assoc.size))
+        disso_lst.append(disso[:, 0] + rng.normal(0, noise, time_disso.size))
+        t_assoc_lst.append(time_assoc + offset)
+        t_disso_lst.append(time_disso + offset)
         if single_cycle:
-            offset += TIME_DISSO[-1] + 2.0
+            offset += time_disso[-1] + 2.0
     return t_assoc_lst, assoc_lst, t_disso_lst, disso_lst
 
 
-def _fitter(smax_id=None, single_cycle=False, trim_time=0, steady_state=True, **sim_kwargs):
-    t_assoc_lst, assoc_lst, t_disso_lst, disso_lst = _simulate(single_cycle=single_cycle, **sim_kwargs)
+def _fitter(smax_id=None, single_cycle=False, trim_time=0, steady_state=True,
+            concentrations=CONCS, **sim_kwargs):
+    t_assoc_lst, assoc_lst, t_disso_lst, disso_lst = _simulate(
+        single_cycle=single_cycle, concentrations=concentrations, **sim_kwargs)
     fitter = KineticsFitter(
         time_assoc_lst=t_assoc_lst,
         association_signal_lst=assoc_lst,
-        lig_conc_lst=CONCS,
+        lig_conc_lst=concentrations,
         time_diss_lst=t_disso_lst,
         dissociation_signal_lst=disso_lst,
-        smax_id=[0] * len(CONCS) if smax_id is None else smax_id,
+        smax_id=smax_id,
         name_lst=['bivalent'],
         is_single_cycle=single_cycle,
         trim_time=trim_time,
@@ -238,6 +241,23 @@ def test_fit_leave_one_out():
     # The generic dispatch runs the same calculation
     fitter.calc_leave_one_out_errors()
     assert np.isclose(fitter.Kd1_loo_mean, fitter.Kd1, rtol=0.05)
+
+
+@pytest.mark.parametrize(('shared_smax', 'fixed_t0', 'trim_time'), [(True, True, 0), (False, False, 4)])
+def test_single_cycle_leave_one_out_recovers_rates_after_missing_injection(shared_smax, fixed_t0, trim_time):
+    p = {**TRUTH, 'ka2': 0.01}
+    concentrations = [0.5, 1.0, 2.0, 4.0, 8.0, 16.0]
+    fitter = _fitter(p=p, single_cycle=True, trim_time=trim_time, concentrations=concentrations,
+                     time_assoc=np.arange(0., 91., 2), time_disso=np.arange(92., 111., 2))
+    assert fitter.assoc_lst[1][0] > 10.0
+
+    fitter.fit_bivalent_analyte_assoc_and_disso(
+        shared_smax=shared_smax, fixed_t0=fixed_t0, calc_loo=True, **COARSE_GRID)
+
+    for name, key in [('Kd1', 'Kd1'), ('k_off1', 'koff1'), ('k_a2', 'ka2'), ('k_d2', 'kd2')]:
+        values = getattr(fitter, f'{name}_loo')
+        assert len(values) == len(concentrations)
+        np.testing.assert_allclose(values, p[key], rtol=0.01)
 
 
 def test_grid_failure_raises(monkeypatch):
