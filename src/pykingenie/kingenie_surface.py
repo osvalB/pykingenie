@@ -4,6 +4,7 @@ import pandas as pd
 import numpy  as np
 
 from .surface_exp import SurfaceBasedExperiment
+from .utils.text_io import read_delimited_table
 
 class KinGenieCsv(SurfaceBasedExperiment):
     """
@@ -86,9 +87,11 @@ class KinGenieCsv(SurfaceBasedExperiment):
         - self.df_steps: DataFrame with step information
         
         The method handles both multi-cycle and single-cycle kinetics data.
+        Comma, semicolon and tab separators are detected automatically, with
+        standard CSV quoting and decimal-point numeric values.
         """
 
-        df = pd.read_csv(file)
+        df = read_delimited_table(file)
 
         # Read only the first Smax value
         smax_unq = df['Smax'].unique()

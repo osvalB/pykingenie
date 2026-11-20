@@ -95,12 +95,29 @@ fig = plot_association_dissociation(pyKinetics)
 fig.write_image('test_bli_fitted.png')
 ```
 
+## Delimited text inputs
+
+KinGenie surface and solution CSVs, Gator sensor CSVs, generic surface steps and
+traces, and the SPR readers below automatically recognize **commas, semicolons,
+and tabs**. Each file is detected independently, so a steps file and its traces
+file can use different delimiters. No delimiter argument or file extension
+change is needed. For example, `KinGenieCsv().read_csv("simulation.csv")` accepts
+the same table saved with semicolons instead of commas.
+
+Standard CSV quotes preserve delimiters inside names and values. Spaces after
+separators are accepted, including before quoted fields. This changes field
+separation only: decimal marks are separate. `SprTextExperiment.read_file` and
+`CarterraExperiment.read_csv` also detect decimal commas from the measurements;
+pass `decimal="."` or `decimal=","` only for a file that uses both. In a
+comma-separated file, decimal-comma values must be quoted. The other readers
+continue to expect decimal points.
+
 ## SPR sensorgram text exports
 
 `SprTextExperiment` reads text/CSV/TSV files with one named `_X` time column
 and `_Y` response column per curve. Verified examples include Biacore T200
 `Cycle=..._Fc=...` and `Cycle: ...` headers, and rstoolbox's `Run/Ch/Cy/conc`
-export. Delimiters are detected; decimal commas and gzip files are supported.
+export. Delimiters and decimal commas are detected; gzip files are supported.
 
 ```python
 from pykingenie import SprTextExperiment, CarterraExperiment
@@ -112,7 +129,6 @@ spr.read_file(
     association_end=120,
     concentrations=[25, 50],   # one concentration per measured curve, in file order
     concentration_unit="nM",
-    decimal=",",              # use "." for dot-decimal exports
 )
 
 carterra = CarterraExperiment("lsa")
@@ -126,7 +142,9 @@ carterra.read_csv(
 
 Supply the actual injection boundaries for your experiment: association is
 `[association_start, association_end)`, and dissociation starts at
-`association_end`. By default, these readers represent one association/
+`association_end`. For `SprTextExperiment`, each boundary can also be a list or
+curve-label mapping with one value per curve, when injections start at different
+times on the exported time axis; Carterra imports use one timing for all rows. By default, these readers represent one association/
 dissociation pair per curve. For Carterra rows representing consecutive
 injections on one physical sensor, pass `single_cycle=True` and an explicit
 `cycle_duration` in seconds. The importer translates row clocks into one
@@ -144,6 +162,9 @@ converted; set `concentration_unit` to interpret unitless `conc=...` labels.
 Unresolved concentrations generate a warning and stay `NaN` in
 `ligand_conc_df`. Carterra `Conc. N` indices, bare numbers and mass units are
 never treated as molar concentrations. Supply these values before fitting.
+For a Carterra dilution series, `top_concentration=1, dilution_factor=2` replaces
+the list: the last row gets the top concentration and each earlier row is diluted
+once more (`highest_last=False` if the top concentration is the first row).
 The common `sample_id="sample"` groups all curves as one binding interaction;
 pass a list or curve-name mapping of sample IDs for exports containing several
 interactions. The resulting experiments use the standard `KineticsAnalyzer`
@@ -170,14 +191,13 @@ one-site fitter and compare its output with the authors' reference reports:
 The [teaching-data sources](notebooks/data/spr_exports/SOURCES.md) record curve
 selection, full-resolution point counts, licenses, and explicit missing-pair
 handling. The small files in `test_files/spr_exports/` remain parser regression
-fixtures. The Cycle/Fc example displays full binning cycles plus a display zoom;
-it does not represent a single association/dissociation experiment.
+fixtures. The Cycle/Fc example displays full binning cycles; it does not
+represent a single association/dissociation experiment.
 
-These curve exports have no plate-well coordinates. The notebooks display the
-available curve labels and draw a plate layout only if plate metadata exists.
-The Duke examples use their original companion sample sheets for concentrations
-and phase timing. Each calls `align_association(inplace=True, npoints=10)` on
-a copy before fitting and keeps the raw import plot.
+These curve exports have no plate-well coordinates, so the notebooks do not draw
+a plate layout. The Duke examples use their original companion sample sheets for
+concentrations and phase timing. Each plots the raw import with `plot_traces_all`,
+then calls `align_association(npoints=10)` and fits through `KineticsAnalyzer`.
 The rstoolbox and binning notebooks demonstrate import only. See
 [SPR fits with published comparisons](notebooks/SPR_FITTING.md) for the API calls,
 source reports and remaining differences in fitting setup. Both Duke examples
@@ -196,6 +216,28 @@ are conditional on the reconstructed 1140 s cycle period; the absolute injection
 clock has not been verified. Leave-one-out SD describes the spread of deletion
 estimates, rather than a confidence interval. After a deletion creates a gap,
 the fitter estimates the next association's initial response from its observations.
+
+### Settings from a TitrationAnalysis Data Info Sheet
+
+These exports lack injection timing and molar concentrations. If you have the
+TitrationAnalysis *Data Info Sheet* for the run (`.xlsx`, CSV or TSV), pass it as
+`info=` and both readers take the association window, concentrations, analyte
+(`sample_id`) and, for Carterra single-cycle imports, the cycle period from it:
+
+```python
+from pykingenie import CarterraExperiment, read_info_sheet
+
+carterra = CarterraExperiment("lsa")
+carterra.read_csv("sensorgrams.csv", info="Data Info Sheet.xlsx", single_cycle=True)
+```
+
+`association_start` is `Bsl Start` + `Baseline`, `association_end` adds
+`Association`, and `cycle_duration` is `Baseline` + `Association` + `Dissociation`.
+Concentrations missing from the sheet's `Incl. Conc.` start unselected in the
+`Select` column used for fitting. Arguments you pass explicitly take precedence.
+If the sheet's included rows differ, pass one row: `info=read_info_sheet(path).iloc[0]`.
+The full row is kept in `exp_info["info_sheet"]`, including the skip times to use
+as `trim_time`.
 
 ## Detecting input formats
 
@@ -232,14 +274,39 @@ metadata preambles, BOMs, Windows-1252 text, gzip, and comma/tab/semicolon
 delimiters. Native Biacore and Gator archives are checked for their internal
 structure. Renaming a file does not change its content-based identifier.
 Detection identifies the layout; the reader still validates the measurements
-and requires its normal arguments, including decimal conventions, injection
-boundaries, concentrations and companion files where applicable.
+and requires its normal arguments, such as injection boundaries,
+concentrations and companion files where applicable.
 
 Ambiguous or unsupported inputs return `unknown`, including generic two-column
 `Time,Signal` data and native XLSX files. Choose the reader explicitly for such
 inputs. Missing/inaccessible files raise the normal filesystem error.
 `guess_experiment_type` remains the compatible surface/solution helper, with its
 historical `surface` fallback; use `detect_file_format` for reader selection.
+
+### Loading files without choosing the reader
+
+`KineticsAnalyzer.load` runs `detect_file_format`, calls the reader from the
+table above and adds the experiment to the analyzer:
+
+```python
+from pathlib import Path
+from pykingenie import KineticsAnalyzer
+
+pyKinetics = KineticsAnalyzer()
+octet = pyKinetics.load(sorted(Path("octet_run").glob("*.frd")) + ["octet_run/ExpMethod.fmf"])
+blr = pyKinetics.load("run.blr")
+spr = pyKinetics.load("sensorgrams.txt", association_end=180, concentrations=[0.1, 0.2])
+```
+
+The files must form one experiment of one format: all `.frd` files of an Octet
+run (with optional `.fmf` plate files), a Gator zip or its `.ini` files and
+sensor CSVs, a steps file plus a traces file, or one file of the other formats.
+Keyword options go to the reader; only the SPR text, Carterra and steps/traces
+readers take them. The experiment is named after the Octet run or the file
+(numbered if the name is already used), unless `name=` is given. Unknown or
+mixed files raise an error listing the format detected for each file; load
+those with their experiment class. A Gator zip is extracted next to itself, as
+`GatorExperiment.read_all_gator_data` does.
 
 ## Keeping results when changing models
 

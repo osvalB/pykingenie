@@ -1,6 +1,5 @@
 """Identify supported input layouts without fitting or inferring experiment metadata."""
 
-import csv
 import gzip
 from pathlib import Path
 import re
@@ -8,34 +7,26 @@ import struct
 import zipfile
 import zlib
 
+from . import carterra, spr_text
 from .utils.compound_file import SIGNATURE, read_compound_file
+from .utils.sensorgram_text import find_header
 
 __all__ = ["detect_file_format"]
 
 _HEADER_BYTES = 65536
-_AXIS = re.compile(r"^(.+?)_([XY])$", re.IGNORECASE)
 
 
 def _table_format(fields):
-    fields = [field.strip() for field in fields]
-    while fields and not fields[-1]:
-        fields.pop()
     if len(fields) < 2:
         return None
+    # The readers' own header checks, so detection and import cannot disagree.
     if fields[0] == "Label":
-        expected = ["Label"] + [
-            f"{axis}{i}" for i in range(1, (len(fields) + 1) // 2) for axis in ("X", "Y")
-        ]
-        return "carterra_csv" if len(fields) >= 3 and fields == expected else None
-    matches = [_AXIS.fullmatch(field) for field in fields]
-    if all(matches):
-        pairs = {}
-        for match in matches:
-            name, axis = match[1].strip(), match[2].upper()
-            if not name or axis in pairs.setdefault(name, set()):
-                return None
-            pairs[name].add(axis)
-        return "spr_text" if all(axes == {"X", "Y"} for axes in pairs.values()) else None
+        return "carterra_csv" if carterra.is_header(fields) else None
+    try:
+        spr_text.curve_columns(fields)
+        return "spr_text"
+    except ValueError:
+        pass
     names = {re.sub(r"\s+", " ", field).casefold() for field in fields}
     if {"time", "signal", "smax", "analyte_concentration_micromolar_constant"} <= names:
         return "kingenie_surface"
@@ -116,10 +107,8 @@ def detect_file_format(file):
         return "gator_steps"
     if "[BasicInformation]" in text and "PreExperiment=" in text:
         return "gator_settings"
-    for line in text.splitlines():
-        for delimiter in ("\t", ",", ";"):
-            fields = next(csv.reader([line], delimiter=delimiter))
-            result = _table_format(fields)
-            if result:
-                return result
-    return "unknown"
+    try:
+        _, _, fields = find_header(text.splitlines(), _table_format)
+    except ValueError:
+        return "unknown"
+    return _table_format(fields)

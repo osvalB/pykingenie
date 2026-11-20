@@ -1169,19 +1169,20 @@ class KineticsFitter(KineticsFitterGeneral):
 
         masks = trim_masks(self.time_assoc_lst, self.trim_time)
 
-        i = 0
-        for y,t in zip(self.assoc_lst,self.time_assoc_lst):
+        for i, (y, t) in enumerate(zip(self.assoc_lst, self.time_assoc_lst)):
 
             # Edited with AI assistance: leave out the first trim_time seconds
             if masks is not None:
                 y, t = y[masks[i]], t[masks[i]]
 
-            fit_params, _, _ = fit_single_exponential(y,t)
+            # A curve that a single exponential cannot describe keeps k_obs = NaN,
+            # so this diagnostic never invalidates the kinetic fit before it.
+            try:
+                fit_params, _, _ = fit_single_exponential(y, t)
+            except RuntimeError:
+                continue
 
-            # Append the k_obs value to the list
             k_obs[i] = fit_params[2]
-
-            i += 1
 
         self.k_obs = k_obs
 
