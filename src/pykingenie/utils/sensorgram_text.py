@@ -160,6 +160,25 @@ def _seconds_per_curve(value, names, label):
     return seconds
 
 
+def _injection_seconds(value, names, label):
+    """Single-cycle times: one list for every curve, or a curve-label mapping of lists."""
+    if isinstance(value, (dict, pd.Series)):
+        value = values_per_curve(value, names, label)
+    else:
+        value = [value] * len(names)
+    try:
+        rows = [np.atleast_1d(np.asarray(row, dtype=float)) for row in value]
+    except (TypeError, ValueError) as error:
+        raise ValueError(f"{label} must be numbers of seconds.") from error
+    # The steps table is shared, so every curve needs the same number of injections.
+    if any(row.ndim != 1 or len(row) != len(rows[0]) for row in rows):
+        raise ValueError(
+            f"{label} must give every curve the same number of injections, "
+            "one number each."
+        )
+    return np.array(rows)
+
+
 def values_per_curve(value, names, label):
     # A Series is matched by its index, never by position, so a reordered one
     # cannot silently assign values to the wrong curves.
@@ -181,17 +200,25 @@ def values_per_curve(value, names, label):
 
 
 def _check_boundaries(starts, ends, names):
+    """Rows are curves, columns injections; times must strictly increase."""
     for start, end, name in zip(starts, ends, names):
-        if not np.isfinite([start, end]).all() or end <= start:
+        times = np.column_stack([start, end]).ravel()
+        if not np.isfinite(times).all() or (np.diff(times) <= 0).any():
             where = f" (curve {name!r})" if name is not None else ""
+            after = " and each injection after the previous one ends" if len(start) > 1 else ""
             raise ValueError(
                 "Association boundaries must be finite, with end greater than "
-                f"start{where}."
+                f"start{after}{where}."
             )
 
 
+def _by_curve(seconds):
+    """Each curve's timing: one number, or a list per injection when single-cycle."""
+    return seconds[:, 0].tolist() if seconds.shape[1] == 1 else seconds.tolist()
+
+
 def _shared(seconds):
-    return float(seconds[0]) if np.all(seconds == seconds[0]) else None
+    return _by_curve(seconds)[0] if np.all(seconds == seconds[0]) else None
 
 
 class SensorgramTextExperiment(SurfaceBasedExperiment):
@@ -260,6 +287,7 @@ class SensorgramTextExperiment(SurfaceBasedExperiment):
         included=None,
         info_record=None,
         dilution=None,
+        single_cycle=False,
     ):
         if time_unit not in _TIME_UNITS:
             raise ValueError("time_unit must be 's' or 'min'.")
@@ -272,15 +300,39 @@ class SensorgramTextExperiment(SurfaceBasedExperiment):
             )
         if not is_per_curve(association_start) and not is_per_curve(association_end):
             # Check one shared timing before reading the file.
-            _check_boundaries([float(association_start)], [float(association_end)], [None])
+            _check_boundaries(
+                [[float(association_start)]], [[float(association_end)]], [None]
+            )
         traces, decimal = reader(file, decimal, encoding)
         names = [trace.name for trace in traces]
-        starts = _seconds_per_curve(association_start, names, "association_start")
-        ends = _seconds_per_curve(association_end, names, "association_end")
+        # Rows are curves, columns injections (one column unless single-cycle).
+        if single_cycle:
+            starts = _injection_seconds(association_start, names, "association_start")
+            ends = _injection_seconds(association_end, names, "association_end")
+            if starts.shape != ends.shape:
+                raise ValueError(
+                    "association_start and association_end must list the same "
+                    "number of injections."
+                )
+        else:
+            starts = _seconds_per_curve(association_start, names, "association_start")[:, None]
+            ends = _seconds_per_curve(association_end, names, "association_end")[:, None]
         _check_boundaries(starts, ends, names)
+        injections = starts.shape[1]
         samples = values_per_curve(sample_id, names, "sample_id")
         if any(not isinstance(sample, str) or not sample.strip() for sample in samples):
             raise ValueError("sample_id values must be non-empty strings.")
+        # shortcut: the fitter sorts a sample's injections by time across curves,
+        # so curves sharing a sample_id interleave and share one Smax; allow it
+        # once generate_fittings keeps each sensor's injections together.
+        if single_cycle and len(set(samples)) != len(samples):
+            raise ValueError(
+                "With single_cycle=True each curve needs its own sample_id."
+            )
+        if single_cycle and concentrations is None:
+            raise ValueError(
+                "single_cycle=True needs concentrations, one per injection."
+            )
         if dilution is not None:
             top, factor, highest_last = dilution
             steps = np.arange(len(names))
@@ -290,18 +342,30 @@ class SensorgramTextExperiment(SurfaceBasedExperiment):
                 raise ValueError(
                     "concentrations must be a sequence or curve-name mapping."
                 )
-            if concentrations_from_info and len(concentrations) != len(names):
+            count, what = (injections, "injections") if single_cycle else (len(names), "curves")
+            if concentrations_from_info and len(concentrations) != count:
                 raise ValueError(
                     f"The info sheet lists {len(concentrations)} concentrations but "
-                    f"the file has {len(names)} curves. Pass concentrations= with "
-                    "one value per curve."
+                    f"the file has {count} {what}. Pass concentrations= with "
+                    f"one value per {what[:-1]}."
                 )
-            values = values_per_curve(concentrations, names, "concentrations")
-            conc = (
-                np.asarray(values, dtype=float)
-                * _CONCENTRATION_UNITS[concentration_unit or "uM"]
-            )
-            if conc.ndim != 1:
+            if single_cycle and not isinstance(concentrations, (dict, pd.Series)):
+                values = [concentrations] * len(names)
+            else:
+                values = values_per_curve(concentrations, names, "concentrations")
+            try:
+                conc = (
+                    np.asarray(values, dtype=float)
+                    * _CONCENTRATION_UNITS[concentration_unit or "uM"]
+                )
+            except ValueError as error:
+                raise ValueError("concentrations must be numbers.") from error
+            if single_cycle and conc.shape != starts.shape:
+                raise ValueError(
+                    f"concentrations must contain {injections} numbers per curve, "
+                    "one per injection."
+                )
+            if not single_cycle and conc.ndim != 1:
                 raise ValueError("concentrations must contain one scalar per curve.")
         else:
             conc = []
@@ -327,10 +391,16 @@ class SensorgramTextExperiment(SurfaceBasedExperiment):
             or (concentrations is not None and np.isnan(conc).any())
         ):
             raise ValueError("Provided concentrations must be finite and non-negative.")
+        conc = conc.reshape(starts.shape)
         xs, ys = [], []
         for trace, start, end in zip(traces, starts, ends):
             time = trace.time * _TIME_UNITS[time_unit]
-            masks = (time < start, (time >= start) & (time < end), time >= end)
+            # Baseline, then each association and the dissociation that lasts
+            # until the next injection starts (or the end of the curve).
+            edges = np.append(np.column_stack([start, end]).ravel(), np.inf)
+            masks = [time < start[0]] + [
+                (time >= low) & (time < high) for low, high in zip(edges[:-1], edges[1:])
+            ]
             if any(mask.sum() < 2 for mask in masks[1:]):
                 raise ValueError(
                     f"Curve {trace.name!r} needs at least two points in each "
@@ -339,32 +409,43 @@ class SensorgramTextExperiment(SurfaceBasedExperiment):
             xs.append([time[mask].copy() for mask in masks])
             ys.append([trace.response[mask].copy() for mask in masks])
         # Commit only a fully validated import, preserving existing data on failure.
-        self.sensor_names, self.no_sensors, self.no_steps = names, len(names), 3
+        steps = 1 + 2 * injections
+        self.sensor_names, self.no_sensors, self.no_steps = names, len(names), steps
         self.xs, self.ys = xs, ys
+        numbers = [f" {i + 1}" if single_cycle else "" for i in range(injections)]
         self.df_steps = pd.DataFrame(
             {
-                "#Step": [1, 2, 3],
-                "Name": ["Baseline", "Association", "Dissociation"],
-                "Type": ["BASELINE", "ASSOC", "DISASSOC"],
+                "#Step": list(range(1, steps + 1)),
+                "Name": ["Baseline"] + [
+                    f"{phase}{number}"
+                    for number in numbers
+                    for phase in ("Association", "Dissociation")
+                ],
+                "Type": ["BASELINE"] + ["ASSOC", "DISASSOC"] * injections,
                 # With per-curve timing, each step starts at its earliest curve.
                 "Start": [
                     min(
                         starts.min(),
                         *(trace.time[0] * _TIME_UNITS[time_unit] for trace in traces),
-                    ),
-                    starts.min(),
-                    ends.min(),
+                    )
+                ]
+                + [
+                    float(times[:, i].min())
+                    for i in range(injections)
+                    for times in (starts, ends)
                 ],
-                "Column_location": ["0", "1", "1"],
-                "Loading_location": [np.nan, "0", np.nan],
+                "Column_location": ["0"]
+                + [str(i + 1) for i in range(injections) for _ in range(2)],
+                "Loading_location": [np.nan] + ["0", np.nan] * injections,
             }
         )
+        # One row per curve and injection; Analyte_location is the injection number.
         self.ligand_conc_df = pd.DataFrame(
             {
-                "Sensor": names,
-                "Analyte_location": "1",
-                "Concentration_micromolar": conc,
-                "SampleID": samples,
+                "Sensor": np.repeat(names, injections).tolist(),
+                "Analyte_location": [str(i + 1) for i in range(injections)] * len(names),
+                "Concentration_micromolar": conc.ravel(),
+                "SampleID": np.repeat(samples, injections).tolist(),
                 "Replicate": 1,
                 "Loading_location": "0",
                 "Experiment": self.name,
@@ -372,14 +453,16 @@ class SensorgramTextExperiment(SurfaceBasedExperiment):
         )
         if included is not None:
             # Curves outside the info sheet's "Incl. Conc." start unselected.
-            selected = [bool(np.isclose(c, included, rtol=1e-6, atol=0).any()) for c in conc]
+            selected = [
+                bool(np.isclose(c, included, rtol=1e-6, atol=0).any()) for c in conc.ravel()
+            ]
             if not any(selected):
                 warnings.warn(
                     "No curve matches the info sheet's included concentrations; "
                     "all curves are selected.",
                     UserWarning,
                 )
-                selected = [True] * len(names)
+                selected = [True] * conc.size
             self.ligand_conc_df["Select"] = selected
         self.exp_info = {
             "format": self.type,
@@ -392,8 +475,10 @@ class SensorgramTextExperiment(SurfaceBasedExperiment):
             "curve_labels": names.copy(),
         }
         if _shared(starts) is None or _shared(ends) is None:
-            self.exp_info["association_start_seconds_by_curve"] = dict(zip(names, starts.tolist()))
-            self.exp_info["association_end_seconds_by_curve"] = dict(zip(names, ends.tolist()))
+            self.exp_info["association_start_seconds_by_curve"] = dict(zip(names, _by_curve(starts)))
+            self.exp_info["association_end_seconds_by_curve"] = dict(zip(names, _by_curve(ends)))
+        if single_cycle:
+            self.exp_info.update(single_cycle=True, injection_count=injections)
         if info_record is not None:
             self.exp_info["info_sheet"] = dict(info_record)
         self.fns = [str(file)]
