@@ -130,7 +130,8 @@ class SprTextExperiment(SensorgramTextExperiment):
         conc= labels are used, with their own molar unit or, if they have
         none, concentration_unit; other values stay NaN with a warning.
         sample_id accepts a common string or one value per curve (list or
-        mapping), to distinguish different binding interactions. time_unit
+        mapping), to distinguish different binding interactions. A pandas
+        Series counts as a mapping: its index must be the curve labels. time_unit
         describes the file ('s' or 'min'). decimal is detected from the
         measurements ('.' or ','); pass decimal='.' or ',' to set it.
         encoding can be changed for older instrument exports. No times, units

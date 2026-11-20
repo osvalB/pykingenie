@@ -67,6 +67,21 @@ def test_mapping_series_and_shared_values_can_be_mixed(tmp_path):
     assert [x[1][0] for x in series.xs] == OFFSETS
 
 
+def test_series_settings_are_matched_by_curve_label_not_position(tmp_path):
+    path, names = write_curves(tmp_path / "curves.csv")
+    reordered = pd.Series(dict(zip(names, CONCENTRATIONS))).iloc[::-1]
+    samples = pd.Series({name: f"S{i}" for i, name in enumerate(names)}).iloc[::-1]
+    experiment = SprTextExperiment()
+    experiment.read_file(path, association_end=150, concentrations=reordered,
+                         sample_id=samples)
+    conc = experiment.ligand_conc_df
+    assert conc.Concentration_micromolar.tolist() == CONCENTRATIONS
+    assert conc.SampleID.tolist() == ["S0", "S1", "S2", "S3"]
+    with pytest.raises(ValueError, match="pass a list for values in curve order"):
+        SprTextExperiment().read_file(path, association_end=150,
+                                      concentrations=pd.Series(CONCENTRATIONS))
+
+
 def test_equal_per_curve_values_keep_the_shared_keys(tmp_path):
     path, _ = write_curves(tmp_path / "curves.csv")
     experiment = read(path, association_start=[0] * 4, association_end=(150,) * 4)

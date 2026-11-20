@@ -148,8 +148,6 @@ def is_per_curve(value):
 
 def _seconds_per_curve(value, names, label):
     if is_per_curve(value):
-        if isinstance(value, pd.Series):
-            value = value.to_dict()
         value = values_per_curve(value, names, label)
     else:
         value = [value] * len(names)
@@ -163,9 +161,16 @@ def _seconds_per_curve(value, names, label):
 
 
 def values_per_curve(value, names, label):
+    # A Series is matched by its index, never by position, so a reordered one
+    # cannot silently assign values to the wrong curves.
+    if isinstance(value, pd.Series):
+        value = value.to_dict()
     if isinstance(value, dict):
         if set(value) != set(names):
-            raise ValueError(f"{label} must contain exactly the exported curve names.")
+            raise ValueError(
+                f"{label} must contain exactly the exported curve names; "
+                "pass a list for values in curve order."
+            )
         return [value[name] for name in names]
     if isinstance(value, str):
         return [value] * len(names)
