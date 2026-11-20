@@ -81,7 +81,7 @@ Solution fits also support single and double exponentials, induced fit, and conf
 
 ## Contributing
 
-Questions and contributions are welcome at oburastero@embl-hamburg.de. If you use pyKinGenie, please cite [Burastero (2026)](docs/citation.rst).
+Questions and contributions are welcome at oburastero@gmail.com. If you use pyKinGenie, please cite [Burastero (2026)](docs/citation.rst).
 
 AI assistants may help with documentation, boilerplate tests, plotting, and file handling. Mark files that contain AI-generated code. A person must write, or review, understand, and validate, changes that affect numerical results before merge. This includes models, fitting, preprocessing, and parameter interpretation. Validate against simulations with known parameters or validated datasets, and inspect AI-assisted preprocessing and fits before reporting estimates.
 
