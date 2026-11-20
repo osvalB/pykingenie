@@ -191,6 +191,32 @@ def test_fit_function_default_smax_index():
     np.testing.assert_allclose(fit_assoc[-1], assoc_lst[-1], atol=1e-4)
 
 
+def test_fit_initial_state_index_must_be_a_trace():
+    from pykingenie.utils.fitting_surface import fit_bivalent_analyte_assoc_and_disso
+
+    t_assoc_lst, assoc_lst, t_disso_lst, disso_lst = _simulate()
+    p0 = [TRUTH['Kd1'], TRUTH['koff1'], TRUTH['ka2'], TRUTH['kd2'], TRUTH['Rmax']]
+    with pytest.raises(ValueError, match="fit_initial_state_at"):
+        fit_bivalent_analyte_assoc_and_disso(
+            assoc_lst, t_assoc_lst, CONCS, disso_lst, t_disso_lst,
+            p0, [x / 10 for x in p0], [x * 10 for x in p0],
+            smax_idx=[0] * len(CONCS), fit_initial_state_at=len(CONCS))
+
+
+def test_initial_occupancy_guess():
+    from pykingenie.utils.fitting_surface import _initial_occupancy_guess
+
+    signals = [np.array([0.0, 1.0]), np.array([20.0, 30.0])]
+    # The first retained point of the trace, as a fraction of the capacity
+    assert _initial_occupancy_guess(signals, None, 1, 40.0) == 0.5
+    assert _initial_occupancy_guess(signals, [None, [False, True]], 1, 40.0) == 0.75
+    # Clipped to (0.01, 0.99)
+    assert _initial_occupancy_guess(signals, None, 1, 10.0) == 0.99
+    # Half occupied when there is no point to read or no capacity
+    assert _initial_occupancy_guess(signals, [None, [False, False]], 1, 40.0) == 0.5
+    assert _initial_occupancy_guess(signals, None, 1, 0.0) == 0.5
+
+
 def test_fit_single_cycle_and_trim():
     fitter = _fitter(single_cycle=True)
     fitter.fit_bivalent_analyte_assoc_and_disso(**COARSE_GRID)
