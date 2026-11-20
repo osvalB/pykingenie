@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 
 from .utils.processing import find_loading_column
+from .utils.text_io import read_delimited_table
 
 class GatorExperiment(SurfaceBasedExperiment):
     """
@@ -403,6 +404,8 @@ class GatorExperiment(SurfaceBasedExperiment):
         - File names contain 'Channel' and have a '.csv' extension
         - The first column contains signal values
         - The second column contains time values
+
+        Comma, semicolon and tab separators are detected automatically; numeric values use decimal points.
         """
 
         fns   = [fn for fn, name in zip(files, names) if '.csv' in name and 'Channel' in name]
@@ -482,7 +485,7 @@ class GatorExperiment(SurfaceBasedExperiment):
                 assay_number_i   = int(name.split('_')[1].split('Channel')[0])
                 channel_number_i = int(name.split('Channel')[1].split('.')[0])
 
-                df = pd.read_csv(fn, skiprows=1, header=None)
+                df = read_delimited_table(fn, skiprows=1, header=None)
 
                 x = df.iloc[:, 1].to_numpy(dtype=float)
                 y = df.iloc[:, 0].to_numpy(dtype=float)

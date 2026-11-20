@@ -81,6 +81,14 @@ pykingenie.kingenie\_surface module
    :show-inheritance:
    :undoc-members:
 
+pykingenie.loader module
+------------------------
+
+.. automodule:: pykingenie.loader
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 pykingenie.main module
 ----------------------
 
@@ -113,10 +121,26 @@ pykingenie.surface\_csv module
    :show-inheritance:
    :undoc-members:
 
-pykingenie.spr\_exports module
-------------------------------
+pykingenie.spr\_text module
+---------------------------
 
-.. automodule:: pykingenie.spr_exports
+.. automodule:: pykingenie.spr_text
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+pykingenie.carterra module
+--------------------------
+
+.. automodule:: pykingenie.carterra
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+pykingenie.info\_sheet module
+-----------------------------
+
+.. automodule:: pykingenie.info_sheet
    :members:
    :show-inheritance:
    :undoc-members:

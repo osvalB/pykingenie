@@ -68,6 +68,8 @@ def test_new_formats_independent_of_extension(tmp_path, filename, expected):
     [
         ('Report metadata\n"a, quoted_X","a, quoted_Y"\n0,1', "spr_text"),
         ("Export metadata\na_Y;a_X;b_X;b_Y;;\n1;0;0;2;;", "spr_text"),
+        # Fitted-curve columns are skipped by the reader, so a lone one is fine.
+        ("a_X,a_Y,a fitted curve_Y\n0,1,1", "spr_text"),
         ("Label;X1;Y1;X2;Y2\na;0;1;1;2", "carterra_csv"),
         ("Time,Signal,Smax,Analyte_concentration_micromolar_constant", "kingenie_surface"),
         ("Time,Signal,Ligand_concentration_micromolar", "kingenie_solution"),

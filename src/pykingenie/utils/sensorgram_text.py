@@ -1,0 +1,401 @@
+"""Shared parsing for sensorgram text exports (paired-column SPR and Carterra).
+
+These exports contain sensorgrams, rather than a complete instrument run log.
+Injection boundaries must be supplied by the caller, directly or through a
+TitrationAnalysis Data Info Sheet (``info=``). Responses and individual
+time grids are retained without interpolation or subtraction.
+"""
+
+import csv
+from dataclasses import dataclass
+import gzip
+import re
+import warnings
+
+import numpy as np
+import pandas as pd
+
+from ..info_sheet import info_settings
+from ..surface_exp import SurfaceBasedExperiment
+from .text_io import DELIMITERS
+
+__all__ = [
+    "SensorgramTextExperiment",
+    "Trace",
+    "data_rows",
+    "detect_decimal",
+    "find_header",
+    "is_per_curve",
+    "parse_trace",
+    "text_lines",
+    "values_per_curve",
+]
+
+_CONCENTRATION_UNITS = {
+    "M": 1e6,
+    "mM": 1e3,
+    "uM": 1.0,
+    "µM": 1.0,
+    "μM": 1.0,
+    "nM": 1e-3,
+    "pM": 1e-6,
+}
+_TIME_UNITS = {"s": 1.0, "min": 60.0}
+_CONCENTRATION = re.compile(
+    r"\bconc\s*=\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)\s*(M|mM|[uµμ]M|nM|pM)?\s*$",
+    re.IGNORECASE,
+)
+
+
+@dataclass
+class Trace:
+    name: str
+    time: np.ndarray
+    response: np.ndarray
+
+
+def text_lines(file, encoding):
+    opener = gzip.open if str(file).lower().endswith(".gz") else open
+    with opener(file, "rt", encoding=encoding, newline="") as stream:
+        return stream.read().splitlines()
+
+
+_DECIMAL_POINT = re.compile(r"^[+-]?(?:\d+\.\d*|\.\d+)(?:[eE][+-]?\d+)?$")
+_DECIMAL_COMMA = re.compile(r"^[+-]?(?:\d+,\d*|,\d+)(?:[eE][+-]?\d+)?$")
+
+
+def detect_decimal(cells, decimal=None):
+    """Return the decimal mark of the measurements, or check the one given.
+
+    ``decimal=None`` detects it from the cells: ``','`` when numbers such as
+    ``1,5`` occur, otherwise ``'.'``. Integers do not decide either way. Cells
+    using both marks are ambiguous and raise an error.
+    """
+    if decimal is not None:
+        if decimal not in (".", ","):
+            raise ValueError("decimal must be '.', ',' or None to detect it.")
+        return decimal
+    point = comma = False
+    for cell in cells:
+        cell = cell.strip()
+        point = point or bool(_DECIMAL_POINT.match(cell))
+        comma = comma or bool(_DECIMAL_COMMA.match(cell))
+        if point and comma:
+            raise ValueError(
+                "The measurements use both '.' and ',' as decimal marks; "
+                "pass decimal='.' or decimal=','."
+            )
+    return "," if comma else "."
+
+
+def _number(value, decimal, name):
+    try:
+        result = float(value.strip().replace(decimal, "."))
+    except ValueError as error:
+        raise ValueError(
+            f"Non-numeric measurement in curve {name!r}: {value!r}."
+        ) from error
+    if not np.isfinite(result):
+        raise ValueError(f"Non-finite measurement in curve {name!r}.")
+    return result
+
+
+def parse_trace(name, points, decimal):
+    numeric = []
+    for x, y in points:
+        if not x.strip() and not y.strip():
+            continue
+        if not x.strip() or not y.strip():
+            raise ValueError(f"Incomplete X/Y measurement in curve {name!r}.")
+        numeric.append((_number(x, decimal, name), _number(y, decimal, name)))
+    if len(numeric) < 2:
+        raise ValueError(f"Curve {name!r} must contain at least two measurements.")
+    time, response = np.asarray(numeric, dtype=float).T
+    if not np.all(np.diff(time) > 0):
+        raise ValueError(f"Time must increase strictly in curve {name!r}.")
+    return Trace(name, time, response)
+
+
+def find_header(lines, predicate):
+    for i, line in enumerate(lines):
+        for delimiter in DELIMITERS:
+            fields = [
+                field.strip()
+                for field in next(
+                    csv.reader([line], delimiter=delimiter, skipinitialspace=True)
+                )
+            ]
+            while fields and not fields[-1]:
+                fields.pop()
+            if predicate(fields):
+                return i, delimiter, fields
+    raise ValueError("No supported SPR export header found.")
+
+
+def data_rows(lines, start, delimiter, width):
+    for row in csv.reader(lines[start:], delimiter=delimiter, skipinitialspace=True):
+        if not any(field.strip() for field in row):
+            continue
+        if any(field.strip() for field in row[width:]):
+            raise ValueError("Data row contains more fields than the export header.")
+        yield row[:width] + [""] * max(0, width - len(row))
+
+
+def is_per_curve(value):
+    """Whether a setting gives one value per curve (sequence or mapping)."""
+    return isinstance(value, (dict, list, tuple, np.ndarray, pd.Series))
+
+
+def _seconds_per_curve(value, names, label):
+    if is_per_curve(value):
+        value = values_per_curve(value, names, label)
+    else:
+        value = [value] * len(names)
+    try:
+        seconds = np.asarray(value, dtype=float)
+    except (TypeError, ValueError) as error:
+        raise ValueError(f"{label} must be numbers of seconds.") from error
+    if seconds.ndim != 1:
+        raise ValueError(f"{label} must contain one number per curve.")
+    return seconds
+
+
+def values_per_curve(value, names, label):
+    # A Series is matched by its index, never by position, so a reordered one
+    # cannot silently assign values to the wrong curves.
+    if isinstance(value, pd.Series):
+        value = value.to_dict()
+    if isinstance(value, dict):
+        if set(value) != set(names):
+            raise ValueError(
+                f"{label} must contain exactly the exported curve names; "
+                "pass a list for values in curve order."
+            )
+        return [value[name] for name in names]
+    if isinstance(value, str):
+        return [value] * len(names)
+    values = list(value)
+    if len(values) != len(names):
+        raise ValueError(f"Expected {len(names)} {label} values, got {len(values)}.")
+    return values
+
+
+def _check_boundaries(starts, ends, names):
+    for start, end, name in zip(starts, ends, names):
+        if not np.isfinite([start, end]).all() or end <= start:
+            where = f" (curve {name!r})" if name is not None else ""
+            raise ValueError(
+                "Association boundaries must be finite, with end greater than "
+                f"start{where}."
+            )
+
+
+def _shared(seconds):
+    return float(seconds[0]) if np.all(seconds == seconds[0]) else None
+
+
+class SensorgramTextExperiment(SurfaceBasedExperiment):
+    """Common import for sensorgram exports without an instrument run log.
+
+    Subclasses supply a reader returning ``Trace`` objects. Each trace becomes
+    a sensor with Baseline, Association and Dissociation steps defined by
+    caller-supplied boundaries; responses and time grids are kept unchanged.
+    """
+
+    @staticmethod
+    def _settings(
+        info,
+        *,
+        association_start,
+        association_end,
+        concentrations,
+        concentration_unit,
+        sample_id,
+        dilution=None,
+    ):
+        """Combine an info sheet with explicit arguments; explicit values win."""
+        sheet = info_settings(info) if info is not None else {}
+        from_info = (
+            concentrations is None and dilution is None and "concentrations" in sheet
+        )
+        if from_info and concentration_unit is not None:
+            raise ValueError(
+                "concentration_unit applies only to concentrations you pass; "
+                "info-sheet concentrations are already molar."
+            )
+        settings = {
+            "association_start": association_start
+            if association_start is not None
+            else sheet.get("association_start", 0),
+            "association_end": association_end
+            if association_end is not None
+            else sheet.get("association_end"),
+            "concentrations": sheet["concentrations"] if from_info else concentrations,
+            "concentration_unit": "uM" if from_info else concentration_unit,
+            "sample_id": sample_id
+            if sample_id is not None
+            else sheet.get("sample_id", "sample"),
+            "concentrations_from_info": from_info,
+            "dilution": dilution,
+            "included": sheet.get("included_concentrations"),
+            "info_record": sheet.get("record"),
+        }
+        if settings["association_end"] is None:
+            raise ValueError("Provide association_end, or an info sheet with info=.")
+        return settings, sheet
+
+    def _load(
+        self,
+        file,
+        reader,
+        association_end,
+        association_start,
+        concentrations,
+        concentration_unit,
+        time_unit,
+        sample_id,
+        decimal,
+        encoding,
+        concentrations_from_info=False,
+        included=None,
+        info_record=None,
+        dilution=None,
+    ):
+        if time_unit not in _TIME_UNITS:
+            raise ValueError("time_unit must be 's' or 'min'.")
+        if (
+            concentration_unit is not None
+            and concentration_unit not in _CONCENTRATION_UNITS
+        ):
+            raise ValueError(
+                "Unsupported concentration unit; use M, mM, uM, µM, nM or pM."
+            )
+        if not is_per_curve(association_start) and not is_per_curve(association_end):
+            # Check one shared timing before reading the file.
+            _check_boundaries([float(association_start)], [float(association_end)], [None])
+        traces, decimal = reader(file, decimal, encoding)
+        names = [trace.name for trace in traces]
+        starts = _seconds_per_curve(association_start, names, "association_start")
+        ends = _seconds_per_curve(association_end, names, "association_end")
+        _check_boundaries(starts, ends, names)
+        samples = values_per_curve(sample_id, names, "sample_id")
+        if any(not isinstance(sample, str) or not sample.strip() for sample in samples):
+            raise ValueError("sample_id values must be non-empty strings.")
+        if dilution is not None:
+            top, factor, highest_last = dilution
+            steps = np.arange(len(names))
+            concentrations = list(top / factor ** (steps[::-1] if highest_last else steps))
+        if concentrations is not None:
+            if isinstance(concentrations, (str, bytes)):
+                raise ValueError(
+                    "concentrations must be a sequence or curve-name mapping."
+                )
+            if concentrations_from_info and len(concentrations) != len(names):
+                raise ValueError(
+                    f"The info sheet lists {len(concentrations)} concentrations but "
+                    f"the file has {len(names)} curves. Pass concentrations= with "
+                    "one value per curve."
+                )
+            values = values_per_curve(concentrations, names, "concentrations")
+            conc = (
+                np.asarray(values, dtype=float)
+                * _CONCENTRATION_UNITS[concentration_unit or "uM"]
+            )
+            if conc.ndim != 1:
+                raise ValueError("concentrations must contain one scalar per curve.")
+        else:
+            conc = []
+            for name in names:
+                match = _CONCENTRATION.search(name)
+                unit = (match[2] if match else None) or concentration_unit
+                # Unitless labels and Carterra "Conc. 13" indices do not define molarity.
+                conc.append(
+                    float(match[1]) * _CONCENTRATION_UNITS[unit]
+                    if match and unit in _CONCENTRATION_UNITS
+                    else np.nan
+                )
+            conc = np.asarray(conc)
+            if np.isnan(conc).any():
+                warnings.warn(
+                    "Some analyte concentrations are unavailable or have no unit. "
+                    "Provide concentrations or edit ligand_conc_df before fitting.",
+                    UserWarning,
+                )
+        if (
+            np.isinf(conc).any()
+            or (conc < 0).any()
+            or (concentrations is not None and np.isnan(conc).any())
+        ):
+            raise ValueError("Provided concentrations must be finite and non-negative.")
+        xs, ys = [], []
+        for trace, start, end in zip(traces, starts, ends):
+            time = trace.time * _TIME_UNITS[time_unit]
+            masks = (time < start, (time >= start) & (time < end), time >= end)
+            if any(mask.sum() < 2 for mask in masks[1:]):
+                raise ValueError(
+                    f"Curve {trace.name!r} needs at least two points in each "
+                    "association/dissociation phase; check boundaries."
+                )
+            xs.append([time[mask].copy() for mask in masks])
+            ys.append([trace.response[mask].copy() for mask in masks])
+        # Commit only a fully validated import, preserving existing data on failure.
+        self.sensor_names, self.no_sensors, self.no_steps = names, len(names), 3
+        self.xs, self.ys = xs, ys
+        self.df_steps = pd.DataFrame(
+            {
+                "#Step": [1, 2, 3],
+                "Name": ["Baseline", "Association", "Dissociation"],
+                "Type": ["BASELINE", "ASSOC", "DISASSOC"],
+                # With per-curve timing, each step starts at its earliest curve.
+                "Start": [
+                    min(
+                        starts.min(),
+                        *(trace.time[0] * _TIME_UNITS[time_unit] for trace in traces),
+                    ),
+                    starts.min(),
+                    ends.min(),
+                ],
+                "Column_location": ["0", "1", "1"],
+                "Loading_location": [np.nan, "0", np.nan],
+            }
+        )
+        self.ligand_conc_df = pd.DataFrame(
+            {
+                "Sensor": names,
+                "Analyte_location": "1",
+                "Concentration_micromolar": conc,
+                "SampleID": samples,
+                "Replicate": 1,
+                "Loading_location": "0",
+                "Experiment": self.name,
+            }
+        )
+        if included is not None:
+            # Curves outside the info sheet's "Incl. Conc." start unselected.
+            selected = [bool(np.isclose(c, included, rtol=1e-6, atol=0).any()) for c in conc]
+            if not any(selected):
+                warnings.warn(
+                    "No curve matches the info sheet's included concentrations; "
+                    "all curves are selected.",
+                    UserWarning,
+                )
+                selected = [True] * len(names)
+            self.ligand_conc_df["Select"] = selected
+        self.exp_info = {
+            "format": self.type,
+            "time_unit_in_file": time_unit,
+            "decimal_in_file": decimal,
+            # None when the curves have different timing; see the _by_curve keys.
+            "association_start_seconds": _shared(starts),
+            "association_end_seconds": _shared(ends),
+            "concentration_unit_in_file": concentration_unit,
+            "curve_labels": names.copy(),
+        }
+        if _shared(starts) is None or _shared(ends) is None:
+            self.exp_info["association_start_seconds_by_curve"] = dict(zip(names, starts.tolist()))
+            self.exp_info["association_end_seconds_by_curve"] = dict(zip(names, ends.tolist()))
+        if info_record is not None:
+            self.exp_info["info_sheet"] = dict(info_record)
+        self.fns = [str(file)]
+        self.create_unique_sensor_names()
+        self.traces_loaded = True

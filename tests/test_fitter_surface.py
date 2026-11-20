@@ -450,6 +450,27 @@ def test_fit_single_exponentials():
         err_msg="The k_obs values should be close to the expected values."
     )
 
+
+def test_fit_single_exponentials_keeps_nan_for_unfittable_curve(monkeypatch):
+
+    import pykingenie.fitter_surface as module
+
+    fitter_surface = create_fitter(test_file_1)
+    original = module.fit_single_exponential_fast
+    calls = []
+
+    def fail_on_second_curve(y, t):
+        calls.append(1)
+        if len(calls) == 2:
+            raise RuntimeError("Optimal parameters not found")
+        return original(y, t)
+
+    monkeypatch.setattr(module, "fit_single_exponential_fast", fail_on_second_curve)
+    fitter_surface.fit_single_exponentials()
+
+    assert np.isnan(fitter_surface.k_obs[1])
+    assert np.isfinite(np.delete(fitter_surface.k_obs, 1)).all()
+
 def test_fit_one_site_assoc_and_disso_0():
 
     fitter_surface = create_fitter(test_file_1)
