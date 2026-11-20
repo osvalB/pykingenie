@@ -17,6 +17,14 @@ Subpackages
 Submodules
 ----------
 
+pykingenie.file\_detection module
+----------------------------------------
+
+.. automodule:: pykingenie.file_detection
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 pykingenie.biacore module
 -------------------------
 
@@ -101,6 +109,14 @@ pykingenie.surface\_csv module
 ------------------------------
 
 .. automodule:: pykingenie.surface_csv
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+pykingenie.spr\_exports module
+------------------------------
+
+.. automodule:: pykingenie.spr_exports
    :members:
    :show-inheritance:
    :undoc-members:

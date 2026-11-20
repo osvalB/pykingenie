@@ -1,12 +1,27 @@
 Examples
 ========
 
-Below you will find a collection of example notebooks that show how to simulate
-and visualize binding kinetics models with PyKinGenie.
+Below you will find example notebooks for importing experimental sensorgrams
+and simulating and visualizing binding kinetics models with PyKinGenie.
 
 .. toctree::
    :maxdepth: 1
-   :caption: Example notebooks:
+   :caption: SPR import examples:
+
+   Paired Run/Ch/Cy CSV <notebooks/12_spr_paired_run_import>
+   Biacore Cycle/Fc TSV with decimal commas <notebooks/13_biacore_cycle_fc_import>
+   Biacore Cycle/sample TSV <notebooks/14_biacore_cycle_sample_import>
+   Carterra CSV: five-injection literature comparison <notebooks/15_carterra_csv_import>
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Advanced SPR fitting example:
+
+   Carterra: 13 injections, global Smax and leave-one-out sensitivity <notebooks/16_carterra_global_smax>
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Binding model examples:
 
    One-site association and dissociation <notebooks/1_one_site_assoc_disso_simulation>
    One-site association and dissociation with mass transport <notebooks/2_one_site_assoc_disso_mass_transport_simulation>

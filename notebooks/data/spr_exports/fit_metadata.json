@@ -1,0 +1,199 @@
+{
+  "biacore_cycle_sample": {
+    "file": "biacore_cycle_sample.tsv",
+    "concentrations": [
+      0.2217,
+      0.4434,
+      0.8868,
+      1.774,
+      3.547
+    ],
+    "concentration_unit": "µM",
+    "molar_concentrations_verified": true,
+    "association_start": 0,
+    "association_end": 180,
+    "timing_verified": true,
+    "regenerated": true,
+    "bulk_shift": true,
+    "analyte": "AE.A244",
+    "ligand": "CH31",
+    "protocol": "Regenerated Biacore T200 cycles 18–22; author report concentrations 221.7,443.4,886.8,1774,3547 nM; All Concentrations entries 4–8",
+    "source_sheet_row": {
+      "Incl.": "Y",
+      "Block/Chip/Tray": 1,
+      "Position/Channel/Sensor": 2,
+      "Analyte": "AE.A244",
+      "Ligand": "CH31",
+      "Baseline": 60,
+      "Association": 180,
+      "Dissociation": 600,
+      "Asso. Skip": 0,
+      "Disso. Skip": 0,
+      "All Concentrations": "2.771E-08, 5.543E-08, 1.109E-07, 2.217E-07, 4.434E-07, 8.868E-07, 1.774E-06, 3.547E-06",
+      "Incl. Conc.": "All",
+      "Bulkshift": "Y",
+      "Regen.": "Y",
+      "Bsl Start": -60,
+      "Bass Corr": "N",
+      "Global Rmax": "N"
+    },
+    "source_sha256": "469af4090726a5d230bbe119ba769b5d17b3b9a5f9bc8edc1913d060c4a571ba",
+    "sources": [
+      "https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20T200/Example%20T200%20Data%20Info%20Sheet.xlsx"
+    ],
+    "literature_reference": {
+      "model": "1:1 Langmuir with local Rmax",
+      "paper_doi": "10.12688/gatesopenres.14743.2",
+      "source_url": "https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20T200/Titration%20Analysis_T200_Report_Example.csv",
+      "local_file": "metadata/Titration Analysis_T200_Report_Example.csv",
+      "source_sha256": "cb144fadd6e8be97f6ebdaf5786bc7221ae54291859a5308a0d12f11340b0e5d",
+      "row_identity": {
+        "Chip": "1",
+        "Channel": "2",
+        "Fitting#": "1"
+      },
+      "curves_fitted": 5,
+      "parameters_molar": {
+        "kon": 1812.098520356821,
+        "koff": 0.00011911969721158095,
+        "Kd": 6.573577312348616e-08
+      },
+      "concentrations_nM": [
+        221.70000000000002,
+        443.40000000000003,
+        886.8000000000001,
+        1774.0,
+        3547.0
+      ],
+      "sensorgram_pdf_url": "https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20T200/Titration%20Analysis_T200_Sensorgram_Example.pdf",
+      "sensorgram_pdf_sha256": "67554318c653a4a905c2398ede451525ad2a3b050584bf81fd2382e4a64f5764",
+      "sensorgram_pdf_page": 1
+    },
+    "source_concentration_entries_one_based": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "fitting_window_seconds": {
+      "association": [
+        0,
+        180
+      ],
+      "dissociation": [
+        180,
+        780
+      ]
+    },
+    "trim_time": 0
+  },
+  "carterra_rows": {
+    "file": "carterra_rows.csv",
+    "concentrations": [
+      0.0625,
+      0.125,
+      0.25,
+      0.5,
+      1.0
+    ],
+    "concentration_unit": "µM",
+    "molar_concentrations_verified": true,
+    "association_start": 120,
+    "association_end": 420,
+    "timing_verified": true,
+    "regenerated": false,
+    "bulk_shift": false,
+    "analyte": "AE.A244",
+    "ligand": "CH31 10µg/ml",
+    "protocol": "All 13 injections from Block 1/A1/ROI 1 imported as one sequence; source rows 2–14. Published comparison selects injections 9–13 (worksheet rows 10–14).",
+    "source_sheet_row": {
+      "Incl.": "Y",
+      "Block/Chip/Tray": "1,2,3,4",
+      "Position/Channel/Sensor": "A1",
+      "Analyte": "AE.A244",
+      "Ligand": "CH31 10µg/ml",
+      "Baseline": 120,
+      "Association": 300,
+      "Dissociation": 720,
+      "Asso. Skip": 0,
+      "Disso. Skip": 0,
+      "All Concentrations": "2.44E-10, 4.88E-10, 9.77E-10, 1.95E-09, 3.91E-09, 7.81E-09, 1.56E-08, 3.13E-08, 6.25E-08, 1.25E-07, 2.50E-07, 5.00E-07, 1.00E-06",
+      "Incl. Conc.": "6.25E-08, 1.25E-07, 2.50E-07, 5.00E-07, 1.00E-06",
+      "Bulkshift": "N",
+      "Regen.": "N",
+      "Bsl Start": 0,
+      "Base Corr": "Y",
+      "Global Rmax": "N"
+    },
+    "source_sha256": "6688322663cba3a0c4f55e83e1a0b4f9a7a75f8efff72494fa2717464049c7e2",
+    "sources": [
+      "https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20Carterra/Example%20Data%20Info%20Sheet%20-%20Carterra.xlsx"
+    ],
+    "literature_reference": {
+      "model": "1:1 Langmuir with local Rmax",
+      "paper_doi": "10.12688/gatesopenres.14743.2",
+      "source_url": "https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20Carterra/Titration%20Analysis_Carterra_Report_Example.csv",
+      "local_file": "metadata/Titration Analysis_Carterra_Report_Example.csv",
+      "source_sha256": "bd623cfc2f903ff0afbb3b844e624c2591a66a89ffd05dfc91073daca3b99cc3",
+      "row_identity": {
+        "Block": "1",
+        "Well": "A1",
+        "ROI": "1",
+        "Fitting#": "1"
+      },
+      "curves_fitted": 5,
+      "parameters_molar": {
+        "kon": 5161.17784918819,
+        "koff": 7.37342131097028e-05,
+        "Kd": 1.4286315113380675e-08
+      },
+      "concentrations_nM": [
+        62.5,
+        125.0,
+        250.0,
+        500.0,
+        1000.0
+      ],
+      "sensorgram_pdf_url": "https://github.com/DukeCHSI/TitrationAnalysis/blob/cb8112503658d24c4c6576503243fa506bf99e27/Example%20Files%20-%20Carterra/Titration%20Analysis_Carterra_Sensorgram_Example.pdf",
+      "sensorgram_pdf_sha256": "5d9b59d18d673245aa1fdd9a78f3b65205218ed3779290552bd746f36f047c79",
+      "sensorgram_pdf_page": 1
+    },
+    "source_concentration_entries_one_based": [
+      9,
+      10,
+      11,
+      12,
+      13
+    ],
+    "fitting_window_seconds": {
+      "association": [
+        120,
+        420
+      ],
+      "dissociation": [
+        420,
+        1140
+      ]
+    },
+    "trim_time": 0,
+    "cycle_concentrations": [
+      0.000244,
+      0.000488,
+      0.000977,
+      0.0019500000000000001,
+      0.00391,
+      0.00781,
+      0.015600000000000001,
+      0.0313,
+      0.0625,
+      0.125,
+      0.25,
+      0.5,
+      1.0
+    ],
+    "cycle_duration_seconds": 1140,
+    "cycle_duration_source": "Nominal Baseline + Association + Dissociation from the source sheet; reconstructed protocol clock, not an absolute injection log",
+    "cycle_clock_verified": false
+  }
+}
