@@ -50,16 +50,13 @@ __all__ = ["SprTextExperiment"]
 _AXIS = re.compile(r"^(.*?)_([XY])\s*$", re.IGNORECASE)
 
 
-def _paired_columns(file, decimal, encoding):
-    lines = text_lines(file, encoding)
-    start, delimiter, header = find_header(
-        lines,
-        lambda fields: len(fields) >= 2
-        and all(_AXIS.fullmatch(field) for field in fields),
-    )
+def curve_columns(header):
+    """Map each measured curve to its X and Y column index; raise if malformed."""
     pairs = {}
     for index, column in enumerate(header):
         match = _AXIS.fullmatch(column)
+        if not match:
+            raise ValueError(f"Not an X/Y curve header: {column!r}.")
         name, axis = match[1].strip(), match[2].upper()
         # Exported fitting curves are not experimental observations.
         if re.search(r"\bfitted\s+curve\b", name, flags=re.IGNORECASE):
@@ -67,12 +64,23 @@ def _paired_columns(file, decimal, encoding):
         if not name or axis in pairs.setdefault(name, {}):
             raise ValueError(f"Empty or duplicate X/Y curve header: {column!r}.")
         pairs[name][axis] = index
-    if not pairs:
-        raise ValueError("The export contains no measured sensorgrams.")
     if any(set(axes) != {"X", "Y"} for axes in pairs.values()):
         raise ValueError(
             "Each measured curve must have exactly one X and one Y column."
         )
+    return pairs
+
+
+def _paired_columns(file, decimal, encoding):
+    lines = text_lines(file, encoding)
+    start, delimiter, header = find_header(
+        lines,
+        lambda fields: len(fields) >= 2
+        and all(_AXIS.fullmatch(field) for field in fields),
+    )
+    pairs = curve_columns(header)
+    if not pairs:
+        raise ValueError("The export contains no measured sensorgrams.")
     rows = list(data_rows(lines, start + 1, delimiter, len(header)))
     columns = [index for axes in pairs.values() for index in axes.values()]
     decimal = detect_decimal((row[i] for row in rows for i in columns), decimal)

@@ -51,15 +51,19 @@ from .utils.sensorgram_text import (
 __all__ = ["CarterraExperiment"]
 
 
+def is_header(fields):
+    """Whether fields are exactly Label, X1, Y1, X2, Y2, ... ."""
+    return len(fields) >= 3 and fields == ["Label"] + [
+        f"{axis}{i}" for i in range(1, (len(fields) + 1) // 2) for axis in ("X", "Y")
+    ]
+
+
 def _carterra_rows(file, decimal, encoding):
     lines = text_lines(file, encoding)
     start, delimiter, header = find_header(
         lines, lambda fields: len(fields) >= 3 and fields[0] == "Label"
     )
-    expected = ["Label"] + [
-        f"{axis}{i}" for i in range(1, (len(header) + 1) // 2) for axis in ("X", "Y")
-    ]
-    if header != expected:
+    if not is_header(header):
         raise ValueError("Carterra headers must be Label, X1, Y1, X2, Y2, ... .")
     rows = list(data_rows(lines, start + 1, delimiter, len(header)))
     if not rows:
